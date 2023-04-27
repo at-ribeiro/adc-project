@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>200</title>
+</head>
+
+<body>
+<h1 id="header-username"></h1>
+<table>
+    <tr>
+        <td><a href='/login/loginMenu.html'>Now Login!</a></td>
+    </tr>
+</table>
+
+<script>
+    const headerUsername = document.getElementById("header-username");
+
+    const username = sessionStorage.getItem("username");
+
+    if (username) {
+        headerUsername.textContent = `${username} was registered successfully.`;
+    }
+</script>
+
+</body>
+</html>
