@@ -120,7 +120,7 @@ class _SignUpViewState extends State<SignUpView> {
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Text(
-            'Junta-te aos teus colegas!',
+            'Conecta-te aos teus colegas!',
             style: kLoginSubtitleStyle(size),
           ),
         ),

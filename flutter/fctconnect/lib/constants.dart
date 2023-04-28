@@ -22,7 +22,7 @@ TextStyle kLoginOrSignUpTextStyle(
     GoogleFonts.ubuntu(
       fontSize: size.height * 0.022,
       fontWeight: FontWeight.w500,
-      color: Colors.deepPurpleAccent,
+      color: Color.fromARGB(151, 0, 105, 253),
     );
 
 TextStyle kTextFormFieldStyle() => const TextStyle(color: Colors.black);

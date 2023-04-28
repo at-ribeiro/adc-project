@@ -146,7 +146,7 @@ class _LoginViewState extends State<LoginView> {
                   style: kTextFormFieldStyle(),
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
-                    hintText: 'Username or Gmail',
+                    hintText: 'Username',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
                     ),
@@ -284,7 +284,7 @@ class _LoginViewState extends State<LoginView> {
       height: 55,
       child: ElevatedButton(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Colors.deepPurpleAccent),
+          backgroundColor: MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
