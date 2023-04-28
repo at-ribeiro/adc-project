@@ -17,16 +17,20 @@ class SignUpView extends StatefulWidget {
 
 class _SignUpViewState extends State<SignUpView> {
   TextEditingController nameController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
+  TextEditingController passwordVerController = TextEditingController();
+ 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     nameController.dispose();
+    fullNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    passwordVerController.dispose();
     super.dispose();
   }
 
@@ -83,8 +87,9 @@ class _SignUpViewState extends State<SignUpView> {
   /// For Small screens
   Widget _buildSmallScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
-    return Center(
+    return SingleChildScrollView( child: Center(
       child: _buildMainBody(size, simpleUIController, theme),
+    ),
     );
   }
 
@@ -157,6 +162,33 @@ class _SignUpViewState extends State<SignUpView> {
                     return null;
                   },
                 ),
+
+                SizedBox(
+                  height: size.height * 0.02,
+                ),
+
+                
+                 TextFormField(
+                  style: kTextFormFieldStyle(),
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    hintText: 'Full Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                    ),
+                  ),
+
+                  controller: fullNameController,
+                  // The validator receives the text that the user has entered.
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter username';
+                    } else{
+                    return null;
+                    }
+                  },
+                ),
+
                 SizedBox(
                   height: size.height * 0.02,
                 ),
@@ -218,6 +250,44 @@ class _SignUpViewState extends State<SignUpView> {
                       } else if (value.length > 13) {
                         return 'maximum character is 13';
                       }
+                      return null;
+                    },
+                  ),
+                ),
+
+                SizedBox(
+                  height: size.height * 0.02,
+                ),
+
+                Obx(
+                  () => TextFormField(
+                    style: kTextFormFieldStyle(),
+                    controller: passwordVerController,
+                    obscureText: simpleUIController.isObscure.value,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock_open),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          simpleUIController.isObscure.value
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          simpleUIController.isObscureActive();
+                        },
+                      ),
+                      hintText: 'Password Verefication',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                    ),
+                    // The validator receives the text that the user has entered.
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      } else if (passwordVerController.text != passwordController.text) {
+                        return 'Passwords must match';
+                      } 
                       return null;
                     },
                   ),

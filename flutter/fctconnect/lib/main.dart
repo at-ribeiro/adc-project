@@ -9,10 +9,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  //? CodeWithFlexz on Instagram
-
-//* AmirBayat0 on Github
-//! Programming with Flexz on Youtube
 
   @override
   Widget build(BuildContext context) {
