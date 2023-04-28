@@ -128,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
         Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Text(
-            'Welcome Back Catchy',
+            'Bem vindo de volta!',
             style: kLoginSubtitleStyle(size),
           ),
         ),
@@ -287,7 +287,7 @@ class _LoginViewState extends State<LoginView> {
           backgroundColor: MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(50),
             ),
           ),
         ),

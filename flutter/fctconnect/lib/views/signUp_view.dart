@@ -284,7 +284,7 @@ class _SignUpViewState extends State<SignUpView> {
           backgroundColor: MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(50),
             ),
           ),
         ),
