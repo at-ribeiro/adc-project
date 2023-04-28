@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>Register Menu</title>
+</head>
+<body>
+<h1>Register Menu</h1>
+
+<form id="register-form">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+    <label for="passwordV">Verify Password:</label>
+    <input type="password" id="passwordV" name="passwordV">
+
+    <div style="margin-bottom: 20px;"></div>
+
+    <label for="fullname">Name:</label>
+    <input type="text" id="fullname" name="fullname">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email">
+    <label for="privacy">Privacy Type:</label>
+    <select id="privacy" name="privacy">
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+    </select>
+
+    <button type="submit">Register</button>
+
+</form>
+
+<script>
+    const form = document.getElementById("register-form");
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = form.elements.username.value;
+        const fullname = form.elements.fullname.value;
+        const password = form.elements.password.value;
+        const passwordV = form.elements.passwordV.value;
+        const email = form.elements.email.value;
+        const role = "USER";
+        const state = "INACTIVE";
+        const privacy = form.elements.privacy.value;
+
+        const user = { username, fullname, password , passwordV, email, role, state, privacy};
+
+        fetch("/rest/register/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(user)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    response.text().then(username => {
+                        sessionStorage.setItem('username', username);
+                        window.location.href = "/register/200.html";
+                    })
+                } else if (response.status === 400){
+                    window.location.href = "/register/400.html";
+                } else if (response.status === 409){
+                    window.location.href = "/register/409.html";
+                }
+            })
+            .catch(error => {
+                window.location.href = "/register/unknown.html";
+            });
+    });
+</script>
+</body>
+</html>
