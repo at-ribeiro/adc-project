@@ -2,56 +2,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
-  <title>Login Menu</title>
+  <title>Login</title>
+  <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-<h1>Login Menu</h1>
 
-<form id="login-form">
-  <label for="username">Username:</label>
-  <input type="text" id="username" name="username">
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password">
-  <button type="submit">Login</button>
-</form>
+<img id= logo src="https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/logo_nova_black.png" alt="Logo">
 
-<script>
-  const form = document.getElementById("login-form");
+<div class="container">
+  <h1 id="page-title">Login</h1>
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const username = form.elements.username.value;
-    const password = form.elements.password.value;
-    const user = { username, password };
+  <form id="login-form">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username"><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password"><br>
+    <button type="submit" id="login-button">Login</button>
+  </form>
+</div>
 
-    fetch("/rest/login/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(user)
-    })
-            .then(response => {
-              if (response.status === 200) {
-                response.json().then(token => {
-                  sessionStorage.setItem('token', JSON.stringify(token));
-                  window.location.href = "../mainMenu.html";
-                })
-              } else if (response.status === 403){
-                window.location.href = "/login/403.html";
-              }
-              else if (response.status === 404){
-                window.location.href = "/login/404.html";
-              }
-              else if (response.status === 500){
-                window.location.href = "/login/500.html";
-              }
-            })
-
-            .catch(error => {
-              window.location.href = "/login/unknown.html";
-            });
-  });
-</script>
+<footer>
+  Copyright: FCT NOVA 2023
+</footer>
 </body>
 </html>
