@@ -1,4 +1,4 @@
-#Wed May 03 13:58:27 WEST 2023
+#Wed May 03 15:07:11 WEST 2023
 base.0=/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/adc-project/flutter/fctconnect/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex
