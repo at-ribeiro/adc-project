@@ -52,11 +52,12 @@ public class LoginResource {
 
             if (hashedPWD.equals(DigestUtils.sha512Hex(data.getPassword()))) {
 
-                //return token
-
                 AuthToken token = new AuthToken(data.getUsername(), user.getString("user_role"));
 
-                Key tokenKey = datastore.newKeyFactory().addAncestors(PathElement.of("User", data.getUsername())).setKind("Token").newKey(token.getTokenID());
+                Key tokenKey = datastore.newKeyFactory()
+                        .setKind("Token")
+                        .addAncestor(PathElement.of("User", data.getUsername()))
+                        .newKey(DigestUtils.sha512Hex(token.getTokenID()));
 
                 Entity tokenEntity = Entity.newBuilder(tokenKey)
                         .set("token_id", DigestUtils.sha512Hex(token.getTokenID()))

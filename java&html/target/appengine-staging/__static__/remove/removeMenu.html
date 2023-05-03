@@ -20,8 +20,8 @@
         const username = form.elements.username.value;
         const tokenUsername = JSON.parse(sessionStorage.getItem("token")).username;
         const role = JSON.parse(sessionStorage.getItem("token")).role;
-        const expirationDate = JSON.parse(sessionStorage.getItem("token")).expirationDate;
-        const data = {username, tokenUsername, role, expirationDate}
+        const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenId;
+        const data = {username, tokenUsername, role, tokenId}
 
         fetch("/rest/remove/", {
             method: "DELETE",

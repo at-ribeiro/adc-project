@@ -47,7 +47,7 @@
     const username = JSON.parse(sessionStorage.getItem("token")).username;
     const tokenUser = JSON.parse(sessionStorage.getItem("token")).username;
     const tokenRole = JSON.parse(sessionStorage.getItem("token")).role;
-    const expiration = JSON.parse(sessionStorage.getItem("token")).expirationDate;
+    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenID;
     const fullname = form.elements.fullname.value;
     const email = form.elements.email.value;
     const privacy = form.elements.privacy.value;
@@ -59,7 +59,7 @@
     const role = "";
     const state = "";
 
-    const data = {username, tokenUser, tokenRole, expiration, fullname, email, privacy, homephone, mobilephone, occupation, address, nif, role, state}
+    const data = {username, tokenUser, tokenRole, tokenId, fullname, email, privacy, homephone, mobilephone, occupation, address, nif, role, state}
 
     fetch("/rest/update/user", {
       method: "PUT",

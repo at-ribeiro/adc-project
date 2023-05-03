@@ -38,7 +38,10 @@ public class RemoveResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", data.getTokenUsername()))
+                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
 
             Entity token = txn.get(tokenKey);
 

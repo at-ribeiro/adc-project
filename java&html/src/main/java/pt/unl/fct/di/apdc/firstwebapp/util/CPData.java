@@ -10,10 +10,10 @@ public class CPData {
 
     public CPData(){}
 
-    public CPData(String username, String tokenId, String password, String oldPassword, String passwordV){
+    public CPData(String username, String tokenId, String newPassword, String oldPassword, String passwordV){
         this.username = username;
         this.tokenId = tokenId;
-        this.newPassword = password;
+        this.newPassword = newPassword;
         this.oldPassword = oldPassword;
         this.passwordV = passwordV;
     }

@@ -28,10 +28,11 @@
     const username = form.elements.username.value;
     const role = JSON.parse(sessionStorage.getItem("token")).role;
     const tUser = JSON.parse(sessionStorage.getItem("token")).username;
-    const expiration = JSON.parse(sessionStorage.getItem("token")).expirationDate;
+    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenID;
 
 
-    fetch(`/rest/get/?username=${username}&tUser=${tUser}&role=${role}&expiration=${expiration}` , {
+
+    fetch(`/rest/get/?username=${username}&tUser=${tUser}&role=${role}&tokenID=${tokenId}` , {
       method: "GET",
       headers: {
         "Content-Type": "application/json"

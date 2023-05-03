@@ -15,11 +15,12 @@ public class ListData {
     public String getUsername(){
         return username;
     }
+
     public String getRole() {
         return role;
     }
+
     public String getTokenId() {
         return tokenId;
     }
-
 }

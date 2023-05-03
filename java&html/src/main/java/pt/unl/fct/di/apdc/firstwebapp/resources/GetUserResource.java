@@ -38,7 +38,10 @@ public class GetUserResource {
 
         try {
 
-            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(tokenId));
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(DigestUtils.sha512Hex(tokenId));
 
             Entity token = txn.get(tokenKey);
 

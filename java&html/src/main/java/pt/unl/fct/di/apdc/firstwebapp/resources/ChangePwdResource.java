@@ -42,7 +42,10 @@ public class ChangePwdResource {
             }
 
 
-            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
 
             Entity token = txn.get(tokenKey);
 

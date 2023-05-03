@@ -22,8 +22,6 @@ public class ListUsersResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-
-    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
     private final Gson g = new Gson();
     @POST
     @Path("/")
@@ -34,9 +32,16 @@ public class ListUsersResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+
+            LOG.warning(data.getTokenId());
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
 
             Entity token = txn.get(tokenKey);
+
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
@@ -72,10 +77,13 @@ public class ListUsersResource {
 
 
         } catch (Exception e) {
+            LOG.severe("Exception caught: " + e.getClass().getName());
+            e.printStackTrace();
             txn.rollback();
             LOG.severe(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
+
             if (txn.isActive()) {
                 txn.rollback();
             }
