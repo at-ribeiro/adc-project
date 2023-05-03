@@ -3,10 +3,17 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:responsive_login_ui/models/register_user.dart';
 
 import '../views/login_view.dart';
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
+import '../models/register_user.dart';
+import '../services/base_client.dart';
+
+const List<String> privacy = ["private", "public"];
+
+const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({Key? key}) : super(key: key);
@@ -21,7 +28,8 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
- 
+  TextEditingController privacyController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -31,6 +39,7 @@ class _SignUpViewState extends State<SignUpView> {
     emailController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
+    privacyController.dispose();
     super.dispose();
   }
 
@@ -68,7 +77,7 @@ class _SignUpViewState extends State<SignUpView> {
           child: RotatedBox(
             quarterTurns: 3,
             child: Lottie.asset(
-              'assets/coin.json',
+              'assets/wave.json',
               height: size.height * 0.3,
               width: double.infinity,
               fit: BoxFit.fill,
@@ -87,9 +96,10 @@ class _SignUpViewState extends State<SignUpView> {
   /// For Small screens
   Widget _buildSmallScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
-    return SingleChildScrollView( child: Center(
-      child: _buildMainBody(size, simpleUIController, theme),
-    ),
+    return SingleChildScrollView(
+      child: Center(
+        child: _buildMainBody(size, simpleUIController, theme),
+      ),
     );
   }
 
@@ -167,8 +177,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: size.height * 0.02,
                 ),
 
-                
-                 TextFormField(
+                TextFormField(
                   style: kTextFormFieldStyle(),
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
@@ -183,8 +192,8 @@ class _SignUpViewState extends State<SignUpView> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter username';
-                    } else{
-                    return null;
+                    } else {
+                      return null;
                     }
                   },
                 ),
@@ -245,7 +254,7 @@ class _SignUpViewState extends State<SignUpView> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
-                      } else if (value.length < 7) {
+                      } else if (value.length < 6) {
                         return 'at least enter 6 characters';
                       } else if (value.length > 13) {
                         return 'maximum character is 13';
@@ -276,7 +285,7 @@ class _SignUpViewState extends State<SignUpView> {
                           simpleUIController.isObscureActive();
                         },
                       ),
-                      hintText: 'Password Verefication',
+                      hintText: 'Password Verification',
                       border: const OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -285,13 +294,15 @@ class _SignUpViewState extends State<SignUpView> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
-                      } else if (passwordVerController.text != passwordController.text) {
+                      } else if (passwordVerController.text !=
+                          passwordController.text) {
                         return 'Passwords must match';
-                      } 
+                      }
                       return null;
                     },
                   ),
                 ),
+
                 SizedBox(
                   height: size.height * 0.01,
                 ),
@@ -351,17 +362,32 @@ class _SignUpViewState extends State<SignUpView> {
       height: 55,
       child: ElevatedButton(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
+          backgroundColor:
+              MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
             // ... Navigate To your Home Page
+            var user = RegisterUser(
+                username: nameController.text,
+                fullname: fullNameController.text,
+                password: passwordController.text,
+                passwordV: passwordVerController.text,
+                email: emailController.text
+                );
+            
+                var response = await BaseClient().post("/register", user).catchError((err){});
+                if (response == null)
+                return;
+
+                print('Succesfull');
+          
           }
         },
         child: const Text('Sign up'),

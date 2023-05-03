@@ -62,7 +62,7 @@ class _LoginViewState extends State<LoginView> {
           child: RotatedBox(
             quarterTurns: 3,
             child: Lottie.asset(
-              'assets/coin.json',
+              'assets/wave.json',
               height: size.height * 0.3,
               width: double.infinity,
               fit: BoxFit.fill,
