@@ -1,18 +1,18 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class CPData {
 
     private String username;
-    private long expiration;
+    private String tokenId;
     private String newPassword;
     private String oldPassword;
     private String passwordV;
 
     public CPData(){}
 
-    public CPData(String username, long expiration, String password, String oldPassword, String passwordV){
+    public CPData(String username, String tokenId, String password, String oldPassword, String passwordV){
         this.username = username;
-        this.expiration = expiration;
+        this.tokenId = tokenId;
         this.newPassword = password;
         this.oldPassword = oldPassword;
         this.passwordV = passwordV;
@@ -38,7 +38,7 @@ public class CPData {
        return passwordV.equals(oldPassword);
     }
 
-    public long getExpiration() {
-        return expiration;
+    public String getTokenId() {
+        return tokenId;
     }
 }

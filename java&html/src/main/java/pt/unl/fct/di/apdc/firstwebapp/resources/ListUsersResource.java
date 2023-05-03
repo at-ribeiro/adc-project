@@ -1,10 +1,11 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.ListData;
-import pt.unl.fct.di.apdc.firstwebapp.util.UserData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.ListData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.UserData;
+import org.apache.commons.codec.digest.DigestUtils;
 
 
 import javax.ws.rs.*;
@@ -21,6 +22,8 @@ public class ListUsersResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
     private final Gson g = new Gson();
     @POST
     @Path("/")
@@ -31,14 +34,17 @@ public class ListUsersResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            AuthToken token = new AuthToken(data.getUsername(), data.getRole());
-            if (token.expired(data.getExpirationDate())) {
+            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+
+            Entity token = txn.get(tokenKey);
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            Key tokenKey = userKeyFactory.newKey(data.getUsername());
-            if(txn.get(tokenKey).getString("user_state").equals("INACTIVE")){
+            Key userKey = userKeyFactory.newKey(data.getUsername());
+            if(txn.get(userKey).getString("user_state").equals("INACTIVE")){
                 LOG.warning("User " + data.getUsername() + " is inactive");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }

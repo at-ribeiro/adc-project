@@ -1,8 +1,9 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,6 +18,9 @@ public class UpdateResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+
     @PUT
     @Path("/admin")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -34,15 +38,19 @@ public class UpdateResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            AuthToken token = new AuthToken("", "");
-            if (token.expired(data.getExpiration())) {
+            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+
+            Entity token = txn.get(tokenKey);
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            Key tokenKey = userKeyFactory.newKey(data.getTokenUser());
-            Entity tokenUser = txn.get(tokenKey);
-            if (tokenUser.getString("user_state").equals("INACTIVE")){
+
+            Key updaterKey = userKeyFactory.newKey(data.getTokenUser());
+            Entity updater = txn.get(updaterKey);
+            if (updater.getString("user_state").equals("INACTIVE")){
                 LOG.warning("Inactive User.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -163,15 +171,18 @@ public class UpdateResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            AuthToken token = new AuthToken("", "");
-            if (token.expired(data.getExpiration())) {
+            Key tokenKey = tokenKeyFactory.newKey(DigestUtils.sha512Hex(data.getTokenId()));
+
+            Entity token = txn.get(tokenKey);
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            Key tokenKey = userKeyFactory.newKey(data.getTokenUser());
-            Entity tokenUser = txn.get(tokenKey);
-            if (tokenUser.getString("user_state").equals("INACTIVE")){
+            Key updaterKey = userKeyFactory.newKey(data.getTokenUser());
+            Entity updater = txn.get(updaterKey);
+            if (updater.getString("user_state").equals("INACTIVE")){
                 LOG.warning("Inactive User.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }

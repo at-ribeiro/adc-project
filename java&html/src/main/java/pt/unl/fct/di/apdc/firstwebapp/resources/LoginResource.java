@@ -1,10 +1,9 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
-import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.LoginData;
 
 
 import javax.ws.rs.Consumes;
@@ -56,6 +55,20 @@ public class LoginResource {
                 //return token
 
                 AuthToken token = new AuthToken(data.getUsername(), user.getString("user_role"));
+
+                Key tokenKey = datastore.newKeyFactory().addAncestors(PathElement.of("User", data.getUsername())).setKind("Token").newKey(token.getTokenID());
+
+                Entity tokenEntity = Entity.newBuilder(tokenKey)
+                        .set("token_id", DigestUtils.sha512Hex(token.getTokenID()))
+                        .set("token_username", token.getUsername())
+                        .set("token_role", token.getRole())
+                        .set("token_creation", token.creationData())
+                        .set("token_expiration", token.expirationData())
+                        .build();
+
+                txn.add(tokenEntity);
+                txn.commit();
+
                 LOG.info("User '" + data.getUsername() + "' logged in successfully.");
                 return Response.ok(g.toJson(token)).build();
 
