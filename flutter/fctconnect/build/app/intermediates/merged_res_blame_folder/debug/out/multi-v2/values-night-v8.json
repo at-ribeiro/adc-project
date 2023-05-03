@@ -4,7 +4,7 @@
             "outputFile": "com.example.fctconnect.app-mergeDebugResources-9:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/fctconnect/android/app/src/main/res/values-night/styles.xml",
+                    "source": "/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/adc-project/flutter/fctconnect/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

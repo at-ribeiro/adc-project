@@ -105,9 +105,9 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/http-0.13.5",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/http-0.13.6",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "2.19"
     },
     {
       "name": "http_parser",
@@ -290,7 +290,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-04-28T13:19:31.520147Z",
+  "generated": "2023-05-03T10:03:05.530126Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }
