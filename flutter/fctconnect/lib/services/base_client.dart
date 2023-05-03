@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http; 
 
 
-const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
+const String baseUrl = 'http://fct-connect-2023.oa.r.appspot.com/rest';
 
 
 class BaseClient{
@@ -27,14 +27,18 @@ var client = http.Client();
 
   Future<dynamic> post(String api, dynamic object) async{
     var _body = json.encode(object);
-    
+
+    var _headers ={
+            "Content-Type": "application/json"
+        };
     var uri = Uri.parse(baseUrl + api);
 
-    var response = await client.post(uri, body: _body);
+    var response = await client.post(uri, body: _body, headers: _headers);
     if (response.statusCode == 201 || response.statusCode == 200){
       return response.body;
     }else{
       //throw exception
+      return response.body;
     }
   }
 
