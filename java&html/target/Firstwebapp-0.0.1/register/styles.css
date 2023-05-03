@@ -9,6 +9,7 @@ body {
 }
 
 .container {
+    position: relative;
     box-shadow: 0 0 5px #888;
     border-radius: 5px;
     padding: 5px 40px;
@@ -19,8 +20,8 @@ body {
 #logo {
     width: 350px;
     height: auto;
-    margin-top: -250px;
     margin-left: -1050px;
+
 }
 
 /* Title */
@@ -31,7 +32,7 @@ body {
 }
 
 /* Form */
-#login-form {
+#register-form {
     margin-bottom: 30px;
 }
 
@@ -46,12 +47,19 @@ input {
     box-shadow: 0 0 5px #888;
 }
 
-label[for="username"], label[for="password"] {
+label[for="username"], label[for="password"],label[for="passwordV"], label[for="fullname"],
+label[for="email"], label[for="privacy"]{
     font-size: 16px;
     font-family: 'Raleway', sans-serif;
 }
 
-#login-button {
+select{
+    margin-top: 10px;
+    font-size: 16px;
+    font-family: 'Raleway', sans-serif;
+}
+
+#register-button {
     font-family: 'Raleway', sans-serif;
     background-color: #4880fa;
     color: white;
@@ -65,7 +73,7 @@ label[for="username"], label[for="password"] {
     margin-top: 20px;
 }
 
-#login-button:hover {
+#register-button:hover {
     background-color: lightskyblue;
 }
 
@@ -81,3 +89,4 @@ footer {
     text-align: center;
     line-height: 30px;
 }
+
