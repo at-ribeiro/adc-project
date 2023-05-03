@@ -24,12 +24,12 @@
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const username = JSON.parse(sessionStorage.getItem("token")).username;
-    const expiration = JSON.parse(sessionStorage.getItem("token")).expirationDate;
+    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenID;
     const oldPassword = form.elements.password.value;
     const passwordV = form.elements.passwordV.value;
     const newPassword = form.elements.newPassword.value;
 
-    const data = {username, expiration, newPassword, oldPassword, passwordV};
+    const data = {username, tokenId, newPassword, oldPassword, passwordV};
 
     fetch("/rest/changepwd/", {
       method: "PUT",

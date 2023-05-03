@@ -1,18 +1,18 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class RemoveData {
     private String username;
     private String tokenUsername;
     private String role;
-    private long expirationDate;
+    private String tokenId;
 
     public RemoveData(){}
 
-    public RemoveData(String username, String tokenUsername, String role, long expirationDate){
+    public RemoveData(String username, String tokenUsername, String role, String tokenId){
         this.username = username;
         this.tokenUsername = tokenUsername;
         this.role = role;
-        this.expirationDate = expirationDate;
+        this.tokenId = tokenId;
     }
 
     public String getUsername(){
@@ -27,5 +27,7 @@ public class RemoveData {
         return role;
     }
 
-    public long getExpirationDate() {return expirationDate;}
+    public String getTokenId() {
+        return tokenId;
+    }
 }

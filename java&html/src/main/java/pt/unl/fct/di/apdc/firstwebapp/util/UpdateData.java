@@ -1,11 +1,11 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class UpdateData {
 
     private String username;
     private String tokenUser;
     private String tokenRole;
-    private long expiration;
+    private String tokenId;
     private String fullname;
     private String email;
     private String privacy;
@@ -19,12 +19,12 @@ public class UpdateData {
 
     public UpdateData(){}
 
-    public UpdateData(String username, String tokenUser, String tokenRole, long expiration, String fullname, String email, String privacy, String homephone,
+    public UpdateData(String username, String tokenUser, String tokenRole, String tokenId, String fullname, String email, String privacy, String homephone,
                       String mobilephone, String occupation, String address, String nif, String role, String state){
         this.username = username;
         this.tokenUser = tokenUser;
         this.tokenRole = tokenRole;
-        this.expiration = expiration;
+        this.tokenId = tokenId;
         this.fullname = fullname;
         this.email = email;
         this.privacy = privacy;
@@ -89,7 +89,7 @@ public class UpdateData {
         return tokenUser;
     }
 
-    public long getExpiration() {
-        return expiration;
+    public String getTokenId() {
+        return tokenId;
     }
 }

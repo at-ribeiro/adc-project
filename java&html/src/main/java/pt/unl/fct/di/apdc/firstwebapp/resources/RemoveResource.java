@@ -1,14 +1,11 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.RemoveData;
 import org.apache.commons.codec.digest.DigestUtils;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.RemoveData;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
@@ -22,6 +19,8 @@ public class RemoveResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+
 
     @DELETE
     @Path("/")
@@ -39,14 +38,20 @@ public class RemoveResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            AuthToken token = new AuthToken(data.getTokenUsername(), data.getRole());
-            if(token.expired(data.getExpirationDate())){
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", data.getTokenUsername()))
+                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
+
+            Entity token = txn.get(tokenKey);
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            Key tokenKey = userKeyFactory.newKey(data.getTokenUsername());
-            if(txn.get(tokenKey).getString("user_state").equals("INACTIVE")){
+            Key removerKey = userKeyFactory.newKey(data.getTokenUsername());
+            if(txn.get(removerKey).getString("user_state").equals("INACTIVE")){
                 LOG.warning("User " + data.getTokenUsername() + " is inactive");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }

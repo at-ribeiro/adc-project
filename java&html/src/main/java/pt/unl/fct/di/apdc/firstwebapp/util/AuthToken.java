@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 import java.util.UUID;
 
 public class AuthToken {
@@ -35,11 +35,8 @@ public class AuthToken {
         return expirationDate;
     }
 
-    public boolean expired(long expirationDate){
-        if(System.currentTimeMillis() > expirationDate)
-            return true;
-        else
-            return false;
+    public static boolean expired(long expirationDate){
+        return System.currentTimeMillis() > expirationDate;
     }
 
 
