@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>Remove Menu</title>
+</head>
+<body>
+<h1>Remove Menu</h1>
+
+<form id="remove-form">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+    <button type="submit">Delete</button>
+</form>
+<script>
+    const form = document.getElementById("remove-form");
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = form.elements.username.value;
+        const tokenUsername = JSON.parse(sessionStorage.getItem("token")).username;
+        const role = JSON.parse(sessionStorage.getItem("token")).role;
+        const expirationDate = JSON.parse(sessionStorage.getItem("token")).expirationDate;
+        const data = {username, tokenUsername, role, expirationDate}
+
+        fetch("/rest/remove/", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    response.text().then(username => {
+                        sessionStorage.setItem('username', username);
+                        if(username === tokenUsername) {
+                            sessionStorage.removeItem('token');
+                            window.location.href = "/remove/self200.html";
+                        }
+                        else
+                            window.location.href = "/remove/200.html";
+                    })
+                } else {
+                    window.location.href = response.statusText;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                window.location.href = "/remove/unknown.html";
+            });
+    });
+
+</script>
+</body>
+</html>

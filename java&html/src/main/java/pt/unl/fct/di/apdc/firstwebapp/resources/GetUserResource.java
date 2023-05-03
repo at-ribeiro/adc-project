@@ -66,7 +66,7 @@ public class GetUserResource {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            UpdateData data = new UpdateData(username, "", "",  user.getString("user_fullname"), user.getString("user_email"),
+            UpdateData data = new UpdateData(username, "", "", "", user.getString("user_fullname"), user.getString("user_email"),
                     user.getString("user_privacy"), user.getString("user_homephone"), user.getString("user_mobilephone"), user.getString("user_occupation"),
                     user.getString("user_address"), user.getString("user_nif"), user.getString("user_role"), user.getString("user_state"));
 

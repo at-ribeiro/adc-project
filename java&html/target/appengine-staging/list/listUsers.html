@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+    <title>List Users</title>
+</head>
+
+<body>
+
+
+<table>
+    <tr>
+        <td><a href='../mainMenu.html'>Back to Main Menu</a></td>
+    </tr>
+    <tr>
+        <td>
+            <form id="form">
+                <button type="submit">List Users</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<ul id="user-list"></ul>
+
+<script>
+    const form = document.getElementById("form");
+    const userList =document.getElementById("user-list")
+
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = JSON.parse(sessionStorage.getItem("token")).username;
+        const role = JSON.parse(sessionStorage.getItem("token")).role;
+        const expirationDate = JSON.parse(sessionStorage.getItem("token")).expirationDate;
+        const data = {username, role, expirationDate}
+
+        fetch("/rest/list/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    response.json().then(users => {
+                        userList.innerHTML = "";
+                        users.forEach(user =>{
+                            const li = document.createElement('li');
+                            if(user.role == null) //case USER
+                                li.textContent = `username: ${user.username} | email: ${user.email} | name: ${user.fullname} `;
+                            else //case GBO/GS etc
+                                li.textContent= `username: ${user.username} | email: ${user.email} | name: ${user.fullname} | role: ${user.role} | privacy: ${user.privacy} | state: ${user.state} | creation: ${user.creationTime}`;
+                            userList.appendChild(li);
+                        })
+                    })
+                } else if (response.status === 401) {
+                    window.location.href = "../login/loginMenu.html";
+                } else if (response.status === 500){
+                    window.location.href = response.statusText
+                }
+            })
+    })
+
+</script>
+
+</body>
+</html>

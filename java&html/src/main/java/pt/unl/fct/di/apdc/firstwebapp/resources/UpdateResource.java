@@ -55,6 +55,12 @@ public class UpdateResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
+            Entity tokenUser = txn.get(userKeyFactory.newKey(data.getTokenUser()));
+
+            if (!data.getTokenRole().equals(tokenUser.getString("user_role"))){
+                LOG.warning("Token role does not correspond current user role");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
 
             String fullname = data.getFullname();
             if(fullname.equals(""))
@@ -184,6 +190,13 @@ public class UpdateResource {
             Entity updater = txn.get(updaterKey);
             if (updater.getString("user_state").equals("INACTIVE")){
                 LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Entity tokenUser = txn.get(userKeyFactory.newKey(data.getTokenUser()));
+
+            if (!data.getTokenRole().equals(tokenUser.getString("user_role"))){
+                LOG.warning("Token role does not correspond current user role");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 

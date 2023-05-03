@@ -19,7 +19,7 @@ public class UpdateData {
 
     public UpdateData(){}
 
-    public UpdateData(String username, String tokenUser, String tokenRole, String fullname, String email, String privacy, String homephone,
+    public UpdateData(String username, String tokenUser, String tokenRole, String tokenId, String fullname, String email, String privacy, String homephone,
                       String mobilephone, String occupation, String address, String nif, String role, String state){
         this.username = username;
         this.tokenUser = tokenUser;
