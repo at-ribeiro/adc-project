@@ -24,7 +24,7 @@
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const username = JSON.parse(sessionStorage.getItem("token")).username;
-    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenId;
+    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenID;
     const oldPassword = form.elements.password.value;
     const passwordV = form.elements.passwordV.value;
     const newPassword = form.elements.newPassword.value;

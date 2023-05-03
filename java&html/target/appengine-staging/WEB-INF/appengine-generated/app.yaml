@@ -5,7 +5,7 @@ inbound_services:
 - warmup
 auto_id_policy: default
 beta_settings:
-  'source_reference': 'https://github.com/at-ribeiro/adc-project.git#035d3321fb6f2ed48165faf40fb4d6babcf77f9b'
+  'source_reference': 'https://github.com/at-ribeiro/adc-project.git#c10107a9db2172af4232f8313eda8b39238e1143'
 handlers:
 - url: (/.*/)
   static_files: __static__\1index.html
