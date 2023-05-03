@@ -1,9 +1,10 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.ws.rs.Consumes;
 
@@ -23,18 +24,28 @@ public class GetUserResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+
     private final Gson g = new Gson();
 
     @GET
     @Path("/")
-    public Response getUser(@QueryParam("username")String username,@QueryParam("tUser") String tUser,@QueryParam("role")String role, @QueryParam("expiration")Long expiration) {
+    public Response getUser(@QueryParam("username")String username,@QueryParam("tUser") String tUser,@QueryParam("role")String role, @QueryParam("tokenId")String tokenId) {
         LOG.fine("Attempt to get user " + username);
 
         Transaction txn = datastore.newTransaction();
 
         try {
-            AuthToken token = new AuthToken("", role);
-            if (token.expired(expiration)) {
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(DigestUtils.sha512Hex(tokenId));
+
+            Entity token = txn.get(tokenKey);
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -58,7 +69,7 @@ public class GetUserResource {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            UpdateData data = new UpdateData(username, "", "", 0,  user.getString("user_fullname"), user.getString("user_email"),
+            UpdateData data = new UpdateData(username, "", "", "", user.getString("user_fullname"), user.getString("user_email"),
                     user.getString("user_privacy"), user.getString("user_homephone"), user.getString("user_mobilephone"), user.getString("user_occupation"),
                     user.getString("user_address"), user.getString("user_nif"), user.getString("user_role"), user.getString("user_state"));
 

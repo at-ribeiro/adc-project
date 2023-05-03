@@ -1,25 +1,26 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class ListData {
     private String username;
     private String role;
-    private long expirationDate;
+    private String tokenId;
     public ListData(){}
 
-    public ListData(String username, String role, long expirationDate){
+    public ListData(String username, String role, String tokenId){
         this.username = username;
         this.role = role;
-        this.expirationDate = expirationDate;
+        this.tokenId = tokenId;
     }
 
     public String getUsername(){
         return username;
     }
+
     public String getRole() {
         return role;
     }
-    public long getExpirationDate() {
-        return expirationDate;
-    }
 
+    public String getTokenId() {
+        return tokenId;
+    }
 }
