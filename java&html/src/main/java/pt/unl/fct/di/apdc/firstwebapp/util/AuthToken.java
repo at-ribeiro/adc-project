@@ -9,6 +9,8 @@ public class AuthToken {
     private long creationDate;
     private long expirationDate;
 
+
+    //for new AuthTokens
     public AuthToken(String username, String role) {
         this.username = username;
         this.role = role;
@@ -16,6 +18,8 @@ public class AuthToken {
         this.creationDate = System.currentTimeMillis();
         this.expirationDate = this.creationDate + AuthToken.EXPIRATION_TIME;
     }
+
+    //for prev established tokens
 
     public String getUsername(){
         return username;

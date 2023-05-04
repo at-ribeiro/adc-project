@@ -38,10 +38,14 @@ public class ListUsersResource {
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
                     .addAncestor(PathElement.of("User", data.getUsername()))
-                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
+                    .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
+            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");

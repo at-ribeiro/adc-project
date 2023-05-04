@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.logging.Logger;
 import com.google.gson.Gson;
 
@@ -57,7 +58,7 @@ public class LoginResource {
                 Key tokenKey = datastore.newKeyFactory()
                         .setKind("Token")
                         .addAncestor(PathElement.of("User", data.getUsername()))
-                        .newKey(DigestUtils.sha512Hex(token.getTokenID()));
+                        .newKey("token");
 
                 Entity tokenEntity = Entity.newBuilder(tokenKey)
                         .set("token_id", DigestUtils.sha512Hex(token.getTokenID()))
@@ -67,13 +68,17 @@ public class LoginResource {
                         .set("token_expiration", token.expirationData())
                         .build();
 
-                txn.add(tokenEntity);
+                if(txn.get(tokenKey) == null)
+                    txn.add(tokenEntity);
+                else
+                    txn.update(tokenEntity);
+
                 txn.commit();
 
                 LOG.info("User '" + data.getUsername() + "' logged in successfully.");
                 return Response.ok(g.toJson(token)).build();
 
-            } else {
+            }else {
                 //Incorrect password
                 LOG.warning("Wrong password for username: " + data.getUsername());
                 return Response.status(Response.Status.FORBIDDEN).build();
