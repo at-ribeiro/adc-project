@@ -41,10 +41,14 @@ public class GetUserResource {
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
                     .addAncestor(PathElement.of("User", username))
-                    .newKey(DigestUtils.sha512Hex(tokenId));
+                    .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
+            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();

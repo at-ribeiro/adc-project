@@ -57,7 +57,7 @@ public class RegisterResource {
                 txn.add(user);
                 LOG.info("User registered" + data.getUsername());
                 txn.commit();
-                return Response.ok(data.getUsername()).build();
+                return Response.ok(data.getUsername()).header("Access-Control-Allow_Origin", "*").build();
             }
         }finally {
             if(txn.isActive()){

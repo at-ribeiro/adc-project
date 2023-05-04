@@ -40,10 +40,15 @@ public class RemoveResource {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", data.getTokenUsername()))
-                    .newKey(DigestUtils.sha512Hex(data.getTokenId()));
+                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .newKey("token");
 
             Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
