@@ -374,25 +374,24 @@ class _SignUpViewState extends State<SignUpView> {
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
             // ... Navigate To your Home Page
-            var user = RegisterUser(
-                username: nameController.text,
-                fullname: fullNameController.text,
-                password: passwordController.text,
-                passwordV: passwordVerController.text,
-                email: emailController.text,
-                role: "USER",
-                state: "ACTIVE",
-                privacy: "PRIVATE"
-                );
-            
-                var response = await BaseClient().post("/register/", user.toJson()).catchError((err){});
-                if (response == null)
-                return;
-                else return response.printError();
-                print('Succesfull');
-          
-          }
-        },
+            var _body = {
+              "username": nameController.text,
+              "fullname": fullNameController.text,
+              "password": passwordController.text,
+              "passwordV": passwordVerController.text,
+              "email": emailController.text,
+              "role": "USER",
+              "state": "ACTIVE",
+              "privacy": "PRIVATE",
+              };
+
+            var response = BaseClient().post("/register/", _body);
+            if(response == null);
+
+           print("success");
+
+            }
+          },
         child: const Text('Sign up'),
       ),
     );

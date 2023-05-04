@@ -33,7 +33,7 @@ var client = http.Client();
         };
     var url = Uri.parse(baseUrl + api);
 
-    var response = await http.post(url, headers: _headers, body: _body);
+    var response = await http.post(url, headers: _headers, body: jsonEncode(_body));
     if (response.statusCode == 201 || response.statusCode == 200){
       return response.body;
     }else{
