@@ -380,13 +380,15 @@ class _SignUpViewState extends State<SignUpView> {
                 password: passwordController.text,
                 passwordV: passwordVerController.text,
                 email: emailController.text,
-                privacy: "pivate"
+                role: "USER",
+                state: "ACTIVE",
+                privacy: "PRIVATE"
                 );
             
                 var response = await BaseClient().post("/register/", user.toJson()).catchError((err){});
                 if (response == null)
                 return;
-
+                else return response.printError();
                 print('Succesfull');
           
           }

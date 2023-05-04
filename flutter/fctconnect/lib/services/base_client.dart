@@ -29,11 +29,11 @@ var client = http.Client();
     var _body = object;
 
     var _headers ={
-            "Content-Type": "application/json"
+      "Content-Type": "application/json; charset=UTF-8"
         };
     var url = Uri.parse(baseUrl + api);
 
-    var response = await http.post(url,headers: _headers, body: _body);
+    var response = await http.post(url, headers: _headers, body: _body);
     if (response.statusCode == 201 || response.statusCode == 200){
       return response.body;
     }else{
