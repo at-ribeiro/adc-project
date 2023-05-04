@@ -324,7 +324,7 @@ class _SignUpViewState extends State<SignUpView> {
                 /// Navigate To Login Screen
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                         context,
                         CupertinoPageRoute(
                             builder: (ctx) => const LoginView()));
