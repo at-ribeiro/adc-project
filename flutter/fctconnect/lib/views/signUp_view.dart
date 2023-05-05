@@ -388,6 +388,15 @@ class _SignUpViewState extends State<SignUpView> {
             var response = BaseClient().post("/register/", _body);
             if(response == null);
 
+            Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                    builder: (ctx) => const LoginView()));
+            nameController.clear();
+            emailController.clear();
+            passwordController.clear();
+            _formKey.currentState?.reset();
+
            print("success");
 
             }
