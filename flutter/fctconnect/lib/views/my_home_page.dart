@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
                 decoration: const InputDecoration(
-                  hintText: 'O que se passa na FCT?',
+                  hintText: 'O que se passa na FC?',
                   border: OutlineInputBorder(),
                 ),
                 minLines: 5,
