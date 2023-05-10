@@ -33,6 +33,7 @@ public class LogoutResource {
             if (token != null) {
 
                 txn.delete(tokenKey);
+                txn.commit();
 
                 return Response.ok().build();
 
