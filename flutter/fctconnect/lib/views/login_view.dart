@@ -1,10 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:responsive_login_ui/views/signUp_view.dart';
 
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
+import '../services/base_client.dart';
+import 'my_home_page.dart';
+
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -156,10 +161,7 @@ class _LoginViewState extends State<LoginView> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter username';
-                    } else if (value.length < 4) {
-                      return 'at least enter 4 characters';
-                    } else if (value.length > 13) {
-                      return 'maximum character is 13';
+                  
                     }
                     return null;
                   },
@@ -217,10 +219,7 @@ class _LoginViewState extends State<LoginView> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
-                      } else if (value.length < 7) {
-                        return 'at least enter 6 characters';
-                      } else if (value.length > 13) {
-                        return 'maximum character is 13';
+                    
                       }
                       return null;
                     },
@@ -247,7 +246,10 @@ class _LoginViewState extends State<LoginView> {
                 /// Navigate To Login Screen
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (ctx) => const SignUpView()));
                     nameController.clear();
                     emailController.clear();
                     passwordController.clear();
@@ -291,10 +293,28 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
         ),
-        onPressed: () {
+        onPressed:  () async {
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
             // ... Navigate To your Home Page
+            var _body = {
+              "username": nameController.text,
+              "password": passwordController.text,
+            };
+            //TODO guardar o token, redirecionar para o feed
+            var response = BaseClient().postLogin("/login/", _body);
+            if(response != null){
+              print(response);
+              Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                    builder: (ctx) => MyHomePage(
+                        token: response
+                    )
+                ),
+              );
+            }
+
           }
         },
         child: const Text('Login'),

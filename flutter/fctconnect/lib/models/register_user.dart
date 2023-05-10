@@ -14,6 +14,8 @@ class RegisterUser {
     String password;
     String passwordV;
     String email;
+    String role;
+    String state;
     String privacy;
 
     RegisterUser({
@@ -22,6 +24,8 @@ class RegisterUser {
         required this.password,
         required this.passwordV,
         required this.email,
+        required this.role,
+        required this.state,
         required this.privacy,
     });
 
@@ -31,6 +35,8 @@ class RegisterUser {
         password: json["password"],
         passwordV: json["passwordV"],
         email: json["email"],
+        role: json["role"],
+        state: json["state"],
         privacy: json["privacy"],
     );
 
@@ -40,6 +46,8 @@ class RegisterUser {
         "password": password,
         "passwordV": passwordV,
         "email": email,
+        "role": role,
+        "state": state,
         "privacy": privacy,
     };
 }

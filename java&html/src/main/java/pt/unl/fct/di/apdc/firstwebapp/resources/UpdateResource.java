@@ -19,8 +19,6 @@ public class UpdateResource {
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
-    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
-
     @PUT
     @Path("/admin")
     @Consumes(MediaType.APPLICATION_JSON)

@@ -6,6 +6,7 @@ main\java\pt\unl\fct\di\apdc\firstwebapp\resources\RegisterResource.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\util\RemoveData.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\resources\RemoveResource.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\resources\ChangePwdResource.class
+main\java\pt\unl\fct\di\apdc\firstwebapp\resources\LogoutResource.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\util\ListData.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\util\AuthToken.class
 main\java\pt\unl\fct\di\apdc\firstwebapp\util\CPData.class
