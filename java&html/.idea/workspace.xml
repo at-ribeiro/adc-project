@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/LogoutResource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/LoginResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/LoginResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +37,11 @@
         <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="workspaceImportEnabled" value="true" />
+      </MavenImportingSettings>
+    </option>
   </component>
   <component name="ProjectId" id="2P3Gfr9UfQJqVWDr4vEooFKMH4j" />
   <component name="ProjectViewState">
@@ -49,11 +53,15 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "jdk.selected.JAVA_MODULE": "11",
     "last_opened_file_path": "C:/Users/geekg/Desktop/ADC/FCT CONNECT/adc-project/java&html",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -67,6 +75,8 @@
       <updated>1682678471071</updated>
       <workItem from="1682678474296" duration="6072000" />
       <workItem from="1683709973017" duration="1111000" />
+      <workItem from="1683731165662" duration="55000" />
+      <workItem from="1683731234389" duration="705000" />
     </task>
     <servers />
   </component>
