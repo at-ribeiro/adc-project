@@ -324,7 +324,7 @@ class _SignUpViewState extends State<SignUpView> {
                 /// Navigate To Login Screen
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                         context,
                         CupertinoPageRoute(
                             builder: (ctx) => const LoginView()));
@@ -374,23 +374,33 @@ class _SignUpViewState extends State<SignUpView> {
           // Validate returns true if the form is valid, or false otherwise.
           if (_formKey.currentState!.validate()) {
             // ... Navigate To your Home Page
-            var user = RegisterUser(
-                username: nameController.text,
-                fullname: fullNameController.text,
-                password: passwordController.text,
-                passwordV: passwordVerController.text,
-                email: emailController.text,
-                privacy: "pivate"
-                );
-            
-                var response = await BaseClient().post("/register/", user.toJson()).catchError((err){});
-                if (response == null)
-                return;
+            var _body = {
+              "username": nameController.text,
+              "fullname": fullNameController.text,
+              "password": passwordController.text,
+              "passwordV": passwordVerController.text,
+              "email": emailController.text,
+              "role": "USER",
+              "state": "ACTIVE",
+              "privacy": "PRIVATE",
+              };
 
-                print('Succesfull');
-          
-          }
-        },
+            var response = BaseClient().post("/register/", _body);
+            if(response == null);
+
+            Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                    builder: (ctx) => const LoginView()));
+            nameController.clear();
+            emailController.clear();
+            passwordController.clear();
+            _formKey.currentState?.reset();
+
+           print("success");
+
+            }
+          },
         child: const Text('Sign up'),
       ),
     );

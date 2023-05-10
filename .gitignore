@@ -27,3 +27,20 @@ hs_err_pid*
 .project
 .classpath
 
+.idea/modules.xml
+.idea/modules.xml
+flutter/fctconnect/.dart_tool/package_config.json
+.idea/modules.xml
+java&html/Firstwebapp.iml
+.idea/modules.xml
+flutter/fctconnect/.dart_tool/package_config.json
+flutter/fctconnect/.dart_tool/package_config_subset
+flutter/fctconnect/.dart_tool/version
+flutter/fctconnect/.flutter-plugins
+flutter/fctconnect/android/local.properties
+flutter/fctconnect/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux
+flutter/fctconnect/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows
+java&html/Firstwebapp.iml
+flutter/fctconnect/windows/flutter/ephemeral/.plugin_symlinks/path_provider_windows
+flutter/fctconnect/linux/flutter/ephemeral/.plugin_symlinks/path_provider_linux
+flutter/fctconnect/android/local.properties

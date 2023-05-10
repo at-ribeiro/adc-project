@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fctconnect.iml" filepath="$PROJECT_DIR$/fctconnect.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fct-connect-flutter.iml" filepath="$PROJECT_DIR$/fct-connect-flutter.iml" />
       <module fileurl="file://$PROJECT_DIR$/android/fctconnect_android.iml" filepath="$PROJECT_DIR$/android/fctconnect_android.iml" />
     </modules>
   </component>
