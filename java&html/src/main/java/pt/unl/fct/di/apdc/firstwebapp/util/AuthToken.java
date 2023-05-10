@@ -1,4 +1,4 @@
-package pt.unl.fct.di.apdc.firstwebapp.util;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
 import java.util.UUID;
 
 public class AuthToken {
@@ -9,6 +9,8 @@ public class AuthToken {
     private long creationDate;
     private long expirationDate;
 
+
+    //for new AuthTokens
     public AuthToken(String username, String role) {
         this.username = username;
         this.role = role;
@@ -16,6 +18,8 @@ public class AuthToken {
         this.creationDate = System.currentTimeMillis();
         this.expirationDate = this.creationDate + AuthToken.EXPIRATION_TIME;
     }
+
+    //for prev established tokens
 
     public String getUsername(){
         return username;
@@ -35,11 +39,8 @@ public class AuthToken {
         return expirationDate;
     }
 
-    public boolean expired(long expirationDate){
-        if(System.currentTimeMillis() > expirationDate)
-            return true;
-        else
-            return false;
+    public static boolean expired(long expirationDate){
+        return System.currentTimeMillis() > expirationDate;
     }
 
 

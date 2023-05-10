@@ -1,9 +1,9 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
+package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.CPData;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import main.java.pt.unl.fct.di.apdc.firstwebapp.util.CPData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,7 +19,6 @@ public class ChangePwdResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-
     @PUT
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -39,8 +38,20 @@ public class ChangePwdResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            AuthToken token = new AuthToken("", "");
-            if (token.expired(data.getExpiration())) {
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
