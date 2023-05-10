@@ -2,9 +2,9 @@ package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
@@ -16,7 +16,7 @@ public class LogoutResource {
 
     @DELETE
     @Path("/")
-    public Response logout(@PathParam("username") String username, @QueryParam("tokenId") String tokenId) {
+    public Response logout(@HeaderParam("Authorization") String tokenId, @PathParam("username") String username) {
 
         LOG.fine("Attempting to logout user: " + username);
 

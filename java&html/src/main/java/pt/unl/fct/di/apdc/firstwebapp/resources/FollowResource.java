@@ -18,7 +18,7 @@ public class FollowResource {
     @POST
     @Path("/{follower}/{followee}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response follow(@PathParam("follower") String follower, @PathParam("followee") String followee, @QueryParam("tokenId") String tokenId){
+    public Response follow(@PathParam("follower") String follower, @PathParam("followee") String followee, @HeaderParam("Authorization") String tokenId){
         LOG.fine("Attempt to follow user " + followee + " with follower: " + follower);
 
         Transaction txn = datastore.newTransaction();
