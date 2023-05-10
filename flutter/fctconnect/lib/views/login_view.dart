@@ -301,7 +301,6 @@ class _LoginViewState extends State<LoginView> {
               "username": nameController.text,
               "password": passwordController.text,
             };
-            //TODO guardar o token, redirecionar para o feed
             var response = BaseClient().postLogin("/login/", _body);
             if(response != null){
               print(response);

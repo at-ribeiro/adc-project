@@ -44,6 +44,22 @@ var client = http.Client();
     }
   }
 
+  Future<dynamic> doLogout(String api, String username) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      };
+    var url = Uri.parse(baseUrl + api + '?username=' + username);
+
+    var response = await http.delete(url, headers: _headers, );
+
+    if (response.statusCode == 200){
+      return response.body;
+    }else{
+      //throw exception
+      return null;
+    }
+  }
+
 Future<Token> postLogin(String api, dynamic object) async {
   var _body = object;
 

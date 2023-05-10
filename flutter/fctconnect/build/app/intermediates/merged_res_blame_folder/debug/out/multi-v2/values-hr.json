@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.fctconnect.app-mergeDebugResources-9:/values-hr/values-hr.xml",
+            "outputFile": "com.example.fctconnect.app-mergeDebugResources-16:/values-hr/values-hr.xml",
             "map": [
                 {
-                    "source": "/Users/joaohenriquegarcia/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/res/values-hr/values-hr.xml",
+                    "source": "/Users/joaohenriquegarcia/.gradle/caches/transforms-3/5f80b20db3afa86c72a9766b008d752d/transformed/core-1.9.0/res/values-hr/values-hr.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

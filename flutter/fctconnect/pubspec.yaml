@@ -17,6 +17,9 @@ dependencies:
   google_fonts: ^3.0.1
   lottie: ^1.4.2
   http: ^0.13.6
+  file_picker: ^5.3.0
+  flutter_dropzone: ^3.0.5
+  flutter_platform_widgets: ^3.3.2
 
 dev_dependencies:
   flutter_test:
