@@ -38,6 +38,11 @@
         <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="workspaceImportEnabled" value="true" />
+      </MavenImportingSettings>
+    </option>
   </component>
   <component name="ProjectId" id="2P3Gfr9UfQJqVWDr4vEooFKMH4j" />
   <component name="ProjectViewState">
@@ -67,6 +72,8 @@
       <updated>1682678471071</updated>
       <workItem from="1682678474296" duration="6072000" />
       <workItem from="1683709973017" duration="1111000" />
+      <workItem from="1683731165662" duration="55000" />
+      <workItem from="1683731234389" duration="705000" />
     </task>
     <servers />
   </component>

@@ -38,6 +38,7 @@ public class LogoutResource {
                 }
 
                 txn.delete(tokenKey);
+                txn.commit();
 
                 return Response.ok().build();
 
