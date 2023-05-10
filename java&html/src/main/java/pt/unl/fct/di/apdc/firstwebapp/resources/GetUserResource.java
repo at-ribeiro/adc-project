@@ -24,9 +24,6 @@ public class GetUserResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-
-    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
-
     private final Gson g = new Gson();
 
     @GET
