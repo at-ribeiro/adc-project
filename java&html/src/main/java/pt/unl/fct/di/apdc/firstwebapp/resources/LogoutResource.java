@@ -3,11 +3,12 @@ package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 import com.google.cloud.datastore.*;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
-@Path("/logout")
+@Path("/logout/{username}")
 public class LogoutResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
@@ -15,7 +16,7 @@ public class LogoutResource {
 
     @DELETE
     @Path("/")
-    public Response logout(@QueryParam("username") String username) {
+    public Response logout(@PathParam("username") String username, @QueryParam("tokenId") String tokenId) {
 
         LOG.fine("Attempting to logout user: " + username);
 
@@ -31,6 +32,10 @@ public class LogoutResource {
             Entity token = txn.get(tokenKey);
 
             if (token != null) {
+                if(!token.getString("token_id").equals(tokenId)){
+                    LOG.warning("Token id doesn't belong to user");
+                    return Response.status(Response.Status.UNAUTHORIZED).build();
+                }
 
                 txn.delete(tokenKey);
 
