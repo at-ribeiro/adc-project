@@ -11,7 +11,6 @@ class Post {
   Map<String, dynamic> toMap() {
     return {
       'post': post,
-      'image': image,
       'username': username,
     };
   }

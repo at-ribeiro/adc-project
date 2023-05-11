@@ -16,6 +16,7 @@ const List<String> privacy = ["private", "public"];
 const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
+  
   const SignUpView({Key? key}) : super(key: key);
 
   @override
@@ -23,6 +24,9 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpViewState extends State<SignUpView> {
+
+  
+
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();

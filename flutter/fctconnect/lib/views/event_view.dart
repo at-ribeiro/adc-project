@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_login_ui/views/event_creator.dart';
 import 'package:responsive_login_ui/views/search_event_view.dart';
 
 class EventView extends StatefulWidget {
@@ -56,7 +57,14 @@ class _EventViewState extends State<EventView> {
             ),
           ),
           ElevatedButton(
-            onPressed: addEvent,
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EventCreator(event: '',),
+                ),
+              );
+            },
             child: Text('Register Event'),
           ),
           Padding(padding: const EdgeInsets.all(16.0)),

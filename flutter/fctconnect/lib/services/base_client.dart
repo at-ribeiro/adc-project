@@ -95,26 +95,34 @@ Future<Token> postLogin(String api, dynamic object) async {
 
 Future<int> createPost(String api, String tokenID, Post post) async {
   var _headers = {
-    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Type": "multipart/form-data",
     "Authorization": tokenID,
   };
 
-  var jsonBody = {
-    "post": post.post,
-    "username": post.username,
-  };
+  var request = await http.MultipartRequest('POST', Uri.parse(baseUrl + api));
+  request.headers.addAll(_headers);
+
+  request.files.add(
+    http.MultipartFile.fromString(
+      'post',
+      json.encode(post.toJson()),
+      filename: 'post.json',
+      contentType: MediaType('application', 'json'),
+    ),
+  );
 
   if (post.image != null) {
     List<int> imageBytes = await post.image!.readAsBytes();
-    String base64Image = base64Encode(imageBytes);
-    jsonBody["image"] = base64Image;
+    var multipartFile = http.MultipartFile.fromBytes(
+      'image',
+      imageBytes,
+      filename: basename(post.image!.path),
+      contentType: MediaType('image', 'jpeg'),
+    );                 
+    request.files.add(multipartFile);
   }
 
-  var response = await http.post(
-    Uri.parse(baseUrl + api),
-    headers: _headers,
-    body: json.encode(jsonBody),
-  );
+  var response = await request.send();
 
   return response.statusCode;
 }
