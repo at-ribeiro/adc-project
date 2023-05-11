@@ -35,6 +35,15 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>PostServlet</servlet-name>
+		<servlet-class>main.java.pt.unl.fct.di.apdc.firstwebapp.resources.PostServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>PostServlet</servlet-name>
+		<url-pattern>/rest/post/*</url-pattern>
+	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>
