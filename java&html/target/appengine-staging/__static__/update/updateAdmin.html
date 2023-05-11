@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Modifier</title>
+</head>
+<body>
+<h1>Admin Modifier Page</h1>
+<h2>Any space left blank will be considered as "same as before"</h2>
+
+<form id="update-form">
+  <label for="username">User to Change:</label>
+  <input type="text" id="username" name="username">
+  <label for="fullname">Name:</label>
+  <input type="text" id="fullname" name="fullname">
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email">
+  <label for="privacy">Privacy Type:</label>
+  <select id="privacy" name="privacy">
+    <option value="public">Public</option>
+    <option value="private">Private</option>
+  </select>
+
+  <div style="margin-bottom: 20px;"></div>
+
+  <label for="homephone">Home Phone Number:</label>
+  <input type="text" id="homephone" name="homephone">
+  <label for="mobilephone">Mobile Phone Number:</label>
+  <input type="text" id="mobilephone" name="mobilephone">
+  <label for="occupation">Occupation:</label>
+  <input type="text" id="occupation" name="occupation">
+
+  <div style="margin-bottom: 20px;"></div>
+
+  <label for="address">Address:</label>
+  <input type="text" id="address" name="address">
+  <label for="nif">NIF:</label>
+  <input type="text" id="nif" name="nif">
+  <label for="role">Role:</label>
+  <select id="role" name="role">
+    <option value="USER">USER</option>
+    <option value="GBO">GBO</option>
+    <option value="GA">GA</option>
+    <option value="GS">GS</option>
+    <option value="SU">SU</option>
+  </select>
+  <label for="state">State:</label>
+  <select id="state" name="state">
+    <option value="ACTIVE">ACTIVE</option>
+    <option value="INACTIVE">INACTIVE</option>
+  </select>
+
+
+  <button type="submit">Update</button>
+
+</form>
+
+<script>
+  const form = document.getElementById("update-form");
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const username = form.elements.username.value;
+    const tokenUser = JSON.parse(sessionStorage.getItem("token")).username;
+    const tokenRole = JSON.parse(sessionStorage.getItem("token")).role;
+    const tokenId = JSON.parse(sessionStorage.getItem("token")).tokenID;
+    const fullname = form.elements.fullname.value;
+    const email = form.elements.email.value;
+    const privacy = form.elements.privacy.value;
+    const homephone = form.elements.homephone.value;
+    const mobilephone = form.elements.mobilephone.value;
+    const occupation = form.elements.occupation.value;
+    const address = form.elements.address.value;
+    const nif = form.elements.nif.value;
+    const role = form.elements.role.value;
+    const state = form.elements.state.value;
+
+    const data = {username, tokenUser, tokenRole, tokenId, fullname, email, privacy, homephone, mobilephone, occupation, address, nif, role, state}
+
+    fetch("/rest/update/admin", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+            .then(response => {
+              if (response.status === 200) {
+                window.location.href = "/update/200.html";
+              } else if(response.status === 401){
+                window.location.href = "/update/401.html";
+              }else if (response.status === 403) {
+                window.location.href = "/update/403.html";
+              }else if (response.status === 404){
+                window.location.href = "/update/404.html";
+              }else if (response.status === 500){
+                window.location.href = "/update/500.html";
+              }
+            })
+
+  })
+</script>
+
+</body>
+</html>
