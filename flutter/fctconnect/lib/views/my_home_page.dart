@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
+import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import 'login_view.dart';
+import 'event_view.dart';
 
 class MyHomePage extends StatefulWidget {
   final Token token;
@@ -26,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late DropzoneViewController dropControler;
 
   @override
-  void initState()async{
+  void initState(){
   
     super.initState();
   
@@ -114,7 +116,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Eventos'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(context,
+              CupertinoPageRoute(builder: (ctx) => EventView()));
             },
           ),
           ListTile(
@@ -206,8 +209,8 @@ Widget _buildPostModal(BuildContext context) {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                //TODO criar o objeto a guardar
-                BaseClient().createPost("/post", _token.username, _token.tokenID);
+                Post post = Post(post: _postText, image: _imageFile, username: _token.username);
+                BaseClient().createPost("/post", _token.tokenID, post);
               },
               child: const Text('Post'),
             ),

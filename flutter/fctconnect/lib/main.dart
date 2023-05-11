@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
+import 'package:fluro/fluro.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-
   @override
   Widget build(BuildContext context) {
-    return const GetMaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignUpView(),
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/signup', page: () => SignUpView()),
+        
+      ],
     );
   }
+
+
+final router = FluroRouter();
+
+void defineRoutes() {
+  router.define('/signup', handler: Handler(handlerFunc: (_, __) => SignUpView()));
+
+}
+
 }

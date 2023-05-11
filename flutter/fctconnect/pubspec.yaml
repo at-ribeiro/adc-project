@@ -20,6 +20,7 @@ dependencies:
   file_picker: ^5.3.0
   flutter_dropzone: ^3.0.5
   flutter_platform_widgets: ^3.3.2
+  fluro: ^2.0.5
 
 dev_dependencies:
   flutter_test:
