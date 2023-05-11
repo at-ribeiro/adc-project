@@ -38,6 +38,14 @@ public class PostServlet extends HttpServlet {
 
             String jsonPart = IOUtils.toString(request.getPart("post").getInputStream(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
+
+            // Remove outermost quotes if they exist
+            if (jsonPart.startsWith("\"") && jsonPart.endsWith("\"")) {
+                jsonPart = jsonPart.substring(1, jsonPart.length() - 1);
+                // Replace escaped inner quotes
+                jsonPart = jsonPart.replace("\\\"", "\"");
+            }
+
             PostData data = mapper.readValue(jsonPart, PostData.class);
 
             String tokenId = request.getHeader("Authorization");
