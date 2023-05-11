@@ -1,6 +1,8 @@
 package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -32,7 +34,7 @@ public class LogoutResource {
             Entity token = txn.get(tokenKey);
 
             if (token != null) {
-                if(!token.getString("token_id").equals(tokenId)){
+                if(!token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))){
                     LOG.warning("Token id doesn't belong to user");
                     return Response.status(Response.Status.UNAUTHORIZED).build();
                 }
