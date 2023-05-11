@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
 import '../services/base_client.dart';
 import 'my_home_page.dart';
+import 'loading_screen.dart';
 
 
 class LoginView extends StatefulWidget {
@@ -307,8 +309,8 @@ class _LoginViewState extends State<LoginView> {
               Navigator.pushReplacement(
                 context,
                 CupertinoPageRoute(
-                    builder: (ctx) => MyHomePage(
-                        token: response
+                    builder: (ctx) => LoadingScreen(
+                        // token: response
                     )
                 ),
               );

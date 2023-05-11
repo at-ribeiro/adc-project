@@ -1,12 +1,16 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import 'login_view.dart';
 
 class MyHomePage extends StatefulWidget {
-  final Future<Token> token;
+  final Token token;
+
 
   const MyHomePage({Key? key, required this.token}) : super(key: key);
 
@@ -17,17 +21,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Token _token;
   String _postText = '';
+  File? _imageFile;
 
- // late DropzoneViewController dropControler;
+  late DropzoneViewController dropControler;
 
   @override
-  void initState() {
+  void initState()async{
+  
     super.initState();
-    widget.token.then((value) {
-      setState(() {
-        _token = value;
-      });
-    });
+  
+        _token = widget.token;
+ 
   }
 
   @override
@@ -123,9 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Sair'),
             onTap: () {
-              BaseClient().doLogout("/logout", _token.username);
+              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
               Navigator.pushReplacement(context,
-                      CupertinoPageRoute(builder: (ctx) => const LoginView()));
+                  CupertinoPageRoute(builder: (ctx) => const LoginView()));
             },
           ),
         ],
@@ -156,54 +160,73 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Widget _buildPostModal(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Column(children: [
-          const Padding(padding: EdgeInsets.all(16.0)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _postText = value;
-                });
-              },
-              decoration: const InputDecoration(
-                hintText: 'O que se passa na FCT?',
-                border: OutlineInputBorder(),
-              ),
-              minLines: 5,
-              maxLines: 10,
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceEvenly, // adjust this as per your need
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  //fazer o post
-                },
-                child: const Text('Post'),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  //fazer a chamada rest
-                },
-                child: const Text('image'),
-              ),
-              const SizedBox(height: 16.0),
-            ],
-          ),
-        ]
-        ),
+  void _selectImage() async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  setState(() {
+    _imageFile = pickedFile != null ? File(pickedFile.path) : null;
+  });
+}
+
+void _takePhoto() async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+  setState(() {
+    _imageFile = pickedFile != null ? File(pickedFile.path) : null;
+  });
+}
+
+Widget _buildPostModal(BuildContext context) {
+  return SingleChildScrollView(
+    child: Container(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-    );
-  }
+      child: Column(children: [
+        const Padding(padding: EdgeInsets.all(16.0)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: TextField(
+            onChanged: (value) {
+              setState(() {
+                _postText = value;
+              });
+            },
+            decoration: const InputDecoration(
+              hintText: 'O que se passa na FCT?',
+              border: OutlineInputBorder(),
+            ),
+            minLines: 5,
+            maxLines: 10,
+          ),
+        ),
+        const SizedBox(height: 16.0),
+        if (_imageFile != null) Image.file(_imageFile!),
+        const SizedBox(height: 16.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                //TODO criar o objeto a guardar
+                BaseClient().createPost("/post", _token.username, _token.tokenID);
+              },
+              child: const Text('Post'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _selectImage();
+              },
+              child: const Text('Select Image'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _takePhoto();
+              },
+              child: const Text('Take Photo'),
+            ),
+          ],
+        ),
+      ]),
+    ),
+  );
+}
 }

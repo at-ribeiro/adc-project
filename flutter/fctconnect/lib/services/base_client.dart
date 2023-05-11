@@ -44,9 +44,10 @@ var client = http.Client();
     }
   }
 
-  Future<dynamic> doLogout(String api, String username) async{
+  Future<dynamic> doLogout(String api, String username, String tokenID) async{
     var _headers ={
       "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
       };
     var url = Uri.parse(baseUrl + api + '?username=' + username);
 
@@ -70,6 +71,7 @@ Future<Token> postLogin(String api, dynamic object) async {
 
   var response = await http.post(url, headers: _headers, body: jsonEncode(_body));
   if (response.statusCode == 200) {
+    print (response.statusCode);
     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
     Token token = Token(
       username: jsonResponse['username'],
@@ -79,11 +81,29 @@ Future<Token> postLogin(String api, dynamic object) async {
       expirationDate: jsonResponse['expirationDate'],
     );
     return token;
-  } else {
+  } else{
     // throw exception
-    throw Exception('Failed to login');
+   throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
   }
 }
+
+
+Future<dynamic> createPost(String api, String username, String tokenID) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse(baseUrl + api + '?username=' + username);
+
+    var response = await http.delete(url, headers: _headers, );
+
+    if (response.statusCode == 200){
+      return response.body;
+    }else{
+      //throw exception
+      return null;
+    }
+  }
 
   Future<dynamic> put(String api) async{}
 
