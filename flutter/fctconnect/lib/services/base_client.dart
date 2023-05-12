@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 
@@ -53,7 +54,7 @@ var client = http.Client();
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
       };
-    var url = Uri.parse(baseUrl + api + '/' + username);
+    var url = Uri.parse('$baseUrl$api/$username');
 
     var response = await http.delete(url, headers: _headers, );
 
@@ -92,33 +93,25 @@ Future<Token> postLogin(String api, dynamic object) async {
 
 
 
-
 Future<int> createPost(String api, String tokenID, Post post) async {
   var _headers = {
     "Content-Type": "multipart/form-data",
     "Authorization": tokenID,
   };
 
-  var request = await http.MultipartRequest('POST', Uri.parse(baseUrl + api));
+  var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
   request.headers.addAll(_headers);
 
-  request.files.add(
-    http.MultipartFile.fromString(
-      'post',
-      json.encode(post.toJson()),
-      filename: 'post.json',
-      contentType: MediaType('application', 'json'),
-    ),
-  );
+  request.fields['post'] = json.encode(post.toJson());
+  request.fields['username'] = post.username;
 
-  if (post.image != null) {
-    List<int> imageBytes = await post.image!.readAsBytes();
+  if (post.imageData != null) {
     var multipartFile = http.MultipartFile.fromBytes(
       'image',
-      imageBytes,
-      filename: basename(post.image!.path),
+      post.imageData!,
+      filename: "${post.fileName}.jpg",
       contentType: MediaType('image', 'jpeg'),
-    );                 
+    );
     request.files.add(multipartFile);
   }
 
@@ -127,8 +120,26 @@ Future<int> createPost(String api, String tokenID, Post post) async {
   return response.statusCode;
 }
 
+Future<List<FeedData>> getFeed(String api, String tokenID, String username, String time) async {
+  var _headers ={
+    "Content-Type": "application/json; charset=UTF-8",
+    "Authorization": tokenID,
+  };
+  var url = Uri.parse('$baseUrl$api/$username?timestamp=$time');
 
+  var response = await http.get(url, headers: _headers);
+  if (response.statusCode == 200) {
+    
+    final jsonList = json.decode(response.body) as List<dynamic>;
+    final postList = jsonList.map((json) => FeedData.fromJson(json)).toList();
 
+    return postList;
+
+  } else{
+    // throw exception
+    throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+  }
+}
 
   Future<dynamic> put(String api) async{}
 

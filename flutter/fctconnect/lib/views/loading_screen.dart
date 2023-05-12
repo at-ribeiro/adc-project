@@ -29,12 +29,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
     try {
       final token = await widget.token;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MyHomePage(token: token),
-        ),
-      );
     } catch (error) {
       setState(() {
         _showError = true;
