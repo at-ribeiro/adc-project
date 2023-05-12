@@ -1,9 +1,9 @@
-package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
+package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
+import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.ws.rs.Consumes;
