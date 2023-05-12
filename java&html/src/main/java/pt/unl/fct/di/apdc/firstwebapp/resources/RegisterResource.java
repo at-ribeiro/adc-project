@@ -1,10 +1,10 @@
-package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
+package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
+import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

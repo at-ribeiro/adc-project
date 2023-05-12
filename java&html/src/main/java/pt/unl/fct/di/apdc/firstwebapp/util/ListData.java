@@ -1,4 +1,4 @@
-package main.java.pt.unl.fct.di.apdc.firstwebapp.util;
+package pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class ListData {
     private String username;

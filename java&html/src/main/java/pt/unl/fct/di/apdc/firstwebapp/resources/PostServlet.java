@@ -1,4 +1,4 @@
-package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
+package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.Timestamp;
@@ -7,16 +7,14 @@ import com.google.cloud.storage.*;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import main.java.pt.unl.fct.di.apdc.firstwebapp.util.PostData;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
