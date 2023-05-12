@@ -81,7 +81,8 @@ public class FeedServlet extends HttpServlet {
             QueryResults<Entity> followingResults = datastore.run(followingQuery);
             Set<String> followeesKeys = new HashSet<>();
             followingResults.forEachRemaining(followees->{
-              String toAdd = txn.get(followees.getKey()).getString("user_username");
+              String toAdd = txn.get(followees.getKey()).getString("followee");
+              followeesKeys.add(toAdd);
             });
 
             LOG.info("followees: " + followeesKeys.toString());
@@ -91,18 +92,16 @@ public class FeedServlet extends HttpServlet {
 
             StructuredQuery.OrderBy ascendingTimestamp = StructuredQuery.OrderBy.asc("timestamp");
 
-            // Retrieve the 20 latest posts
+            // TODO: paginacao e timestamp thing
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
-                    .setFilter(
-                            StructuredQuery.PropertyFilter.le("timestamp", Timestamp.ofTimeMicroseconds(timestampLong))
-                    )
                     .addOrderBy(ascendingTimestamp)
                     .build();
 
             QueryResults<Entity> postResults = datastore.run(postQuery);
 
             postResults.forEachRemaining(post-> {
+                        LOG.info("DEBUG!!!!!!!!!: " + post.getString("id"));
 
                             if (followeesKeys.contains(txn.get(post.getKey()).getString("user"))) {
 
