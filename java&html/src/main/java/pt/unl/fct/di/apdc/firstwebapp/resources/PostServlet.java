@@ -1,28 +1,31 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.cloud.storage.*;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.cloud.storage.Blob;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.PostData;
+import pt.unl.fct.di.apdc.firstwebapp.util.FeedData;
+import pt.unl.fct.di.apdc.firstwebapp.util.PostData;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
 @MultipartConfig
 public class PostServlet extends HttpServlet {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(PostServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
@@ -49,7 +52,7 @@ public class PostServlet extends HttpServlet {
             String tokenId = request.getHeader("Authorization");
             String postText = data.getPost();
             String username = data.getUsername();
-            Timestamp timestamp = Timestamp.now();
+            long timestamp = System.currentTimeMillis();
 
             LOG.fine("Attempt to create post for user " + username);
 
@@ -99,12 +102,13 @@ public class PostServlet extends HttpServlet {
             if (imageStream != null) {
 
                 imageName = request.getPart("image").getSubmittedFileName();
-                BlobId blobId = BlobId.of(bucketName, imageName + username);
+                BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
                                                 Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
 
                 byte[] imageBytes = IOUtils.toByteArray(imageStream);
+
 
                 storage.create(blobInfo, imageBytes);
             }
@@ -115,6 +119,7 @@ public class PostServlet extends HttpServlet {
                                 .newKey(username + "-" + timestamp);
 
             Entity entity = Entity.newBuilder(postKey)
+                    .set("id", username + "-" + timestamp)
                     .set("text", postText)
                     .set("user", username)
                     .set("timestamp", timestamp)
@@ -144,6 +149,7 @@ public class PostServlet extends HttpServlet {
         try{
             String tokenId = request.getHeader("Authorization");
             String username = request.getParameter("username");
+            String timestamp = request.getParameter("timestamp");
             LOG.fine("Attempt to create post for user " + username);
 
             //verifications
@@ -179,7 +185,61 @@ public class PostServlet extends HttpServlet {
                 return;
             }
 
+            StructuredQuery.OrderBy ascendingOrder = StructuredQuery.OrderBy.asc("timestamp");
+            Query<Entity> postQuery = Query.newEntityQueryBuilder()
+                    .setKind("Post")
+                    .setFilter(
+                            StructuredQuery.CompositeFilter.and(
+                                    StructuredQuery.PropertyFilter.hasAncestor(userKey),
+                                    StructuredQuery.PropertyFilter.gt("timestamp", timestamp)
+                            )
 
+                    )
+                    .addOrderBy(ascendingOrder)
+                    .setLimit(20)
+                    .build();
+
+            QueryResults<Entity> postResults = datastore.run(postQuery);
+
+            List<FeedData> posts = new ArrayList<>();
+            postResults.forEachRemaining(post->{
+
+                        String url = "";
+
+                        if(!post.getString("image").equals("")){
+
+                            BlobId blobId = BlobId.of( bucketName,
+                                    post.getString("user") + "-" + post.getString("image"));
+                            Blob blob = storage.get(blobId);
+                            url = blob.getMediaLink();
+                        }
+
+                        FeedData feedPost = new FeedData(
+                                post.getString("id"),
+                                post.getString("text"),
+                                post.getString("user"),
+                                url,
+                                post.getString("id").split("-")[1]
+                        );
+
+                        posts.add(feedPost);
+
+                    }
+            );
+
+            if(posts.isEmpty()){
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
+            // Convert the list of posts to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(posts);
+
+            // Set the response content type and write the JSON string to the output stream
+            response.setContentType("application/json");
+            response.getWriter().write(json);
+            response.setStatus(HttpServletResponse.SC_OK);
 
         }catch (Exception e) {
             txn.rollback();
