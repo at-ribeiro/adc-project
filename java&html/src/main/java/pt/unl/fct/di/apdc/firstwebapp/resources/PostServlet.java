@@ -1,7 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.cloud.storage.*;
 
@@ -26,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 @MultipartConfig
 public class PostServlet extends HttpServlet {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(PostServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
@@ -53,7 +52,7 @@ public class PostServlet extends HttpServlet {
             String tokenId = request.getHeader("Authorization");
             String postText = data.getPost();
             String username = data.getUsername();
-            Timestamp timestamp = Timestamp.now();
+            long timestamp = System.currentTimeMillis();
 
             LOG.fine("Attempt to create post for user " + username);
 
@@ -117,10 +116,10 @@ public class PostServlet extends HttpServlet {
             Key postKey = datastore.newKeyFactory()
                                 .setKind("Post")
                                 .addAncestor(PathElement.of("User", username))
-                                .newKey(username + "-" + System.currentTimeMillis());
+                                .newKey(username + "-" + timestamp);
 
             Entity entity = Entity.newBuilder(postKey)
-                    .set("id", username + "-" + System.currentTimeMillis())
+                    .set("id", username + "-" + timestamp)
                     .set("text", postText)
                     .set("user", username)
                     .set("timestamp", timestamp)

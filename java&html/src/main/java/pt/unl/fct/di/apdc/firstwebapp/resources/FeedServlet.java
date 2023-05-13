@@ -1,7 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -22,7 +21,7 @@ import java.util.logging.Logger;
 
 public class FeedServlet extends HttpServlet {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(FeedServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
@@ -88,13 +87,14 @@ public class FeedServlet extends HttpServlet {
             LOG.info("followees: " + followeesKeys.toString());
 
             List<FeedData> posts = new ArrayList<>();
-            long timestampLong = Long.parseLong(timestamp);
 
             StructuredQuery.OrderBy ascendingTimestamp = StructuredQuery.OrderBy.asc("timestamp");
 
-            // TODO: paginacao e timestamp thing
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
+                    .setFilter(
+                            StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
+                    )
                     .addOrderBy(ascendingTimestamp)
                     .build();
 
@@ -104,26 +104,28 @@ public class FeedServlet extends HttpServlet {
                         LOG.info("DEBUG!!!!!!!!!: " + post.getString("id"));
 
                             if (followeesKeys.contains(txn.get(post.getKey()).getString("user"))) {
+                                //paginacao
+                                if(posts.size() < 20) {
+                                    String url = "";
 
-                                String url = "";
+                                    if (!post.getString("image").equals("")) {
 
-                                if (!post.getString("image").equals("")) {
+                                        BlobId blobId = BlobId.of(bucketName,
+                                                post.getString("user") + "-" + post.getString("image"));
+                                        Blob blob = storage.get(blobId);
+                                        url = blob.getMediaLink();
+                                    }
 
-                                    BlobId blobId = BlobId.of(bucketName,
-                                            post.getString("user") + "-" + post.getString("image"));
-                                    Blob blob = storage.get(blobId);
-                                    url = blob.getMediaLink();
+                                    FeedData feedPost = new FeedData(
+                                            post.getString("id"),
+                                            post.getString("text"),
+                                            post.getString("user"),
+                                            url,
+                                            post.getString("id").split("-")[1]
+                                    );
+
+                                    posts.add(feedPost);
                                 }
-
-                                FeedData feedPost = new FeedData(
-                                        post.getString("id"),
-                                        post.getString("text"),
-                                        post.getString("user"),
-                                        url,
-                                        post.getString("id").split("-")[1]
-                                );
-
-                                posts.add(feedPost);
 
                             }
 
