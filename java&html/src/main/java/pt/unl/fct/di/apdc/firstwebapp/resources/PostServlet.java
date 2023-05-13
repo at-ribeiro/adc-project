@@ -238,6 +238,7 @@ public class PostServlet extends HttpServlet {
 
             // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 
