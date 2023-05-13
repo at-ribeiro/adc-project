@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/FeedData.dart';
+import '../models/NewsData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 
@@ -144,5 +145,26 @@ Future<List<FeedData>> getFeed(String api, String tokenID, String username, Stri
   Future<dynamic> put(String api) async{}
 
   Future<dynamic> delete(String api) async{}
+
+Future<List<NewsData>> fetchNews(String api, String tokenID, String username) async {
+  var _headers ={
+    "Content-Type": "application/json; charset=UTF-8",
+    "Authorization": tokenID,
+  };
+  var url = Uri.parse("$baseUrl$api?username=$username");
+
+  var response = await http.get(url, headers: _headers);
+  if (response.statusCode == 200) {
+    
+    final jsonList = json.decode(response.body) as List<dynamic>;
+    final newsList = jsonList.map((json) => NewsData.fromJson(json)).toList();
+
+    return newsList;
+
+  } else{
+    // throw exception
+    throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+  }
+}
 
 }

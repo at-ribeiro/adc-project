@@ -2,17 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:responsive_login_ui/views/event_creator.dart';
 import 'package:responsive_login_ui/views/search_event_view.dart';
 
+import '../models/Token.dart';
+
 class EventView extends StatefulWidget {
+  final Token token;
+
+  const EventView({Key? key, required this.token}) : super(key: key);
+
   @override
-  _EventViewState createState() => _EventViewState();
+  State<EventView> createState() => _EventViewState();
 }
 
 class _EventViewState extends State<EventView> {
   List<String> events = [];
   List<String> filteredEvents = [];
+  late Token _token;
 
   TextEditingController eventController = TextEditingController();
   TextEditingController searchController = TextEditingController();
+
+   @override
+  void initState() {
+    super.initState();
+    _token = widget.token;
+  }
 
   void addEvent() {
     String newEvent = eventController.text;
@@ -43,7 +56,7 @@ class _EventViewState extends State<EventView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event Registration'),
+        title: Text('Eventos'),
       ),
       body: Column(
         children: [
@@ -52,22 +65,10 @@ class _EventViewState extends State<EventView> {
             child: TextField(
               controller: eventController,
               decoration: InputDecoration(
-                labelText: 'Event Name',
+                labelText: 'Nome do Evento',
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EventCreator(event: '',),
-                ),
-              );
-            },
-            child: Text('Register Event'),
-          ),
-          Padding(padding: const EdgeInsets.all(16.0)),
           ElevatedButton(
               onPressed: () {
                 Navigator.pushReplacement(
@@ -77,7 +78,21 @@ class _EventViewState extends State<EventView> {
                   ),
                 );
               },
-              child: Text('Pesquisar outros eventos')),
+              child: const Text('Pesquisar outros eventos')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EventCreator(
+                    event: '',
+                  ),
+                ),
+              );
+            },
+            child: const Text('Registar Evento'),
+          ),
+          Padding(padding: const EdgeInsets.all(16.0)),
           Expanded(
             child: ListView.builder(
               itemCount: filteredEvents.length,
@@ -89,7 +104,7 @@ class _EventViewState extends State<EventView> {
             ),
           ),
           PersonEventsWidget(
-            personName: 'John Doe',
+            personName: _token.username,
             events: personEvents,
           ),
         ],
@@ -102,7 +117,7 @@ class PersonEventsWidget extends StatelessWidget {
   final String personName;
   final List<String> events;
 
-  PersonEventsWidget({
+  const PersonEventsWidget({
     required this.personName,
     required this.events,
   });
@@ -112,15 +127,18 @@ class PersonEventsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 16),
-        Text(
-          'Events for $personName:',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 0.0, 0.0),
+          child: Text(
+            'Eventos de $personName:',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         ListView.builder(
           shrinkWrap: true,
           itemCount: events.length,

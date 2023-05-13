@@ -11,6 +11,7 @@ import '../services/base_client.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
+import 'news_view.dart';
 
 class MyHomePage extends StatefulWidget {
   final Token token;
@@ -157,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Perfil',
           ),
         ],
         onTap: (index) {
@@ -207,13 +208,30 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Eventos'),
             onTap: () {
               Navigator.push(
-                  context, CupertinoPageRoute(builder: (ctx) => EventView()));
+                  context,
+                  CupertinoPageRoute(
+                      builder: (ctx) => EventView(token: _token)));
             },
           ),
           ListTile(
             title: const Text('Grupos'),
             onTap: () {
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Calendário'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Noticias'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (ctx) => NewsView(token: _token)));
             },
           ),
           const Spacer(),
