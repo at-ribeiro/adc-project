@@ -39,6 +39,26 @@ public class AuthToken {
         return expirationDate;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setTokenID(String tokenID) {
+        this.tokenID = tokenID;
+    }
+
+    public void setCreationDate(long creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setExpirationDate(long expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
     public static boolean expired(long expirationDate){
         return System.currentTimeMillis() > expirationDate;
     }
