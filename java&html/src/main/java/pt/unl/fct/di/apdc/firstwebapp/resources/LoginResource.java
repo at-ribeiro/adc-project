@@ -108,18 +108,41 @@ public class LoginResource {
                         .addAncestor(PathElement.of("User", data.getUsername()))
                         .newKey("token");
 
-                Entity tokenEntity = Entity.newBuilder(tokenKey)
-                        .set("token_id", DigestUtils.sha512Hex(token.getTokenID()))
-                        .set("token_username", token.getUsername())
-                        .set("token_role", token.getRole())
-                        .set("token_creation", token.creationData())
-                        .set("token_expiration", token.expirationData())
-                        .build();
+                Entity tokenEntity = txn.get(tokenKey);
 
-                if(txn.get(tokenKey) == null)
+                if(tokenEntity == null) {
+
+                    tokenEntity = Entity.newBuilder(tokenKey)
+                            .set("token_hashed_id", DigestUtils.sha512Hex(token.getTokenID()))
+                            .set("token_username", token.getUsername())
+                            .set("token_role", token.getRole())
+                            .set("token_creation", token.creationData())
+                            .set("token_expiration", token.expirationData())
+                            .set("token_id", token.getTokenID())
+                            .build();
+
                     txn.add(tokenEntity);
-                else
+                }
+                else if (AuthToken.expired(tokenEntity.getLong("token_expiration"))){
+
+                    tokenEntity = Entity.newBuilder(tokenKey)
+                            .set("token_hashed_id", DigestUtils.sha512Hex(token.getTokenID()))
+                            .set("token_username", token.getUsername())
+                            .set("token_role", token.getRole())
+                            .set("token_creation", token.creationData())
+                            .set("token_expiration", token.expirationData())
+                            .set("token_id", token.getTokenID())
+                            .build();
+
                     txn.update(tokenEntity);
+
+                } else{
+                    token.setTokenID(tokenEntity.getString("token_id"));
+                    token.setUsername(tokenEntity.getString("token_username"));
+                    token.setRole(tokenEntity.getString("token_role"));
+                    token.setCreationDate(tokenEntity.getLong("token_creation"));
+                    token.setExpirationDate(tokenEntity.getLong("token_expiration"));
+                }
 
                 txn.commit();
 
