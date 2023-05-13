@@ -68,7 +68,7 @@ class _NewsViewState extends State<NewsView> {
                             height: 100,
                             child: Image.network(
                               news.url,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.scaleDown,
                             ),
                           ),
                           const SizedBox(width: 8.0),
@@ -98,13 +98,14 @@ class NewsDetailPage extends StatelessWidget {
   const NewsDetailPage({Key? key, required this.news}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 news.title,
@@ -125,11 +126,16 @@ class NewsDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16.0),
-              AspectRatio(
-                aspectRatio: 16/9, // Replace with the correct aspect ratio of the image
-                child: Image.network(
-                  news.url,
-                  fit: BoxFit.cover,
+              SizedBox(
+                height: 400.0, // Replace with your desired height
+                child: AspectRatio(
+                  aspectRatio: 16 / 9, // Replace with the actual aspect ratio of the image
+                  child: FittedBox(
+                    fit: BoxFit.contain, // Adjust the fit property as needed
+                    child: Image.network(
+                      news.url,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16.0),
@@ -143,6 +149,7 @@ class NewsDetailPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

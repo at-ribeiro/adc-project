@@ -4,11 +4,10 @@ import 'package:get/get.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 
 void main() {
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
   MyApp({Key? key}) : super(key: key);
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

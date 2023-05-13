@@ -116,7 +116,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       child: Image.network(
                                         post.url,
                                         fit: BoxFit.cover,
-                                        height: 240.0,
                                       ),
                                     ),
                                   )
@@ -146,34 +145,41 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
         currentIndex: 0, // set the initial index to 0
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home, color: Colors.black),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.post_add),
+            icon: Icon(Icons.newspaper, color: Colors.black),
+            label: 'Noticias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.post_add, color: Colors.black),
             label: 'Post',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person, color: Colors.black),
             label: 'Perfil',
           ),
         ],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
         onTap: (index) {
           if (index == 0) {
-// Navigate to home page
           } else if (index == 1) {
-// Display post modal
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+          } else if (index == 2) {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
               builder: (context) => _buildPostModal(context),
             );
-          } else if (index == 2) {
-// Navigate to profile page
-          }
+          } else if (index == 3) {}
         },
       ),
     );
@@ -223,15 +229,6 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Calendário'),
             onTap: () {
               Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: const Text('Noticias'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => NewsView(token: _token)));
             },
           ),
           const Spacer(),

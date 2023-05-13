@@ -21,7 +21,8 @@ dependencies:
   flutter_dropzone: ^3.0.5
   flutter_platform_widgets: ^3.3.2
   fluro: ^2.0.5
-  intl: ^0.18.1
+  intl: ^0.17.0
+  date_time_picker: ^2.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -16,11 +17,15 @@ const List<String> privacy = ["private", "public"];
 const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
+
   
   const SignUpView({Key? key}) : super(key: key);
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
+
+
+
 }
 
 class _SignUpViewState extends State<SignUpView> {

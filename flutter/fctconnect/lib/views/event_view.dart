@@ -1,8 +1,14 @@
+import 'dart:html';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:responsive_login_ui/models/events_list_data.dart';
 import 'package:responsive_login_ui/views/event_creator.dart';
 import 'package:responsive_login_ui/views/search_event_view.dart';
 
 import '../models/Token.dart';
+import '../services/base_client.dart';
+import '../models/event_data.dart';
 
 class EventView extends StatefulWidget {
   final Token token;
@@ -14,40 +20,28 @@ class EventView extends StatefulWidget {
 }
 
 class _EventViewState extends State<EventView> {
-  List<String> events = [];
+  String _eventText = '';
+  Uint8List? _imageData;
+  String? _fileName;
+  List<EventsListData> _events = [];
   List<String> filteredEvents = [];
   late Token _token;
+  bool _loadingMore = false;
+  String _lastDisplayedEventTimestamp =
+      DateTime.now().millisecondsSinceEpoch.toString();
+
+  late ScrollController _scrollController;
 
   TextEditingController eventController = TextEditingController();
   TextEditingController searchController = TextEditingController();
 
-   @override
+  @override
   void initState() {
     super.initState();
     _token = widget.token;
-  }
-
-  void addEvent() {
-    String newEvent = eventController.text;
-    if (newEvent.isNotEmpty) {
-      setState(() {
-        events.add(newEvent);
-        eventController.clear();
-        filteredEvents = List.from(events);
-      });
-    }
-  }
-
-  void filterEvents(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredEvents = List.from(events);
-      } else {
-        filteredEvents = events
-            .where((event) => event.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    _loadEvents();
   }
 
   @override
@@ -85,7 +79,7 @@ class _EventViewState extends State<EventView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => EventCreator(
-                    event: '',
+                    token: _token
                   ),
                 ),
               );
@@ -111,19 +105,45 @@ class _EventViewState extends State<EventView> {
       ),
     );
   }
+
+  void _loadEvents() async {
+    List<EventsListData> events = await BaseClient().getEvents("/events",
+        _token.tokenID, _token.username, _lastDisplayedEventTimestamp);
+    if (mounted) {
+      setState(() {
+        _events = events;
+        if (events.isNotEmpty) {
+          _lastDisplayedEventTimestamp = events.last.timestamp;
+        }
+      });
+    }
+  }
+
+   Future<void> _refreshEvents() async {
+    _lastDisplayedEventTimestamp =
+        DateTime.now().millisecondsSinceEpoch.toString();
+    List<EventsListData> latestEvents = await BaseClient().getEvents("/events",
+        _token.tokenID, _token.username, _lastDisplayedEventTimestamp);
+    setState(() {
+      _events = latestEvents;
+      if (latestEvents.isNotEmpty) {
+        _lastDisplayedEventTimestamp = latestEvents.last.timestamp;
+      }
+    });
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      _loadEvents();
+    }
+  }
 }
-
-class PersonEventsWidget extends StatelessWidget {
-  final String personName;
-  final List<String> events;
-
-  const PersonEventsWidget({
-    required this.personName,
-    required this.events,
-  });
 
   @override
   Widget build(BuildContext context) {
+    var personName;
+    var events;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,17 +158,7 @@ class PersonEventsWidget extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(events[index]),
-            );
-          },
-        ),
       ],
+      
     );
   }
-}
