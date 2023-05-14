@@ -17,21 +17,13 @@ const List<String> privacy = ["private", "public"];
 const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
-
-  
   const SignUpView({Key? key}) : super(key: key);
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
-
-
-
 }
 
 class _SignUpViewState extends State<SignUpView> {
-
-  
-
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -118,8 +110,9 @@ class _SignUpViewState extends State<SignUpView> {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment:
-            size.width > 600 ? MainAxisAlignment.center : MainAxisAlignment.start,
+        mainAxisAlignment: size.width > 600
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
         children: [
           size.width > 600
               ? Container()
@@ -168,7 +161,7 @@ class _SignUpViewState extends State<SignUpView> {
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
                     ),
-    
+
                     controller: nameController,
                     // The validator receives the text that the user has entered.
                     validator: (value) {
@@ -182,11 +175,11 @@ class _SignUpViewState extends State<SignUpView> {
                       return null;
                     },
                   ),
-    
+
                   SizedBox(
                     height: size.height * 0.02,
                   ),
-    
+
                   TextFormField(
                     style: kTextFormFieldStyle(),
                     decoration: const InputDecoration(
@@ -196,7 +189,7 @@ class _SignUpViewState extends State<SignUpView> {
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
                     ),
-    
+
                     controller: fullNameController,
                     // The validator receives the text that the user has entered.
                     validator: (value) {
@@ -207,11 +200,11 @@ class _SignUpViewState extends State<SignUpView> {
                       }
                     },
                   ),
-    
+
                   SizedBox(
                     height: size.height * 0.02,
                   ),
-    
+
                   /// Email
                   TextFormField(
                     style: kTextFormFieldStyle(),
@@ -236,7 +229,7 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(
                     height: size.height * 0.02,
                   ),
-    
+
                   /// password
                   Obx(
                     () => TextFormField(
@@ -273,11 +266,11 @@ class _SignUpViewState extends State<SignUpView> {
                       },
                     ),
                   ),
-    
+
                   SizedBox(
                     height: size.height * 0.02,
                   ),
-    
+
                   Obx(
                     () => TextFormField(
                       style: kTextFormFieldStyle(),
@@ -312,7 +305,7 @@ class _SignUpViewState extends State<SignUpView> {
                       },
                     ),
                   ),
-    
+
                   SizedBox(
                     height: size.height * 0.01,
                   ),
@@ -324,13 +317,13 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(
                     height: size.height * 0.02,
                   ),
-    
+
                   /// SignUp Button
                   signUpButton(theme),
                   SizedBox(
                     height: size.height * 0.03,
                   ),
-    
+
                   /// Navigate To Login Screen
                   GestureDetector(
                     onTap: () {
@@ -342,7 +335,7 @@ class _SignUpViewState extends State<SignUpView> {
                       emailController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
-    
+
                       simpleUIController.isObscure.value = true;
                     },
                     child: RichText(
@@ -381,10 +374,8 @@ class _SignUpViewState extends State<SignUpView> {
             ),
           ),
         ),
-        onPressed: () async {
-          // Validate returns true if the form is valid, or false otherwise.
+        onPressed: () {
           if (_formKey.currentState!.validate()) {
-            // ... Navigate To your Home Page
             var _body = {
               "username": nameController.text,
               "fullname": fullNameController.text,
@@ -394,24 +385,75 @@ class _SignUpViewState extends State<SignUpView> {
               "role": "USER",
               "state": "ACTIVE",
               "privacy": "PRIVATE",
-              };
+            };
 
-            var response = BaseClient().post("/register/", _body);
-            if(response == null);
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return FutureBuilder(
+                  future: BaseClient().post("/register/", _body),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return AlertDialog(
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(width: 10),
+                            Text('Loading...'),
+                          ],
+                        ),
+                      );
+                    } else {
+                      String showErrorMessage;
+                      if (snapshot.hasError) {
+                        switch (snapshot.error) {
+                          case '409':
+                            showErrorMessage = "username ou email já existem!";
+                            break;
+                          default:
+                            showErrorMessage =
+                                "Ulgo de errado  não está certo, tente outra vez!";
+                            break;
+                        }
 
-            Navigator.pushReplacement(
-                context,
-                CupertinoPageRoute(
-                    builder: (ctx) => const LoginView()));
-            nameController.clear();
-            emailController.clear();
-            passwordController.clear();
-            _formKey.currentState?.reset();
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text(showErrorMessage),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      } else {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          Navigator.of(context).pop();
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (ctx) => const LoginView()),
+                          );
 
-           print("success");
-
-            }
-          },
+                          nameController.clear();
+                          emailController.clear();
+                          passwordController.clear();
+                          _formKey.currentState?.reset();
+                        });
+                      }
+                    }
+                    return Container();
+                  },
+                );
+              },
+            );
+          }
+        },
         child: const Text('Sign up'),
       ),
     );

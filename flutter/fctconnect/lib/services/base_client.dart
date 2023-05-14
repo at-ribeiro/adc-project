@@ -35,6 +35,7 @@ var client = http.Client();
       return response.body;
     }else{
       //throw exception
+      throw extension("Something went wrong");
     }
   }
 
@@ -49,9 +50,9 @@ var client = http.Client();
     var response = await http.post(url, headers: _headers, body: jsonEncode(_body));
     if (response.statusCode == 200){
       return response.body;
-    }else{
+    }else if (response.statusCode == 409) {
       //throw exception
-      return null;
+     throw '409';
     }
   }
 
@@ -172,23 +173,24 @@ Future<List<NewsData>> fetchNews(String api, String tokenID, String username) as
   }
 }
 
-Future<int> createEvent(String api, String tokenID, Post post) async {
+Future<int> createEvent(String api, String tokenID, EventData event) async {
   var _headers = {
     "Content-Type": "multipart/form-data",
     "Authorization": tokenID,
   };
 
-  var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
+  var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api + '/' + event.creator));
   request.headers.addAll(_headers);
 
-  request.fields['post'] = json.encode(post.toJson());
-  request.fields['username'] = post.username;
+  request.fields['event'] = json.encode(event.toJson());
+  request.fields['creator'] = event.creator;
+  
 
-  if (post.imageData != null) {
+  if (event.imageData != null) {
     var multipartFile = http.MultipartFile.fromBytes(
       'image',
-      post.imageData!,
-      filename: "${post.fileName}.jpg",
+      event.imageData!,
+      filename: "${event.fileName}.jpg",
       contentType: MediaType('image', 'jpeg'),
     );
     request.files.add(multipartFile);
