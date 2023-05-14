@@ -77,14 +77,18 @@ public class FeedServlet extends HttpServlet {
                     .setKind("Follow")
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
+
             QueryResults<Entity> followingResults = datastore.run(followingQuery);
-            Set<String> followeesKeys = new HashSet<>();
-            followingResults.forEachRemaining(followees->{
-              String toAdd = txn.get(followees.getKey()).getString("followee");
-              followeesKeys.add(toAdd);
+
+            List<Value<Key>> followeesKeys = new ArrayList<>();
+            followingResults.forEachRemaining(followees -> {
+                Key followeeKey = followees.getKey().getParent();
+                followeesKeys.add(KeyValue.of(followeeKey));
             });
 
-            LOG.info("followees: " + followeesKeys.toString());
+            LOG.info("followees: " + followeesKeys);
+
+            ListValue followeesKeysValues = ListValue.of(followeesKeys);
 
             List<FeedData> posts = new ArrayList<>();
 
@@ -94,44 +98,43 @@ public class FeedServlet extends HttpServlet {
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
                     .setFilter(
-                            StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
+                            StructuredQuery.CompositeFilter.and(
+                                    StructuredQuery.PropertyFilter.in("user", followeesKeysValues),
+                                    StructuredQuery.PropertyFilter.gt("timestamp", timestamp)
+                            )
+
                     )
                     .addOrderBy(descendingTimestamp)
+                    .setLimit(20)
                     .build();
 
             QueryResults<Entity> postResults = datastore.run(postQuery);
 
-            postResults.forEachRemaining(post-> {
+            postResults.forEachRemaining(post -> {
                         LOG.info("DEBUG!!!!!!!!!: " + post.getString("id"));
 
-                            if (followeesKeys.contains(txn.get(post.getKey()).getString("user"))) {
-                                //paginacao
-                                if(posts.size() < 20) {
-                                    String url = "";
+                        String url = "";
 
-                                    if (!post.getString("image").equals("")) {
+                        if (!post.getString("image").equals("")) {
 
-                                        BlobId blobId = BlobId.of(bucketName,
-                                                post.getString("user") + "-" + post.getString("image"));
-                                        Blob blob = storage.get(blobId);
-                                        url = blob.getMediaLink();
-                                    }
+                            BlobId blobId = BlobId.of(bucketName,
+                                    post.getString("user") + "-" + post.getString("image"));
+                            Blob blob = storage.get(blobId);
+                            url = blob.getMediaLink();
+                        }
 
-                                    FeedData feedPost = new FeedData(
-                                            post.getString("id"),
-                                            post.getString("text"),
-                                            post.getString("user"),
-                                            url,
-                                            post.getString("id").split("-")[1]
-                                    );
+                        FeedData feedPost = new FeedData(
+                                post.getString("id"),
+                                post.getString("text"),
+                                post.getString("user"),
+                                url,
+                                post.getString("id").split("-")[1]
+                        );
 
-                                    posts.add(feedPost);
-                                }
-
-                            }
+                        posts.add(feedPost);
 
                     }
-                    );
+            );
 
 
             if(posts.isEmpty()){
