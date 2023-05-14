@@ -43,6 +43,10 @@
 		<servlet-name>FeedServlet</servlet-name>
 		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.FeedServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>NewsServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.NewsServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>PostServlet</servlet-name>
@@ -52,7 +56,10 @@
 		<servlet-name>FeedServlet</servlet-name>
 		<url-pattern>/rest/feed/*</url-pattern>
 	</servlet-mapping>
-
+	<servlet-mapping>
+		<servlet-name>NewsServlet</servlet-name>
+		<url-pattern>/rest/news/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>
 		<url-pattern>/rest/*</url-pattern>

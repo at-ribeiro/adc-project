@@ -60,7 +60,7 @@ public class FeedServlet extends HttpServlet {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
@@ -88,14 +88,15 @@ public class FeedServlet extends HttpServlet {
 
             List<FeedData> posts = new ArrayList<>();
 
-            StructuredQuery.OrderBy ascendingTimestamp = StructuredQuery.OrderBy.asc("timestamp");
+            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
 
+            //TODO: MUDAR BEM ESTA QUERY VER EXEMPLO DO STOR
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
                     .setFilter(
                             StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
                     )
-                    .addOrderBy(ascendingTimestamp)
+                    .addOrderBy(descendingTimestamp)
                     .build();
 
             QueryResults<Entity> postResults = datastore.run(postQuery);
@@ -145,6 +146,7 @@ public class FeedServlet extends HttpServlet {
 
             // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 

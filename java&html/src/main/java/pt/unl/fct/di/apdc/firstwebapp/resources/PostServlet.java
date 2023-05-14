@@ -104,6 +104,11 @@ public class PostServlet extends HttpServlet {
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
+                if(storage.get(blobId)==null){
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    return;
+                }
+
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
                                                 Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
 
@@ -238,6 +243,7 @@ public class PostServlet extends HttpServlet {
 
             // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 
