@@ -6,16 +6,16 @@ import com.google.cloud.storage.*;
 import com.google.cloud.storage.Blob;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.EventPostData;
-import pt.unl.fct.di.apdc.firstwebapp.util.NewsPostData;
+import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class EventsServlet extends HttpServlet {
@@ -32,6 +32,81 @@ public class EventsServlet extends HttpServlet {
         Transaction txn = datastore.newTransaction();
 
         try{
+
+            String tokenId = request.getHeader("Authorization");
+            String username = request.getParameter("username");
+
+            LOG.fine("Attempt get news");
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
+
+            Query<Entity> newsQuery = Query.newEntityQueryBuilder()
+                    .setKind("Event")
+                    .addOrderBy(descendingTimestamp)
+                    .build();
+
+            QueryResults<Entity> eventResults = datastore.run(newsQuery);
+
+            List<EventGetData> eventList = new ArrayList<>();
+
+
+            eventResults.forEachRemaining(event -> {
+                String url = "";
+
+                if (!event.getString("img").equals("")) {
+
+                    BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
+                    Blob blob = storage.get(blobId);
+                    url = blob.getMediaLink();
+                }
+
+
+                //TODO: Check with frontend
+                EventGetData newsInstance = new EventGetData(
+                        event.getString("event_creator"),
+                        event.getString("event_title"),
+                        event.getString("event_description"),
+                        url,
+                        Long.toString(event.getLong("event_start")),
+                        Long.toString(event.getLong("event_end"))
+                );
+
+                eventList.add(newsInstance);
+            } );
+
+            if(eventList.isEmpty()){
+                LOG.info("events: " + eventList);
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
+            // Convert the list of posts to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(eventList);
+
+            // Set the response content type and write the JSON string to the output stream
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(json);
+            response.setStatus(HttpServletResponse.SC_OK);
 
         }catch (Exception e) {
             txn.rollback();
