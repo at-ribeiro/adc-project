@@ -104,6 +104,11 @@ public class PostServlet extends HttpServlet {
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
+                if(storage.get(blobId)==null){
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    return;
+                }
+
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
                                                 Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
 

@@ -189,6 +189,11 @@ public class NewsServlet extends HttpServlet {
                     imageName = request.getPart("image").getSubmittedFileName();
                     BlobId blobId = BlobId.of(bucketName,  timestamp + "-" + imageName);
 
+                    if(storage.get(blobId)==null){
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        return;
+                    }
+
                     BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
                             Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
 
@@ -198,14 +203,13 @@ public class NewsServlet extends HttpServlet {
                     storage.create(blobInfo, imageBytes);
                 }
 
-                Key postKey = datastore.newKeyFactory()
-                        .setKind("Post")
-                        .addAncestor(PathElement.of("User", username))
-                        .newKey(username + "-" + timestamp);
+                Key newsKey = datastore.newKeyFactory()
+                        .setKind("News")
+                        .newKey(timestamp);
 
-                Entity entity = Entity.newBuilder(postKey)
+                Entity entity = Entity.newBuilder(newsKey)
                         .set("title", newsTitle)
-                        .set("text", newsText)
+                        .set("text", StringValue.newBuilder(newsText).setExcludeFromIndexes(true).build())
                         .set("timestamp", timestamp)
                         .set("image", timestamp + "-" + imageName)
                         .build();
