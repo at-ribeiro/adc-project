@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:responsive_login_ui/services/base_client.dart';
 import '../models/Token.dart';
 import '../models/event_data.dart';
 
@@ -190,6 +191,7 @@ class _EventCreatorState extends State<EventCreator> {
                       start: _startingDate.millisecondsSinceEpoch,
                       end: _endingDate.millisecondsSinceEpoch,
                     );
+                    var response = BaseClient().createEvent("/events", _token.tokenID, event);
 
                     // TODO: Handle event creation
                   } else {
