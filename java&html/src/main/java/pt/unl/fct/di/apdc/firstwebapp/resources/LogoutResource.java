@@ -34,7 +34,7 @@ public class LogoutResource {
             Entity token = txn.get(tokenKey);
 
             if (token != null) {
-                if(!token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))){
+                if(!token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))){
                     LOG.warning("Token id doesn't belong to user");
                     return Response.status(Response.Status.UNAUTHORIZED).build();
                 }

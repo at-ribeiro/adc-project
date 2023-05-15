@@ -31,7 +31,7 @@ public class FollowResource {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
