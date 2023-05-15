@@ -80,10 +80,11 @@ public class FeedServlet extends HttpServlet {
 
             QueryResults<Entity> followingResults = datastore.run(followingQuery);
 
-            List<Value<Key>> followeesKeys = new ArrayList<>();
+            List<Value<String>> followeesKeys = new ArrayList<>();
             followingResults.forEachRemaining(followees -> {
-                Key followeeKey = followees.getKey().getParent();
-                followeesKeys.add(KeyValue.of(followeeKey));
+                String followeeString = followees.getString("followee");
+
+                followeesKeys.add(StringValue.of(followeeString));
             });
 
             LOG.info("followees: " + followeesKeys);
@@ -100,7 +101,7 @@ public class FeedServlet extends HttpServlet {
                     .setFilter(
                             StructuredQuery.CompositeFilter.and(
                                     StructuredQuery.PropertyFilter.in("user", followeesKeysValues),
-                                    StructuredQuery.PropertyFilter.gt("timestamp", timestamp)
+                                    StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
                             )
 
                     )
