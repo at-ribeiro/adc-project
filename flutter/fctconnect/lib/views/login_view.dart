@@ -3,21 +3,30 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 
+
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
+import '../main.dart';
 import '../services/base_client.dart';
 import 'my_home_page.dart';
 import 'loading_screen.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+
+  final String? session;
+
+
+  const LoginView({Key? key, this.session}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
+
+
 
 class _LoginViewState extends State<LoginView> {
   TextEditingController nameController = TextEditingController();
@@ -25,6 +34,14 @@ class _LoginViewState extends State<LoginView> {
   TextEditingController passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+@override
+void initState() {
+  
+  super.initState();
+  
+  SessionManager.storeSession('/');
+}
 
   @override
   void dispose() {
@@ -34,10 +51,27 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+    void _handleLogin() async {
+    // Perform login operation
+
+    // Store the current page route
+    final String currentPage = ModalRoute.of(context)!.settings.name!;
+    MyApp().setLastVisitedPage(currentPage);
+
+    // Return to the previous page
+    Navigator.pop(context);
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+
+   final SimpleUIController simpleUIController = Get.find<SimpleUIController>();
+    
     var size = MediaQuery.of(context).size;
-    SimpleUIController simpleUIController = Get.find<SimpleUIController>();
+    
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(

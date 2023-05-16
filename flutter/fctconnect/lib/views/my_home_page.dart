@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/cookie_manager.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -36,20 +38,42 @@ class _MyHomePageState extends State<MyHomePage> {
 
   late ScrollController _scrollController;
 
+
+
   @override
   void initState() {
     super.initState();
     _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+    SessionManager.storeSession('/home');
     _loadPosts();
   }
+
+  
+
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     super.dispose();
   }
+
+   @override
+  void didUpdateWidget(MyHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.token != oldWidget.token) {
+      setState(() {
+        _token = widget.token;
+      });
+    }
+  }
+
+ 
+
+  
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (context) => _buildPostModal(context),
             );
           } else if (index == 3) {}
-        },
+        }, 
       ),
     );
   }
@@ -236,6 +260,13 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Sair'),
             onTap: () {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
+              SessionManager.storeSession('/');
+              CookieManager.delete('Username');
+              CookieManager.delete('Token');
+              CookieManager.delete('ED');
+              CookieManager.delete('CD');
+              CookieManager.delete('Role');
+
               Navigator.pushReplacement(context,
                   CupertinoPageRoute(builder: (ctx) => const LoginView()));
             },

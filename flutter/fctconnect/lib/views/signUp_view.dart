@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:responsive_login_ui/models/register_user.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 
 import '../views/login_view.dart';
 import '../constants.dart';
@@ -32,6 +33,12 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController privacyController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    SessionManager.storeSession('/signup');
+    super.initState();
+    
+  }
 
   @override
   void dispose() {
