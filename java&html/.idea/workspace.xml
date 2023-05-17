@@ -6,13 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/appengine-generated/app.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/appengine-generated/app.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/appengine-generated/index.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/appengine-generated/index.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/classes/source-context.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/classes/source-context.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/quickstart-web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/WEB-INF/quickstart-web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/appengine-staging/app.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/app.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/GetUserResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/GetUserResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/ListUsersResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/ListUsersResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/UserData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/UserData.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +83,7 @@
       <workItem from="1683796662156" duration="19857000" />
       <workItem from="1683968929677" duration="4076000" />
       <workItem from="1684055819830" duration="6250000" />
-      <workItem from="1684315832473" duration="1566000" />
+      <workItem from="1684315832473" duration="4378000" />
     </task>
     <servers />
   </component>
