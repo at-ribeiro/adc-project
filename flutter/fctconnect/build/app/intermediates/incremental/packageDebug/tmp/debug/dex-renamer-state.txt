@@ -1,4 +1,0 @@
-#Thu May 11 15:12:20 WEST 2023
-base.0=/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/adc-project/flutter/fctconnect/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
-renamed.0=classes.dex
-path.0=classes.dex

@@ -23,6 +23,9 @@ dependencies:
   fluro: ^2.0.5
   intl: ^0.17.0
   date_time_picker: ^2.0.1
+  cookie_jar: ^4.0.2
+  dio_cookie_manager: ^3.0.0
+  shared_preferences: ^2.0.6
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/event_creator.dart';
 import 'package:responsive_login_ui/views/search_event_view.dart';
 
@@ -20,6 +21,7 @@ class NewsView extends StatefulWidget {
 class _NewsViewState extends State<NewsView> {
   late Token _token;
   List<NewsData> _news = [];
+  
 
   @override
   void initState() {

@@ -20,6 +20,7 @@ const String baseUrl = 'https://fct-connect-2023.oa.r.appspot.com/rest';
 
 
 class BaseClient{
+
 var client = http.Client();
 
 
@@ -91,6 +92,7 @@ Future<Token> postLogin(String api, dynamic object) async {
       creationDate: jsonResponse['creationDate'],
       expirationDate: jsonResponse['expirationDate'],
     );
+  
     return token;
   } else{
     // throw exception

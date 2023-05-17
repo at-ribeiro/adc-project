@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 
@@ -81,7 +83,25 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   } else {
                     // When the future completes successfully, navigate to the home page
                     final token = snapshot.data;
-                    return MyHomePage(token: token!);
+                    String tokenId = token!.tokenID;
+                    String username = token.username;
+                    String role = token.role;
+                    String cD = token.creationDate.toString();
+                    String eD = token.expirationDate.toString();
+                  
+
+              
+
+
+                   
+                    document.cookie="Session=MyHomePage";
+                     document.cookie="Token="+tokenId;
+                     document.cookie="CD="+cD;
+                     document.cookie="ED="+eD;
+                     document.cookie="Role="+role;
+                     document.cookie="Username="+username;
+
+                    return MyHomePage(token: token);
                   }
                 }),
       ),
