@@ -95,7 +95,6 @@ public class FeedServlet extends HttpServlet {
 
             StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
 
-            //TODO: Editar yaml
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
                     .setFilter(

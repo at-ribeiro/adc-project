@@ -153,9 +153,10 @@ public class PostServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
+            String username = request.getPathInfo().substring(1);
             String timestamp = request.getParameter("timestamp");
-            LOG.fine("Attempt to create post for user " + username);
+
+            LOG.fine("Attempt to get posts from user " + username);
 
             //verifications
 
@@ -190,17 +191,17 @@ public class PostServlet extends HttpServlet {
                 return;
             }
 
-            StructuredQuery.OrderBy ascendingOrder = StructuredQuery.OrderBy.asc("timestamp");
+            StructuredQuery.OrderBy descendingOrder = StructuredQuery.OrderBy.desc("timestamp");
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
                     .setFilter(
                             StructuredQuery.CompositeFilter.and(
                                     StructuredQuery.PropertyFilter.hasAncestor(userKey),
-                                    StructuredQuery.PropertyFilter.gt("timestamp", timestamp)
+                                    StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
                             )
 
                     )
-                    .addOrderBy(ascendingOrder)
+                    .addOrderBy(descendingOrder)
                     .setLimit(20)
                     .build();
 
