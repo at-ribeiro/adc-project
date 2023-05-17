@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:responsive_login_ui/services/cookie_manager.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,13 +13,12 @@ import 'views/news_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   Get.put(SimpleUIController());
 
   // Restore session from shared preferences
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? session = prefs.getString('session');
-  
+  String? session = await SessionManager.get('session');
+
   runApp(MyApp(session: session));
 }
 
@@ -39,53 +38,72 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (RouteSettings settings) {
         return MaterialPageRoute(
           builder: (BuildContext context) {
-            return _getRouteWidget(_getSession());
+            return FutureBuilder<Widget>(
+              future: _getRouteWidget(_getSession()),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!;
+                } else {
+                  return Scaffold(
+                    body: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+              },
+            );
           },
         );
       },
     );
   }
 
-  Widget _getRouteWidget(String routeName) {
-    String? _tokenid;
-    String? _username;
-    String? _role;
-    String? _creationDate;
-    String? _expirationDate;
-
-    Token? token;
-    if (routeName != '/') {
-      _tokenid = CookieManager.get('Token');
-      _username = CookieManager.get('Username');
-      _role = CookieManager.get('Role');
-      _creationDate = CookieManager.get('CD');
-      _expirationDate = CookieManager.get('ED');
-
-      token = Token(
-        username: _username,
-        role: _role,
-        tokenID: _tokenid,
-        creationDate: int.parse(_creationDate!),
-        expirationDate: int.parse(_expirationDate!),
-      );
-    }
+  Future<Widget> _getRouteWidget(String routeName) async {
     
-    switch (routeName) {
-      case '/':
-        return LoginView();
-      case '/home':
-        // Return your home page widget here
-        return MyHomePage(token: token!);
-      case '/news':
-        // Return your profile page widget here
-        return NewsView(token: token!);
-      // Add more routes as needed
-      case '/singup':
-        return SignUpView();
-      default:
+      String? _tokenid;
+      String? _username;
+      String? _role;
+      String? _creationDate;
+      String? _expirationDate;
 
-        return LoginView();
-    }
+
+        Token? token;
+      if (routeName != '/') {
+        _tokenid = await SessionManager.get('Token');
+        _username = await SessionManager.get('Username');
+        _role = await SessionManager.get('Role');
+        _creationDate = await SessionManager.get('CD');
+        _expirationDate = await SessionManager.get('ED');
+
+        token = Token(
+          username: _username!,
+          role: _role!,
+          tokenID: _tokenid!,
+          creationDate: int.parse(_creationDate!),
+          expirationDate: int.parse(_expirationDate!),
+        );
+        }else{
+
+          SessionManager.storeSession('session', '/');
+        }
+    
+
+      switch (routeName) {
+        case '/':
+          return LoginView();
+        case '/home':
+          // Return your home page widget here
+          return MyHomePage(token: token!);
+        case '/news':
+          // Return your profile page widget here
+          return NewsView(token: token!);
+        // Add more routes as needed
+        case '/signup':
+          return SignUpView();
+        default:
+          return LoginView();
+      }
+    
   }
 
   String _getSession() {
@@ -99,5 +117,11 @@ class MyApp extends StatelessWidget {
   void setLastVisitedPage(String currentPage) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('last_visited_page', currentPage);
+  }
+  
+  
+  Future<String?> isLoggedIn() async {
+    return await SessionManager.get('isLoggedIn');
+
   }
 }

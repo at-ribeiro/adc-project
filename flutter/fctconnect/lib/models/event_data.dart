@@ -28,8 +28,8 @@ class EventData {
         "creator": creator,
         "title": title,
         "description": description,
-        "data_inicio": start,
-        "data_fim": end,
+        "start": start,
+        "end": end,
       };
    
    String toJson() => json.encode(toMap());

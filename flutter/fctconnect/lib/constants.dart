@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+ var brightness = SchedulerBinding.instance.window.platformBrightness;
+ bool isDarkMode = brightness == Brightness.dark;
+
 
 TextStyle kLoginTitleStyle(Size size) => GoogleFonts.ubuntu(
       fontSize: size.height * 0.060,

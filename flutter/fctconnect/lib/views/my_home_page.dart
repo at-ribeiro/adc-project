@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +8,10 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
-import '../services/cookie_manager.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
+import 'my_profile.dart';
 import 'news_view.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -37,21 +36,15 @@ class _MyHomePageState extends State<MyHomePage> {
   late DropzoneViewController dropControler;
 
   late ScrollController _scrollController;
-
-
-
   @override
   void initState() {
     super.initState();
     _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    SessionManager.storeSession('/home');
+    SessionManager.storeSession('session' ,'/home');
     _loadPosts();
   }
-
-  
-
 
   @override
   void dispose() {
@@ -59,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-   @override
+  @override
   void didUpdateWidget(MyHomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.token != oldWidget.token) {
@@ -68,12 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
-
- 
-
-  
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,8 +190,11 @@ class _MyHomePageState extends State<MyHomePage> {
               isScrollControlled: true,
               builder: (context) => _buildPostModal(context),
             );
-          } else if (index == 3) {}
-        }, 
+          } else if (index == 3) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+          }
+        },
       ),
     );
   }
@@ -258,14 +248,18 @@ class _MyHomePageState extends State<MyHomePage> {
           const Spacer(),
           ListTile(
             title: const Text('Sair'),
-            onTap: () {
+            onTap: () async {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
-              SessionManager.storeSession('/');
-              CookieManager.delete('Username');
-              CookieManager.delete('Token');
-              CookieManager.delete('ED');
-              CookieManager.delete('CD');
-              CookieManager.delete('Role');
+
+              SessionManager.storeSession('session', '/');
+              if (kIsWeb) {
+                SessionManager.storeSession('isLoggedIn', 'false');
+                SessionManager.delete('Username');
+                SessionManager.delete('Token');
+                SessionManager.delete('ED');
+                SessionManager.delete('CD');
+                SessionManager.delete('Role');
+              }
 
               Navigator.pushReplacement(context,
                   CupertinoPageRoute(builder: (ctx) => const LoginView()));

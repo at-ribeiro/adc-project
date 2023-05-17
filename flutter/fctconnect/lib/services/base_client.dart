@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/events_list_data.dart';
-import 'package:responsive_login_ui/views/event_view.dart';
+
 
 import '../models/FeedData.dart';
 import '../models/NewsData.dart';
@@ -14,6 +13,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
 import '../models/event_data.dart';
+import '../models/profile_info.dart';
 
 
 const String baseUrl = 'https://fct-connect-2023.oa.r.appspot.com/rest';
@@ -185,8 +185,6 @@ Future<int> createEvent(String api, String tokenID, EventData event) async {
   request.headers.addAll(_headers);
 
   request.fields['event'] = json.encode(event.toJson());
-  request.fields['creator'] = event.creator;
-  
 
   if (event.imageData != null) {
     var multipartFile = http.MultipartFile.fromBytes(
@@ -223,4 +221,20 @@ Future<int> createEvent(String api, String tokenID, EventData event) async {
     throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
   }
 
+}
+Future<ProfileInfo> fetchInfo(String api, String tokenID, String username) async {
+  var _headers ={
+    "Content-Type": "application/json; charset=UTF-8",
+    "Authorization": tokenID,
+  };
+  var url = Uri.parse('$baseUrl$api/$username?searcher=$username');
+
+  var response = await http.get(url, headers: _headers);
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    final profileInfo = ProfileInfo.fromJson(jsonData);
+    return profileInfo;
+  } else {
+    throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+  }
 }}
