@@ -109,6 +109,7 @@
           <element id="library" level="project" name="Maven: com.google.api.grpc:proto-google-cloud-storage-v2:2.20.1-alpha" />
           <element id="library" level="project" name="Maven: com.google.api.grpc:grpc-google-cloud-storage-v2:2.20.1-alpha" />
           <element id="library" level="project" name="Maven: com.google.api.grpc:gapic-google-cloud-storage-v2:2.20.1-alpha" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.11.0" />
         </element>
       </element>
       <element id="directory" name="META-INF">
