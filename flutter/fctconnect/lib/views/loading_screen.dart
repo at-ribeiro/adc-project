@@ -1,11 +1,9 @@
-import 'dart:html';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
-
 import '../models/Token.dart';
+import '../services/session_manager.dart';
 import 'my_home_page.dart';
-import 'login_view.dart';
 
 class LoadingScreen extends StatefulWidget {
   final Future<Token> token;
@@ -30,7 +28,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
         Duration(seconds: 1)); // Simulating an asynchronous operation
     try {
       final token = await widget.token;
-
     } catch (error) {
       setState(() {
         _showError = true;
@@ -83,25 +80,22 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   } else {
                     // When the future completes successfully, navigate to the home page
                     final token = snapshot.data;
-                    String tokenId = token!.tokenID;
-                    String username = token.username;
-                    String role = token.role;
-                    String cD = token.creationDate.toString();
-                    String eD = token.expirationDate.toString();
-                  
 
-              
+                    if (kIsWeb) {
+                      String tokenId = token!.tokenID;
+                      String username = token.username;
+                      String role = token.role;
+                      String cD = token.creationDate.toString();
+                      String eD = token.expirationDate.toString();
 
-
-                   
-                    document.cookie="Session=MyHomePage";
-                     document.cookie="Token="+tokenId;
-                     document.cookie="CD="+cD;
-                     document.cookie="ED="+eD;
-                     document.cookie="Role="+role;
-                     document.cookie="Username="+username;
-
-                    return MyHomePage(token: token);
+                      SessionManager.storeSession('Token', tokenId );
+                      SessionManager.storeSession('CD', cD);
+                      SessionManager.storeSession('ED', eD);
+                      SessionManager.storeSession('Role', role);
+                      SessionManager.storeSession('Username', username);
+                      SessionManager.storeSession('isLoggedIn', 'true');
+                    }
+                    return MyHomePage(token: token!);
                   }
                 }),
       ),

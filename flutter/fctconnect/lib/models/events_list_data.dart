@@ -1,25 +1,29 @@
 class EventsListData {
-  final String id;
-  final String text;
-  final String user;
+  final String title;
+  final String description;
+  final String creator;
   final String url;
-  final String timestamp;
+  final String start;
+  final String end;
 
   EventsListData({
-    required this.id,
-    required this.text,
-    required this.user,
+    required this.title,
+    required this.description,
+    required this.creator,
     required this.url,
-    required this.timestamp,
+    required this.start,
+    required this.end
+
   });
 
   factory EventsListData.fromJson(Map<String, dynamic> json) {
     return EventsListData(
-      id: json['id'],
-      text: json['text'],
-      user: json['user'],
+      title: json['title'],
+      description: json['description'],
+      creator: json['creator'],
       url: json['url'],
-      timestamp: json['timestamp'],
+      start: json['start'],
+      end: json['end'],
     );
   }
 }
