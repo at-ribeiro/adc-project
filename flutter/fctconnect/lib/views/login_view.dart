@@ -40,7 +40,7 @@ void initState() {
   
   super.initState();
   
-  SessionManager.storeSession('/');
+  SessionManager.storeSession('session', '/');
 }
 
   @override

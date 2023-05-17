@@ -35,7 +35,7 @@ class _SignUpViewState extends State<SignUpView> {
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    SessionManager.storeSession('/signup');
+    SessionManager.storeSession('session' ,'/signup');
     super.initState();
     
   }
