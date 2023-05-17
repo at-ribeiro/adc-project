@@ -34,9 +34,9 @@ public class EventsServlet extends HttpServlet {
         try{
 
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
+            String username = request.getPathInfo().substring(1);
 
-            LOG.fine("Attempt get news");
+            LOG.fine("Attempt get events");
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
@@ -58,12 +58,12 @@ public class EventsServlet extends HttpServlet {
 
             StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
 
-            Query<Entity> newsQuery = Query.newEntityQueryBuilder()
+            Query<Entity> eventsQuery = Query.newEntityQueryBuilder()
                     .setKind("Event")
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> eventResults = datastore.run(newsQuery);
+            QueryResults<Entity> eventResults = datastore.run(eventsQuery);
 
             List<EventGetData> eventList = new ArrayList<>();
 
@@ -125,6 +125,8 @@ public class EventsServlet extends HttpServlet {
 
         try{
 
+            String creator = request.getPathInfo().substring(1);
+
             String jsonPart = IOUtils.toString(request.getPart("event").getInputStream(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
 
@@ -139,7 +141,6 @@ public class EventsServlet extends HttpServlet {
             String tokenId = request.getHeader("Authorization");
             String username = request.getParameter("username");
             String title = data.getTitle();
-            String creator = data.getCreator();
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
