@@ -139,16 +139,15 @@ public class EventsServlet extends HttpServlet {
             EventPostData data = mapper.readValue(jsonPart, EventPostData.class);
 
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
             String title = data.getTitle();
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
 
-            LOG.fine("Attempt to create event with user " + username);
+            LOG.fine("Attempt to create event with user " + creator);
 
             //verifications
-            Key userKey = userKeyFactory.newKey(username);
+            Key userKey = userKeyFactory.newKey(creator);
             Entity user = txn.get(userKey);
             if (user == null){
                 LOG.warning("User does not exist.");
@@ -165,7 +164,7 @@ public class EventsServlet extends HttpServlet {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", creator))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);

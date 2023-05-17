@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 @Consumes(MediaType.APPLICATION_JSON)
 public class GetUserResource {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(GetUserResource.class.getName());
 
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -100,14 +100,14 @@ public class GetUserResource {
             int nFollowers = followerList.size();
 
             UserData data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
-                                            nFollowing, nFollowers);
+                                            user.getString("user_role"), nFollowing, nFollowers);
 
             return Response.ok(g.toJson(data)).build();
 
 
         } catch (Exception e) {
             txn.rollback();
-            LOG.severe(e.getMessage());
+            LOG.severe(e.);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             if (txn.isActive()) {
