@@ -4,7 +4,9 @@ pt\unl\fct\di\apdc\firstwebapp\resources\LogoutResource.class
 pt\unl\fct\di\apdc\firstwebapp\util\NewsGetData.class
 pt\unl\fct\di\apdc\firstwebapp\resources\RemoveResource.class
 pt\unl\fct\di\apdc\firstwebapp\resources\UpdateResource.class
+pt\unl\fct\di\apdc\firstwebapp\resources\SearchResource.class
 pt\unl\fct\di\apdc\firstwebapp\resources\FeedServlet.class
+pt\unl\fct\di\apdc\firstwebapp\util\SearchUserData.class
 pt\unl\fct\di\apdc\firstwebapp\util\EventGetData.class
 pt\unl\fct\di\apdc\firstwebapp\resources\PostServlet.class
 pt\unl\fct\di\apdc\firstwebapp\util\UserData.class

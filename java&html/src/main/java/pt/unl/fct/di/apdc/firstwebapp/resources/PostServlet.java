@@ -196,8 +196,8 @@ public class PostServlet extends HttpServlet {
                     .setKind("Post")
                     .setFilter(
                             StructuredQuery.CompositeFilter.and(
-                                    StructuredQuery.PropertyFilter.hasAncestor(userKey),
-                                    StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
+                                    StructuredQuery.PropertyFilter.eq("user", username),
+                                    StructuredQuery.PropertyFilter.lt("timestamp", Long.parseLong(timestamp))
                             )
 
                     )
@@ -241,6 +241,8 @@ public class PostServlet extends HttpServlet {
             // Convert the list of posts to JSON
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(posts);
+
+            LOG.warning("DEBUG POSTS!!!!! : " + json);
 
             // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
