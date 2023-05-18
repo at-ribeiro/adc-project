@@ -49,7 +49,7 @@ public class SearchResource {
             QueryResults<Entity> lessThanResults = datastore.run(queryLessThan);
 
             List<SearchUserData> matchedUsers = new ArrayList<>();
-            while (greaterThanOrEqualResults.hasNext() && lessThanResults.hasNext()) {
+            while (greaterThanOrEqualResults.hasNext() && lessThanResults.hasNext() && matchedUsers.size()<=5) {
                 Entity user1 = greaterThanOrEqualResults.next();
                 Entity user2 = lessThanResults.next();
 
@@ -58,7 +58,7 @@ public class SearchResource {
 
                 SearchUserData data2 = new SearchUserData(user2.getString("user_username"),
                         user2.getString("user_fullname"));
-                
+
                 // If the username matches in both queries, add it to the result list
                 if (user1.getString("user_username").startsWith(query)) {
                     matchedUsers.add(data1);
