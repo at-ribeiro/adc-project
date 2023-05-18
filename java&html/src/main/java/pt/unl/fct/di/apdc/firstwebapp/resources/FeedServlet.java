@@ -100,7 +100,7 @@ public class FeedServlet extends HttpServlet {
                     .setFilter(
                             StructuredQuery.CompositeFilter.and(
                                     StructuredQuery.PropertyFilter.in("user", followeesKeysValues),
-                                    StructuredQuery.PropertyFilter.lt("timestamp", timestamp)
+                                    StructuredQuery.PropertyFilter.lt("timestamp", Long.parseLong(timestamp))
                             )
 
                     )
@@ -112,6 +112,8 @@ public class FeedServlet extends HttpServlet {
 
             postResults.forEachRemaining(post -> {
                         LOG.info("DEBUG!!!!!!!!!: " + post.getString("id"));
+                        if(post.getLong("timestamp") < Long.parseLong(timestamp))
+                            LOG.info("timestamp comperator: " + timestamp);
 
                         String url = "";
 
