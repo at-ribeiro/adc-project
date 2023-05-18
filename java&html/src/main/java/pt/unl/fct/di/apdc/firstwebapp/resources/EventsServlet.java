@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
 import javax.servlet.*;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+
+@MultipartConfig
+
 
 public class EventsServlet extends HttpServlet {
 
@@ -56,7 +60,7 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
+            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("event_start");
 
             Query<Entity> eventsQuery = Query.newEntityQueryBuilder()
                     .setKind("Event")
@@ -71,7 +75,7 @@ public class EventsServlet extends HttpServlet {
             eventResults.forEachRemaining(event -> {
                 String url = "";
 
-                if (!event.getString("img").equals("")) {
+                if (!event.getString("event_image").equals("")) {
 
                     BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
                     Blob blob = storage.get(blobId);
@@ -139,16 +143,15 @@ public class EventsServlet extends HttpServlet {
             EventPostData data = mapper.readValue(jsonPart, EventPostData.class);
 
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
             String title = data.getTitle();
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
 
-            LOG.fine("Attempt to create event with user " + username);
+            LOG.fine("Attempt to create event with user " + creator);
 
             //verifications
-            Key userKey = userKeyFactory.newKey(username);
+            Key userKey = userKeyFactory.newKey(creator);
             Entity user = txn.get(userKey);
             if (user == null){
                 LOG.warning("User does not exist.");
@@ -165,12 +168,12 @@ public class EventsServlet extends HttpServlet {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", creator))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
@@ -194,7 +197,7 @@ public class EventsServlet extends HttpServlet {
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName,  title + "-" + imageName);
 
-                if(storage.get(blobId)==null){
+                if(storage.get(blobId)!=null){
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     return;
                 }
