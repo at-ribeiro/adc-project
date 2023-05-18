@@ -129,7 +129,7 @@ Future<int> createPost(String api, String tokenID, Post post) async {
   return response.statusCode;
 }
 
-Future<List<FeedData>> getFeed(String api, String tokenID, String username, String time) async {
+Future<List<FeedData>> getFeedorPost(String api, String tokenID, String username, String time) async {
   var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,

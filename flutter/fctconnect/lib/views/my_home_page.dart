@@ -30,12 +30,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _fileName;
   List<FeedData> _posts = [];
   bool _loadingMore = false;
-  String _lastDisplayedMessageTimestamp =
-      DateTime.now().millisecondsSinceEpoch.toString();
+  String _lastDisplayedMessageTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  late ScrollController _scrollController;
 
   late DropzoneViewController dropControler;
 
-  late ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +79,57 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       drawer: _buildDrawer(),
-      body: RefreshIndicator(
+      body: ContentBody(),
+      bottomNavigationBar: NavigationBody(),
+    );
+  }
+
+  Widget NavigationBody() {
+    return BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
+        currentIndex: 0, // set the initial index to 0
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.black),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.newspaper, color: Colors.black),
+            label: 'Noticias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.post_add, color: Colors.black),
+            label: 'Post',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: Colors.black),
+            label: 'Perfil',
+          ),
+        ],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+        onTap: (index) {
+          if (index == 0) {
+          } else if (index == 1) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+          } else if (index == 2) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => _buildPostModal(context),
+            );
+          } else if (index == 3) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+          }
+        },
+      );
+  }
+
+  Widget ContentBody() {
+    return RefreshIndicator(
         onRefresh: _refreshPosts,
         child: ListView.builder(
           controller: _scrollController,
@@ -154,49 +204,8 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        currentIndex: 0, // set the initial index to 0
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, color: Colors.black),
-            label: 'Noticias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.post_add, color: Colors.black),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
-            label: 'Perfil',
-          ),
-        ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        onTap: (index) {
-          if (index == 0) {
-          } else if (index == 1) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-          } else if (index == 2) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => _buildPostModal(context),
-            );
-          } else if (index == 3) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
-          }
-        },
-      ),
-    );
+      );
+
   }
 
   Widget _buildDrawer() {
@@ -268,29 +277,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
-  }
-
-  Widget _buildBody() {
-    if (_token != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Welcome, ${_token.username}'),
-            Text('Role: ${_token.role}'),
-            Text('Token ID: ${_token.tokenID}'),
-            Text(
-                'Creation Date: ${DateTime.fromMillisecondsSinceEpoch(_token.creationDate as int)}'),
-            Text(
-                'Expiration Date: ${DateTime.fromMillisecondsSinceEpoch(_token.expirationDate as int)}'),
-          ],
-        ),
-      );
-    } else {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
   }
 
   Widget _buildPostModal(BuildContext context) {
@@ -407,22 +393,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadPosts() async {
-    List<FeedData> posts = await BaseClient().getFeed("/feed", _token.tokenID,
-        _token.username, _lastDisplayedMessageTimestamp);
-    if (mounted) {
-      setState(() {
-        _posts = posts;
-        if (posts.isNotEmpty) {
-          _lastDisplayedMessageTimestamp = posts.last.timestamp;
-        }
-      });
-    }
+  List<FeedData> posts = await BaseClient().getFeedorPost(
+    "/feed",
+    _token.tokenID,
+    _token.username,
+    _lastDisplayedMessageTimestamp,
+  );
+
+  if (posts.isNotEmpty) {
+    setState(() {
+      _lastDisplayedMessageTimestamp = posts.last.timestamp;
+      _posts.addAll(posts);
+    });
   }
+}
 
   Future<void> _refreshPosts() async {
     _lastDisplayedMessageTimestamp =
         DateTime.now().millisecondsSinceEpoch.toString();
-    List<FeedData> latestPosts = await BaseClient().getFeed("/feed",
+    List<FeedData> latestPosts = await BaseClient().getFeedorPost("/feed",
         _token.tokenID, _token.username, _lastDisplayedMessageTimestamp);
     setState(() {
       _posts = latestPosts;
