@@ -8,6 +8,7 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/costum_search_delegate.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -67,6 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
+        actions: [
+          IconButton(onPressed: (){
+            showSearch(context: context, delegate: CustomSearchDelegate());
+          }
+          , icon: Icon(Icons.search))
+        ],
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
