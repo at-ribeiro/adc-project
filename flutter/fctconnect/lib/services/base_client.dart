@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/events_list_data.dart';
+
 import 'package:responsive_login_ui/models/user_query_data.dart';
+
 
 
 import '../models/FeedData.dart';
@@ -130,7 +132,7 @@ Future<int> createPost(String api, String tokenID, Post post) async {
   return response.statusCode;
 }
 
-Future<List<FeedData>> getFeed(String api, String tokenID, String username, String time) async {
+Future<List<FeedData>> getFeedorPost(String api, String tokenID, String username, String time) async {
   var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,
@@ -238,6 +240,7 @@ Future<ProfileInfo> fetchInfo(String api, String tokenID, String username) async
   } else {
     throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
   }
+
 }
 Future<List<UserQueryData>> searchUser(String query, String api) async {
 
@@ -260,3 +263,6 @@ Future<List<UserQueryData>> searchUser(String query, String api) async {
   
   
   }
+
+}}
+

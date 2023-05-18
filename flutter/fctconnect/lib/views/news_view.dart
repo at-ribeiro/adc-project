@@ -21,7 +21,6 @@ class NewsView extends StatefulWidget {
 class _NewsViewState extends State<NewsView> {
   late Token _token;
   List<NewsData> _news = [];
-  
 
   @override
   void initState() {
@@ -75,11 +74,13 @@ class _NewsViewState extends State<NewsView> {
                           ),
                           const SizedBox(width: 8.0),
                           Expanded(
-                            child: Text(
-                              news.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Text(
+                                news.title,
+                                style: const TextStyle(
+                                  fontSize: 18.0,
+                                ),
                               ),
                             ),
                           ),
@@ -100,58 +101,59 @@ class NewsDetailPage extends StatelessWidget {
   const NewsDetailPage({Key? key, required this.news}) : super(key: key);
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                news.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24.0,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  news.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                DateFormat('dd-MM-yyyy')
-                    .format(DateTime.fromMillisecondsSinceEpoch(
-                        int.parse(news.timestamp)))
-                    .toString(),
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16.0,
+                const SizedBox(height: 8.0),
+                Text(
+                  DateFormat('dd-MM-yyyy')
+                      .format(DateTime.fromMillisecondsSinceEpoch(
+                          int.parse(news.timestamp)))
+                      .toString(),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16.0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16.0),
-              SizedBox(
-                height: 400.0, // Replace with your desired height
-                child: AspectRatio(
-                  aspectRatio: 16 / 9, // Replace with the actual aspect ratio of the image
-                  child: FittedBox(
-                    fit: BoxFit.contain, // Adjust the fit property as needed
-                    child: Image.network(
-                      news.url,
+                const SizedBox(height: 16.0),
+                SizedBox(
+                  height: 400.0, // Replace with your desired height
+                  child: AspectRatio(
+                    aspectRatio: 16 /
+                        9, // Replace with the actual aspect ratio of the image
+                    child: FittedBox(
+                      fit: BoxFit.contain, // Adjust the fit property as needed
+                      child: Image.network(
+                        news.url,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16.0),
-              Text(
-                news.text,
-                style: const TextStyle(
-                  fontSize: 18.0,
+                const SizedBox(height: 16.0),
+                Text(
+                  news.text,
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

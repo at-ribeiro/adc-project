@@ -422,7 +422,7 @@ class _SignUpViewState extends State<SignUpView> {
                             break;
                           default:
                             showErrorMessage =
-                                "Ulgo de errado  não está certo, tente outra vez!";
+                                "Algo não está certo, tente outra vez!";
                             break;
                         }
 
