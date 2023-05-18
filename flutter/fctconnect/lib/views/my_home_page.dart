@@ -212,8 +212,8 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
-
-      ),
+    );
+      
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         currentIndex: 0, // set the initial index to 0
@@ -254,11 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
           }
         },
-      ),
-    );
-
       );
-
 
   }
 

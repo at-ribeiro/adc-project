@@ -264,5 +264,5 @@ Future<List<UserQueryData>> searchUser(String query, String api) async {
   
   }
 
-}}
+
 
