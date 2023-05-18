@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/events_list_data.dart';
 
+import 'package:responsive_login_ui/models/user_query_data.dart';
+
+
 
 import '../models/FeedData.dart';
 import '../models/NewsData.dart';
@@ -237,4 +240,29 @@ Future<ProfileInfo> fetchInfo(String api, String tokenID, String username) async
   } else {
     throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
   }
+
+}
+Future<List<UserQueryData>> searchUser(String query, String api) async {
+
+  var url = Uri.parse('$baseUrl$api/user?query=$query');
+
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    // If the server returns a 200 OK response, parse the JSON.
+    // Replace this with your actual data parsing
+     final jsonList = json.decode(response.body) as List<dynamic>;
+    final usersList = jsonList.map((json) => UserQueryData.fromJson(json)).toList();
+
+    return usersList;
+  } else {
+    // If the server did not return a 200 OK response, throw an exception.
+    throw Exception('Failed to load data');
+  }
+}
+  
+  
+  }
+
 }}
+

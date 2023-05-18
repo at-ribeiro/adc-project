@@ -8,6 +8,8 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/costum_search_delegate.dart';
+
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -33,8 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _lastDisplayedMessageTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
 
-  late DropzoneViewController dropControler;
 
+  late DropzoneViewController dropControler;
 
   @override
   void initState() {
@@ -67,6 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
+        actions: [
+          IconButton(onPressed: (){
+            showSearch(context: context, delegate: CustomSearchDelegate());
+          }
+          , icon: Icon(Icons.search))
+        ],
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -204,7 +212,53 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
+
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
+        currentIndex: 0, // set the initial index to 0
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.black),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.newspaper, color: Colors.black),
+            label: 'Noticias',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.post_add, color: Colors.black),
+            label: 'Post',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person, color: Colors.black),
+            label: 'Perfil',
+          ),
+        ],
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
+        showUnselectedLabels: true,
+        onTap: (index) {
+          if (index == 0) {
+          } else if (index == 1) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+          } else if (index == 2) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => _buildPostModal(context),
+            );
+          } else if (index == 3) {
+            Navigator.push(context,
+                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+          }
+        },
+      ),
+    );
+
       );
+
 
   }
 
