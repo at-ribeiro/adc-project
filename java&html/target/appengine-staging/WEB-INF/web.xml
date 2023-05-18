@@ -47,6 +47,10 @@
 		<servlet-name>NewsServlet</servlet-name>
 		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.NewsServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>EventsServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.EventsServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>PostServlet</servlet-name>
@@ -59,6 +63,10 @@
 	<servlet-mapping>
 		<servlet-name>NewsServlet</servlet-name>
 		<url-pattern>/rest/news/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EventsServlet</servlet-name>
+		<url-pattern>/rest/events/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>

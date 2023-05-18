@@ -104,7 +104,7 @@ public class PostServlet extends HttpServlet {
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
-                if(storage.get(blobId)==null){
+                if(storage.get(blobId)!=null){
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     return;
                 }
@@ -153,7 +153,7 @@ public class PostServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
+            String username = request.getPathInfo().substring(1);
             String timestamp = request.getParameter("timestamp");
             LOG.fine("Attempt to create post for user " + username);
 
@@ -179,7 +179,7 @@ public class PostServlet extends HttpServlet {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;

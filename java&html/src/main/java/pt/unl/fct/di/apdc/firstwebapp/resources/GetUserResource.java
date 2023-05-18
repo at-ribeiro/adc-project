@@ -49,18 +49,18 @@ public class GetUserResource {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", searcher))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key userKey = userKeyFactory.newKey(username);
@@ -99,15 +99,28 @@ public class GetUserResource {
 
             int nFollowers = followerList.size();
 
+            Query<Entity> postsQuery = Query.newEntityQueryBuilder()
+                    .setKind("Post")
+                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                    .build();
+
+            QueryResults<Entity> postResults = datastore.run(postsQuery);
+
+            List<Entity> postsList = new ArrayList<>();
+            postResults.forEachRemaining(postsList::add);
+
+            int nPosts = postsList.size();
+
             UserData data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
-                                            user.getString("user_role"), nFollowing, nFollowers);
+                                            user.getString("user_role"), nFollowing, nFollowers, nPosts);
 
             return Response.ok(g.toJson(data)).build();
 
 
         } catch (Exception e) {
             txn.rollback();
-            LOG.severe(e.);
+            LOG.severe(e.getMessage());
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             if (txn.isActive()) {

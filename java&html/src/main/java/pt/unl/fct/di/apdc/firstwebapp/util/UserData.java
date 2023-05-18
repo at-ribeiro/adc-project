@@ -15,14 +15,17 @@ public class UserData {
     private int nFollowing;
     private int nFollowers;
 
+    private int nPosts;
+
     public UserData(){}
 
-    public UserData(String username, String fullname, String email, String role, int nFollowing, int nFollowers){
+    public UserData(String username, String fullname, String email, String role, int nFollowing, int nFollowers, int nPosts){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
         this.role = role;
         this.nFollowing = nFollowing;
         this.nFollowers = nFollowers;
+        this.nPosts = nPosts;
     }
 }
