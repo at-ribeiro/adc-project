@@ -41,7 +41,7 @@ class _MyProfileState extends State<MyProfile> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent) {
+        _scrollController.position.maxScrollExtent && selectedButton != 'Info') {
       _loadPosts();
     }
   }
