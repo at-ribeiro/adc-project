@@ -225,12 +225,13 @@ Future<int> createEvent(String api, String tokenID, EventData event) async {
   }
 
 }
-Future<ProfileInfo> fetchInfo(String api, String tokenID, String username) async {
+Future<ProfileInfo> fetchInfo(String api, String tokenID, String username, String searches) async {
   var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,
+    "User": username,
   };
-  var url = Uri.parse('$baseUrl$api/$username?searcher=$username');
+  var url = Uri.parse('$baseUrl$api/$username?searcher=$searches');
 
   var response = await http.get(url, headers: _headers);
   if (response.statusCode == 200) {

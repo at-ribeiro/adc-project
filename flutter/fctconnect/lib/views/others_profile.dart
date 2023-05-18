@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
 
+import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/models/profile_info.dart';
+import '../models/FeedData.dart';
+
 import '../models/Token.dart';
 import '../services/base_client.dart';
 
 class OtherProfile extends StatefulWidget {
   final Token token;
+  final String name;
 
-  const OtherProfile({Key? key, required this.token}) : super(key: key);
+  const OtherProfile({Key? key, required this.token, required this.name})
+      : super(key: key);
 
   @override
   State<OtherProfile> createState() => _OtherProfileState();
@@ -20,55 +26,21 @@ class _OtherProfileState extends State<OtherProfile> {
   late Token _token;
   final double coverHeight = 200;
   final double profileHeight = 144;
+  late String name;
+  String selectedButton = 'Info';
+  List<FeedData> _posts = [];
+  bool _loadingMore = false;
+  String _lastDisplayedMessageTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _token = widget.token;
+    name = widget.name;
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
   }
-
-  Future<ProfileInfo> _loadInfo() async {
-    ProfileInfo info = await BaseClient()
-        .fetchInfo("/profile", _token.tokenID, _token.username);
-
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/profile_info.dart';
-import '../models/FeedData.dart';
-import '../models/Token.dart';
-import '../services/base_client.dart';
-
-class MyProfile extends StatefulWidget {
-  final Token token;
-  final String name;
-
-  const MyProfile({Key? key, required this.token, required this.name}) : super(key: key);
-
-  @override
-  State<MyProfile> createState() => _MyProfileState();
-}
-
-class _MyProfileState extends State<MyProfile> {
-  late Token _token;
-  late String name;
-
-  final double coverHeight = 200;
-  final double profileHeight = 100;
-  String selectedButton = 'Info';
-
-  List<FeedData> _posts = [];
-  bool _loadingMore = false;
-  String _lastDisplayedMessageTimestamp =
-      DateTime.now().millisecondsSinceEpoch.toString();
-  late ScrollController _scrollController;
-
-  @override
-void initState() {
-  super.initState();
-  _token = widget.token;
-  _scrollController = ScrollController();
-  _scrollController.addListener(_onScroll);
-}
-
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
@@ -78,27 +50,35 @@ void initState() {
   }
 
   Future<void> _loadPosts() async {
-  List<FeedData> posts = await BaseClient().getFeedorPost(
-    "/post",
-    _token.tokenID,
-    name,
-    _lastDisplayedMessageTimestamp,
-  );
+    if (_loadingMore) return;
 
-  if (posts.isNotEmpty) {
     setState(() {
-      _lastDisplayedMessageTimestamp = posts.last.timestamp;
-      _posts.addAll(posts);
+      _loadingMore = true;
     });
+
+    List<FeedData> posts = await BaseClient().getFeedorPost(
+      "/post",
+      _token.tokenID,
+      name,
+      _lastDisplayedMessageTimestamp,
+    );
+
+    if (posts.isNotEmpty) {
+      setState(() {
+        _lastDisplayedMessageTimestamp = posts.last.timestamp;
+        _posts.addAll(posts);
+        _loadingMore = false;
+      });
+    } else {
+      setState(() {
+        _loadingMore = false;
+      });
+    }
   }
-}
-
-
 
   Future<ProfileInfo> _loadInfo() async {
     ProfileInfo info = await BaseClient()
-        .fetchInfo("/profile", _token.tokenID, name);
-
+        .fetchInfo("/profile", _token.tokenID, name, _token.username);
     return info;
   }
 
@@ -106,14 +86,8 @@ void initState() {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-
         padding: EdgeInsets.zero,
-        children: <Widget>[
-          buildTop(),
-          buildContent(),
-
         controller: _scrollController,
-        padding: EdgeInsets.zero,
         children: <Widget>[
           buildTop(),
           ContentWidget(
@@ -128,7 +102,6 @@ void initState() {
           ),
           const SizedBox(height: 16),
           buildInfoSection(),
-
           const SizedBox(height: 32),
         ],
       ),
@@ -181,9 +154,7 @@ void initState() {
 
   Widget buildBody() => Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          
-        ],
+        children: [],
       );
 
   Widget NumbersWidget(ProfileInfo info) => Row(
@@ -224,7 +195,7 @@ void initState() {
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              'Desenvolvedor profissional de flutter ',
+              'Desenvolvedor profissional de flutter',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16),
@@ -238,7 +209,7 @@ void initState() {
             ),
             SizedBox(height: 16),
             Text(
-              'Ano ',
+              'Ano',
               style: TextStyle(fontSize: 20),
             ),
             Text(
@@ -247,84 +218,93 @@ void initState() {
             ),
             SizedBox(height: 16),
             Text(
-              'Grupos ',
+              'Grupos',
               style: TextStyle(fontSize: 20),
             ),
             SizedBox(height: 16),
             Text(
-              'Eventos ',
+              'Eventos',
               style: TextStyle(fontSize: 20),
             ),
           ],
         ),
       );
     } else {
-      List<Widget> userPosts = [];
-      for (FeedData post in _posts) {
-        userPosts.add(
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                    ),
+      if (_posts.isEmpty) {
+        return Center(
+          child: Text('No posts available'),
+        );
+      } else {
+        return Column(
+          children: _posts.map((post) => buildPostCard(post)).toList(),
+        );
+      }
+    }
+  }
+
+  Widget buildPostCard(FeedData post) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
                   ),
-                  const SizedBox(width: 7.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                          child: Text(post.user),
-                        ),
-                        const SizedBox(height: 8.0),
-                        Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(25.0, 8.0, 8.0, 8.0),
-                          child: Text(post.text),
-                        ),
-                        const SizedBox(height: 8.0),
-                        post.url.isNotEmpty
-                            ? AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  child: Image.network(
-                                    post.url,
-                                    fit: BoxFit.cover,
-                                  ),
+                ),
+                const SizedBox(width: 7.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                        child: Text(post.user),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(25.0, 8.0, 8.0, 8.0),
+                        child: Text(post.text),
+                      ),
+                      const SizedBox(height: 8.0),
+                      post.url.isNotEmpty
+                          ? AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Image.network(
+                                  post.url,
+                                  fit: BoxFit.cover,
                                 ),
-                              )
-                            : const SizedBox.shrink(),
-                        const SizedBox(height: 8.0),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            DateFormat('dd-MM-yyyy HH:mm:ss').format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(post.timestamp),
                               ),
+                            )
+                          : const SizedBox.shrink(),
+                      const SizedBox(height: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(post.timestamp),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8.0),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 8.0),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        );
-      }
-      return Column(children: userPosts);
-    }
+          ],
+        ),
+      ),
+    );
   }
 
   void selectButton(String buttonName) {
@@ -332,7 +312,6 @@ void initState() {
       selectedButton = buttonName;
     });
   }
-
 
   Widget buildTop() {
     final top = coverHeight - profileHeight / 2;
@@ -348,11 +327,7 @@ void initState() {
         Positioned(
           top: top,
           child: buildProfileImage(),
-
-        )
-
         ),
-
       ],
     );
   }
@@ -363,27 +338,6 @@ void initState() {
   }) =>
       MaterialButton(
         padding: EdgeInsets.symmetric(vertical: 4),
-
-        //TODO fazer cenas no on pressed
-        onPressed: () {},
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                '$value',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                text,
-                style: const TextStyle(fontSize: 16),
-              )
-            ]),
-
-        //TODO: Add functionality to onPressed
         onPressed: () {},
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         child: Column(
@@ -401,7 +355,6 @@ void initState() {
             ),
           ],
         ),
-
       );
 
   Widget buildCoverImage() => Container(
@@ -421,9 +374,6 @@ void initState() {
           'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
         ),
       );
-
-}
-
 }
 
 class ContentWidget extends StatefulWidget {
@@ -536,9 +486,9 @@ class _ContentWidgetState extends State<ContentWidget> {
                   ElevatedButton(
                     onPressed: () {
                       widget.onButtonSelected('Posts');
-                      _MyProfileState myProfileState =
-                          context.findAncestorStateOfType<_MyProfileState>()!;
-                      myProfileState._loadPosts();
+                      _OtherProfileState otherProfileState = context
+                          .findAncestorStateOfType<_OtherProfileState>()!;
+                      otherProfileState._loadPosts();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -576,7 +526,6 @@ class _ContentWidgetState extends State<ContentWidget> {
   }) =>
       MaterialButton(
         padding: EdgeInsets.symmetric(vertical: 4),
-        //TODO: Add functionality to onPressed
         onPressed: () {},
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         child: Column(
