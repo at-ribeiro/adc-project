@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/models/events_list_data.dart';
@@ -9,6 +11,7 @@ import 'package:responsive_login_ui/views/search_event_view.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../models/event_data.dart';
+import 'event_page.dart';
 
 class EventView extends StatefulWidget {
   final Token token;
@@ -44,153 +47,156 @@ class _EventViewState extends State<EventView> {
     _loadEvents();
   }
 
- @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text('Eventos'),
-    ),
-    body: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            controller: eventController,
-            decoration: InputDecoration(
-              labelText: 'Nome do Evento',
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Eventos'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: eventController,
+              decoration: InputDecoration(
+                labelText: 'Nome do Evento',
+              ),
             ),
           ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => SearchEventView(),
-              ),
-            );
-          },
-          child: const Text('Pesquisar outros eventos'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EventCreator(
-                  token: _token,
-                ),
-              ),
-            );
-          },
-          child: const Text('Registar Evento'),
-        ),
-        Padding(padding: const EdgeInsets.all(16.0)),
-        Expanded(
-          child: ListView.builder(
-            itemCount: filteredEvents.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(filteredEvents[index]),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _refreshEvents,
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: _events.length + (_loadingMore ? 1 : 0),
-              itemBuilder: (BuildContext context, int index) {
-                if (index >= _events.length) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchEventView(),
+                    ),
                   );
-                } else {
-                  EventsListData event = _events[index];
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                            ),
-                          ),
-                          const SizedBox(width: 7.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.0, 8.0, 0.0),
-                                  child: Text(event.creator),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    25.0, 8.0, 8.0, 8.0),
-                                  child: Text(event.description),
-                                ),
-                                const SizedBox(height: 8.0),
-                                if (event.url.isNotEmpty)
-                                  AspectRatio(
-                                    aspectRatio: 16 / 9,
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      child: Image.network(
-                                        event.url,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(height: 8.0),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0),
-                                  child: Text(
-                                    DateFormat('dd-MM-yyyy HH:mm:ss')
-                                      .format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(event.start),
-                                        ),
-                                      ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0),
-                                  child: Text(
-                                    DateFormat('dd-MM-yyyy HH:mm:ss')
-                                      .format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(event.end),
-                                        ),
-                                      ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8.0),
-                              ],
-                            ),
-                          ),
-                        ],
+                },
+                child: const Text('Pesquisar outros eventos'),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EventCreator(
+                        token: _token,
                       ),
                     ),
                   );
-                }
+                },
+                child: const Text('Registar Evento'),
+              )
+            ],
+          ),
+          Padding(padding: const EdgeInsets.all(16.0)),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredEvents.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(filteredEvents[index]),
+                );
               },
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          Expanded(
+            flex: 30,
+            child: RefreshIndicator(
+              onRefresh: _refreshEvents,
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _events.length + (_loadingMore ? 1 : 0),
+                itemBuilder: (BuildContext context, int index) {
+                  if (index >= _events.length) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    EventsListData event = _events[index];
+                    return GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (ctx) => EventPage(event: event)),
+                          );
+                        },
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (event.url.isNotEmpty)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      event.url,
+                                      width: 220,
+                                      height: 150,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                const SizedBox(width: 7.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        event.title,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Text(
+                                        'Start Date & Time: ' +
+                                            DateFormat('dd-MM-yyyy HH:mm:ss')
+                                                .format(
+                                              DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                                int.parse(event.start),
+                                              ),
+                                            ),
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Text(
+                                        'End Date & Time: ' +
+                                            DateFormat('dd-MM-yyyy HH:mm:ss')
+                                                .format(
+                                              DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                                int.parse(event.end),
+                                              ),
+                                            ),
+                                        style:
+                                            TextStyle(color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ));
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _loadEvents() async {
     List<EventsListData> events = await BaseClient().getEvents(
