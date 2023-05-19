@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  <title>Main Menu</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+
+<h1 id="header-username"></h1>
+<h2 id="header-role" class="role su-role gs-role ga-role gbo-role user-role"></h2>
+
+<div class="search-wrapper">
+  <div class="search-container">
+    <label for="search-bar"></label>
+    <input type="search" id="search-bar" data-search placeholder="Procure colegas e nucleos ">
+  </div>
+  <div class="user-cards-container" data-user-cards-container></div>
+</div>
+
+<template data-user-template>
+  <div class="card">
+    <div class="header" data-header></div>
+    <div class="body" data-body></div>
+  </div>
+</template>
+
+<table>
+  <tr>
+    <td><a href='../remove/removeMenu.html'>Remove User</a></td>
+  </tr>
+  <tr>
+    <td><a href='../list/listUsers.html'>List Users</a></td>
+  </tr>
+  <tr>
+    <td><a id="modLink" href='../update/updateUser.html'>Modify User</a></td>
+  </tr>
+  <tr>
+    <td><a href='../changePwd/changePwd.html'>Change Password</a></td>
+  </tr>
+  <tr>
+    <td><a href='../token/showToken.html'>Check Authorization Token</a></td>
+  </tr>
+  <tr>
+    <td><a id="extraLink" href='../extra/getUser.html'>Get a User</a></td>
+  </tr>
+  <tr>
+    <td>
+      <form id="form">
+        <button>Logout</button>
+      </form>
+    </td>
+  </tr>
+</table>
+
+<a id="google-cloud" href="https://console.cloud.google.com/welcome?authuser=2&hl=pt-br&project=peak-castle-382619">Google Cloud Link</a>
+
+<script src="script.js"></script>
+
+
+</body>
+<footer>
+  Copyright: FCT NOVA 2023
+</footer>
+</html>
