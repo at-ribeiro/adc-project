@@ -1,0 +1,35 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/views/event_creator.dart';
+import 'package:responsive_login_ui/views/search_event_view.dart';
+
+import '../models/NewsData.dart';
+import '../models/Token.dart';
+import '../services/base_client.dart';
+
+class ProfileView extends StatefulWidget {
+  final Token token;
+
+  const ProfileView({Key? key, required this.token}) : super(key: key);
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  late Token _token;
+
+  @override
+  void initState() {
+    super.initState();
+    _token = widget.token;
+  }
+
+  @override
+Widget build(BuildContext context) {
+  
+}
+
+
+}
