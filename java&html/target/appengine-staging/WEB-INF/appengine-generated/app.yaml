@@ -4,8 +4,9 @@ automatic_scaling:
 inbound_services:
 - warmup
 auto_id_policy: default
-beta_settings:
+
   'source_reference': 'https://github.com/at-ribeiro/adc-project.git#719f9fb37e0a8d9760ea1dfbb89a4bd38a35e055'
+
 handlers:
 - url: (/.*/)
   static_files: __static__\1index.html

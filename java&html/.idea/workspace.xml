@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
-    <option name="SHOW_DIALOG" value="false" />
+="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
@@ -36,6 +37,11 @@
         <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="workspaceImportEnabled" value="true" />
+      </MavenImportingSettings>
+    </option>
   </component>
   <component name="ProjectId" id="2P3Gfr9UfQJqVWDr4vEooFKMH4j" />
   <component name="ProjectViewState">
@@ -47,12 +53,16 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;flutter&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/adc-project/java&amp;html&quot;,
+
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/geekg/Desktop/ADC/FCT CONNECT/adc-project/java&amp;html&quot;,
+
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+
+
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -66,9 +76,15 @@
       <updated>1682678471071</updated>
       <workItem from="1682678474296" duration="6072000" />
       <workItem from="1683709973017" duration="1111000" />
-      <workItem from="1683717077005" duration="1423000" />
-      <workItem from="1684054261463" duration="21000" />
-      <workItem from="1684054300832" duration="57000" />
+
+      <workItem from="1683731165662" duration="55000" />
+      <workItem from="1683731234389" duration="705000" />
+      <workItem from="1683749945055" duration="68000" />
+      <workItem from="1683796662156" duration="19857000" />
+      <workItem from="1683968929677" duration="4076000" />
+      <workItem from="1684055819830" duration="6250000" />
+      <workItem from="1684315832473" duration="4378000" />
+
     </task>
     <servers />
   </component>

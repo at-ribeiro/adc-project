@@ -15,11 +15,11 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>jersey.config.server.provider.classnames</param-name>
-			<param-value>main.java.pt.unl.fct.di.apdc.firstwebapp.filters.AdditionalResponseHeadersFilter</param-value>
+			<param-value>pt.unl.fct.di.apdc.firstwebapp.filters.AdditionalResponseHeadersFilter</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.server.provider.packages</param-name>
-			<param-value>main.java.pt.unl.fct.di.apdc.firstwebapp.resources</param-value>
+			<param-value>pt.unl.fct.di.apdc.firstwebapp.resources</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jersey.config.server.provider.scanning.recursive</param-name>
@@ -35,7 +35,39 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet>
+		<servlet-name>PostServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.PostServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>FeedServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.FeedServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>NewsServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.NewsServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>EventsServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.EventsServlet</servlet-class>
+	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>PostServlet</servlet-name>
+		<url-pattern>/rest/post/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>FeedServlet</servlet-name>
+		<url-pattern>/rest/feed/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>NewsServlet</servlet-name>
+		<url-pattern>/rest/news/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EventsServlet</servlet-name>
+		<url-pattern>/rest/events/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>
 		<url-pattern>/rest/*</url-pattern>

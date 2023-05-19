@@ -1,0 +1,12 @@
+indexes:
+  - kind: Post
+    properties:
+      - name: user
+      - name: timestamp
+        direction: desc
+
+  - kind: Post
+    ancestor: yes
+    properties:
+      - name: timestamp
+        direction: desc

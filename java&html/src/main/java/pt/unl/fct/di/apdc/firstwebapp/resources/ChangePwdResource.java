@@ -1,9 +1,9 @@
-package main.java.pt.unl.fct.di.apdc.firstwebapp.resources;
+package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import main.java.pt.unl.fct.di.apdc.firstwebapp.util.CPData;
+import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.CPData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
