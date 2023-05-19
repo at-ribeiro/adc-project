@@ -2,7 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
+import 'package:responsive_login_ui/models/FeedData.dart';
+import 'package:responsive_login_ui/models/Token.dart';
+import 'package:responsive_login_ui/services/base_client.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -30,7 +34,8 @@ class _OtherProfileState extends State<OtherProfile> {
   String selectedButton = 'Info';
   List<FeedData> _posts = [];
   bool _loadingMore = false;
-  String _lastDisplayedMessageTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  String _lastDisplayedMessageTimestamp =
+      DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
 
   @override
@@ -44,7 +49,8 @@ class _OtherProfileState extends State<OtherProfile> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent && selectedButton != 'Info') {
+            _scrollController.position.maxScrollExtent &&
+        selectedButton != 'Info') {
       _loadPosts();
     }
   }
@@ -61,6 +67,7 @@ class _OtherProfileState extends State<OtherProfile> {
       _token.tokenID,
       name,
       _lastDisplayedMessageTimestamp,
+      _token.username,
     );
 
     if (posts.isNotEmpty) {
@@ -94,6 +101,7 @@ class _OtherProfileState extends State<OtherProfile> {
             loadInfo: _loadInfo,
             selectedButton: selectedButton,
             onButtonSelected: selectButton,
+            token: _token,
           ),
           const SizedBox(height: 16),
           Divider(
@@ -107,81 +115,6 @@ class _OtherProfileState extends State<OtherProfile> {
       ),
     );
   }
-
-  Widget buildContent() {
-    return FutureBuilder<ProfileInfo>(
-      future: _loadInfo(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(
-                height: 8,
-              ),
-              Text(
-                info.fullname,
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                info.role,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
-              ),
-              const SizedBox(height: 16),
-              NumbersWidget(info),
-              const Divider(),
-              const SizedBox(height: 16),
-            ],
-          );
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
-  }
-
-  Widget buildBody() => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [],
-      );
-
-  Widget NumbersWidget(ProfileInfo info) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: buildButton(text: 'Posts', value: info.nPosts),
-          ),
-          Divider(
-            thickness: 2.0,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-            child: buildButton(text: 'Following', value: info.nFollowing),
-          ),
-          Divider(
-            thickness: 2.0,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: buildButton(text: 'Followers', value: info.nFollowers),
-          ),
-        ],
-      );
 
   Widget buildInfoSection() {
     if (selectedButton == 'Info') {
@@ -232,7 +165,7 @@ class _OtherProfileState extends State<OtherProfile> {
     } else {
       if (_posts.isEmpty) {
         return Center(
-          child: Text('No posts available'),
+          child: CircularProgressIndicator(),
         );
       } else {
         return Column(
@@ -378,6 +311,8 @@ class _OtherProfileState extends State<OtherProfile> {
 
 class ContentWidget extends StatefulWidget {
   final Future<ProfileInfo> Function() loadInfo;
+  final Token token;
+
   final String selectedButton;
   final void Function(String) onButtonSelected;
 
@@ -386,6 +321,7 @@ class ContentWidget extends StatefulWidget {
     required this.loadInfo,
     required this.selectedButton,
     required this.onButtonSelected,
+    required this.token,
   }) : super(key: key);
 
   @override
@@ -394,11 +330,17 @@ class ContentWidget extends StatefulWidget {
 
 class _ContentWidgetState extends State<ContentWidget> {
   late Future<ProfileInfo> _infoFuture;
+  late Future<bool> _followStatusFuture;
+  late Token _token;
+  bool _follows = false;
+  bool _processing =
+      false; // To check if the follow/unfollow operation is in progress.
 
   @override
   void initState() {
     super.initState();
     _infoFuture = widget.loadInfo();
+    _token = widget.token;
   }
 
   @override
@@ -416,6 +358,8 @@ class _ContentWidgetState extends State<ContentWidget> {
           );
         } else if (snapshot.hasData) {
           ProfileInfo info = snapshot.data!;
+          _followStatusFuture = BaseClient().doesUserFollow(
+              "/follow", _token.username, _token.tokenID, info.username);
           return Column(
             children: [
               const SizedBox(height: 8),
@@ -428,6 +372,40 @@ class _ContentWidgetState extends State<ContentWidget> {
               Text(
                 info.role,
                 style: const TextStyle(fontSize: 20, color: Colors.black),
+              ),
+              const SizedBox(height: 16),
+              FutureBuilder<bool>(
+                future: _followStatusFuture,
+                builder: (context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error retrieving follow status');
+                  } else {
+                    _follows = snapshot.data!;
+
+                    return ElevatedButton(
+                      onPressed: _follows ? _unfollow(info) : _follow(info),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                          (states) {
+                            if (_follows) {
+                              return Colors
+                                  .grey; // Set the button background color to grey if following
+                            }
+                            return Colors
+                                .blue; // Set the button background color to blue if not following
+                          },
+                        ),
+                      ),
+                      child: Text(
+                        _follows ? 'Unfollow' : 'Follow',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 16),
               Row(
@@ -520,28 +498,68 @@ class _ContentWidgetState extends State<ContentWidget> {
     );
   }
 
-  Widget buildButton({
-    required String text,
-    required int value,
-  }) =>
-      MaterialButton(
-        padding: EdgeInsets.symmetric(vertical: 4),
-        onPressed: () {},
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '$value',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              text,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      );
+  Function()? _follow(ProfileInfo info) {
+    if (_processing) {
+      return null;
+    } else {
+      return () async {
+        setState(() {
+          _processing = true;
+        });
+
+        await BaseClient()
+            .follow("/follow", _token.username, _token.tokenID, info.username);
+
+        setState(() {
+          _follows = true;
+          _processing = false;
+        });
+      };
+    }
+  }
+
+  Function()? _unfollow(ProfileInfo info) {
+    if (_processing) {
+      return null;
+    } else {
+      return () async {
+        setState(() {
+          _processing = true;
+        });
+
+        await BaseClient().unfollow(
+            "/follow", _token.username, _token.tokenID, info.username);
+
+        setState(() {
+          _follows = false;
+          _processing = false;
+        });
+      };
+    }
+  }
+
+Widget buildButton({
+  required String text,
+  required int value,
+}) =>
+    MaterialButton(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      onPressed: () {},
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            '$value',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
 }

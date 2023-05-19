@@ -41,7 +41,8 @@ class _MyProfileState extends State<MyProfile> {
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent && selectedButton != 'Info') {
+            _scrollController.position.maxScrollExtent &&
+        selectedButton != 'Info') {
       _loadPosts();
     }
   }
@@ -58,6 +59,7 @@ class _MyProfileState extends State<MyProfile> {
       _token.tokenID,
       _token.username,
       _lastDisplayedMessageTimestamp,
+      _token.username,
     );
 
     if (posts.isNotEmpty) {
@@ -74,8 +76,8 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Future<ProfileInfo> _loadInfo() async {
-    ProfileInfo info = await BaseClient()
-        .fetchInfo("/profile", _token.tokenID, _token.username, _token.username);
+    ProfileInfo info = await BaseClient().fetchInfo(
+        "/profile", _token.tokenID, _token.username, _token.username);
     return info;
   }
 
@@ -229,7 +231,7 @@ class _MyProfileState extends State<MyProfile> {
     } else {
       if (_posts.isEmpty) {
         return Center(
-          child: Text('No posts available'),
+          child: CircularProgressIndicator(),
         );
       } else {
         return Column(

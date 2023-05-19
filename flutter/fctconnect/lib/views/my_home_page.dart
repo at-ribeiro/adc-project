@@ -448,6 +448,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _token.tokenID,
     _token.username,
     _lastDisplayedMessageTimestamp,
+    _token.username,
+
   );
 
   if (posts.isNotEmpty) {
@@ -462,7 +464,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _lastDisplayedMessageTimestamp =
         DateTime.now().millisecondsSinceEpoch.toString();
     List<FeedData> latestPosts = await BaseClient().getFeedorPost("/feed",
-        _token.tokenID, _token.username, _lastDisplayedMessageTimestamp);
+        _token.tokenID, _token.username, _lastDisplayedMessageTimestamp,     _token.username,
+);
     setState(() {
       _posts = latestPosts;
       if (latestPosts.isNotEmpty) {

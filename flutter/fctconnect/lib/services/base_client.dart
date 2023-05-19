@@ -132,10 +132,12 @@ Future<int> createPost(String api, String tokenID, Post post) async {
   return response.statusCode;
 }
 
-Future<List<FeedData>> getFeedorPost(String api, String tokenID, String username, String time) async {
+Future<List<FeedData>> getFeedorPost(String api, String tokenID, String username, String time, String searching) async {
   var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,
+    "User": searching,
+
   };
   var url = Uri.parse('$baseUrl$api/$username?timestamp=$time');
 
@@ -229,7 +231,6 @@ Future<ProfileInfo> fetchInfo(String api, String tokenID, String username, Strin
   var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,
-    "User": username,
   };
   var url = Uri.parse('$baseUrl$api/$username?searcher=$searches');
 
@@ -261,9 +262,55 @@ Future<List<UserQueryData>> searchUser(String query, String api) async {
     throw Exception('Failed to load data');
   }
 }
-  
-  
+
+Future<dynamic> follow(String api, String username, String tokenID, String following) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse('$baseUrl$api/$username/$following');
+
+    var response = await http.post(url, headers: _headers, );
+
+    if (response.statusCode == 200){
+      return response;
+    }else{
+      //throw exception
+      throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
   }
+
+  Future<dynamic> unfollow(String api, String username, String tokenID, String following) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse('$baseUrl$api/$username/$following');
+
+    var response = await http.delete(url, headers: _headers, );
+
+    if (response.statusCode == 200){
+      return response;
+    }else{
+      //throw exception
+      throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<bool> doesUserFollow(String api, String username, String tokenID, String following) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse('$baseUrl$api/$username/$following');
+
+    var response = await http.get(url, headers: _headers, );
+
+    return response.statusCode == 200;
+
+  }
+  
+}
 
 
 
