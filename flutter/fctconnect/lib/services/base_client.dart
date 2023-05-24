@@ -206,7 +206,7 @@ Future<int> createEvent(String api, String tokenID, EventData event) async {
   return response.statusCode;
 }
 
-  Future<List<EventsListData>> getEvents(String api, String tokenID, String username, String time) async {
+  Future<List<EventData>> getEvents(String api, String tokenID, String username, String time) async {
    var _headers ={
     "Content-Type": "application/json; charset=UTF-8",
     "Authorization": tokenID,
@@ -217,7 +217,7 @@ Future<int> createEvent(String api, String tokenID, EventData event) async {
   if (response.statusCode == 200) {
     
     final jsonList = json.decode(response.body) as List<dynamic>;
-    final eventsList = jsonList.map((json) => EventsListData.fromJson(json)).toList();
+    final eventsList = jsonList.map((json) => EventData.fromJson(json)).toList();
 
     return eventsList;
 
@@ -309,6 +309,38 @@ Future<dynamic> follow(String api, String username, String tokenID, String follo
     return response.statusCode == 200;
 
   }
+
+    Future<bool> isInEvent(String api, String username, String tokenID) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.get(url, headers: _headers, );
+
+    return response.statusCode == 200;
+
+  }
+
+  Future<dynamic> joinEvent(String api, String username, String tokenID, EventData event) async{
+    var _headers ={
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.post(url, headers: _headers, );
+
+    if (response.statusCode == 200){
+      return response;
+    }else{
+      //throw exception
+      throw Exception("Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  leaveEvent(String s, String t, String u, EventData event) {}
   
 }
 
