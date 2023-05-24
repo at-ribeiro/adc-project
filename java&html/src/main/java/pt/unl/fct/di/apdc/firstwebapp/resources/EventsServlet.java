@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 @MultipartConfig
 
-
 public class EventsServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(EventsServlet.class.getName());
@@ -35,7 +34,7 @@ public class EventsServlet extends HttpServlet {
 
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
 
             String tokenId = request.getHeader("Authorization");
             String username = request.getPathInfo().substring(1);
@@ -71,7 +70,6 @@ public class EventsServlet extends HttpServlet {
 
             List<EventGetData> eventList = new ArrayList<>();
 
-
             eventResults.forEachRemaining(event -> {
                 String url = "";
 
@@ -82,21 +80,20 @@ public class EventsServlet extends HttpServlet {
                     url = blob.getMediaLink();
                 }
 
-
-                //TODO: Check with frontend
+                // TODO: Check with frontend
                 EventGetData newsInstance = new EventGetData(
                         event.getString("event_creator"),
                         event.getString("event_title"),
                         event.getString("event_description"),
                         url,
-                        Long.toString(event.getLong("event_start")),
-                        Long.toString(event.getLong("event_end"))
-                );
+                        event.getLong("event_start"),
+                        event.getLong("event_end"),
+                        event.getString("id"));
 
                 eventList.add(newsInstance);
-            } );
+            });
 
-            if(eventList.isEmpty()){
+            if (eventList.isEmpty()) {
                 LOG.info("events: " + eventList);
                 response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
@@ -112,7 +109,7 @@ public class EventsServlet extends HttpServlet {
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -127,7 +124,7 @@ public class EventsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
 
             String creator = request.getPathInfo().substring(1);
 
@@ -147,24 +144,25 @@ public class EventsServlet extends HttpServlet {
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
+            String uniqueEventId = title + System.currentTimeMillis();
 
             LOG.fine("Attempt to create event with user " + creator);
 
-            //verifications
+            // verifications
             Key userKey = userKeyFactory.newKey(creator);
             Entity user = txn.get(userKey);
-            if (user == null){
+            if (user == null) {
                 LOG.warning("User does not exist.");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            if (user.getString("user_state").equals("INACTIVE")){
+            if (user.getString("user_state").equals("INACTIVE")) {
                 LOG.warning("Inactive User.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
-            //TODO:Check user's role
+            // TODO:Check user's role
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
@@ -195,9 +193,9 @@ public class EventsServlet extends HttpServlet {
             if (imageStream != null) {
 
                 imageName = request.getPart("image").getSubmittedFileName();
-                BlobId blobId = BlobId.of(bucketName,  title + "-" + imageName);
+                BlobId blobId = BlobId.of(bucketName, title + "-" + imageName);
 
-                if(storage.get(blobId)!=null){
+                if (storage.get(blobId) != null) {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     return;
                 }
@@ -212,9 +210,10 @@ public class EventsServlet extends HttpServlet {
 
             Key eventKey = datastore.newKeyFactory()
                     .setKind("Event")
-                    .newKey(title);
+                    .newKey(uniqueEventId);
 
             Entity entity = Entity.newBuilder(eventKey)
+                    .set("id", uniqueEventId)
                     .set("event_title", title)
                     .set("event_creator", creator)
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
@@ -228,7 +227,7 @@ public class EventsServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
