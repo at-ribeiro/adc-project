@@ -4,6 +4,7 @@ class FeedData {
   final String user;
   final String url;
   final String timestamp;
+  bool isLiked;
 
   FeedData({
     required this.id,
@@ -11,6 +12,7 @@ class FeedData {
     required this.user,
     required this.url,
     required this.timestamp,
+    this.isLiked = false,
   });
 
   factory FeedData.fromJson(Map<String, dynamic> json) {
