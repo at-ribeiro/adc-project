@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/views/post_page.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -213,8 +214,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    if(post.isLiked == true); // endpoint para adicionar like e ir buscar o valor e somar
-                                    else; //endpoint para remover o like e ir buscar o valor e remover
+                                    if (post.isLiked == true)
+                                      ; // endpoint para adicionar like e ir buscar o valor e somar
+                                    else
+                                      ; //endpoint para remover o like e ir buscar o valor e remover
                                     post.isLiked = !post.isLiked;
                                   });
                                 },
@@ -227,7 +230,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               Text('0'),
                               IconButton(
                                 onPressed: () {
-                                  // Handle comment button tap
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (ctx) =>
+                                          PostPage(token: _token),
+                                    ),
+                                  );
                                 },
                                 icon: Icon(Icons.comment_outlined),
                               ),
