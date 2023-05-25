@@ -7,10 +7,11 @@ public class EventPostData {
     private String description;
     private long start;
     private long end;
+    private String id;
 
     public EventPostData(){}
 
-    public EventPostData(String creator, String title, String description, long start, long end){
+    public EventPostData(String creator, String title, String description, long start, long end, String id){
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -37,4 +38,6 @@ public class EventPostData {
     public long getEnd() {
         return end;
     }
+
+
 }

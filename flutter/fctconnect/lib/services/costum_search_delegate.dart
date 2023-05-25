@@ -73,15 +73,26 @@ class CustomSearchDelegate extends SearchDelegate {
                         tokenID: results[3]!,
                         username: results[4]!,
                       );
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (ctx) => OtherProfile(
-                            token: _token,
-                            name: snapshot.data![index].username,
+                      if (_token.username == snapshot.data![index].username) {
+                        Navigator.pushReplacement(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (ctx) => MyProfile(
+                              token: _token,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        Navigator.pushReplacement(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (ctx) => OtherProfile(
+                              token: _token,
+                              name: snapshot.data![index].username,
+                            ),
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       margin: EdgeInsets.all(8),
