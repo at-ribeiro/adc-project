@@ -5,7 +5,7 @@ class CommentData {
   final String timestamp;
 
   CommentData({
-    required this.username,
+    required this.username, 
     required this.text,
     required this.url,
     required this.timestamp,
