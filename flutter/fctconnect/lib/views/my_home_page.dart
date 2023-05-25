@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/views/post_page.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -32,9 +33,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _fileName;
   List<FeedData> _posts = [];
   bool _loadingMore = false;
-  String _lastDisplayedMessageTimestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  String _lastDisplayedMessageTimestamp =
+      DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
-
 
   late DropzoneViewController dropControler;
 
@@ -44,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    SessionManager.storeSession('session' ,'/home');
+    SessionManager.storeSession('session', '/home');
     _loadPosts();
   }
 
@@ -70,10 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text(''),
         actions: [
-          IconButton(onPressed: (){
-            showSearch(context: context, delegate: CustomSearchDelegate());
-          }
-          , icon: Icon(Icons.search))
+          IconButton(
+              onPressed: () {
+                showSearch(context: context, delegate: CustomSearchDelegate());
+              },
+              icon: Icon(Icons.search))
         ],
         leading: Builder(
           builder: (BuildContext context) {
@@ -94,168 +96,163 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget NavigationBody() {
     return BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        currentIndex: 0, // set the initial index to 0
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, color: Colors.black),
-            label: 'Noticias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.post_add, color: Colors.black),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
-            label: 'Perfil',
-          ),
-        ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        onTap: (index) {
-          if (index == 0) {
-          } else if (index == 1) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-          } else if (index == 2) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => _buildPostModal(context),
-            );
-          } else if (index == 3) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
-          }
-        },
-      );
+      type: BottomNavigationBarType.shifting,
+      currentIndex: 0, // set the initial index to 0
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home, color: Colors.black),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.newspaper, color: Colors.black),
+          label: 'Noticias',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.post_add, color: Colors.black),
+          label: 'Post',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person, color: Colors.black),
+          label: 'Perfil',
+        ),
+      ],
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black,
+      showUnselectedLabels: true,
+      onTap: (index) {
+        if (index == 0) {
+        } else if (index == 1) {
+          Navigator.pushReplacement(context,
+              CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+        } else if (index == 2) {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => _buildPostModal(context),
+          );
+        } else if (index == 3) {
+          Navigator.pushReplacement(context,
+              CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+        }
+      },
+    );
   }
 
   Widget ContentBody() {
     return RefreshIndicator(
-        onRefresh: _refreshPosts,
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: _posts.length + (_loadingMore ? 1 : 0),
-          itemBuilder: (BuildContext context, int index) {
-            if (index >= _posts.length) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              FeedData post = _posts[index];
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                        ),
+      onRefresh: _refreshPosts,
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: _posts.length + (_loadingMore ? 1 : 0),
+        itemBuilder: (BuildContext context, int index) {
+          if (index >= _posts.length) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            FeedData post = _posts[index];
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
                       ),
-                      const SizedBox(width: 7.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                              child: Text(post.user),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  25.0, 8.0, 8.0, 8.0),
-                              child: Text(post.text),
-                            ),
-                            const SizedBox(height: 8.0),
-                            post.url.isNotEmpty
-                                ? AspectRatio(
-                                    aspectRatio: 16 / 9,
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      child: Image.network(
-                                        post.url,
-                                        fit: BoxFit.cover,
-                                      ),
+                    ),
+                    const SizedBox(width: 7.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    8.0, 0.0, 8.0, 0.0),
+                                child: Text(post.user),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    0.0, 0.0, 8.0, 0.0),
+                                child: Text(
+                                  DateFormat('HH:mm - dd-MM-yyyy').format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                      int.parse(post.timestamp),
                                     ),
-                                  )
-                                : const SizedBox.shrink(),
-                            const SizedBox(height: 8.0),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                DateFormat('dd-MM-yyyy HH:mm:ss').format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                    int.parse(post.timestamp),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 8.0),
-                          ],
-                        ),
+                            ],
+                          ),
+                          const SizedBox(height: 8.0),
+                          Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+                            child: Text(post.text),
+                          ),
+                          const SizedBox(height: 8.0),
+                          post.url.isNotEmpty
+                              ? AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Image.network(
+                                      post.url,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (post.isLiked == true)
+                                      ; // endpoint para adicionar like e ir buscar o valor e somar
+                                    else
+                                      ; //endpoint para remover o like e ir buscar o valor e remover
+                                    post.isLiked = !post.isLiked;
+                                  });
+                                },
+                                icon: Icon(
+                                  post.isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                ),
+                              ),
+                              Text('0'),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (ctx) =>
+                                          PostPage(token: _token),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.comment_outlined),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            }
-          },
-        ),
-    );
-      
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        currentIndex: 0, // set the initial index to 0
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, color: Colors.black),
-            label: 'Noticias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.post_add, color: Colors.black),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
-            label: 'Perfil',
-          ),
-        ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        onTap: (index) {
-          if (index == 0) {
-          } else if (index == 1) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-          } else if (index == 2) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => _buildPostModal(context),
+              ),
             );
-          } else if (index == 3) {
-            Navigator.push(context,
-                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
           }
         },
-      );
-
+      ),
+    );
   }
 
   Widget _buildDrawer() {
@@ -443,29 +440,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadPosts() async {
-  List<FeedData> posts = await BaseClient().getFeedorPost(
-    "/feed",
-    _token.tokenID,
-    _token.username,
-    _lastDisplayedMessageTimestamp,
-    _token.username,
+    List<FeedData> posts = await BaseClient().getFeedorPost(
+      "/feed",
+      _token.tokenID,
+      _token.username,
+      _lastDisplayedMessageTimestamp,
+      _token.username,
+    );
 
-  );
-
-  if (posts.isNotEmpty) {
-    setState(() {
-      _lastDisplayedMessageTimestamp = posts.last.timestamp;
-      _posts.addAll(posts);
-    });
+    if (posts.isNotEmpty) {
+      setState(() {
+        _lastDisplayedMessageTimestamp = posts.last.timestamp;
+        _posts.addAll(posts);
+      });
+    }
   }
-}
 
   Future<void> _refreshPosts() async {
     _lastDisplayedMessageTimestamp =
         DateTime.now().millisecondsSinceEpoch.toString();
-    List<FeedData> latestPosts = await BaseClient().getFeedorPost("/feed",
-        _token.tokenID, _token.username, _lastDisplayedMessageTimestamp,     _token.username,
-);
+    List<FeedData> latestPosts = await BaseClient().getFeedorPost(
+      "/feed",
+      _token.tokenID,
+      _token.username,
+      _lastDisplayedMessageTimestamp,
+      _token.username,
+    );
     setState(() {
       _posts = latestPosts;
       if (latestPosts.isNotEmpty) {
