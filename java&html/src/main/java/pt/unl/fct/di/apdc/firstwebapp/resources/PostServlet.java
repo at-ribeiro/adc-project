@@ -123,12 +123,16 @@ public class PostServlet extends HttpServlet {
                                 .addAncestor(PathElement.of("User", username))
                                 .newKey(username + "-" + timestamp);
 
+            List<Value<Key>> likeList = new ArrayList<>();
+
+
             Entity entity = Entity.newBuilder(postKey)
                     .set("id", username + "-" + timestamp)
                     .set("text", postText)
                     .set("user", username)
                     .set("timestamp", timestamp)
                     .set("image", imageName)
+                    .set("likes", likeList)
                     .build();
 
             txn.put(entity);
@@ -219,6 +223,15 @@ public class PostServlet extends HttpServlet {
                                     post.getString("user") + "-" + post.getString("image"));
                             Blob blob = storage.get(blobId);
                             url = blob.getMediaLink();
+
+                        }
+
+                        List<String> likes = new ArrayList<>();
+
+                        for(Value<?> value : post.getList("likes")){
+                            Key likedKey = (Key) value.get();
+                            Entity likedEntity = txn.get(likedKey);
+                            likes.add(likedEntity.getString("user_username"));
                         }
 
                         FeedData feedPost = new FeedData(
@@ -226,7 +239,8 @@ public class PostServlet extends HttpServlet {
                                 post.getString("text"),
                                 post.getString("user"),
                                 url,
-                                post.getString("id").split("-")[1]
+                                post.getString("id").split("-")[1],
+                                likes
                         );
 
                         posts.add(feedPost);
@@ -242,8 +256,6 @@ public class PostServlet extends HttpServlet {
             // Convert the list of posts to JSON
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(posts);
-
-            LOG.warning("DEBUG POSTS!!!!! : " + json);
 
             // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
