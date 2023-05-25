@@ -165,6 +165,7 @@ public class FeedServlet extends HttpServlet {
         } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (txn.isActive()) {
@@ -231,17 +232,24 @@ public class FeedServlet extends HttpServlet {
                 return;
             }
 
-            List<Value<Key>> likeValues = post.getList("likes");
-            KeyValue toAdd = new KeyValue(userKey);
-            likeValues.add(toAdd);
+            List<Value<Key>> originalLikes = post.getList("likes");
+            List<Value<Key>> newLikes = new ArrayList<>(originalLikes);
+
+            KeyValue keyValue = new KeyValue(userKey);
+
+            if (newLikes.contains(keyValue)) {
+                newLikes.remove(keyValue);
+            } else {
+                newLikes.add(keyValue);
+            }
 
             Entity updatedPost = Entity.newBuilder(postKey)
-                    .set("id",post.getString("id"))
+                    .set("id", post.getString("id"))
                     .set("text", post.getString("text"))
                     .set("user", post.getString("user"))
-                    .set("timestamp", post.getTimestamp("timestamp"))
+                    .set("timestamp", post.getLong("timestamp"))
                     .set("image", post.getString("image"))
-                    .set("likes", likeValues)
+                    .set("likes", newLikes)
                     .build();
 
             txn.put(updatedPost);
@@ -251,6 +259,8 @@ public class FeedServlet extends HttpServlet {
         } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (txn.isActive()) {
