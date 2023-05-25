@@ -1,9 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -16,12 +13,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
 
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import org.apache.commons.codec.binary.Base64;
@@ -32,9 +25,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.*;
 
 import javax.ws.rs.*;
@@ -42,19 +32,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
-import static com.google.api.services.gmail.GmailScopes.GMAIL_SEND;
-import static javax.mail.Message.RecipientType.TO;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
-    private static final String PATH_TO_JSON = "C:/Users/geekg/Desktop/ADC/FCT CONNECT/adc-project/java&html/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/client_secret.json";
-
+    private static final String API_MAIL = "fct-connect-estudasses@appspot.gserviceaccount.com";
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
-    private final String TEST_EMAIL = "fctconnect2023@gmail.com";
 
     @POST
     @Path("/")
@@ -129,7 +114,7 @@ public class RegisterResource {
             txn.commit();
 
 
-            sendEmailVerification(tokenId, data.getUsername());
+            sendEmailVerification(tokenId, data.getUsername(), data.getEmail());
 
             return Response.ok(tokenData).header("Access-Control-Allow_Origin", "*").build();
 
@@ -141,8 +126,7 @@ public class RegisterResource {
     }
 
 
-    public static Message sendEmail(String fromEmailAddress,
-                                    String toEmailAddress)
+    public static void sendEmail(String toEmailAddress, String link)
             throws MessagingException, IOException {
         /* Load pre-authorized user credentials from the environment.
            TODO(developer) - See https://developers.google.com/identity for
@@ -159,14 +143,15 @@ public class RegisterResource {
                 .build();
 
         // Create the email content
+
         String messageSubject = "noreply - Verify your FCT Connect email";
-        String bodyText = "lorem ipsum.";
+        String bodyText = "Thank you for registering! Please verify your account by clicking on the following link: \n" + link;
 
         // Encode as MIME message
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(fromEmailAddress));
+        email.setFrom(new InternetAddress(API_MAIL));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
                 new InternetAddress(toEmailAddress));
         email.setSubject(messageSubject);
@@ -183,30 +168,26 @@ public class RegisterResource {
         try {
             // Create send message
             message = service.users().messages().send("me", message).execute();
-            System.out.println("Message id: " + message.getId());
-            System.out.println(message.toPrettyString());
-            return message;
+            LOG.fine("Message id: " + message.getId());
+            LOG.fine(message.toPrettyString());
         } catch (GoogleJsonResponseException e) {
             GoogleJsonError error = e.getDetails();
             if (error.getCode() == 403) {
-                System.err.println("Unable to send message: " + e.getDetails());
+                LOG.warning("Unable to send message: " + e.getDetails());
             } else {
                 throw e;
             }
         }
-        return null;
     }
-}
 
-    public void sendEmailVerification(String tokenId, String username) {
+    public void sendEmailVerification(String tokenId, String username, String email) {
 
         String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username +"?token=" + tokenId;
 
         try{
-            sendMail("noreply - Verify your FCT Connect email",
-                    "Thank you for registering! Please verify your account by clicking on the following link: \n" +
-                    link);
+            sendEmail(email, link);
         } catch (Exception e) {
+            LOG.warning("Google API Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -270,10 +251,6 @@ public class RegisterResource {
                 txn.rollback();
             }
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        new RegisterResource().sendEmailVerification("12345", "username");
     }
 
 
