@@ -78,8 +78,11 @@ public class CommentResource {
 
             Key commentKey = datastore.newKeyFactory()
                     .setKind("Comment")
+                    .addAncestor(PathElement.of("User", creator))
                     .addAncestor(PathElement.of("Post", postId))
                     .newKey(data.getTimestamp());
+
+            LOG.warning("DEBUG COMENTÁRIOOOS keyPost = " + commentKey);
 
             Entity comment = Entity.newBuilder(commentKey)
                     .set("user", data.getUser())
@@ -166,15 +169,19 @@ public class CommentResource {
 
             Query<Entity> commentQuery = Query.newEntityQueryBuilder()
                                         .setKind("Comment")
-                                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(creatorKey))
+                                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(postKey))
                                         .addOrderBy(descendingTimestamp)
                                         .build();
+
+
+            LOG.warning("DEBUG DO COMENTÁRIOOOOOOOOO key = " + postKey);
 
             QueryResults<Entity> commentResults = datastore.run(commentQuery);
 
             List<CommentGetData> toSend = new ArrayList<>();
 
             commentResults.forEachRemaining(comment -> {
+                LOG.warning("DEBUG DO COMENTÁRIOOOOOOOOO comment = " + comment);
 
                 toSend.add(new CommentGetData(
                         comment.getString("user"),
