@@ -1,7 +1,52 @@
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'package:responsive_login_ui/models/profile_info.dart';
+
+import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/models/profile_info.dart';
+import 'package:responsive_login_ui/views/edit_profile_page.dart';
+import '../models/FeedData.dart';
+
+import '../models/Token.dart';
+import '../services/base_client.dart';
+
+class MyProfile extends StatefulWidget {
+  final Token token;
+
+  const MyProfile({Key? key, required this.token}) : super(key: key);
+
+  @override
+  State<MyProfile> createState() => _MyProfileState();
+}
+
+class _MyProfileState extends State<MyProfile> {
+  late Token _token;
+  final double coverHeight = 200;
+  final double profileHeight = 144;
+  String selectedButton = 'Info';
+  List<FeedData> _posts = [];
+  bool _loadingMore = false;
+  String _lastDisplayedMessageTimestamp =
+      DateTime.now().millisecondsSinceEpoch.toString();
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _token = widget.token;
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
   import 'package:flutter/cupertino.dart';
   import 'package:flutter/foundation.dart';
   import 'package:flutter/material.dart';
   import 'package:image_picker/image_picker.dart';
+
 
   import 'package:responsive_login_ui/models/profile_info.dart';
 
@@ -71,6 +116,32 @@
         _token.username,
       );
 
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        padding: EdgeInsets.zero,
+        controller: _scrollController,
+        children: <Widget>[
+          buildTop(),
+          ContentWidget(
+            loadInfo: _loadInfo,
+            selectedButton: selectedButton,
+            onButtonSelected: selectButton, token: _token,
+          ),
+          const SizedBox(height: 16),
+          Divider(
+            color: Colors.grey,
+            thickness: 2.0,
+          ),
+          const SizedBox(height: 16),
+          buildInfoSection(),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
       if (posts.isNotEmpty) {
         setState(() {
           _lastDisplayedMessageTimestamp = posts.last.timestamp;
@@ -83,6 +154,7 @@
         });
       }
     }
+
 
     Future<ProfileInfo> _loadInfo() async {
       ProfileInfo info = await BaseClient().fetchInfo(
@@ -392,10 +464,62 @@
                       ],
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void selectButton(String buttonName) {
+    setState(() {
+      selectedButton = buttonName;
+    });
+  }
+
+  Widget buildTop() {
+    final top = coverHeight - profileHeight / 2;
+    final bottom = profileHeight / 2;
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Container(
+          margin: EdgeInsets.only(bottom: bottom),
+          child: buildCoverImage(),
+        ),
+        Positioned(
+          top: top,
+          child: buildProfileAndEditButton(),
+        ),
+      ],
+    );
+  }
+
+  Widget buildButton({
+    required String text,
+    required int value,
+  }) =>
+      MaterialButton(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        onPressed: () {},
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '$value',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
         ),
       );
     }
@@ -423,7 +547,70 @@
           ),
         ],
       );
-    }
+
+Widget buildProfileAndEditButton() => Stack(
+  children: <Widget>[
+    Center(child: buildProfileImage()),
+    Positioned(
+      left: 200,
+      bottom: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(0),
+        child: ElevatedButton(
+          onPressed: () {
+           
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            'editar prefil',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+}
+
+class ContentWidget extends StatefulWidget {
+  final Future<ProfileInfo> Function() loadInfo;
+  final String selectedButton;
+  final void Function(String) onButtonSelected;
+  final Token token;
+
+  const ContentWidget({
+    Key? key,
+    required this.loadInfo,
+    required this.selectedButton,
+    required this.onButtonSelected, required this.token,
+  }) : super(key: key);
+
+  @override
+  _ContentWidgetState createState() => _ContentWidgetState();
+}
+
+class _ContentWidgetState extends State<ContentWidget> {
+  late Future<ProfileInfo> _infoFuture;
+  late Token _token;
+
+  @override
+  void initState() {
+    super.initState();
+    _token = widget.token;
+    _infoFuture = widget.loadInfo();
+  }
+
 
     Widget buildButton({
       required String text,
@@ -446,6 +633,74 @@
                 text,
                 style: const TextStyle(fontSize: 16),
               ),
+
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: buildButton(text: 'Posts', value: info.nPosts),
+                  ),
+                  Divider(
+                    thickness: 2.0,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                    child:
+                        buildButton(text: 'Following', value: info.nFollowing),
+                  ),
+                  Divider(
+                    thickness: 2.0,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child:
+                        buildButton(text: 'Followers', value: info.nFollowers),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => EditProfile(token: _token,)));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'editar prefil',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      widget.onButtonSelected('Info');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
             ],
           ),
         );

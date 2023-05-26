@@ -8,6 +8,7 @@ class ProfileInfo {
   final int nPosts;
 
 
+
   ProfileInfo({
     required this.username,
     required this.fullname,
@@ -16,6 +17,7 @@ class ProfileInfo {
     required this.nFollowing,
     required this.nFollowers,
     required this.nPosts,
+
   });
 
   factory ProfileInfo.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class ProfileInfo {
       nFollowing: json['nFollowing'],
       nFollowers: json['nFollowers'],
       nPosts: json['nPosts'],
+ 
     );
   }
 }
