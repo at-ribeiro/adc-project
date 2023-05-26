@@ -28,10 +28,10 @@ public class FeedServlet extends HttpServlet {
     private final String bucketName = "staging.fct-connect-2023.appspot.com";
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response){
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
             String tokenId = request.getHeader("Authorization");
             String username = request.getPathInfo().substring(1);
             String timestamp = request.getParameter("timestamp");
@@ -42,12 +42,12 @@ public class FeedServlet extends HttpServlet {
 
             Key userKey = userKeyFactory.newKey(username);
             Entity user = txn.get(userKey);
-            if (user == null){
+            if (user == null) {
                 LOG.warning("User does not exist.");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            if (user.getString("user_state").equals("INACTIVE")){
+            if (user.getString("user_state").equals("INACTIVE")) {
                 LOG.warning("Inactive User.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
@@ -70,7 +70,6 @@ public class FeedServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
-
 
             // Retrieve the user's followees
             Query<Entity> followingQuery = Query.newEntityQueryBuilder()
@@ -111,8 +110,7 @@ public class FeedServlet extends HttpServlet {
             QueryResults<Entity> postResults = datastore.run(postQuery);
 
             postResults.forEachRemaining(post -> {
-                        LOG.info("DEBUG!!!!!!!!!: " + post.getString("id"));
-                        if(post.getLong("timestamp") < Long.parseLong(timestamp))
+                        if (post.getLong("timestamp") < Long.parseLong(timestamp))
                             LOG.info("timestamp comperator: " + timestamp);
 
                         String url = "";
@@ -125,12 +123,21 @@ public class FeedServlet extends HttpServlet {
                             url = blob.getMediaLink();
                         }
 
+                        List<String> likes = new ArrayList<>();
+
+                        for (Value<?> value : post.getList("likes")) {
+                            Key likedKey = (Key) value.get();
+                            Entity likedEntity = txn.get(likedKey);
+                            likes.add(likedEntity.getString("user_username"));
+                        }
+
                         FeedData feedPost = new FeedData(
                                 post.getString("id"),
                                 post.getString("text"),
                                 post.getString("user"),
                                 url,
-                                post.getString("id").split("-")[1]
+                                post.getString("id").split("-")[1],
+                                likes
                         );
 
                         posts.add(feedPost);
@@ -139,7 +146,7 @@ public class FeedServlet extends HttpServlet {
             );
 
 
-            if(posts.isEmpty()){
+            if (posts.isEmpty()) {
                 LOG.info("posts: " + posts.toString());
                 response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
@@ -155,9 +162,105 @@ public class FeedServlet extends HttpServlet {
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    //LIKE OR DISLIKE POST
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
+        Transaction txn = datastore.newTransaction();
+        try {
+
+            String tokenId = request.getHeader("Authorization");
+            String username = request.getPathInfo().substring(1);
+            String postId = request.getParameter("post");
+            String creator = request.getParameter("creator");
+
+            LOG.fine("Attempt add like by " + username + " to post " + postId);
+
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            Key postKey = datastore.newKeyFactory()
+                    .setKind("Post")
+                    .addAncestor(PathElement.of("User", creator))
+                    .newKey(postId);
+
+            Entity post = txn.get(postKey);
+
+            if (post == null) {
+                LOG.warning("Post does not exist.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            List<Value<Key>> originalLikes = post.getList("likes");
+            List<Value<Key>> newLikes = new ArrayList<>(originalLikes);
+
+            KeyValue keyValue = new KeyValue(userKey);
+
+            if (newLikes.contains(keyValue)) {
+                newLikes.remove(keyValue);
+            } else {
+                newLikes.add(keyValue);
+            }
+
+            Entity updatedPost = Entity.newBuilder(postKey)
+                    .set("id", post.getString("id"))
+                    .set("text", post.getString("text"))
+                    .set("user", post.getString("user"))
+                    .set("timestamp", post.getLong("timestamp"))
+                    .set("image", post.getString("image"))
+                    .set("likes", newLikes)
+                    .build();
+
+            txn.put(updatedPost);
+            txn.commit();
+
+
+        } catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            e.printStackTrace();
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (txn.isActive()) {

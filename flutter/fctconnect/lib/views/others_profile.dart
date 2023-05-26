@@ -92,6 +92,9 @@ class _OtherProfileState extends State<OtherProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Perfil'),
+      ),
       body: ListView(
         padding: EdgeInsets.zero,
         controller: _scrollController,
