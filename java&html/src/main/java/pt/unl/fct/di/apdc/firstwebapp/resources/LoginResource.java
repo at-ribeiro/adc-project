@@ -26,9 +26,7 @@ import com.google.gson.Gson;
 public class LoginResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
-
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
     private final Gson g = new Gson();
 

@@ -1,27 +1,44 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.gmail.GmailScopes;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
-import pt.unl.fct.di.apdc.firstwebapp.util.UserData;
+import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
+import org.apache.commons.codec.binary.Base64;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
+
+
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
-
+    private static final String API_MAIL = "fct-connect-estudasses@appspot.gserviceaccount.com";
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
@@ -57,7 +74,7 @@ public class RegisterResource {
 
             if(!userList.isEmpty()){
                 txn.rollback();
-                return Response.status(Response.Status.CONFLICT).entity("Email already exists.").build();
+                return Response.status(Response.Status.CONFLICT).entity("Email already in use.").build();
             }
 
             user = Entity.newBuilder(userKey)
@@ -67,7 +84,7 @@ public class RegisterResource {
                     .set("user_email", data.getEmail())
                     .set("user_creation_time", Timestamp.now())
                     .set("user_role", data.getRole())
-                    .set("user_state", data.getState())
+                    .set("user_state", "INACTIVE")
                     .set("user_privacy", data.getPrivacy())
                     .set("user_homephone", "")
                     .set("user_mobilephone", "")
@@ -75,10 +92,31 @@ public class RegisterResource {
                     .set("user_address", "")
                     .set("user_nif", "")
                     .build();
+
             txn.add(user);
+
             LOG.info("User registered" + data.getUsername());
+
+            String tokenId = UUID.randomUUID().toString();
+            VerificationToken tokenData = new VerificationToken(tokenId, data.getUsername());
+
+            Key verKey = datastore.newKeyFactory()
+                    .setKind("Verification")
+                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .newKey(DigestUtils.sha512Hex(tokenId));
+
+            Entity token = Entity.newBuilder(verKey)
+                            .set("token_id", DigestUtils.sha512Hex(tokenId))
+                            .set("token_user", data.getUsername())
+                            .build();
+
+            txn.add(token);
             txn.commit();
-            return Response.ok(data.getUsername()).header("Access-Control-Allow_Origin", "*").build();
+
+
+            sendEmailVerification(tokenId, data.getUsername(), data.getEmail());
+
+            return Response.ok(tokenData).header("Access-Control-Allow_Origin", "*").build();
 
         }finally {
             if(txn.isActive()){
@@ -86,4 +124,134 @@ public class RegisterResource {
             }
         }
     }
+
+
+    public static void sendEmail(String toEmailAddress, String link)
+            throws MessagingException, IOException {
+        /* Load pre-authorized user credentials from the environment.
+           TODO(developer) - See https://developers.google.com/identity for
+            guides on implementing OAuth2 for your application.*/
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
+                .createScoped(GmailScopes.GMAIL_SEND);
+        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+
+        // Create the gmail API client
+        Gmail service = new Gmail.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                requestInitializer)
+                .setApplicationName("Gmail samples")
+                .build();
+
+        // Create the email content
+
+        String messageSubject = "noreply - Verify your FCT Connect email";
+        String bodyText = "Thank you for registering! Please verify your account by clicking on the following link: \n" + link;
+
+        // Encode as MIME message
+        Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+        MimeMessage email = new MimeMessage(session);
+        email.setFrom(new InternetAddress(API_MAIL));
+        email.addRecipient(javax.mail.Message.RecipientType.TO,
+                new InternetAddress(toEmailAddress));
+        email.setSubject(messageSubject);
+        email.setText(bodyText);
+
+        // Encode and wrap the MIME message into a gmail message
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        email.writeTo(buffer);
+        byte[] rawMessageBytes = buffer.toByteArray();
+        String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
+        Message message = new Message();
+        message.setRaw(encodedEmail);
+
+        try {
+            // Create send message
+            message = service.users().messages().send("me", message).execute();
+            LOG.fine("Message id: " + message.getId());
+            LOG.fine(message.toPrettyString());
+        } catch (GoogleJsonResponseException e) {
+            GoogleJsonError error = e.getDetails();
+            if (error.getCode() == 403) {
+                LOG.warning("Unable to send message: " + e.getDetails());
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public void sendEmailVerification(String tokenId, String username, String email) {
+
+        String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username +"?token=" + tokenId;
+
+        try{
+            sendEmail(email, link);
+        } catch (Exception e) {
+            LOG.warning("Google API Error: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @GET
+    @Path("/verification/{username}")
+    public Response verify(@PathParam("username") String username, @QueryParam("token") String tokenId){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+            Entity user = txn.get(userKey);
+
+            if(user == null){
+                txn.rollback();
+                return Response.status(Response.Status.NOT_FOUND).entity("User doesn't exist.").build();
+            }
+
+            Key verKey = datastore.newKeyFactory()
+                    .setKind("Verification")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(DigestUtils.sha512Hex(tokenId));
+
+            Entity verToken = txn.get(verKey);
+
+            if(verToken == null){
+                LOG.warning("Token doesn't exist");
+                Response.status(Response.Status.FORBIDDEN);
+            }
+
+            user =  Entity.newBuilder(userKey)
+                    .set("user_username", user.getString("user_username"))
+                    .set("user_fullname", user.getString("user_fullname"))
+                    .set("user_pwd", user.getString("user_pwd"))
+                    .set("user_email", user.getString("user_email"))
+                    .set("user_creation_time", user.getTimestamp("user_creation_time"))
+                    .set("user_role", user.getString("user_role"))
+                    .set("user_state", "ACTIVE")
+                    .set("user_privacy", user.getString("user_privacy"))
+                    .set("user_homephone", user.getString("user_homephone"))
+                    .set("user_mobilephone", user.getString("user_mobilephone"))
+                    .set("user_occupation", user.getString("user_occupation"))
+                    .set("user_address", user.getString("user_address"))
+                    .set("user_nif", user.getString("user_nif"))
+                    .build();
+
+            txn.put(user);
+            txn.commit();
+
+            return Response.ok().build();
+
+        }catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+
 }
