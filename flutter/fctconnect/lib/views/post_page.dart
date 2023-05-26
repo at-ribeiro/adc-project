@@ -44,11 +44,7 @@ class _PostPageState extends State<PostPage> {
   void getComments() async {
     // Call the BaseClient method to fetch comments
     List<CommentData> comments = await BaseClient().getComments(
-        '/comment',
-        _token.username,
-        _token.tokenID,
-        _postID,
-        _postUser);
+        '/comment', _token.username, _token.tokenID, _postID, _postUser);
 
     setState(() {
       _comments = comments;
@@ -108,19 +104,21 @@ class _PostPageState extends State<PostPage> {
                     text: c,
                     timestamp: DateTime.now().millisecondsSinceEpoch,
                   );
-                  BaseClient()
-                      .addComment(
-                    '/comment',
-                    _token.username,
-                    _token.tokenID,
-                    _postID,
-                    _postUser,
-                    comment,
-                  )
-                      .then((_) {
-                    _commentController.clear();
-                    getComments(); // Fetch the updated comments
-                  });
+                  if (c != '') {
+                    BaseClient()
+                        .addComment(
+                      '/comment',
+                      _token.username,
+                      _token.tokenID,
+                      _postID,
+                      _postUser,
+                      comment,
+                    )
+                        .then((_) {
+                      _commentController.clear();
+                      getComments(); // Fetch the updated comments
+                    });
+                  }
                 },
                 icon: Icon(Icons.send),
               ),

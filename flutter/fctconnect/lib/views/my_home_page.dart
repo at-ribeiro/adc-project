@@ -1,9 +1,12 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
@@ -288,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                   context,
                   CupertinoPageRoute(
-                      builder: (ctx) => EventView(token: _token)));
+                      builder: (ctx) => MapScreen()));
             },
           ),
           ListTile(
