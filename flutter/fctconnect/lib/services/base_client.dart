@@ -19,7 +19,7 @@ import '../models/event_data.dart';
 import '../models/profile_info.dart';
 
 
-const String baseUrl = 'https://fct-connect-2023.oa.r.appspot.com/rest';
+const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
 
 
 class BaseClient{

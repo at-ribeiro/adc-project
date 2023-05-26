@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
+import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import '../models/FeedData.dart';
 
 import '../models/Token.dart';
@@ -92,7 +94,7 @@ class _MyProfileState extends State<MyProfile> {
           ContentWidget(
             loadInfo: _loadInfo,
             selectedButton: selectedButton,
-            onButtonSelected: selectButton,
+            onButtonSelected: selectButton, token: _token,
           ),
           const SizedBox(height: 16),
           Divider(
@@ -325,7 +327,7 @@ class _MyProfileState extends State<MyProfile> {
         ),
         Positioned(
           top: top,
-          child: buildProfileImage(),
+          child: buildProfileAndEditButton(),
         ),
       ],
     );
@@ -373,18 +375,53 @@ class _MyProfileState extends State<MyProfile> {
           'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
         ),
       );
+
+Widget buildProfileAndEditButton() => Stack(
+  children: <Widget>[
+    Center(child: buildProfileImage()),
+    Positioned(
+      left: 200,
+      bottom: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(0),
+        child: ElevatedButton(
+          onPressed: () {
+           
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(
+            'editar prefil',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
 }
 
 class ContentWidget extends StatefulWidget {
   final Future<ProfileInfo> Function() loadInfo;
   final String selectedButton;
   final void Function(String) onButtonSelected;
+  final Token token;
 
   const ContentWidget({
     Key? key,
     required this.loadInfo,
     required this.selectedButton,
-    required this.onButtonSelected,
+    required this.onButtonSelected, required this.token,
   }) : super(key: key);
 
   @override
@@ -393,10 +430,12 @@ class ContentWidget extends StatefulWidget {
 
 class _ContentWidgetState extends State<ContentWidget> {
   late Future<ProfileInfo> _infoFuture;
+  late Token _token;
 
   @override
   void initState() {
     super.initState();
+    _token = widget.token;
     _infoFuture = widget.loadInfo();
   }
 
@@ -460,6 +499,30 @@ class _ContentWidgetState extends State<ContentWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  ElevatedButton(
+                    onPressed: () {
+                         Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => EditProfile(token: _token,)));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'editar prefil',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       widget.onButtonSelected('Info');

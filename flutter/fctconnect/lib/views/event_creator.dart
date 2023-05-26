@@ -193,7 +193,7 @@ class _EventCreatorState extends State<EventCreator> {
                     );
                     var response = BaseClient().createEvent("/events", _token.tokenID, event);
 
-                    // TODO: Handle event creation
+                    // TODO: Handle event creationf
                   } else {
                     // Dates are invalid, show an error message
                     showDialog(
