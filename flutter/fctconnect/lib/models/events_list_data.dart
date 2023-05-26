@@ -2,7 +2,7 @@ class EventsListData {
   final String title;
   final String description;
   final String creator;
-  final String url;
+  final String? url;
   final String start;
   final String end;
 
@@ -10,7 +10,7 @@ class EventsListData {
     required this.title,
     required this.description,
     required this.creator,
-    required this.url,
+    this.url,
     required this.start,
     required this.end
 

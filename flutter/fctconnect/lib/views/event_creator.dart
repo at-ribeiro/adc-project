@@ -181,6 +181,7 @@ class _EventCreatorState extends State<EventCreator> {
               ElevatedButton(
                 onPressed: () {
                   if (_validateDates()) {
+                    String uniqueId = _titleController.text + "-" + (_startingDate.millisecondsSinceEpoch + _endingDate.millisecondsSinceEpoch).toString();
                     // Dates are valid, proceed with event creation
                     EventData event = EventData(
                       creator: _token.username,

@@ -153,6 +153,7 @@ public class PostServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
+            String searcher = request.getHeader("User");
             String username = request.getPathInfo().substring(1);
             String timestamp = request.getParameter("timestamp");
 
@@ -175,7 +176,7 @@ public class PostServlet extends HttpServlet {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", searcher))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);

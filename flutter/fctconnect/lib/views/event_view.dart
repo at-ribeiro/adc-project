@@ -22,11 +22,11 @@ class EventView extends StatefulWidget {
 }
 
 class _EventViewState extends State<EventView> {
-  List<EventsListData> _events = [];
+  List<EventData> _events = [];
   late Token _token;
   bool _loadingMore = false;
-  String _lastDisplayedEventTimestamp =
-      DateTime.now().millisecondsSinceEpoch.toString();
+  int _lastDisplayedEventTimestamp =
+      DateTime.now().millisecondsSinceEpoch;
 
   late ScrollController _scrollController;
 
@@ -76,7 +76,7 @@ class _EventViewState extends State<EventView> {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => EventCreator(
@@ -101,7 +101,7 @@ class _EventViewState extends State<EventView> {
                       child: CircularProgressIndicator(),
                     );
                   } else {
-                    EventsListData event = _events[index];
+                    EventData event = _events[index];
                     return GestureDetector(
                       onTap: () {
                         Navigator.pushReplacement(
@@ -117,11 +117,11 @@ class _EventViewState extends State<EventView> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (event.url.isNotEmpty)
+                              if (event.url != null)
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Image.network(
-                                    event.url,
+                                    event.url!,
                                     width: 220,
                                     height: 150,
                                     fit: BoxFit.cover,
@@ -144,7 +144,7 @@ class _EventViewState extends State<EventView> {
                                           DateFormat('dd-MM-yyyy HH:mm:ss')
                                               .format(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(event.start),
+                                          event.start,
                                         ),
                                       ),
                                       style: TextStyle(
@@ -157,7 +157,7 @@ class _EventViewState extends State<EventView> {
                                           DateFormat('dd-MM-yyyy HH:mm:ss')
                                               .format(
                                         DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(event.end),
+                                          event.end,
                                         ),
                                       ),
 style: TextStyle(
@@ -184,11 +184,11 @@ style: TextStyle(
   }
 
   void _loadEvents() async {
-    List<EventsListData> events = await BaseClient().getEvents(
+    List<EventData> events = await BaseClient().getEvents(
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp,
+      _lastDisplayedEventTimestamp.toString(),
     );
     if (mounted) {
       setState(() {
@@ -202,12 +202,12 @@ style: TextStyle(
 
   Future<void> _refreshEvents() async {
 _lastDisplayedEventTimestamp =
-        DateTime.now().millisecondsSinceEpoch.toString();
-    List<EventsListData> latestEvents = await BaseClient().getEvents(
+        DateTime.now().millisecondsSinceEpoch;
+    List<EventData> latestEvents = await BaseClient().getEvents(
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp,
+      _lastDisplayedEventTimestamp.toString(),
     );
     setState(() {
       _events = latestEvents;
