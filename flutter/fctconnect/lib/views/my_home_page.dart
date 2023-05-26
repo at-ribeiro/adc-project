@@ -75,7 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 showSearch(context: context, delegate: CustomSearchDelegate());
               },
-              icon: Icon(Icons.search))
+              icon: Icon(Icons.search)
+              )
         ],
         leading: Builder(
           builder: (BuildContext context) {
@@ -214,27 +215,28 @@ class _MyHomePageState extends State<MyHomePage> {
                               IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (post.isLiked == true)
-                                      ; // endpoint para adicionar like e ir buscar o valor e somar
-                                    else
-                                      ; //endpoint para remover o like e ir buscar o valor e remover
-                                    post.isLiked = !post.isLiked;
+                                    if (post.likes.contains(_token.username)) {
+                                      post.likes.remove(_token.username);
+                                    } else {
+                                      post.likes.add(_token.username);
+                                    }
+                                    BaseClient().likePost("/feed",
+                                        _token.username, _token.tokenID, post.id, post.user);
                                   });
                                 },
                                 icon: Icon(
-                                  post.isLiked
+                                  post.likes.contains(_token.username)
                                       ? Icons.favorite
                                       : Icons.favorite_border,
                                 ),
                               ),
-                              Text('0'),
+                              Text(post.likes.length.toString()),
                               IconButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
-                                      builder: (ctx) =>
-                                          PostPage(token: _token),
+                                      builder: (ctx) => PostPage(token: _token, postID: post.id, postUser: post.user),
                                     ),
                                   );
                                 },
@@ -279,6 +281,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ), // Set the width of the DrawerHeader to the maximum available width
+          ),
+          ListTile(
+            title: const Text('Mapa'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (ctx) => EventView(token: _token)));
+            },
           ),
           ListTile(
             title: const Text('Eventos'),
