@@ -9,8 +9,3 @@ indexes:
   properties:
   - name: "timestamp"
     direction: desc
-- kind: "Comment"
-  ancestor: yes
-  properties:
-  - name: "timestamp"
-    direction: desc
