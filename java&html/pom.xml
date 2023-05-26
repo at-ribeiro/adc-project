@@ -8,7 +8,7 @@
   
   <packaging>war</packaging>
   
-  <name>FirstWebApplication</name>
+  <name>FCT Connect</name>
   <description>ADC 2023 Example Application</description>
     <properties>
 		<appengine.maven.plugin.version>2.4.0</appengine.maven.plugin.version>
@@ -138,9 +138,9 @@
 			<version>v1-rev20230206-2.0.0</version>
 			</dependency>
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.7</version>
+			<groupId>com.mailjet</groupId>
+			<artifactId>mailjet-client</artifactId>
+			<version>5.2.3</version>
 		</dependency>
 
 

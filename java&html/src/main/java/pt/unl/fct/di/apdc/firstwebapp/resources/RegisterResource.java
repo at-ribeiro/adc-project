@@ -1,6 +1,10 @@
+
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -13,8 +17,12 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
 
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import org.apache.commons.codec.binary.Base64;
@@ -25,6 +33,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javax.ws.rs.*;
@@ -32,31 +43,36 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
+import static com.google.api.services.gmail.GmailScopes.GMAIL_SEND;
+import static javax.mail.Message.RecipientType.TO;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
-    private static final String API_MAIL = "fct-connect-estudasses@appspot.gserviceaccount.com";
+    private static final String PATH_TO_JSON = "C:/Users/geekg/Desktop/ADC/FCT CONNECT/adc-project/java&html/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/client_secret.json";
+
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+
+    private final String TEST_EMAIL = "fctconnect2023@gmail.com";
 
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(RegisterData data){
+    public Response register(RegisterData data) {
         LOG.fine("Attempt to register user: " + data.getUsername());
 
-        if(!data.validRegistration()){
+        if (!data.validRegistration()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or Wrong parameter.").build();
         }
 
         Transaction txn = datastore.newTransaction();
-        try{
+        try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getUsername());
             Entity user = txn.get(userKey);
 
-            if(user != null){
+            if (user != null) {
                 txn.rollback();
                 return Response.status(Response.Status.CONFLICT).entity("User already exists.").build();
             }
@@ -68,11 +84,11 @@ public class RegisterResource {
 
             List<Entity> userList = new ArrayList<>();
 
-            users.forEachRemaining(userQ ->{
+            users.forEachRemaining(userQ -> {
                 userList.add(userQ);
             });
 
-            if(!userList.isEmpty()){
+            if (!userList.isEmpty()) {
                 txn.rollback();
                 return Response.status(Response.Status.CONFLICT).entity("Email already in use.").build();
             }
@@ -106,88 +122,122 @@ public class RegisterResource {
                     .newKey(DigestUtils.sha512Hex(tokenId));
 
             Entity token = Entity.newBuilder(verKey)
-                            .set("token_id", DigestUtils.sha512Hex(tokenId))
-                            .set("token_user", data.getUsername())
-                            .build();
+                    .set("token_id", DigestUtils.sha512Hex(tokenId))
+                    .set("token_user", data.getUsername())
+                    .build();
 
             txn.add(token);
             txn.commit();
 
 
-            sendEmailVerification(tokenId, data.getUsername(), data.getEmail());
+            sendEmailVerification(tokenId, data.getUsername());
 
             return Response.ok(tokenData).header("Access-Control-Allow_Origin", "*").build();
 
-        }finally {
-            if(txn.isActive()){
+        } finally {
+            if (txn.isActive()) {
                 txn.rollback();
             }
         }
     }
 
+    private static Credential getCredentials(final NetHttpTransport httpTransport, GsonFactory jsonFactory)
+            throws IOException {
 
-    public static void sendEmail(String toEmailAddress, String link)
+        InputStreamReader inputStream = new InputStreamReader(RegisterResource.class.getResourceAsStream("/client_secret.json"));
+
+        System.out.println(inputStream.toString());
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, inputStream);
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                httpTransport, jsonFactory, clientSecrets, Set.of(GMAIL_SEND))
+                .setDataStoreFactory(new FileDataStoreFactory(Paths.get("tokens").toFile()))
+                .setAccessType("offline")
+        public static Message sendEmail (String fromEmailAddress,
+                String toEmailAddress)
             throws MessagingException, IOException {
         /* Load pre-authorized user credentials from the environment.
            TODO(developer) - See https://developers.google.com/identity for
             guides on implementing OAuth2 for your application.*/
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
-                .createScoped(GmailScopes.GMAIL_SEND);
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
+                    .createScoped(GmailScopes.GMAIL_SEND);
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
 
-        // Create the gmail API client
-        Gmail service = new Gmail.Builder(new NetHttpTransport(),
-                GsonFactory.getDefaultInstance(),
-                requestInitializer)
-                .setApplicationName("Gmail samples")
-                .build();
+            // Create the gmail API client
+            Gmail service = new Gmail.Builder(new NetHttpTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    requestInitializer)
+                    .setApplicationName("Gmail samples")
+                    .build();
 
+            LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+            return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        }
         // Create the email content
-
         String messageSubject = "noreply - Verify your FCT Connect email";
-        String bodyText = "Thank you for registering! Please verify your account by clicking on the following link: \n" + link;
+        String bodyText = "lorem ipsum.";
 
-        // Encode as MIME message
-        Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
-        MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(API_MAIL));
-        email.addRecipient(javax.mail.Message.RecipientType.TO,
-                new InternetAddress(toEmailAddress));
-        email.setSubject(messageSubject);
-        email.setText(bodyText);
+        public void sendMail (String subject, String message) throws Exception {
+            // Encode as MIME message
+            Properties props = new Properties();
+            Session session = Session.getDefaultInstance(props, null);
+            MimeMessage email = new MimeMessage(session);
+            email.setFrom(new InternetAddress(TEST_EMAIL));
+            email.addRecipient(TO, new InternetAddress(TEST_EMAIL));
+            email.setSubject(subject);
+            email.setText(message);
+            email.setFrom(new InternetAddress(fromEmailAddress));
+            email.addRecipient(javax.mail.Message.RecipientType.TO,
+                    new InternetAddress(toEmailAddress));
+            email.setSubject(messageSubject);
+            email.setText(bodyText);
 
-        // Encode and wrap the MIME message into a gmail message
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        email.writeTo(buffer);
-        byte[] rawMessageBytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
-        Message message = new Message();
-        message.setRaw(encodedEmail);
+            // Encode and wrap the MIME message into a gmail message
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            email.writeTo(buffer);
+            byte[] rawMessageBytes = buffer.toByteArray();
+            String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
+            Message msg = new Message();
+            msg.setRaw(encodedEmail);
+            Message message = new Message();
+            message.setRaw(encodedEmail);
 
-        try {
-            // Create send message
-            message = service.users().messages().send("me", message).execute();
-            LOG.fine("Message id: " + message.getId());
-            LOG.fine(message.toPrettyString());
-        } catch (GoogleJsonResponseException e) {
-            GoogleJsonError error = e.getDetails();
-            if (error.getCode() == 403) {
-                LOG.warning("Unable to send message: " + e.getDetails());
-            } else {
-                throw e;
+            try {
+                NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+                GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+                Gmail service = new Gmail.Builder(httpTransport, jsonFactory, getCredentials(httpTransport, jsonFactory))
+                        .setApplicationName("Test Mailer")
+                        .build();
+                msg = service.users().messages().send("me", msg).execute();
+                LOG.fine("Verification message id: " + msg.getId());
+                LOG.fine("Message: " + msg.toPrettyString());
+                // Create send message
+                message = service.users().messages().send("me", message).execute();
+                System.out.println("Message id: " + message.getId());
+                System.out.println(message.toPrettyString());
+                return message;
+            } catch (GoogleJsonResponseException e) {
+                GoogleJsonError error = e.getDetails();
+                if (error.getCode() == 403) {
+                    System.err.println("Unable to send message: " + e.getDetails());
+                } else {
+                    throw e;
+                }
             }
+            return null;
         }
     }
 
-    public void sendEmailVerification(String tokenId, String username, String email) {
+    public void sendEmailVerification(String tokenId, String username) {
 
-        String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username +"?token=" + tokenId;
+        String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username + "?token=" + tokenId;
 
-        try{
-            sendEmail(email, link);
+        try {
+            sendMail("noreply - Verify your FCT Connect email",
+                    "Thank you for registering! Please verify your account by clicking on the following link: \n" +
+                            link);
         } catch (Exception e) {
-            LOG.warning("Google API Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -195,16 +245,16 @@ public class RegisterResource {
 
     @GET
     @Path("/verification/{username}")
-    public Response verify(@PathParam("username") String username, @QueryParam("token") String tokenId){
+    public Response verify(@PathParam("username") String username, @QueryParam("token") String tokenId) {
 
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
 
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
             Entity user = txn.get(userKey);
 
-            if(user == null){
+            if (user == null) {
                 txn.rollback();
                 return Response.status(Response.Status.NOT_FOUND).entity("User doesn't exist.").build();
             }
@@ -216,12 +266,12 @@ public class RegisterResource {
 
             Entity verToken = txn.get(verKey);
 
-            if(verToken == null){
+            if (verToken == null) {
                 LOG.warning("Token doesn't exist");
                 Response.status(Response.Status.FORBIDDEN);
             }
 
-            user =  Entity.newBuilder(userKey)
+            user = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
                     .set("user_fullname", user.getString("user_fullname"))
                     .set("user_pwd", user.getString("user_pwd"))
@@ -242,7 +292,7 @@ public class RegisterResource {
 
             return Response.ok().build();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -251,6 +301,10 @@ public class RegisterResource {
                 txn.rollback();
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        new RegisterResource().sendEmailVerification("12345", "username");
     }
 
 
