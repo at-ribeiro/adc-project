@@ -8,7 +8,6 @@ import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 import '../constants.dart';
-import '../models/FeedData.dart';
 
 import '../models/Token.dart';
 import '../services/base_client.dart';

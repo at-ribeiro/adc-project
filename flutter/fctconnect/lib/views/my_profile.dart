@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -14,6 +15,7 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import 'edit_profile_page.dart';
 import 'my_home_page.dart';
 import 'news_view.dart';
 
@@ -58,7 +60,8 @@ class _MyProfileState extends State<MyProfile> {
       _loadPosts();
     }
   }
-Future<void> _loadPosts() async {
+
+  Future<void> _loadPosts() async {
     if (_loadingMore) return;
 
     setState(() {
@@ -230,7 +233,7 @@ Future<void> _loadPosts() async {
                           actions: [
                             TextButton(
                               onPressed: () {
-Navigator.pop(context);
+                                Navigator.pop(context);
                               },
                               child: Text('Tente outra vez'),
                             ),
@@ -420,7 +423,8 @@ Navigator.pop(context);
       selectedButton = buttonName;
     });
   }
-Widget buildTop() {
+
+  Widget buildTop() {
     final top = coverHeight - profileHeight / 2;
     final bottom = profileHeight / 2;
     return Stack(
@@ -553,6 +557,11 @@ Widget buildTop() {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    
+                    Divider(
+                      thickness: 2.0,
+                      color: Colors.grey,
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: buildButton(text: 'Posts', value: info.nPosts),
@@ -581,6 +590,35 @@ Widget buildTop() {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        navigator!.push(
+                          MaterialPageRoute(
+                            builder: (context) => EditProfile(
+                              token: _token,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 24),
+                    
                     ElevatedButton(
                       onPressed: () {
                         widget.onButtonSelected('Info');
@@ -616,7 +654,7 @@ Widget buildTop() {
                             EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
-),
+                        ),
                       ),
                       child: Text(
                         'Posts',

@@ -4,6 +4,12 @@
         android:label="fctconnect"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Add the meta-data tag for the API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E" />
+            
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,8 +36,5 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <meta-data
-            android:name="com.google.android.geo.API:KEY"
-            android:value="AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E" />
     </application>
 </manifest>
