@@ -134,6 +134,7 @@ public class RegisterResource {
                                                                 "To activate your account please click the following link: " + link );
         Mail mail = new Mail(from, subject, to, content);
 
+        //TODO: Remover key e subs por ?
         SendGrid sg = new SendGrid("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");
         Request request = new Request();
         try {
