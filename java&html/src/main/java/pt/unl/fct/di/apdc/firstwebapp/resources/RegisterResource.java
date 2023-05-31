@@ -9,6 +9,7 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.sendgrid.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
-    private static final String API_MAIL = "fct-connect-estudasses@appspot.gserviceaccount.com";
+    private static final String API_MAIL = "fctconnect2023@gmail.com";
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
@@ -125,58 +126,24 @@ public class RegisterResource {
         }
     }
 
+    private void sendSendGridEmail(String email, String link){
+        Email from = new Email("fctconnect2023@gmail.com");
+        String subject = "noreply - Activate your account!";
+        Email to = new Email(email);
+        Content content = new Content("text/plain", "Thank you for registering!\n " +
+                                                                "To activate your account please click the following link: " + link );
+        Mail mail = new Mail(from, subject, to, content);
 
-    public static void sendEmail(String toEmailAddress, String link)
-            throws MessagingException, IOException {
-        /* Load pre-authorized user credentials from the environment.
-           TODO(developer) - See https://developers.google.com/identity for
-            guides on implementing OAuth2 for your application.*/
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
-                .createScoped(GmailScopes.GMAIL_SEND);
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
-
-        // Create the gmail API client
-        Gmail service = new Gmail.Builder(new NetHttpTransport(),
-                GsonFactory.getDefaultInstance(),
-                requestInitializer)
-                .setApplicationName("Gmail samples")
-                .build();
-
-        // Create the email content
-
-        String messageSubject = "noreply - Verify your FCT Connect email";
-        String bodyText = "Thank you for registering! Please verify your account by clicking on the following link: \n" + link;
-
-        // Encode as MIME message
-        Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
-        MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(API_MAIL));
-        email.addRecipient(javax.mail.Message.RecipientType.TO,
-                new InternetAddress(toEmailAddress));
-        email.setSubject(messageSubject);
-        email.setText(bodyText);
-
-        // Encode and wrap the MIME message into a gmail message
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        email.writeTo(buffer);
-        byte[] rawMessageBytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
-        Message message = new Message();
-        message.setRaw(encodedEmail);
-
+        SendGrid sg = new SendGrid("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");
+        Request request = new Request();
         try {
-            // Create send message
-            message = service.users().messages().send("me", message).execute();
-            LOG.fine("Message id: " + message.getId());
-            LOG.fine(message.toPrettyString());
-        } catch (GoogleJsonResponseException e) {
-            GoogleJsonError error = e.getDetails();
-            if (error.getCode() == 403) {
-                LOG.warning("Unable to send message: " + e.getDetails());
-            } else {
-                throw e;
-            }
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            com.sendgrid.Response response = sg.api(request);
+            LOG.info(String.valueOf("Verification email ("+ email +") result: " + response.getStatusCode()));
+        } catch (IOException ex) {
+            LOG.warning(ex.getMessage());
         }
     }
 
@@ -185,7 +152,7 @@ public class RegisterResource {
         String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username +"?token=" + tokenId;
 
         try{
-            sendEmail(email, link);
+            sendSendGridEmail(email, link);
         } catch (Exception e) {
             LOG.warning("Google API Error: " + e.getMessage());
             throw new RuntimeException(e);
@@ -239,6 +206,8 @@ public class RegisterResource {
 
             txn.put(user);
             txn.commit();
+
+            LOG.fine(username + " successfully activated!");
 
             return Response.ok().build();
 
