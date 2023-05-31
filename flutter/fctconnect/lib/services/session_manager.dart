@@ -13,7 +13,7 @@ class SessionManager{
     await prefs.remove(s);
   }
 
-  static Future<String?> get(String s) async {
+  static Future<dynamic?> get(String s) async {
      SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(s);
   }

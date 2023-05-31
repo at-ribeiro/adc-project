@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import '../models/Token.dart';
 import '../services/session_manager.dart';
 import 'my_home_page.dart';
+import '../data/cache_factory_provider.dart';
 
 class LoadingScreen extends StatefulWidget {
+
   final Future<Token> token;
 
   const LoadingScreen({Key? key, required this.token}) : super(key: key);
@@ -15,6 +18,7 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  CacheDefault _cacheDefault = CacheDefault();
   bool _showError = false;
 
   @override
@@ -81,21 +85,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     // When the future completes successfully, navigate to the home page
                     final token = snapshot.data;
 
-                    if (kIsWeb) {
+                    
                       String tokenId = token!.tokenID;
                       String username = token.username;
                       String role = token.role;
                       String cD = token.creationDate.toString();
                       String eD = token.expirationDate.toString();
 
-                      SessionManager.storeSession('Token', tokenId );
-                      SessionManager.storeSession('CD', cD);
-                      SessionManager.storeSession('ED', eD);
-                      SessionManager.storeSession('Role', role);
-                      SessionManager.storeSession('Username', username);
-                      SessionManager.storeSession('isLoggedIn', 'true');
-                    }
-                    return MyHomePage(token: token!);
+                      CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
+
+                    
+                    return MyHomePage(token: token);
                   }
                 }),
       ),

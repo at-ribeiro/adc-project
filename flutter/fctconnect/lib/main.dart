@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
@@ -17,7 +18,9 @@ void main() async {
   Get.put(SimpleUIController());
 
   // Restore session from shared preferences
-  String? session = await SessionManager.get('session');
+  
+  
+  String? session = await CacheDefault.cacheFactory.get('Session');
 
   runApp(MyApp(session: session));
 }
@@ -69,12 +72,11 @@ class MyApp extends StatelessWidget {
 
         Token? token;
       if (routeName != '/') {
-        _tokenid = await SessionManager.get('Token');
-        _username = await SessionManager.get('Username');
-        _role = await SessionManager.get('Role');
-        _creationDate = await SessionManager.get('CD');
-        _expirationDate = await SessionManager.get('ED');
-
+        _tokenid = await CacheDefault.cacheFactory.get('Token');
+        _username = await CacheDefault.cacheFactory.get('Username');
+        _role = await CacheDefault.cacheFactory.get('Role');
+        _creationDate = await CacheDefault.cacheFactory.get('Creationd');
+        _expirationDate = await CacheDefault.cacheFactory.get('Expirationd');
         token = Token(
           username: _username!,
           role: _role!,
@@ -84,7 +86,7 @@ class MyApp extends StatelessWidget {
         );
         }else{
 
-          SessionManager.storeSession('session', '/');
+          CacheDefault.cacheFactory.set('Session', '/');
         }
     
 

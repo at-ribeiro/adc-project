@@ -5,6 +5,7 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
+import '../data/cache_factory_provider.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -27,6 +28,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+   
+
+   
+
   late Token _token;
   String _postText = '';
   Uint8List? _imageData;
@@ -45,9 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    SessionManager.storeSession('session', '/home');
+    CacheDefault.cacheFactory.set('Session', '/home');
     _loadPosts();
   }
+
+  
 
   @override
   void dispose() {
@@ -318,15 +325,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: () async {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
 
-              SessionManager.storeSession('session', '/');
-              if (kIsWeb) {
-                SessionManager.storeSession('isLoggedIn', 'false');
-                SessionManager.delete('Username');
-                SessionManager.delete('Token');
-                SessionManager.delete('ED');
-                SessionManager.delete('CD');
-                SessionManager.delete('Role');
-              }
+              CacheDefault.cacheFactory.logout();
 
               Navigator.pushReplacement(context,
                   CupertinoPageRoute(builder: (ctx) => const LoginView()));

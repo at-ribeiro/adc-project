@@ -26,6 +26,7 @@ dependencies:
   cookie_jar: ^4.0.2
   dio_cookie_manager: ^3.0.0
   shared_preferences: ^2.0.6
+  sqflite: ^2.2.8+4
 
 dev_dependencies:
   flutter_test:
