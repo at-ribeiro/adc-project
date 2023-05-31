@@ -13,6 +13,7 @@ import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../services/costum_search_delegate.dart';
+import '../data/cache_factory_provider.dart';
 
 import 'login_view.dart';
 import 'event_view.dart';
@@ -48,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    SessionManager.storeSession('session', '/home');
+    CacheDefault.cacheFactory.set('Session', '/home');
     _loadPosts();
   }
 
@@ -78,8 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 showSearch(context: context, delegate: CustomSearchDelegate());
               },
-              icon: Icon(Icons.search)
-              )
+              icon: Icon(Icons.search))
         ],
         leading: Builder(
           builder: (BuildContext context) {
@@ -223,8 +223,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                     } else {
                                       post.likes.add(_token.username);
                                     }
-                                    BaseClient().likePost("/feed",
-                                        _token.username, _token.tokenID, post.id, post.user);
+                                    BaseClient().likePost(
+                                        "/feed",
+                                        _token.username,
+                                        _token.tokenID,
+                                        post.id,
+                                        post.user);
                                   });
                                 },
                                 icon: Icon(
@@ -239,7 +243,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   Navigator.push(
                                     context,
                                     CupertinoPageRoute(
-                                      builder: (ctx) => PostPage(token: _token, postID: post.id, postUser: post.user),
+                                      builder: (ctx) => PostPage(
+                                          token: _token,
+                                          postID: post.id,
+                                          postUser: post.user),
                                     ),
                                   );
                                 },
@@ -289,9 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Mapa'),
             onTap: () {
               Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => MapScreen()));
+                  context, CupertinoPageRoute(builder: (ctx) => MapScreen()));
             },
           ),
           ListTile(
@@ -321,15 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: () async {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
 
-              SessionManager.storeSession('session', '/');
-              if (kIsWeb) {
-                SessionManager.storeSession('isLoggedIn', 'false');
-                SessionManager.delete('Username');
-                SessionManager.delete('Token');
-                SessionManager.delete('ED');
-                SessionManager.delete('CD');
-                SessionManager.delete('Role');
-              }
+              CacheDefault.cacheFactory.logout();
 
               Navigator.pushReplacement(context,
                   CupertinoPageRoute(builder: (ctx) => const LoginView()));
