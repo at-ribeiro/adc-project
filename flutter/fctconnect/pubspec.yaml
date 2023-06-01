@@ -14,7 +14,7 @@ dependencies:
   image_picker: ^0.8.4+3
   cupertino_icons: ^1.0.2
   get: ^4.6.5
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.4
   lottie: ^1.4.2
   http: ^0.13.6
   file_picker: ^5.3.0
@@ -26,6 +26,12 @@ dependencies:
   cookie_jar: ^4.0.2
   dio_cookie_manager: ^3.0.0
   shared_preferences: ^2.0.6
+  dio: ^5.0.0
+  flutter_polyline_points: ^1.0.0
+  google_maps_flutter: ^2.2.5
+  google_maps_flutter_web: ^0.4.0+9
+  geolocator: ^9.0.0
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -12,6 +15,7 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import 'edit_profile_page.dart';
 import 'my_home_page.dart';
 import 'news_view.dart';
 
@@ -49,9 +53,10 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
+    if (selectedButton != 'Info' &&
+        _scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
-        selectedButton != 'Info') {
+        !_loadingMore) {
       _loadPosts();
     }
   }
@@ -86,7 +91,11 @@ class _MyProfileState extends State<MyProfile> {
 
   Future<ProfileInfo> _loadInfo() async {
     ProfileInfo info = await BaseClient().fetchInfo(
-        "/profile", _token.tokenID, _token.username, _token.username);
+      "/profile",
+      _token.tokenID,
+      _token.username,
+      _token.username,
+    );
     return info;
   }
 
@@ -105,6 +114,7 @@ class _MyProfileState extends State<MyProfile> {
             loadInfo: _loadInfo,
             selectedButton: selectedButton,
             onButtonSelected: selectButton,
+            token: _token,
           ),
           const SizedBox(height: 16),
           Divider(
@@ -123,7 +133,7 @@ class _MyProfileState extends State<MyProfile> {
   Widget NavigationBody() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.shifting,
-      currentIndex: 0, // set the initial index to 0
+      currentIndex: 3, // set the initial index to 3 for profile
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home, color: Colors.black),
@@ -147,11 +157,15 @@ class _MyProfileState extends State<MyProfile> {
       showUnselectedLabels: true,
       onTap: (index) {
         if (index == 0) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => MyHomePage(token: _token)));
+          Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(builder: (ctx) => MyHomePage(token: _token)),
+          );
         } else if (index == 1) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+          Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)),
+          );
         } else if (index == 2) {
           showModalBottomSheet(
             context: context,
@@ -196,18 +210,20 @@ class _MyProfileState extends State<MyProfile> {
               ElevatedButton(
                 onPressed: () async {
                   Post post = Post(
-                      post: _postText,
-                      imageData: _imageData,
-                      username: _token.username,
-                      fileName: _fileName);
-                  int response = await BaseClient()
-                      .createPost("/post", _token.tokenID, post);
+                    post: _postText,
+                    imageData: _imageData,
+                    username: _token.username,
+                    fileName: _fileName,
+                  );
+                  int response = await BaseClient().createPost(
+                    "/post",
+                    _token.tokenID,
+                    post,
+                  );
 
                   if (response == 200) {
-                    // ignore: use_build_context_synchronously
                     Navigator.pop(context);
                   } else {
-                    // ignore: use_build_context_synchronously
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -254,7 +270,8 @@ class _MyProfileState extends State<MyProfile> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final fileData = await pickedFile.readAsBytes();
       setState(() {
@@ -266,7 +283,8 @@ class _MyProfileState extends State<MyProfile> {
 
   Future<void> _takePicture() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       final fileData = await pickedFile.readAsBytes();
       setState(() {
@@ -275,81 +293,6 @@ class _MyProfileState extends State<MyProfile> {
       });
     }
   }
-
-  Widget buildContent() {
-    return FutureBuilder<ProfileInfo>(
-      future: _loadInfo(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(
-                height: 8,
-              ),
-              Text(
-                info.fullname,
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                info.role,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
-              ),
-              const SizedBox(height: 16),
-              NumbersWidget(info),
-              const Divider(),
-              const SizedBox(height: 16),
-            ],
-          );
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
-  }
-
-  Widget buildBody() => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [],
-      );
-
-  Widget NumbersWidget(ProfileInfo info) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: buildButton(text: 'Posts', value: info.nPosts),
-          ),
-          Divider(
-            thickness: 2.0,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-            child: buildButton(text: 'Following', value: info.nFollowing),
-          ),
-          Divider(
-            thickness: 2.0,
-            color: Colors.grey,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: buildButton(text: 'Followers', value: info.nFollowers),
-          ),
-        ],
-      );
 
   Widget buildInfoSection() {
     if (selectedButton == 'Info') {
@@ -494,36 +437,12 @@ class _MyProfileState extends State<MyProfile> {
         ),
         Positioned(
           top: top,
-          child: buildProfileImage(),
+          child: buildProfileAndEditButton(),
         ),
       ],
     );
   }
 
-  Widget buildButton({
-    required String text,
-    required int value,
-  }) =>
-      MaterialButton(
-        padding: EdgeInsets.symmetric(vertical: 4),
-        onPressed: () {},
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '$value',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              text,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      );
 
   Widget buildCoverImage() => Container(
         color: Colors.grey,
@@ -542,174 +461,245 @@ class _MyProfileState extends State<MyProfile> {
           'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
         ),
       );
+
+
+
+  Widget buildProfileAndEditButton() => Stack(
+        children: <Widget>[
+          Center(child: buildProfileImage()),
+          Positioned(
+            left: 200,
+            bottom: 10,
+            child: Padding(
+              padding: const EdgeInsets.all(0),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'editar perfil',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+      
 }
+  class ContentWidget extends StatefulWidget {
+    final Future<ProfileInfo> Function() loadInfo;
+    final String selectedButton;
+    final void Function(String) onButtonSelected;
+    final Token token;
 
-class ContentWidget extends StatefulWidget {
-  final Future<ProfileInfo> Function() loadInfo;
-  final String selectedButton;
-  final void Function(String) onButtonSelected;
+    const ContentWidget({
+      Key? key,
+      required this.loadInfo,
+      required this.selectedButton,
+      required this.onButtonSelected,
+      required this.token,
+    }) : super(key: key);
 
-  const ContentWidget({
-    Key? key,
-    required this.loadInfo,
-    required this.selectedButton,
-    required this.onButtonSelected,
-  }) : super(key: key);
-
-  @override
-  _ContentWidgetState createState() => _ContentWidgetState();
-}
-
-class _ContentWidgetState extends State<ContentWidget> {
-  late Future<ProfileInfo> _infoFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _infoFuture = widget.loadInfo();
+    @override
+    _ContentWidgetState createState() => _ContentWidgetState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<ProfileInfo>(
-      future: _infoFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(height: 8),
+  class _ContentWidgetState extends State<ContentWidget> {
+    late Future<ProfileInfo> _infoFuture;
+    late Token _token;
+
+    @override
+    void initState() {
+      super.initState();
+      _token = widget.token;
+      _infoFuture = widget.loadInfo();
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return FutureBuilder<ProfileInfo>(
+        future: _infoFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error loading profile info'),
+            );
+          } else if (snapshot.hasData) {
+            ProfileInfo info = snapshot.data!;
+            return Column(
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  info.fullname,
+                  style:
+                      const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  info.role,
+                  style: const TextStyle(fontSize: 20, color: Colors.black),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    
+                    Divider(
+                      thickness: 2.0,
+                      color: Colors.grey,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: buildButton(text: 'Posts', value: info.nPosts),
+                    ),
+                    Divider(
+                      thickness: 2.0,
+                      color: Colors.grey,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+                      child:
+                          buildButton(text: 'Following', value: info.nFollowing),
+                    ),
+                    Divider(
+                      thickness: 2.0,
+                      color: Colors.grey,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child:
+                          buildButton(text: 'Followers', value: info.nFollowers),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        navigator!.push(
+                          MaterialPageRoute(
+                            builder: (context) => EditProfile(
+                              token: _token,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 24),
+                    
+                    ElevatedButton(
+                      onPressed: () {
+                        widget.onButtonSelected('Info');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Info',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        widget.onButtonSelected('Posts');
+                        _MyProfileState myProfileState =
+                            context.findAncestorStateOfType<_MyProfileState>()!;
+                        myProfileState._loadPosts();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Posts',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else {
+            return Center(
+              child: Text('No profile info available'),
+            );
+          }
+        },
+      );
+    }
+
+    Widget buildButton({
+      required String text,
+      required int value,
+    }) =>
+        MaterialButton(
+          padding: EdgeInsets.symmetric(vertical: 4),
+          onPressed: () {},
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
               Text(
-                info.fullname,
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                '$value',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               Text(
-                info.role,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: buildButton(text: 'Posts', value: info.nPosts),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: Colors.grey,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                    child:
-                        buildButton(text: 'Following', value: info.nFollowing),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: Colors.grey,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child:
-                        buildButton(text: 'Followers', value: info.nFollowers),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onButtonSelected('Info');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Info',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onButtonSelected('Posts');
-                      _MyProfileState myProfileState =
-                          context.findAncestorStateOfType<_MyProfileState>()!;
-                      myProfileState._loadPosts();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Posts',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                ],
+                text,
+                style: const TextStyle(fontSize: 16),
               ),
             ],
-          );
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+          ),
+        );
   }
-
-  Widget buildButton({
-    required String text,
-    required int value,
-  }) =>
-      MaterialButton(
-        padding: EdgeInsets.symmetric(vertical: 4),
-        onPressed: () {},
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '$value',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              text,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      );
-}

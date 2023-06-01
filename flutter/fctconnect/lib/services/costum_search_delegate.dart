@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
+import '../data/cache_factory_provider.dart';
 
 import '../models/Token.dart';
 
@@ -58,20 +58,20 @@ class CustomSearchDelegate extends SearchDelegate {
                   elevation: 2,
                   child: InkWell(
                     onTap: () async {
-                      var results = await Future.wait([
-                        SessionManager.get('CD'),
-                        SessionManager.get('ED'),
-                        SessionManager.get('Role'),
-                        SessionManager.get('Token'),
-                        SessionManager.get('Username')
-                      ]);
+                      var cd = await CacheDefault.cacheFactory.get('Creationd');
+                      var ed = await CacheDefault.cacheFactory.get('Expirationd');
+                      var role = await CacheDefault.cacheFactory.get('Role');
+                      var tokenID =
+                          await CacheDefault.cacheFactory.get('Token');
+                      var username =
+                          await CacheDefault.cacheFactory.get('Username');
 
                       var _token = Token(
-                        creationDate: int.parse(results[0]!),
-                        expirationDate: int.parse(results[1]!),
-                        role: results[2]!,
-                        tokenID: results[3]!,
-                        username: results[4]!,
+                        creationDate: int.parse(cd!),
+                        expirationDate: int.parse(ed!),
+                        role: role!,
+                        tokenID: tokenID!,
+                        username: username!,
                       );
                       if (_token.username == snapshot.data![index].username) {
                         Navigator.pushReplacement(

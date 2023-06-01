@@ -1,21 +1,18 @@
 class CommentData {
-  final String username;
+  final String user;
   final String text;
-  final String url;
-  final String timestamp;
+  final int timestamp;
 
   CommentData({
-    required this.username, 
+    required this.user, 
     required this.text,
-    required this.url,
     required this.timestamp,
   });
 
   factory CommentData.fromJson(Map<String, dynamic> json) {
     return CommentData(
-      username: json['username'],
+      user: json['user'],
       text: json['text'],
-      url: json['url'],
       timestamp: json['timestamp'],
     );
   }

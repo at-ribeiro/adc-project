@@ -1,8 +1,8 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/joaohenriquegarcia/Development/flutter
-FLUTTER_APPLICATION_PATH=/Users/joaohenriquegarcia/Library/CloudStorage/OneDrive-Personal/Documents/Universidade/3ANO/2SEMESTRE/ADC/PROJETO/adc-project/flutter/fctconnect
+FLUTTER_ROOT=C:\Users\gugag\AppData\Local\flutter
+FLUTTER_APPLICATION_PATH=C:\Users\gugag\Desktop\adc-project\flutter\fctconnect
 COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=lib/main.dart
+FLUTTER_TARGET=lib\main.dart
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
 FLUTTER_BUILD_NUMBER=1
