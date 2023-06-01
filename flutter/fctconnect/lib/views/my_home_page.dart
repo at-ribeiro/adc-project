@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
+import 'package:responsive_login_ui/views/report_view.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -321,6 +322,15 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           const Spacer(),
+          ListTile(
+            title: const Text('Report'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (ctx) => ReportPage(token: _token)));
+            },
+          ),
           ListTile(
             title: const Text('Sair'),
             onTap: () async {
