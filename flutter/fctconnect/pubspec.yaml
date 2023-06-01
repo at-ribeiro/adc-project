@@ -34,6 +34,10 @@ dependencies:
   permission_handler: ^10.2.0
   firebase_core: ^2.13.1
   firebase_messaging: ^14.6.2
+  firebase_analytics: ^10.4.2
+
+
+
 
 dev_dependencies:
   flutter_test:

@@ -7,6 +7,7 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/map_view.dart';
+import 'package:responsive_login_ui/views/messages/messages_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
@@ -77,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
               onPressed: () {
-                showSearch(context: context, delegate: CustomSearchDelegate());
+                showSearch(context: context, delegate: CustomSearchDelegate("profile"));
               },
               icon: Icon(Icons.search))
         ],
@@ -318,6 +319,15 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Calendário'),
             onTap: () {
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Mensagens'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (ctx) => MessagesView()));
             },
           ),
           const Spacer(),

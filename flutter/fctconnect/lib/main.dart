@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
+import 'package:responsive_login_ui/services/fcm_services.dart';
+import 'package:responsive_login_ui/services/get_fcm_token.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
@@ -8,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+
 
 import 'controller/simple_ui_controller.dart';
 import 'models/Token.dart';
@@ -17,20 +21,11 @@ import 'views/news_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await FcmServices.initializeFirebase();
 
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
-
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-    }
-  });
+  FcmServices.firebaseAnalytics();
+  
+  FcmServices.firebaseMessaging();
 
   Get.put(SimpleUIController());
 
@@ -38,8 +33,18 @@ void main() async {
 
   String? session = await CacheDefault.cacheFactory.get('Session');
 
+  getKey();
+
   runApp(MyApp(session: session));
 }
+
+
+void getKey() async {
+String? fcmKey = await FcmToken.getFcmToken();
+  print("TOKEN : $fcmKey");
+}
+
+
 
 
 
@@ -133,6 +138,7 @@ class MyApp extends StatelessWidget {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('last_visited_page', currentPage);
   }
+
 
   Future<String?> isLoggedIn() async {
     return await SessionManager.get('isLoggedIn');
