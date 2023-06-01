@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:responsive_login_ui/models/register_user.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
@@ -80,18 +81,7 @@ class _SignUpViewState extends State<SignUpView> {
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return Row(
       children: [
-        Expanded(
-          flex: 4,
-          child: RotatedBox(
-            quarterTurns: 3,
-            child: Lottie.asset(
-              'assets/wave.json',
-              height: size.height * 0.3,
-              width: double.infinity,
-              fit: BoxFit.fill,
-            ),
-          ),
-        ),
+       
         SizedBox(width: size.width * 0.06),
         Expanded(
           flex: 5,
@@ -121,14 +111,7 @@ class _SignUpViewState extends State<SignUpView> {
             ? MainAxisAlignment.center
             : MainAxisAlignment.start,
         children: [
-          size.width > 600
-              ? Container()
-              : Lottie.asset(
-                  'assets/wave.json',
-                  height: size.height * 0.2,
-                  width: size.width,
-                  fit: BoxFit.fill,
-                ),
+          
           SizedBox(
             height: size.height * 0.03,
           ),
@@ -334,16 +317,15 @@ class _SignUpViewState extends State<SignUpView> {
                   /// Navigate To Login Screen
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (ctx) => const LoginView()));
+                      
                       nameController.clear();
                       emailController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
 
                       simpleUIController.isObscure.value = true;
+
+                      context.go("/login");
                     },
                     child: RichText(
                       text: TextSpan(

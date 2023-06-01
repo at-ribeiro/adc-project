@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/loading_screen.dart';
@@ -10,6 +11,7 @@ import 'package:responsive_login_ui/views/signUp_view.dart';
 
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
+import '../data/cache_factory_provider.dart';
 import '../main.dart';
 import '../services/base_client.dart';
 import 'my_home_page.dart';
@@ -97,18 +99,7 @@ void initState() {
   ) {
     return Row(
       children: [
-        Expanded(
-          flex: 4,
-          child: RotatedBox(
-            quarterTurns: 3,
-            child: Lottie.asset(
-              'assets/wave.json',
-              height: size.height * 0.3,
-              width: double.infinity,
-              fit: BoxFit.fill,
-            ),
-          ),
-        ),
+      
         SizedBox(width: size.width * 0.06),
         Expanded(
           flex: 5,
@@ -316,42 +307,96 @@ void initState() {
   }
 
   // Login Button
-  Widget loginButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
+ Future<dynamic> _performLogin() async {
+  var _body = {
+    "username": nameController.text,
+    "password": passwordController.text,
+  };
+
+    var response = await BaseClient().postLogin("/login/", _body);
+
+    String tokenId = response.tokenID;
+    String username = response.username;
+    String role = response.role;
+    String cD = response.creationDate.toString();
+    String eD = response.expirationDate.toString();
+
+    CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
+
+    print(response);
+
+    context.go("/homepage");
+
+
+  return response;
+}
+
+Widget doLogin() {
+  return FutureBuilder<void>(
+    future: _performLogin(),
+    builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasError) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  const Text('Something went wrong'),
+                  Text(snapshot.error.toString()),
+                ],
+              ),
             ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Ok'),
+                onPressed: () {
+                  context.go("/login");
+                },
+                
+              ),
+            ],
+          );
+        } else {
+          context.go("/homepage");
+          return Container();
+        }
+      } else {
+        return const CircularProgressIndicator();
+      }
+    },
+  );
+ 
+}
+
+Widget loginButton() {
+  return SizedBox(
+    width: double.infinity,
+    height: 55,
+    child: ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor:
+            MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
           ),
         ),
-        onPressed: () async {
-          // Validate returns true if the form is valid, or false otherwise.
-          if (_formKey.currentState!.validate()) {
-            // ... Navigate To your Home Page
-            var _body = {
-              "username": nameController.text,
-              "password": passwordController.text,
-            };
-      
-              var response = BaseClient().postLogin("/login/", _body);
-
-              print(response);
-              Navigator.pushReplacement(
-                context,
-                CupertinoPageRoute(
-                    builder: (ctx) => LoadingScreen(token: response)),
-              );
-            
-          }
-        },
-        child: const Text('Login'),
       ),
-    );
-  }
+      onPressed: () {
+
+        // Validate returns true if the form is valid, or false otherwise.
+       showDialog(context:context,
+              barrierDismissible: false,
+              builder: (BuildContext context){
+                return doLogin();
+              }
+              );
+               // Call the login funct
+      },
+      child: const Text('Login'),
+    ),
+  );
+}
+
 }

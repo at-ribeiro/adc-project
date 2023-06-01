@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/map_view.dart';
@@ -13,10 +15,10 @@ import 'package:responsive_login_ui/views/report_view.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
+import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/costum_search_delegate.dart';
 import '../data/cache_factory_provider.dart';
-
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -24,9 +26,7 @@ import 'my_profile.dart';
 import 'news_view.dart';
 
 class MyHomePage extends StatefulWidget {
-  final Token token;
-
-  const MyHomePage({Key? key, required this.token}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Token _token;
+  bool _isLoadingToken = true;
   String _postText = '';
   Uint8List? _imageData;
   String? _fileName;
@@ -48,11 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    CacheDefault.cacheFactory.set('Session', '/home');
-    _loadPosts();
+    CacheDefault.cacheFactory.set("Session", "/homepage");
   }
 
   @override
@@ -61,43 +60,50 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(MyHomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.token != oldWidget.token) {
-      setState(() {
-        _token = widget.token;
-      });
-    }
-  }
+  // @override
+  // void didUpdateWidget(MyHomePage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (widget.token != oldWidget.token) {
+  //     setState(() {
+  //       _token = widget.token;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        actions: [
-          IconButton(
-              onPressed: () {
-                showSearch(context: context, delegate: CustomSearchDelegate("profile"));
-              },
-              icon: Icon(Icons.search))
-        ],
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+    if (_isLoadingToken) {
+    return tokenGetter();
+    } else {
+      _loadPosts();
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(''),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showSearch(
+                      context: context,
+                      delegate: CustomSearchDelegate("profile"));
+                },
+                icon: Icon(Icons.search))
+          ],
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            },
+          ),
         ),
-      ),
-      drawer: _buildDrawer(),
-      body: ContentBody(),
-      bottomNavigationBar: NavigationBody(),
-    );
+        drawer: _buildDrawer(),
+        body: ContentBody(),
+        bottomNavigationBar: NavigationBody(),
+      );
+    }
   }
 
   Widget NavigationBody() {
@@ -137,8 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context) => _buildPostModal(context),
           );
         } else if (index == 3) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+          context.go(Paths.myProfile);
         }
       },
     );
@@ -325,10 +330,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Mensagens'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => MessagesView()));
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
             },
           ),
           const Spacer(),
@@ -348,8 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
               CacheDefault.cacheFactory.logout();
 
-              Navigator.pushReplacement(context,
-                  CupertinoPageRoute(builder: (ctx) => const LoginView()));
+              context.go(Paths.login);
             },
           ),
         ],
@@ -509,6 +511,77 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
       _loadPosts();
+    }
+  }
+
+  Widget tokenGetter() {
+      return FutureBuilder(
+          future: _loadToken(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return AlertDialog(
+                  title: Text('Não estás logado!'),
+                  content: Text('Volra para trás e faz login.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        context.go("/login");
+                      },
+                      child: Text('Voltar ao login.'),
+                    ),
+                  ],
+                );
+              } else {
+                Token token = snapshot.data;
+                if(token.expirationDate < DateTime.now().millisecondsSinceEpoch){
+                  return AlertDialog(
+                    title: Text('Sessão expirada!'),
+                    content: Text('Volra para trás e faz login.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          context.go("/login");
+                        },
+                        child: Text('Voltar ao login.'),
+                      ),
+                    ],
+                  );
+                }
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _token = token;
+                      _isLoadingToken = false;
+                    });
+                  });
+                return Container();
+              }
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          });
+  }
+
+  Future<Token> _loadToken() async {
+    try {
+      String username =
+          await CacheDefault.cacheFactory.get("Username") as String;
+      String role = await CacheDefault.cacheFactory.get("Role") as String;
+      String tokenID = await CacheDefault.cacheFactory.get("Token") as String;
+      String creationDate =
+          await CacheDefault.cacheFactory.get("Creationd") as String;
+      String expirationDate =
+          await CacheDefault.cacheFactory.get("Expirationd") as String;
+      Token token = Token(
+          username: username,
+          role: role,
+          tokenID: tokenID,
+          creationDate: int.parse(creationDate),
+          expirationDate: int.parse(expirationDate));
+      return token;
+      
+    } catch (e) {
+      return Future.error(e);
     }
   }
 }

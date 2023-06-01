@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
 
@@ -20,9 +22,9 @@ import 'my_home_page.dart';
 import 'news_view.dart';
 
 class MyProfile extends StatefulWidget {
-  final Token token;
 
-  const MyProfile({Key? key, required this.token}) : super(key: key);
+
+  const MyProfile({Key? key}) : super(key: key);
 
   @override
   State<MyProfile> createState() => _MyProfileState();
@@ -30,6 +32,7 @@ class MyProfile extends StatefulWidget {
 
 class _MyProfileState extends State<MyProfile> {
   late Token _token;
+  bool _isLoadingToken = true;
   final double coverHeight = 200;
   final double profileHeight = 144;
   String selectedButton = 'Info';
@@ -47,9 +50,9 @@ class _MyProfileState extends State<MyProfile> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+    
   }
 
   void _onScroll() {
@@ -101,7 +104,10 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+   if(_isLoadingToken){
+return tokenGetter();
+   }else{ return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil'),
       ),
@@ -127,7 +133,78 @@ class _MyProfileState extends State<MyProfile> {
         ],
       ),
       bottomNavigationBar: NavigationBody(),
-    );
+    );}
+  }
+
+    Widget tokenGetter() {
+      return FutureBuilder(
+          future: _loadToken(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return AlertDialog(
+                  title: Text('Não estás logado!'),
+                  content: Text('Volra para trás e faz login.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        context.go("/login");
+                      },
+                      child: Text('Voltar ao login.'),
+                    ),
+                  ],
+                );
+              } else {
+                Token token = snapshot.data;
+                if(token.expirationDate < DateTime.now().millisecondsSinceEpoch){
+                  return AlertDialog(
+                    title: Text('Sessão expirada!'),
+                    content: Text('Volra para trás e faz login.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          context.go("/login");
+                        },
+                        child: Text('Voltar ao login.'),
+                      ),
+                    ],
+                  );
+                }
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _token = token;
+                      _isLoadingToken = false;
+                    });
+                  });
+                return Container();
+              }
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          });
+  }
+
+  Future<Token> _loadToken() async {
+    try {
+      String username =
+          await CacheDefault.cacheFactory.get("Username") as String;
+      String role = await CacheDefault.cacheFactory.get("Role") as String;
+      String tokenID = await CacheDefault.cacheFactory.get("Token") as String;
+      String creationDate =
+          await CacheDefault.cacheFactory.get("Creationd") as String;
+      String expirationDate =
+          await CacheDefault.cacheFactory.get("Expirationd") as String;
+      Token token = Token(
+          username: username,
+          role: role,
+          tokenID: tokenID,
+          creationDate: int.parse(creationDate),
+          expirationDate: int.parse(expirationDate));
+      return token;
+      
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 
   Widget NavigationBody() {
@@ -159,7 +236,7 @@ class _MyProfileState extends State<MyProfile> {
         if (index == 0) {
           Navigator.pushReplacement(
             context,
-            CupertinoPageRoute(builder: (ctx) => MyHomePage(token: _token)),
+            CupertinoPageRoute(builder: (ctx) => MyHomePage()),
           );
         } else if (index == 1) {
           Navigator.pushReplacement(

@@ -284,6 +284,12 @@
       "languageVersion": "2.15"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/go_router-7.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "google_fonts",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/google_fonts-4.0.4",
       "packageUri": "lib/",
@@ -396,6 +402,12 @@
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/lints-2.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "logging",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/logging-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "lottie",
@@ -626,6 +638,12 @@
       "languageVersion": "2.15"
     },
     {
+      "name": "url_strategy",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/url_strategy-0.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
@@ -650,7 +668,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-06-01T09:42:18.352714Z",
+  "generated": "2023-06-01T15:56:36.979661Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }

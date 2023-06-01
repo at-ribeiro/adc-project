@@ -96,7 +96,6 @@ class CustomSearchDelegate extends SearchDelegate {
                             context,
                             CupertinoPageRoute(
                               builder: (ctx) => MyProfile(
-                                token: _token,
                               ),
                             ),
                           );

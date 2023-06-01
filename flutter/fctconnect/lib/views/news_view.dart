@@ -134,7 +134,7 @@ class _NewsViewState extends State<NewsView> {
         onTap: (index) {
           if (index == 0) {
             Navigator.pushReplacement(context,
-                CupertinoPageRoute(builder: (ctx) => MyHomePage(token: _token)));
+                CupertinoPageRoute(builder: (ctx) => MyHomePage()));
           } else if (index == 1) {
             
           } else if (index == 2) {
@@ -145,7 +145,7 @@ class _NewsViewState extends State<NewsView> {
             );
           } else if (index == 3) {
             Navigator.pushReplacement(context,
-                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+                CupertinoPageRoute(builder: (ctx) => MyProfile()));
           }
         },
       );
