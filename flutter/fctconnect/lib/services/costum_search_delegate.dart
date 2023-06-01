@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
+import 'package:responsive_login_ui/views/messages/new_message.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
 import '../data/cache_factory_provider.dart';
@@ -9,6 +10,10 @@ import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
+  final String type;
+
+  CustomSearchDelegate(this.type);
+
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
@@ -59,7 +64,8 @@ class CustomSearchDelegate extends SearchDelegate {
                   child: InkWell(
                     onTap: () async {
                       var cd = await CacheDefault.cacheFactory.get('Creationd');
-                      var ed = await CacheDefault.cacheFactory.get('Expirationd');
+                      var ed =
+                          await CacheDefault.cacheFactory.get('Expirationd');
                       var role = await CacheDefault.cacheFactory.get('Role');
                       var tokenID =
                           await CacheDefault.cacheFactory.get('Token');
@@ -73,25 +79,39 @@ class CustomSearchDelegate extends SearchDelegate {
                         tokenID: tokenID!,
                         username: username!,
                       );
-                      if (_token.username == snapshot.data![index].username) {
-                        Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (ctx) => MyProfile(
-                              token: _token,
+                 switch(type){
+                          case 'msg':
+                            Navigator.pushReplacement(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (ctx) => NewMessage(
+                                ),
+                              ),
+                            );
+                            break;
+                            case "profile":
+                        
+                        if (_token.username == snapshot.data![index].username) {
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (ctx) => MyProfile(
+                                token: _token,
+                              ),
                             ),
-                          ),
-                        );
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (ctx) => OtherProfile(
-                              token: _token,
-                              name: snapshot.data![index].username,
+                          );
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (ctx) => OtherProfile(
+                                token: _token,
+                                name: snapshot.data![index].username,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                      }
+                      break;
                       }
                     },
                     child: Container(
