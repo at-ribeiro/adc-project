@@ -210,7 +210,7 @@ public class PostServlet extends HttpServlet {
                     .setLimit(20)
                     .build();
 
-            QueryResults<Entity> postResults = datastore.run(postQuery);
+            QueryResults<Entity> postResults = txn.run(postQuery);
 
             List<FeedData> posts = new ArrayList<>();
             postResults.forEachRemaining(post->{

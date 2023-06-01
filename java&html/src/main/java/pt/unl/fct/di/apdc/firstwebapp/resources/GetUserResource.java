@@ -80,7 +80,7 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followingResults = datastore.run(followingQuery);
+            QueryResults<Entity> followingResults = txn.run(followingQuery);
 
             List<Entity> followeesList = new ArrayList<>();
             followingResults.forEachRemaining(followeesList::add);
@@ -92,7 +92,7 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followersResults = datastore.run(followersQuery);
+            QueryResults<Entity> followersResults = txn.run(followersQuery);
 
             List<Entity> followerList = new ArrayList<>();
             followersResults.forEachRemaining(followerList::add);
@@ -104,7 +104,7 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> postResults = datastore.run(postsQuery);
+            QueryResults<Entity> postResults = txn.run(postsQuery);
 
             List<Entity> postsList = new ArrayList<>();
             postResults.forEachRemaining(postsList::add);

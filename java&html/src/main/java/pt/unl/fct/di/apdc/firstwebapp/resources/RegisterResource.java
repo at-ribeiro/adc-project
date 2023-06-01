@@ -65,7 +65,7 @@ public class RegisterResource {
             Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                     StructuredQuery.PropertyFilter.eq("user_email", data.getEmail())
             ).build();
-            QueryResults<Entity> users = datastore.run(query);
+            QueryResults<Entity> users = txn.run(query);
 
             List<Entity> userList = new ArrayList<>();
 
