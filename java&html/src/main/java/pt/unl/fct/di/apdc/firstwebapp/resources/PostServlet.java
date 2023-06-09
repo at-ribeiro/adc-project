@@ -318,7 +318,9 @@ public class PostServlet extends HttpServlet {
                     .addAncestor(PathElement.of("User", username))
                     .newKey(id);
 
-            if(postKey == null){
+            Entity post = txn.get(postKey);
+
+            if(post == null){
                 LOG.warning("Post "+ id +" from user " + username + " does not exist");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -328,6 +330,14 @@ public class PostServlet extends HttpServlet {
                 LOG.warning("You don't have permission to delete this post");
                 response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
+            }
+
+            String imageName = post.getString("image");
+
+            if(!imageName.equals("")){
+                BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
+                Blob blob = storage.get(blobId);
+                blob.delete();
             }
 
             txn.delete(postKey);
