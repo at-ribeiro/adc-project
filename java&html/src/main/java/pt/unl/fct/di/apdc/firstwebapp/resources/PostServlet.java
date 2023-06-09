@@ -204,7 +204,6 @@ public class PostServlet extends HttpServlet {
                                     StructuredQuery.PropertyFilter.eq("user", username),
                                     StructuredQuery.PropertyFilter.lt("timestamp", Long.parseLong(timestamp))
                             )
-
                     )
                     .addOrderBy(descendingOrder)
                     .setLimit(20)
@@ -271,5 +270,92 @@ public class PostServlet extends HttpServlet {
                 txn.rollback();
             }
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response){
+        Transaction txn = datastore.newTransaction();
+
+        try {
+            String tokenId = request.getHeader("Authorization");
+            String deleter = request.getHeader("User");
+            String username = request.getPathInfo().substring(1);
+            String id = request.getParameter("id");
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null){
+                LOG.warning("User does not exist.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            if (user.getString("user_state").equals("INACTIVE")){
+                LOG.warning("Inactive User.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", deleter))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+            Key postKey = datastore.newKeyFactory()
+                    .setKind("Post")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(id);
+
+            Entity post = txn.get(postKey);
+
+            if(post == null){
+                LOG.warning("Post "+ id +" from user " + username + " does not exist");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            if(!enoughRole(deleter, username)){
+                LOG.warning("You don't have permission to delete this post");
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
+            String imageName = post.getString("image");
+
+            if(!imageName.equals("")){
+                BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
+                Blob blob = storage.get(blobId);
+                blob.delete();
+            }
+
+            txn.delete(postKey);
+            txn.commit();
+            response.setStatus(HttpServletResponse.SC_OK);
+
+        }catch (Exception e) {
+            txn.rollback();
+            e.printStackTrace();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    private boolean enoughRole(String deleter, String username) {
+        //TODO: completar quando backoffice for implementado
+        return deleter.equals(username);
     }
 }
