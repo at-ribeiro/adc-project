@@ -17,6 +17,7 @@ import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/load_token.dart';
 import 'edit_profile_page.dart';
 import 'my_home_page.dart';
 import 'news_view.dart';
@@ -105,9 +106,16 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
 
-   if(_isLoadingToken){
-return tokenGetter();
-   }else{ return Scaffold(
+   if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+          });
+        });
+      });
+    }else{ return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil'),
       ),
@@ -132,7 +140,6 @@ return tokenGetter();
           const SizedBox(height: 32),
         ],
       ),
-      bottomNavigationBar: NavigationBody(),
     );}
   }
 
@@ -241,7 +248,7 @@ return tokenGetter();
         } else if (index == 1) {
           Navigator.pushReplacement(
             context,
-            CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)),
+            CupertinoPageRoute(builder: (ctx) => NewsView()),
           );
         } else if (index == 2) {
           showModalBottomSheet(

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:responsive_login_ui/models/paths.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/views/messages/new_message.dart';
@@ -92,23 +94,9 @@ class CustomSearchDelegate extends SearchDelegate {
                             case "profile":
                         
                         if (_token.username == snapshot.data![index].username) {
-                          Navigator.pushReplacement(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (ctx) => MyProfile(
-                              ),
-                            ),
-                          );
+                          context.go(Paths.myProfile);
                         } else {
-                          Navigator.pushReplacement(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (ctx) => OtherProfile(
-                                token: _token,
-                                name: snapshot.data![index].username,
-                              ),
-                            ),
-                          );
+                          context.go(Paths.otherProfile+"?username=${snapshot.data![index].username}" );
                       }
                       break;
                       }

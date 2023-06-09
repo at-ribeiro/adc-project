@@ -136,14 +136,7 @@ void initState() {
         mainAxisAlignment:
             size.width > 600 ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
-          size.width > 600
-              ? Container()
-              : Lottie.asset(
-                  'assets/wave.json',
-                  height: size.height * 0.2,
-                  width: size.width,
-                  fit: BoxFit.fill,
-                ),
+
           SizedBox(
             height: size.height * 0.03,
           ),

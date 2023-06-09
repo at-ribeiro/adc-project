@@ -12,6 +12,7 @@ import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/messages/messages_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
+import 'package:responsive_login_ui/views/reports_list_view.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -19,6 +20,7 @@ import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/costum_search_delegate.dart';
 import '../data/cache_factory_provider.dart';
+import '../services/load_token.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -73,7 +75,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
-    return tokenGetter();
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+          });
+        });
+      });
     } else {
       _loadPosts();
       return Scaffold(
@@ -101,53 +110,53 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         drawer: _buildDrawer(),
         body: ContentBody(),
-        bottomNavigationBar: NavigationBody(),
+        // bottomNavigationBar: NavigationBody(),
       );
     }
   }
 
-  Widget NavigationBody() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.shifting,
-      currentIndex: 0, // set the initial index to 0
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home, color: Colors.black),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.newspaper, color: Colors.black),
-          label: 'Noticias',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.post_add, color: Colors.black),
-          label: 'Post',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person, color: Colors.black),
-          label: 'Perfil',
-        ),
-      ],
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.black,
-      showUnselectedLabels: true,
-      onTap: (index) {
-        if (index == 0) {
-        } else if (index == 1) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-        } else if (index == 2) {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => _buildPostModal(context),
-          );
-        } else if (index == 3) {
-          context.go(Paths.myProfile);
-        }
-      },
-    );
-  }
+  // Widget NavigationBody() {
+  //   return BottomNavigationBar(
+  //     type: BottomNavigationBarType.shifting,
+  //     currentIndex: 0, // set the initial index to 0
+  //     items: const [
+  //       BottomNavigationBarItem(
+  //         icon: Icon(Icons.home, color: Colors.black),
+  //         label: 'Home',
+  //       ),
+  //       BottomNavigationBarItem(
+  //         icon: Icon(Icons.newspaper, color: Colors.black),
+  //         label: 'Noticias',
+  //       ),
+  //       BottomNavigationBarItem(
+  //         icon: Icon(Icons.post_add, color: Colors.black),
+  //         label: 'Post',
+  //       ),
+  //       BottomNavigationBarItem(
+  //         icon: Icon(Icons.person, color: Colors.black),
+  //         label: 'Perfil',
+  //       ),
+  //     ],
+  //     selectedItemColor: Colors.black,
+  //     unselectedItemColor: Colors.black,
+  //     showUnselectedLabels: true,
+  //     onTap: (index) {
+  //       if (index == 0) {
+  //       } else if (index == 1) {
+  //         Navigator.pushReplacement(context,
+  //             CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
+  //       } else if (index == 2) {
+  //         showModalBottomSheet(
+  //           context: context,
+  //           isScrollControlled: true,
+  //           builder: (context) => _buildPostModal(context),
+  //         );
+  //       } else if (index == 3) {
+  //         context.go(Paths.myProfile);
+  //       }
+  //     },
+  //   );
+  // }
 
   Widget ContentBody() {
     return RefreshIndicator(
@@ -247,15 +256,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               Text(post.likes.length.toString()),
                               IconButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (ctx) => PostPage(
-                                          token: _token,
-                                          postID: post.id,
-                                          postUser: post.user),
-                                    ),
-                                  );
+                                  context.push(
+                                    context.namedLocation(Paths.post,
+                                        pathParameters: <String, String>{
+                                          'id': post.id,
+                                          'user': post.user,
+                                        })
+                                    );
                                 },
                                 icon: Icon(Icons.comment_outlined),
                               ),
@@ -302,17 +309,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Mapa'),
             onTap: () {
-              Navigator.push(
-                  context, CupertinoPageRoute(builder: (ctx) => MapScreen()));
+              context.go(Paths.mapas);
             },
           ),
           ListTile(
             title: const Text('Eventos'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => EventView(token: _token)));
+              context.go(Paths.events);
             },
           ),
           ListTile(
@@ -338,10 +341,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Report'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => ReportPage(token: _token)));
+              context.go(Paths.report);
+            },
+          ),
+          ListTile(
+            title: const Text('List Reports'),
+            onTap: () {
+             context.go(Paths.listReports);
             },
           ),
           ListTile(
@@ -511,77 +517,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
       _loadPosts();
-    }
-  }
-
-  Widget tokenGetter() {
-      return FutureBuilder(
-          future: _loadToken(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return AlertDialog(
-                  title: Text('Não estás logado!'),
-                  content: Text('Volra para trás e faz login.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        context.go("/login");
-                      },
-                      child: Text('Voltar ao login.'),
-                    ),
-                  ],
-                );
-              } else {
-                Token token = snapshot.data;
-                if(token.expirationDate < DateTime.now().millisecondsSinceEpoch){
-                  return AlertDialog(
-                    title: Text('Sessão expirada!'),
-                    content: Text('Volra para trás e faz login.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          context.go("/login");
-                        },
-                        child: Text('Voltar ao login.'),
-                      ),
-                    ],
-                  );
-                }
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _token = token;
-                      _isLoadingToken = false;
-                    });
-                  });
-                return Container();
-              }
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          });
-  }
-
-  Future<Token> _loadToken() async {
-    try {
-      String username =
-          await CacheDefault.cacheFactory.get("Username") as String;
-      String role = await CacheDefault.cacheFactory.get("Role") as String;
-      String tokenID = await CacheDefault.cacheFactory.get("Token") as String;
-      String creationDate =
-          await CacheDefault.cacheFactory.get("Creationd") as String;
-      String expirationDate =
-          await CacheDefault.cacheFactory.get("Expirationd") as String;
-      Token token = Token(
-          username: username,
-          role: role,
-          tokenID: tokenID,
-          creationDate: int.parse(creationDate),
-          expirationDate: int.parse(expirationDate));
-      return token;
-      
-    } catch (e) {
-      return Future.error(e);
     }
   }
 }
