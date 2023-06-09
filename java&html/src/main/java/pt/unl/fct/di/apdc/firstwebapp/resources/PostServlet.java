@@ -29,7 +29,7 @@ public class PostServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
@@ -78,7 +78,7 @@ public class PostServlet extends HttpServlet {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
@@ -104,7 +104,7 @@ public class PostServlet extends HttpServlet {
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
-                if(storage.get(blobId)==null){
+                if(storage.get(blobId)!=null){
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     return;
                 }
@@ -123,12 +123,16 @@ public class PostServlet extends HttpServlet {
                                 .addAncestor(PathElement.of("User", username))
                                 .newKey(username + "-" + timestamp);
 
+            List<Value<Key>> likeList = new ArrayList<>();
+
+
             Entity entity = Entity.newBuilder(postKey)
                     .set("id", username + "-" + timestamp)
                     .set("text", postText)
                     .set("user", username)
                     .set("timestamp", timestamp)
                     .set("image", imageName)
+                    .set("likes", likeList)
                     .build();
 
             txn.put(entity);
@@ -153,9 +157,11 @@ public class PostServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
+            String searcher = request.getHeader("User");
+            String username = request.getPathInfo().substring(1);
             String timestamp = request.getParameter("timestamp");
-            LOG.fine("Attempt to create post for user " + username);
+
+            LOG.fine("Attempt to get posts from user " + username);
 
             //verifications
 
@@ -174,12 +180,12 @@ public class PostServlet extends HttpServlet {
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", searcher))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
@@ -190,17 +196,17 @@ public class PostServlet extends HttpServlet {
                 return;
             }
 
-            StructuredQuery.OrderBy ascendingOrder = StructuredQuery.OrderBy.asc("timestamp");
+            StructuredQuery.OrderBy descendingOrder = StructuredQuery.OrderBy.desc("timestamp");
             Query<Entity> postQuery = Query.newEntityQueryBuilder()
                     .setKind("Post")
                     .setFilter(
                             StructuredQuery.CompositeFilter.and(
-                                    StructuredQuery.PropertyFilter.hasAncestor(userKey),
-                                    StructuredQuery.PropertyFilter.gt("timestamp", timestamp)
+                                    StructuredQuery.PropertyFilter.eq("user", username),
+                                    StructuredQuery.PropertyFilter.lt("timestamp", Long.parseLong(timestamp))
                             )
 
                     )
-                    .addOrderBy(ascendingOrder)
+                    .addOrderBy(descendingOrder)
                     .setLimit(20)
                     .build();
 
@@ -217,6 +223,15 @@ public class PostServlet extends HttpServlet {
                                     post.getString("user") + "-" + post.getString("image"));
                             Blob blob = storage.get(blobId);
                             url = blob.getMediaLink();
+
+                        }
+
+                        List<String> likes = new ArrayList<>();
+
+                        for(Value<?> value : post.getList("likes")){
+                            Key likedKey = (Key) value.get();
+                            Entity likedEntity = txn.get(likedKey);
+                            likes.add(likedEntity.getString("user_username"));
                         }
 
                         FeedData feedPost = new FeedData(
@@ -224,7 +239,8 @@ public class PostServlet extends HttpServlet {
                                 post.getString("text"),
                                 post.getString("user"),
                                 url,
-                                post.getString("id").split("-")[1]
+                                post.getString("id").split("-")[1],
+                                likes
                         );
 
                         posts.add(feedPost);

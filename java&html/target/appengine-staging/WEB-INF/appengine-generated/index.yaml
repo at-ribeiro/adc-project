@@ -1,6 +1,0 @@
-indexes:
-- kind: "Post"
-  properties:
-  - name: "user"
-  - name: "timestamp"
-    direction: desc

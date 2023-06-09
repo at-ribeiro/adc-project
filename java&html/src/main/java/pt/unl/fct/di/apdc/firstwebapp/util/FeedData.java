@@ -1,6 +1,11 @@
 package pt.unl.fct.di.apdc.firstwebapp.util;
 
 import com.google.cloud.Timestamp;
+import com.google.cloud.datastore.Key;
+import com.google.cloud.datastore.Value;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FeedData {
 
@@ -9,14 +14,17 @@ public class FeedData {
     public String user;
     public String url;
     public String timestamp;
+    public List<String> likes;
     public FeedData(){};
 
-    public FeedData(String id, String text, String user, String url, String timestamp){
+    public FeedData(String id, String text, String user, String url, String timestamp, List<String> likes){
         this.id = id;
         this.text = text;
         this.user = user;
         this.url = url;
         this.timestamp = timestamp;
+        this.likes = likes;
+
     }
 
     public String getId() {
