@@ -18,4 +18,6 @@ class Paths {
   static String report = '/report';
 
   static String listReports = "${Paths.report}/list";
+
+  static String editProfile  = myProfile + '/edit';
 }

@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
+import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
 import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
@@ -31,9 +31,27 @@ class AppRouter {
           GoRoute(
             path: '/',
             builder: (BuildContext context, GoRouterState state) {
-              return const MyHomePage();
+              return FutureBuilder<dynamic>(
+                future: CacheDefault.cacheFactory.get('isLoggedIn'),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    String isLoggedInAsString = snapshot.data as String;
+                    bool isLoggedIn =
+                        isLoggedInAsString.toLowerCase() == 'true';
+                    if (isLoggedIn) {
+                      return const MyHomePage();
+                    } else {
+                      return const LoginView();
+                    }
+                  } else {
+                    return CircularProgressIndicator(); // Show loading indicator while waiting for future to complete
+                  }
+                },
+              );
             },
           ),
+
           GoRoute(
             path: Paths.homePage,
             builder: (BuildContext context, GoRouterState state) {
@@ -56,7 +74,7 @@ class AppRouter {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.data == false) {
                       return OtherProfile(name: username);
-                    } else  {
+                    } else {
                       return MyProfile();
                     }
                   } else {
@@ -72,18 +90,18 @@ class AppRouter {
               return const NewsView();
             },
           ),
-           GoRoute(
-            path: Paths.post +"/:id/:user",
+          GoRoute(
+            path: Paths.post + "/:id/:user",
             name: Paths.post,
             builder: (BuildContext context, GoRouterState state) {
               return PostPage(
                 postID: state.pathParameters['id']!,
-               postUser: state.pathParameters['user']!,
+                postUser: state.pathParameters['user']!,
               );
             },
           ),
-           GoRoute(
-            path: Paths.events +"/:id",
+          GoRoute(
+            path: Paths.events + "/:id",
             name: Paths.events,
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
@@ -94,7 +112,7 @@ class AppRouter {
           GoRoute(
             path: Paths.events,
             builder: (BuildContext context, GoRouterState state) {
-              return EventView(); 
+              return EventView();
             },
           ),
           GoRoute(
@@ -103,7 +121,7 @@ class AppRouter {
               return ReportPage();
             },
           ),
-           GoRoute(
+          GoRoute(
             path: Paths.listReports,
             builder: (BuildContext context, GoRouterState state) {
               return ListReportsPage();
@@ -114,7 +132,7 @@ class AppRouter {
         builder: (context, state, child) {
           return Scaffold(
             body: child,
-            bottomNavigationBar: navigationBarModel.build(context),
+            bottomNavigationBar: navigationBarModel,
           );
         },
       ),
@@ -131,12 +149,17 @@ class AppRouter {
         },
       ),
       GoRoute(
-            path: Paths.mapas,
-            builder: (BuildContext context, GoRouterState state) {
-              return MapScreen();
-            },
-          ),
-         
+        path: Paths.mapas,
+        builder: (BuildContext context, GoRouterState state) {
+          return MapScreen();
+        },
+      ),
+      GoRoute(
+        path: Paths.editProfile,
+        builder: (BuildContext context, GoRouterState state) {
+          return EditProfile();
+        },
+      ),
     ],
   );
 

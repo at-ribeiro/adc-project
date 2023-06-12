@@ -13,6 +13,7 @@ import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
 import '../data/cache_factory_provider.dart';
 import '../main.dart';
+import '../models/paths.dart';
 import '../services/base_client.dart';
 import 'my_home_page.dart';
 import 'loading_screen.dart';
@@ -315,10 +316,11 @@ void initState() {
     String eD = response.expirationDate.toString();
 
     CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
+    CacheDefault.cacheFactory.set('isLoggedIn', true);
 
     print(response);
 
-    context.go("/homepage");
+    context.go(Paths.homePage);
 
 
   return response;

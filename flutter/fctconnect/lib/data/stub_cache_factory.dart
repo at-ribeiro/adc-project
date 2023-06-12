@@ -31,11 +31,11 @@ class CacheFactoryImpl extends CacheFactory {
   void set(String key, value) {
     // TODO: implement set
   }
-  
+
   @override
-  void login(String token, String username, String creationd, String expirationd, String role) {
+  void login(String token, String username, String creationd,
+      String expirationd, String role) {
     // TODO: implement login
   }
 
-  
 }

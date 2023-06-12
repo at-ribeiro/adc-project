@@ -77,10 +77,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          setState(() {
-            _token = token;
-            _isLoadingToken = false;
-          });
+          if (mounted)
+            setState(() {
+              _token = token;
+              _isLoadingToken = false;
+            });
         });
       });
     } else {
@@ -115,49 +116,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Widget NavigationBody() {
-  //   return BottomNavigationBar(
-  //     type: BottomNavigationBarType.shifting,
-  //     currentIndex: 0, // set the initial index to 0
-  //     items: const [
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.home, color: Colors.black),
-  //         label: 'Home',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.newspaper, color: Colors.black),
-  //         label: 'Noticias',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.post_add, color: Colors.black),
-  //         label: 'Post',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.person, color: Colors.black),
-  //         label: 'Perfil',
-  //       ),
-  //     ],
-  //     selectedItemColor: Colors.black,
-  //     unselectedItemColor: Colors.black,
-  //     showUnselectedLabels: true,
-  //     onTap: (index) {
-  //       if (index == 0) {
-  //       } else if (index == 1) {
-  //         Navigator.pushReplacement(context,
-  //             CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-  //       } else if (index == 2) {
-  //         showModalBottomSheet(
-  //           context: context,
-  //           isScrollControlled: true,
-  //           builder: (context) => _buildPostModal(context),
-  //         );
-  //       } else if (index == 3) {
-  //         context.go(Paths.myProfile);
-  //       }
-  //     },
-  //   );
-  // }
-
   Widget ContentBody() {
     return RefreshIndicator(
       onRefresh: _refreshPosts,
@@ -174,102 +132,141 @@ class _MyHomePageState extends State<MyHomePage> {
             return Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    const CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                      ),
-                    ),
-                    const SizedBox(width: 7.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                          ),
+                        ),
+                        const SizedBox(width: 7.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              const SizedBox(height: 8.0),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.0, 8.0, 0.0),
+                                    8.0, 0.0, 8.0, 8.0),
                                 child: Text(post.user),
                               ),
+                              const SizedBox(height: 8.0),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    0.0, 0.0, 8.0, 0.0),
+                                    8.0, 0.0, 8.0, 8.0),
                                 child: Text(
-                                  DateFormat('HH:mm - dd-MM-yyyy').format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                      int.parse(post.timestamp),
+                                  post.text,
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              post.url.isNotEmpty
+                                  ? AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: Image.network(
+                                          post.url,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              const SizedBox(height: 8.0),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (post.likes
+                                                .contains(_token.username)) {
+                                              post.likes
+                                                  .remove(_token.username);
+                                            } else {
+                                              post.likes.add(_token.username);
+                                            }
+                                            BaseClient().likePost(
+                                              "/feed",
+                                              _token.username,
+                                              _token.tokenID,
+                                              post.id,
+                                              post.user,
+                                            );
+                                          });
+                                        },
+                                        icon: Icon(
+                                          post.likes.contains(_token.username)
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                        ),
+                                      ),
+                                      Text(post.likes.length.toString()),
+                                      IconButton(
+                                        onPressed: () {
+                                          context.push(
+                                            context.namedLocation(Paths.post,
+                                                pathParameters: <String,
+                                                    String>{
+                                                  'id': post.id,
+                                                  'user': post.user,
+                                                }),
+                                          );
+                                        },
+                                        icon: Icon(Icons.comment_outlined),
+                                      ),
+                                    ],
+                                  ),
+                                  Positioned(
+                                    top: 8.0,
+                                    right: 8.0,
+                                    child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: PopupMenuButton(
+                                      icon: Icon(Icons.more_vert),
+                                      onSelected: (value) {
+                                        if (value == 'report') {
+                                          _showReportDialog(context, post.id);
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 'report',
+                                          child: Text('Report'),
+                                        ),
+                                      ],
                                     ),
+                                  ),)
+                                ],
+                              ),
+
+                              const SizedBox(height: 8.0),
+                              
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      8.0, 0.0, 8.0, 8.0),
+                                  child: Text(
+                                    DateFormat('HH:mm - dd-MM-yyyy').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(post.timestamp),
+                                      ),
+                                    ),
+                                    style: TextStyle(fontSize: 12.0),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8.0),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                            child: Text(post.text),
-                          ),
-                          const SizedBox(height: 8.0),
-                          post.url.isNotEmpty
-                              ? AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: Image.network(
-                                      post.url,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          const SizedBox(height: 8.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (post.likes.contains(_token.username)) {
-                                      post.likes.remove(_token.username);
-                                    } else {
-                                      post.likes.add(_token.username);
-                                    }
-                                    BaseClient().likePost(
-                                        "/feed",
-                                        _token.username,
-                                        _token.tokenID,
-                                        post.id,
-                                        post.user);
-                                  });
-                                },
-                                icon: Icon(
-                                  post.likes.contains(_token.username)
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                ),
-                              ),
-                              Text(post.likes.length.toString()),
-                              IconButton(
-                                onPressed: () {
-                                  context.push(
-                                    context.namedLocation(Paths.post,
-                                        pathParameters: <String, String>{
-                                          'id': post.id,
-                                          'user': post.user,
-                                        })
-                                    );
-                                },
-                                icon: Icon(Icons.comment_outlined),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -278,6 +275,59 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         },
       ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context, String id) {
+    TextEditingController _reasonController = TextEditingController();
+    TextEditingController _commentController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Report Post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _reasonController,
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                ),
+              ),
+              TextFormField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: 'Additional Comments',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await BaseClient().reportPost(
+                  "/post/report",
+                  _token.username,
+                  _token.tokenID,
+                  id,
+                  _reasonController.text,
+                  _commentController.text,
+                );
+                Navigator.of(context).pop();
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -347,7 +397,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('List Reports'),
             onTap: () {
-             context.go(Paths.listReports);
+              context.go(Paths.listReports);
             },
           ),
           ListTile(
@@ -356,6 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
 
               CacheDefault.cacheFactory.logout();
+              CacheDefault.cacheFactory.delete('isLoggedIn');
 
               context.go(Paths.login);
             },

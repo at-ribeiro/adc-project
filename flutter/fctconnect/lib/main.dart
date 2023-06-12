@@ -14,14 +14,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-
 import 'controller/simple_ui_controller.dart';
 import 'models/Token.dart';
 import 'views/my_home_page.dart';
 import 'views/news_view.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   setPathUrlStrategy();
@@ -29,7 +27,7 @@ void main() async {
   await FcmServices.initializeFirebase();
 
   FcmServices.firebaseAnalytics();
-  
+
   FcmServices.firebaseMessaging();
 
   Get.put(SimpleUIController());
@@ -43,14 +41,10 @@ void main() async {
   runApp(MyApp(session: session));
 }
 
-
 void getKey() async {
-String? fcmKey = await FcmToken.getFcmToken();
+  String? fcmKey = await FcmToken.getFcmToken();
   print("TOKEN : $fcmKey");
 }
-
-
-
 
 class MyApp extends StatelessWidget {
   final String? session;
@@ -61,6 +55,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _initializeIsLoggedIn();
     return MaterialApp.router(
       routerConfig: AppRouter().router,
       debugShowCheckedModeBanner: false,
@@ -143,8 +138,15 @@ class MyApp extends StatelessWidget {
     prefs.setString('last_visited_page', currentPage);
   }
 
-
   Future<String?> isLoggedIn() async {
     return await SessionManager.get('isLoggedIn');
+  }
+
+  void _initializeIsLoggedIn() async {
+    bool containsIsLoggedIn =
+        await CacheDefault.cacheFactory.get('isLoggedIn') != null;
+    if (!containsIsLoggedIn) {
+      CacheDefault.cacheFactory.set('isLoggedIn', false);
+    }
   }
 }
