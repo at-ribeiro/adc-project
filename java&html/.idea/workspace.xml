@@ -5,11 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/AlertDeleteData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/ActivityResource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/Activity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/AlertResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/AlertResource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/AlertGetData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/AlertGetData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/AlertPostData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/AlertPostData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/Firstwebapp-0.0.1/homePage/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/Firstwebapp-0.0.1/homePage/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/homePage/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/homePage/styles.css" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
