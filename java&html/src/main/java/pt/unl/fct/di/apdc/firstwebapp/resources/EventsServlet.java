@@ -78,6 +78,7 @@ public class EventsServlet extends HttpServlet {
                     BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
                     Blob blob = storage.get(blobId);
                     url = blob.getMediaLink();
+
                 }
 
                 // TODO: Check with frontend

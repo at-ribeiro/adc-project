@@ -5,8 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/ActivityResource.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/Activity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/PostServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/PostServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/EventsServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/Firstwebapp-0.0.1/homePage/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/Firstwebapp-0.0.1/homePage/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/homePage/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/homePage/styles.css" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +93,7 @@
       <workItem from="1684315832473" duration="4378000" />
       <workItem from="1684520664144" duration="1027000" />
       <workItem from="1685005021677" duration="6647000" />
+      <workItem from="1686734316417" duration="9864000" />
     </task>
     <servers />
   </component>
