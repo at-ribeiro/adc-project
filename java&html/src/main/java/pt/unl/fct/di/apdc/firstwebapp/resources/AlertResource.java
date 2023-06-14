@@ -92,7 +92,7 @@ public class AlertResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlerts(@HeaderParam("Authorization") String tokenId, @QueryParam("searcher") String username){
+    public Response getAlerts(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username){
 
         Transaction txn = datastore.newTransaction();
 
@@ -165,7 +165,9 @@ public class AlertResource {
 
     @DELETE
     @Path("/")
-    public Response deleteAlert(@HeaderParam("Authorization") String tokenId, @QueryParam("searcher") String username, AlertDeleteData data){
+    public Response deleteAlert(@HeaderParam("Authorization") String tokenId,
+                                @HeaderParam("User") String username,
+                                AlertDeleteData data){
 
         Transaction txn = datastore.newTransaction();
 
@@ -209,9 +211,9 @@ public class AlertResource {
                 }
 
                 txn.delete(alertKey);
-                txn.commit();
             }
 
+            txn.commit();
             return Response.ok().build();
 
         }catch (Exception e) {
