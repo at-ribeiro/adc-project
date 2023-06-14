@@ -237,7 +237,7 @@ public class EventsServlet extends HttpServlet {
 
             byte[] qrCode = this.generateQRCode("www", 50, 50);
 
-            BlobId blobId = BlobId.of(bucketName, title + "-qrCode");
+            BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode");
 
             if (storage.get(blobId) != null) {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
