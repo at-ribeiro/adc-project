@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/FeedData.dart';
 
 import '../models/CommentData.dart';
 import '../models/Token.dart';

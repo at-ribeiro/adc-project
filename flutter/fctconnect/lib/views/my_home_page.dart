@@ -21,6 +21,8 @@ import '../services/base_client.dart';
 import '../services/costum_search_delegate.dart';
 import '../data/cache_factory_provider.dart';
 import '../services/load_token.dart';
+import 'calendar_view.dart';
+import 'calendar/calendar_widget.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -351,7 +353,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
                   ),
                   const SizedBox(height: 10),
-                  Text(username),
+                  Text(username, style: const TextStyle(fontSize: 18)),
                 ],
               ),
             ), // Set the width of the DrawerHeader to the maximum available width
@@ -377,7 +379,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Calendário'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => CalendarView(token: _token,)));
             },
           ),
           ListTile(

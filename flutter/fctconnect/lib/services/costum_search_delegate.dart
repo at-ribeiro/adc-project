@@ -5,8 +5,7 @@ import 'package:responsive_login_ui/models/paths.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/views/messages/new_message.dart';
-import 'package:responsive_login_ui/views/my_profile.dart';
-import 'package:responsive_login_ui/views/others_profile.dart';
+
 import '../data/cache_factory_provider.dart';
 
 import '../models/Token.dart';

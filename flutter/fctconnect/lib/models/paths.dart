@@ -1,15 +1,17 @@
 class Paths {
   static String login = '/login';
+
   static String signUp = '/signUp';
-  static String homePage = '/homePage';
 
-  static String myProfile = '/myprofile';
+  static String homePage = '/home';
 
-  static String noticias= '/noticias';
+  static String myProfile = '/profile';
+
+  static String noticias= '/news';
 
   static String otherProfile = '/otherProfile';
 
-  static String mapas = '/mapas';
+  static String mapas = '/maps';
 
   static String post = '/post';
 

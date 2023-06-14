@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:responsive_login_ui/models/events_list_data.dart';
+import 'package:responsive_login_ui/models/ActivityData.dart';
 
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
@@ -576,6 +576,119 @@ class BaseClient {
 
     if (response.statusCode != 200) {
       // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+
+  Future<dynamic> createActivity(
+      String api, String username, String tokenID, ActivityData activity) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api');
+
+    var activityJson = jsonEncode({
+      'activityName': activity.activityName,
+      'from': activity.from,
+      'to': activity.to,
+      'background': activity.background,
+      'creationTime': activity.creationTime,
+    });
+
+    var response = await http.post(
+      url,
+      headers: _headers,
+      body: activityJson,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<void> deleteActivity(String api, String username, String tokenID, String activityID) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api/$activityID');
+
+    var response = await http.delete(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode != 200) {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> updateActivity(
+      String api, String username, String tokenID, ActivityData activity) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    String activityID = activity.creationTime;
+    var url = Uri.parse('$baseUrl$api/$activityID');
+
+    var activityJson = jsonEncode({
+      'activityName': activity.activityName,
+      'from': activity.from,
+      'to': activity.to,
+      'background': activity.background,
+      'creationTime': activity.creationTime,
+    });
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+      body: activityJson,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<List<ActivityData>> getActivities(
+      String api, String username, String tokenID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+    };
+    var url = Uri.parse('$baseUrl$api/activity');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final jsonList = json.decode(response.body) as List<dynamic>;
+      final activitiesList =
+          jsonList.map((json) => ActivityData.fromJson(json)).toList();
+      return activitiesList;
+    } else {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
