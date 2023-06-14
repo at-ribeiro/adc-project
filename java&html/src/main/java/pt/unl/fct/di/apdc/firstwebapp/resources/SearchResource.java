@@ -44,8 +44,8 @@ public class SearchResource {
                     .setFilter(StructuredQuery.PropertyFilter.lt("user_username", upperBound))
                     .build();
 
-            QueryResults<Entity> greaterThanOrEqualResults = datastore.run(queryGreaterThanOrEqual);
-            QueryResults<Entity> lessThanResults = datastore.run(queryLessThan);
+            QueryResults<Entity> greaterThanOrEqualResults = txn.run(queryGreaterThanOrEqual);
+            QueryResults<Entity> lessThanResults = txn.run(queryLessThan);
 
             List<SearchUserData> matchedUsers = new ArrayList<>();
             while (greaterThanOrEqualResults.hasNext() && lessThanResults.hasNext() && matchedUsers.size()<=5) {

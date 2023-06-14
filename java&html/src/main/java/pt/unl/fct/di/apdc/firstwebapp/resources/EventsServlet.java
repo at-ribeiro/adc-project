@@ -66,7 +66,7 @@ public class EventsServlet extends HttpServlet {
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> eventResults = datastore.run(eventsQuery);
+            QueryResults<Entity> eventResults = txn.run(eventsQuery);
 
             List<EventGetData> eventList = new ArrayList<>();
 

@@ -60,7 +60,7 @@ public class NewsServlet extends HttpServlet {
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> newsResults = datastore.run(newsQuery);
+            QueryResults<Entity> newsResults = txn.run(newsQuery);
 
             List<NewsGetData> newsList = new ArrayList<>();
 

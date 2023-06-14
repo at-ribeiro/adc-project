@@ -77,7 +77,7 @@ public class FeedServlet extends HttpServlet {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followingResults = datastore.run(followingQuery);
+            QueryResults<Entity> followingResults = txn.run(followingQuery);
 
             List<Value<String>> followeesKeys = new ArrayList<>();
             followingResults.forEachRemaining(followees -> {
@@ -107,7 +107,7 @@ public class FeedServlet extends HttpServlet {
                     .setLimit(20)
                     .build();
 
-            QueryResults<Entity> postResults = datastore.run(postQuery);
+            QueryResults<Entity> postResults = txn.run(postQuery);
 
             postResults.forEachRemaining(post -> {
                         if (post.getLong("timestamp") < Long.parseLong(timestamp))
