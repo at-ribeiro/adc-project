@@ -35,7 +35,7 @@ public class EventsServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     public byte[] generateQRCode(String data, int width, int height) throws IOException, WriterException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -235,9 +235,9 @@ public class EventsServlet extends HttpServlet {
 
             // QR CODE image creation
 
-            byte[] qrCode = this.generateQRCode("www", 50, 50);
+            byte[] qrCode = this.generateQRCode("www", 500, 500);
 
-            BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode");
+            BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
 
             if (storage.get(blobId) != null) {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -264,7 +264,7 @@ public class EventsServlet extends HttpServlet {
                     .set("event_end", end)
                     .set("event_image", title + "-" + imageName)
                     // qr code add
-                    .set("event_qr", uniqueEventId + "-qrCode")
+                    .set("event_qr", uniqueEventId + "-qrCode.png")
                     .build();
 
             txn.put(entity);
