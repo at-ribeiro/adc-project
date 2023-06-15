@@ -64,7 +64,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               Navigator.push(
                   context,
                   CupertinoPageRoute(
-                      builder: (ctx) => EventView(token: token)));
+                      builder: (ctx) => EventView()));
             },
           ),
           ListTile(

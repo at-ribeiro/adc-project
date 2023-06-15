@@ -449,6 +449,7 @@ class _MapScreenState extends State<MapScreen> {
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: _initialCameraPosition!,
                     markers: _markers,
+                    myLocationEnabled: true,
                     polylines: {
                       if (_info != null)
                         Polyline(

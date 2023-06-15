@@ -11,11 +11,11 @@ import '../constants.dart';
 
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/load_token.dart';
 
 class EditProfile extends StatefulWidget {
-  final Token token;
 
-  const EditProfile({Key? key, required this.token}) : super(key: key);
+  const EditProfile({Key? key}) : super(key: key);
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -23,7 +23,12 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
+  bool _isLoadingToken = true;
   TextEditingController fullNameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController homeTownController = TextEditingController();
+  TextEditingController homeRegionController = TextEditingController();
+  TextEditingController privacyController = TextEditingController();
   late Token _token;
   final double coverHeight = 200;
   final double profileHeight = 144;
@@ -33,15 +38,17 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    _profielInfo = _loadInfo();
   }
 
   @override
   void dispose() {
     fullNameController.dispose();
+    phoneNumberController.dispose();
+    homeTownController.dispose();
+    homeRegionController.dispose();
+    privacyController.dispose();
     super.dispose();
   }
 
@@ -56,7 +63,18 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+            _profielInfo = _loadInfo();
+          });
+        });
+      });
+    } 
+    else{return Scaffold(
       body: ListView(
         padding: EdgeInsets.zero,
         controller: _scrollController,
@@ -72,7 +90,7 @@ class _EditProfileState extends State<EditProfile> {
           const SizedBox(height: 32),
         ],
       ),
-    );
+    );}
   }
 
   Widget buildInfoSection() {
@@ -95,6 +113,64 @@ class _EditProfileState extends State<EditProfile> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter username';
+              } else {
+                return null;
+              }
+            },
+          ),
+        
+          TextFormField(
+            style: kTextFormFieldStyle(),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.person),
+              hintText: 'Número de telemóvel',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+              ),
+            ),
+            controller: phoneNumberController,
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter telemovel';
+              } else {
+                return null;
+              }
+            },
+          ),
+          TextFormField(
+            style: kTextFormFieldStyle(),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.person),
+              hintText: 'Cidade',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+              ),
+            ),
+            controller: homeTownController,
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter Cidade';
+              } else {
+                return null;
+              }
+            },
+          ),
+          TextFormField(
+            style: kTextFormFieldStyle(),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.person),
+              hintText: 'Região',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+              ),
+            ),
+            controller: homeRegionController,
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter Região';
               } else {
                 return null;
               }

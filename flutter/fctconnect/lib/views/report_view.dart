@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../models/AlertPostData.dart';
 import '../models/Token.dart';
+import '../services/base_client.dart';
+import '../services/load_token.dart';
 
 class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onPressed;
@@ -24,9 +27,8 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class ReportPage extends StatefulWidget {
-  final Token token;
 
-  const ReportPage({Key? key, required this.token}) : super(key: key);
+  const ReportPage({Key? key}) : super(key: key);
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -34,6 +36,7 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   late Token _token;
+  bool  _isLoadingToken = true;
   TextEditingController nameController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController problemController = TextEditingController();
@@ -41,7 +44,6 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   void initState() {
-    _token = widget.token;
     super.initState();
   }
 
@@ -84,13 +86,32 @@ class _ReportPageState extends State<ReportPage> {
       );
       return;
     }
+    AlertPostData alert = AlertPostData(
+      creator: name,
+      location: location,
+      description: problem,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    );
 
-    
+    BaseClient().createReport("/alert",_token.username, _token.tokenID, alert);
+
+    nameController.clear();
+    locationController.clear();
+    problemController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+      if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+          });
+        });
+      });
+    } else{return Scaffold(
       appBar: _CustomAppBar(
         onPressed: submitForm,
       ),
@@ -127,6 +148,6 @@ class _ReportPageState extends State<ReportPage> {
           ],
         ),
       ),
-    );
+    );}
   }
 }
