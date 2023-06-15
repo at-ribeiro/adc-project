@@ -380,7 +380,7 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Calendário'),
             onTap: () {
               Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => CalendarView(token: _token,)));
+                  CupertinoPageRoute(builder: (ctx) => CalendarView()));
             },
           ),
           ListTile(

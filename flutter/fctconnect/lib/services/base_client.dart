@@ -487,8 +487,9 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api?searcher=$username');
+    var url = Uri.parse('$baseUrl$api');
 
     var response = await http.get(
       url,
@@ -511,6 +512,7 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
 
     var url = Uri.parse('$baseUrl$api');
@@ -581,9 +583,8 @@ class BaseClient {
     }
   }
 
-
-  Future<dynamic> createActivity(
-      String api, String username, String tokenID, ActivityData activity) async {
+  Future<dynamic> createActivity(String api, String username, String tokenID,
+      ActivityData activity) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -615,10 +616,11 @@ class BaseClient {
     }
   }
 
-  Future<void> deleteActivity(String api, String username, String tokenID, String activityID) async {
+  Future<dynamic> deleteActivity(
+      String api, String username, String tokenId, String activityID) async {
     Map<String, String>? _headers = {
-      "Content-Type": "charset=UTF-8",
-      "Authorization": tokenID,
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenId,
       "User": username,
     };
 
@@ -636,8 +638,8 @@ class BaseClient {
     }
   }
 
-  Future<dynamic> updateActivity(
-      String api, String username, String tokenID, ActivityData activity) async {
+  Future<dynamic> updateActivity(String api, String username, String tokenID,
+      ActivityData activity) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -675,8 +677,9 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api/activity');
+    var url = Uri.parse('$baseUrl$api');
 
     var response = await http.get(
       url,

@@ -151,7 +151,7 @@ class _MyProfileState extends State<MyProfile> {
             if (snapshot.hasError) {
               return AlertDialog(
                 title: Text('Não estás logado!'),
-                content: Text('Volra para trás e faz login.'),
+                content: Text('Volta para trás e faz login.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -167,7 +167,7 @@ class _MyProfileState extends State<MyProfile> {
                   DateTime.now().millisecondsSinceEpoch) {
                 return AlertDialog(
                   title: Text('Sessão expirada!'),
-                  content: Text('Volra para trás e faz login.'),
+                  content: Text('Volta para trás e faz login.'),
                   actions: [
                     TextButton(
                       onPressed: () {

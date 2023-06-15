@@ -72,7 +72,7 @@ Widget build(BuildContext context) {
       });
     }else{return Scaffold(
     appBar: AppBar(
-      title: Text('List of Reports'),
+      title: Text('Lista de Anomalias'),
       actions: [
         IconButton(
   onPressed: () async {
@@ -83,6 +83,7 @@ Widget build(BuildContext context) {
       reportsToDelete,
     );
     setState(() {
+      alertDataList.clear();
       reportsToDelete.clear();
     });
     _loadReports();
@@ -102,11 +103,11 @@ Widget build(BuildContext context) {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Creator: ${alertData.creator}'),
-                Text('Location: ${alertData.location}'),
-                Text('Description:'),
+                Text('Criador: ${alertData.creator}'),
+                Text('Localizaçã: ${alertData.location}'),
+                Text('Descrição:'),
                 Text(alertData.description),
-                Text('Timestamp: ${DateFormat('HH:mm - dd-MM-yyyy').format(
+                Text('Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
                   DateTime.fromMillisecondsSinceEpoch(
                     int.parse(alertData.timestamp.toString()),
                   ),

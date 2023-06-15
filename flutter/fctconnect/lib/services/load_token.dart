@@ -19,7 +19,7 @@ class TokenGetterWidget extends StatelessWidget {
             if (snapshot.hasError) {
               return AlertDialog(
                 title: Text('Não estás logado!'),
-                content: Text('Volra para trás e faz login.'),
+                content: Text('Volta para trás e faz login.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -35,7 +35,7 @@ class TokenGetterWidget extends StatelessWidget {
                   DateTime.now().millisecondsSinceEpoch) {
                 return AlertDialog(
                   title: Text('Sessão expirada!'),
-                  content: Text('Volra para trás e faz login.'),
+                  content: Text('Volta para trás e faz login.'),
                   actions: [
                     TextButton(
                       onPressed: () {
