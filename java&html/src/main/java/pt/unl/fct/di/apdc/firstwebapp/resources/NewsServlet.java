@@ -23,7 +23,7 @@ public class NewsServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -60,7 +60,7 @@ public class NewsServlet extends HttpServlet {
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> newsResults = datastore.run(newsQuery);
+            QueryResults<Entity> newsResults = txn.run(newsQuery);
 
             List<NewsGetData> newsList = new ArrayList<>();
 

@@ -25,7 +25,7 @@ public class FeedServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -77,7 +77,7 @@ public class FeedServlet extends HttpServlet {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followingResults = datastore.run(followingQuery);
+            QueryResults<Entity> followingResults = txn.run(followingQuery);
 
             List<Value<String>> followeesKeys = new ArrayList<>();
             followingResults.forEachRemaining(followees -> {
@@ -107,7 +107,7 @@ public class FeedServlet extends HttpServlet {
                     .setLimit(20)
                     .build();
 
-            QueryResults<Entity> postResults = datastore.run(postQuery);
+            QueryResults<Entity> postResults = txn.run(postQuery);
 
             postResults.forEachRemaining(post -> {
                         if (post.getLong("timestamp") < Long.parseLong(timestamp))

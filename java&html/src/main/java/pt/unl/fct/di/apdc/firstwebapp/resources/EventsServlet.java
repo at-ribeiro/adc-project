@@ -48,6 +48,7 @@ public class EventsServlet extends HttpServlet {
         return png;
     }
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
@@ -85,7 +86,7 @@ public class EventsServlet extends HttpServlet {
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> eventResults = datastore.run(eventsQuery);
+            QueryResults<Entity> eventResults = txn.run(eventsQuery);
 
             List<EventGetData> eventList = new ArrayList<>();
 
@@ -98,6 +99,7 @@ public class EventsServlet extends HttpServlet {
                     BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
                     Blob blob = storage.get(blobId);
                     url = blob.getMediaLink();
+
                 }
 
                 BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));

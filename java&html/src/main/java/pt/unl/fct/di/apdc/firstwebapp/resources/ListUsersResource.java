@@ -103,7 +103,7 @@ public class ListUsersResource {
                         StructuredQuery.PropertyFilter.eq("user_privacy", "public")
                 )
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_email"), user.getString("user_fullname"));
@@ -115,7 +115,7 @@ public class ListUsersResource {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                 StructuredQuery.PropertyFilter.eq("user_role", "USER")
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -128,7 +128,7 @@ public class ListUsersResource {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                         StructuredQuery.PropertyFilter.eq("user_role", "USER")
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -140,7 +140,7 @@ public class ListUsersResource {
                 StructuredQuery.PropertyFilter.eq("user_role", "GBO")
         ).build();
 
-        users = datastore.run(query);
+        users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -151,7 +151,7 @@ public class ListUsersResource {
 
     private void caseSU(List<UserData> userList) {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
