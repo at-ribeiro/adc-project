@@ -66,6 +66,7 @@ class _EventPageState extends State<EventPage> {
           setState(() {
             _token = token;
             _isLoadingToken = false;
+            
           });
         });
       });

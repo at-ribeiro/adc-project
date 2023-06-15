@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:responsive_login_ui/models/register_user.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 
+import '../models/paths.dart';
 import '../views/login_view.dart';
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
@@ -423,11 +424,7 @@ class _SignUpViewState extends State<SignUpView> {
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();
-                          Navigator.pushReplacement(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (ctx) => const LoginView()),
-                          );
+                          context.go(Paths.login);
 
                           nameController.clear();
                           emailController.clear();

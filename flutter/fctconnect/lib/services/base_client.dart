@@ -554,17 +554,19 @@ class BaseClient {
   }
 
   Future<void> reportPost(
-      String api, username, tokenID, id, reason, comment) async {
+      String api, username, tokenID, id, postUser ,reason, comment) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
 
-    var url = Uri.parse('$baseUrl$api/$username');
+    var url = Uri.parse('$baseUrl$api');
 
     var reportJson = jsonEncode({
       'creator': username,
       'postId': id,
+      'postCreator': postUser,
       'reason': reason,
       'comment': comment,
       'timestamp': DateTime.now().toString(),

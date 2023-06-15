@@ -266,10 +266,7 @@ void initState() {
                   /// Navigate To Login Screen
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (ctx) => const SignUpView()));
+                      context.go(Paths.signUp);
                       nameController.clear();
                       emailController.clear();
                       passwordController.clear();

@@ -1,15 +1,16 @@
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import '../models/Token.dart';
 import '../models/event_data.dart';
+import '../services/load_token.dart';
 
 class EventCreator extends StatefulWidget {
-  final Token token;
 
-  const EventCreator({Key? key, required this.token}) : super(key: key);
+  const EventCreator({Key? key}) : super(key: key);
 
   @override
   State<EventCreator> createState() => _EventCreatorState();
@@ -19,6 +20,8 @@ class _EventCreatorState extends State<EventCreator> {
   late Token _token;
   Uint8List? _imageData;
   late String _fileName;
+
+  bool _isLoadingToken = true;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -32,7 +35,6 @@ class _EventCreatorState extends State<EventCreator> {
 
   @override
   void initState() {
-    _token = widget.token;
     _scrollController = ScrollController();
     _startingDate = DateTime.now();
     _endingDate = DateTime.now();
@@ -117,7 +119,17 @@ class _EventCreatorState extends State<EventCreator> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted)
+            setState(() {
+              _token = token;
+              _isLoadingToken = false;
+            });
+        });
+      });
+    }else{    return Scaffold(
       appBar: AppBar(
         title: Text('Event Registration'),
       ),
@@ -193,8 +205,30 @@ class _EventCreatorState extends State<EventCreator> {
                       end: _endingDate.millisecondsSinceEpoch,
                     );
                     var response = BaseClient().createEvent("/events", _token.tokenID, event);
-
-                    // TODO: Handle event creationf
+                    
+                    
+                    // TODO: Handle event creation
+                    if(response == 200 || response == 204){
+                      context.pop();
+                    }else{
+                      showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Algo correu mal!'),
+                        content: Text(
+                            'Voltar para tras!'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              context.pop();
+                              context.pop();
+                            },
+                            child: Text('Voltar'),
+                          ),
+                        ],
+                      ),
+                    );
+                    }
                   } else {
                     // Dates are invalid, show an error message
                     showDialog(
@@ -219,6 +253,6 @@ class _EventCreatorState extends State<EventCreator> {
           ),
         ),
       ),
-    );
+    );}
   }
 }

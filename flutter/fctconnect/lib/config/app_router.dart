@@ -16,8 +16,11 @@ import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../models/paths.dart';
+import '../views/calendar_view.dart';
+import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
+import '../views/reported_posts_view.dart';
 
 class AppRouter {
   NavigationBarModel navigationBarModel = NavigationBarModel();
@@ -101,8 +104,8 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: Paths.events + "/:id",
-            name: Paths.events,
+            path: Paths.event + "/:id",
+            name: Paths.event,
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
                 eventId: state.pathParameters['id']!,
@@ -116,17 +119,19 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: Paths.createEvent,
+            builder: (BuildContext context, GoRouterState state) {
+              return EventCreator();
+            },
+          ),
+         
+          GoRoute(
             path: Paths.report,
             builder: (BuildContext context, GoRouterState state) {
               return ReportPage();
             },
           ),
-          GoRoute(
-            path: Paths.listReports,
-            builder: (BuildContext context, GoRouterState state) {
-              return ListReportsPage();
-            },
-          ),
+          
           // Add other GoRoutes here for which you want the navigation bar to appear
         ],
         builder: (context, state, child) {
@@ -160,6 +165,24 @@ class AppRouter {
           return EditProfile();
         },
       ),
+      GoRoute(
+        path: Paths.calendar,
+        builder: (BuildContext context, GoRouterState state) {
+          return const CalendarView();
+        },
+      ),
+      GoRoute(
+        path: Paths.reportedPosts,
+        builder: (BuildContext context, GoRouterState state) {
+          return const ReportedPostsPage();
+        },
+      ),
+      GoRoute(
+            path: Paths.listReports,
+            builder: (BuildContext context, GoRouterState state) {
+              return ListReportsPage();
+            },
+          ),
     ],
   );
 

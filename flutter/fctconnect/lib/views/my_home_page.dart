@@ -26,6 +26,7 @@ import 'calendar/calendar_widget.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
+import 'map_view_pc.dart';
 import 'my_profile.dart';
 import 'news_view.dart';
 
@@ -234,7 +235,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       icon: Icon(Icons.more_vert),
                                       onSelected: (value) {
                                         if (value == 'report') {
-                                          _showReportDialog(context, post.id);
+                                          _showReportDialog(context, post.id, post.user);
                                         }
                                       },
                                       itemBuilder: (context) => [
@@ -280,58 +281,98 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showReportDialog(BuildContext context, String id) {
-    TextEditingController _reasonController = TextEditingController();
-    TextEditingController _commentController = TextEditingController();
+  void _showReportDialog(BuildContext context, String id, String postUser) {
+  TextEditingController _reasonController = TextEditingController();
+  TextEditingController _commentController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Report Post'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _reasonController,
-                decoration: InputDecoration(
-                  labelText: 'Reason',
-                ),
-              ),
-              TextFormField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  labelText: 'Additional Comments',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
+  String? selectedReason;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Report Post'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              value: selectedReason,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedReason = newValue;
+                });
               },
-              child: Text('Cancel'),
+              items: [
+                DropdownMenuItem<String>(
+                  value: 'Assédio',
+                  child: Text('Assédio'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Fraude',
+                  child: Text('Fraude'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Spam',
+                  child: Text('Spam'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Desinformação',
+                  child: Text('Desinformação'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Discurso de ódio',
+                  child: Text('Discurso de ódio'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Ameaças ou violência',
+                  child: Text('Ameaças ou violência'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'Conteúdo sexual',
+                  child: Text('Conteúdo sexual'),
+                ),
+              ],
+              decoration: InputDecoration(
+                labelText: 'Razão',
+              ),
             ),
-            TextButton(
-              onPressed: () async {
-                await BaseClient().reportPost(
-                  "/post/report",
-                  _token.username,
-                  _token.tokenID,
-                  id,
-                  _reasonController.text,
-                  _commentController.text,
-                );
-                Navigator.of(context).pop();
-              },
-              child: Text('Submit'),
+            TextFormField(
+              controller: _commentController,
+              decoration: InputDecoration(
+                labelText: 'Comentários Adicionais (opcional)',
+              ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Voltar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await BaseClient().reportPost(
+                "/post/report",
+                _token.username,
+                _token.tokenID,
+                id,
+                postUser,
+                selectedReason ?? '',
+                _commentController.text,
+              );
+              Navigator.of(context).pop();
+            },
+            child: Text('Submeter'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 
   Widget _buildDrawer() {
     String username = _token.username;
@@ -365,6 +406,13 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           ListTile(
+            title: const Text('Mapas pc'),
+            onTap: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => MapScreenPC()));
+            },
+          ),
+          ListTile(
             title: const Text('Eventos'),
             onTap: () {
               context.go(Paths.events);
@@ -379,8 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Calendário'),
             onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => CalendarView()));
+              context.go(Paths.calendar);
             },
           ),
           ListTile(
@@ -398,9 +445,15 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           ListTile(
-            title: const Text('List Reports'),
+            title: const Text('Lista de Anomalias'),
             onTap: () {
               context.go(Paths.listReports);
+            },
+          ),
+          ListTile(
+            title: const Text('Posts Reportados'),
+            onTap: () {
+              context.go(Paths.reportedPosts);
             },
           ),
           ListTile(
@@ -417,119 +470,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
-  }
-
-  Widget _buildPostModal(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Column(children: [
-          const Padding(padding: EdgeInsets.all(16.0)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _postText = value;
-                });
-              },
-              decoration: const InputDecoration(
-                hintText: 'O que se passa na FCT?',
-                border: OutlineInputBorder(),
-              ),
-              minLines: 5,
-              maxLines: 10,
-            ),
-          ),
-          const SizedBox(height: 30.0),
-          const SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
-              ElevatedButton(
-                onPressed: () async {
-                  Post post = Post(
-                      post: _postText,
-                      imageData: _imageData,
-                      username: _token.username,
-                      fileName: _fileName);
-                  int response = await BaseClient()
-                      .createPost("/post", _token.tokenID, post);
-
-                  if (response == 200) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
-                  } else {
-                    // ignore: use_build_context_synchronously
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Erro'),
-                          content: Text('Algo nao correu bem!'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Tente outra vez'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                child: const Text('Post'),
-              ),
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
-              ElevatedButton(
-                onPressed: () {
-                  _pickImage();
-                },
-                child: const Text('Select Image'),
-              ),
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
-              if (!kIsWeb)
-                ElevatedButton(
-                  onPressed: () {
-                    _takePicture();
-                  },
-                  child: const Text('Take Photo'),
-                ),
-              if (_imageData != null) Image.memory(_imageData!),
-            ],
-          ),
-        ]),
-      ),
-    );
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final fileData = await pickedFile.readAsBytes();
-      setState(() {
-        _imageData = Uint8List.fromList(fileData);
-        _fileName = pickedFile.path.split('/').last;
-      });
-    }
-  }
-
-  Future<void> _takePicture() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      final fileData = await pickedFile.readAsBytes();
-      setState(() {
-        _imageData = Uint8List.fromList(fileData);
-        _fileName = pickedFile.path.split('/').last;
-      });
-    }
   }
 
   Future<void> _loadPosts() async {

@@ -86,14 +86,7 @@ class _EventViewState extends State<EventView> {
                 SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EventCreator(
-                          token: _token,
-                        ),
-                      ),
-                    );
+                    context.push(Paths.createEvent);
                   },
                   child: const Text('Registar Evento'),
                 )
@@ -114,7 +107,7 @@ class _EventViewState extends State<EventView> {
                       EventData event = _events[index];
                       return GestureDetector(
                         onTap: () {
-                          context.go(Paths.events + '/${event.id}');
+                          context.go(Paths.event + '/${event.id}');
                         },
                         child: Card(
                           child: Padding(

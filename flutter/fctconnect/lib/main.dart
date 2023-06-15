@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/services/fcm_services.dart';
 import 'package:responsive_login_ui/services/get_fcm_token.dart';
@@ -40,6 +41,36 @@ void main() async {
 
   runApp(MyApp(session: session));
 }
+
+// class ThemeNotifier extends ChangeNotifier {
+//   // Define your default thememode here
+//   ThemeMode themeMode = ThemeMode.system;
+//   SharedPreferences? prefs;
+
+//   ThemeNotifier() {
+//     _init();
+//   }
+
+//   _init() async {
+//     // Get the stored theme from shared preferences
+//     prefs = await SharedPreferences.getInstance();
+
+//     int _theme = prefs?.getInt("theme") ?? themeMode.index;
+//     themeMode = ThemeMode.values[_theme];
+//     notifyListeners();
+//   }
+
+//   setTheme(ThemeMode mode) {
+//     themeMode = mode;
+//     notifyListeners();
+//     // Save the selected theme using shared preferences
+//     prefs?.setInt("theme", mode.index);
+//   }
+// }
+
+// final themeNotifierProvider =
+//     ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier());
+
 
 void getKey() async {
   String? fcmKey = await FcmToken.getFcmToken();
