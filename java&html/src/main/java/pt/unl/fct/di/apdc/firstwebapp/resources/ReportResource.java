@@ -82,25 +82,40 @@ public class ReportResource {
                             .addAncestor(PathElement.of("Post", data.getPostId()))
                             .newKey("report");
 
+            List<Value<String>> reporters = new ArrayList<>();
             List<Value<String>> reasons = new ArrayList<>();
             List<Value<String>> comments = new ArrayList<>();
+            long reportCount = 1;
 
             if(txn.get(reportKey) != null){
-                reasons = txn.get(reportKey).getList("report_reason");
-                comments = txn.get(reportKey).getList("report_comment");
+                reporters = new ArrayList<>(txn.get(reportKey).getList("report_reporters"));
+                reasons = new ArrayList<>(txn.get(reportKey).getList("report_reasons"));
+                comments = new ArrayList<>(txn.get(reportKey).getList("report_comments"));
+                reportCount = txn.get(reportKey).getLong("report_count") + 1;
             }
 
-            reasons.add(StringValue.newBuilder(data.getReason()).build());
+            StringValue reporter = StringValue.newBuilder(username).build();
+
+            if(!reasons.contains(reporter)){
+                reporters.add(reporter);
+            }
+
+            StringValue reason = StringValue.newBuilder(data.getReason()).build();
+
+            if(!reasons.contains(reason)){
+                reasons.add(reason);
+            }
+
             comments.add(StringValue.newBuilder(data.getComment()).build());
 
 
             Entity report = Entity.newBuilder(reportKey)
-                            .set("report_creator", username)
+                            .set("report_reporters", reporters)
                             .set("report_post_id", data.getPostId())
                             .set("report_post_creator", data.getPostCreator())
                             .set("report_reasons", ListValue.of(reasons))
                             .set("report_comments", ListValue.of(comments))
-                            .set("report_timestamp", data.getTimestamp())
+                            .set("report_count", reportCount)
                             .build();
 
             txn.put(report);
@@ -157,6 +172,7 @@ public class ReportResource {
 
             Query<Entity> query = Query.newEntityQueryBuilder()
                                     .setKind("Report")
+                                    .addOrderBy(StructuredQuery.OrderBy.desc("report_count"))
                                     .build();
 
             QueryResults<Entity> reports = txn.run(query);
@@ -164,12 +180,29 @@ public class ReportResource {
             List<ReportGetData> reportsArray = new ArrayList<>();
 
             reports.forEachRemaining(report -> {
-                ReportGetData data = new ReportGetData(report.getString("report_creator"),
-                                                 report.getString("report_postId"),
-                                                 report.getString("report_post_creator"),
-                                                 report.getList("report_reason"),
-                                                 report.getList("report_comment"),
-                                                 report.getString("report_timestamp"));
+
+                List<String> reporters = new ArrayList<>();
+                List<String> reasons = new ArrayList<>();
+                List<String> comments = new ArrayList<>();
+
+                report.getList("report_reporters").forEach(reporter -> {
+                    reporters.add(reporter.get().toString());
+                });
+                report.getList("report_reasons").forEach(reason -> {
+                    reasons.add(reason.get().toString());
+                });
+                report.getList("report_comments").forEach(comment -> {
+                    comments.add(comment.get().toString());
+                });
+
+
+                ReportGetData data = new ReportGetData(
+                        reporters,
+                        report.getString("report_post_id"),
+                        report.getString("report_post_creator"),
+                        reasons,
+                        comments,
+                        report.getLong("report_count"));
                 reportsArray.add(data);
             });
 
@@ -242,7 +275,7 @@ public class ReportResource {
             txn.commit();
 
             return Response.ok().build();
-            
+
         } catch (Exception e) {
             LOG.warning(e.getMessage());
             e.printStackTrace();

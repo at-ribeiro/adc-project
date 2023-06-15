@@ -7,17 +7,15 @@ public class ReportPostData {
     private String postCreator;
     private String reason;
     private String comment;
-    private String timestamp;
 
     public ReportPostData() {}
 
-    public ReportPostData(String creator, String postId, String postCreator, String reason, String comment, String timestamp){
+    public ReportPostData(String creator, String postId, String postCreator, String reason, String comment){
         this.creator = creator;
         this.postId = postId;
         this.postCreator = postCreator;
         this.reason = reason;
         this.comment = comment;
-        this.timestamp = timestamp;
     }
 
     public String getCreator() {
@@ -38,10 +36,6 @@ public class ReportPostData {
 
     public String getComment() {
         return comment;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
     }
 
 
