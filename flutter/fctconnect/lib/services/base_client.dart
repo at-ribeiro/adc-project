@@ -10,6 +10,7 @@ import '../models/CommentData.dart';
 import '../models/FeedData.dart';
 import '../models/NewsData.dart';
 import '../models/Post.dart';
+import '../models/PostReport.dart';
 import '../models/Token.dart';
 
 import 'package:http_parser/http_parser.dart';
@@ -553,7 +554,7 @@ class BaseClient {
     }
   }
 
-  Future<void> reportPost(
+  Future<dynamic> reportPost(
       String api, username, tokenID, id, postUser ,reason, comment) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
@@ -561,7 +562,7 @@ class BaseClient {
       "User": username,
     };
 
-    var url = Uri.parse('$baseUrl$api');
+    var url = Uri.parse('$baseUrl$api/$id');
 
     var reportJson = jsonEncode({
       'creator': username,
@@ -569,7 +570,6 @@ class BaseClient {
       'postCreator': postUser,
       'reason': reason,
       'comment': comment,
-      'timestamp': DateTime.now().toString(),
     });
 
     var response = await http.post(
@@ -694,6 +694,56 @@ class BaseClient {
           jsonList.map((json) => ActivityData.fromJson(json)).toList();
       return activitiesList;
     } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<List<PostReport>> getPostsReports(
+      String api, String username, String tokenID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final jsonList = json.decode(response.body) as List<dynamic>;
+      final reportsList =
+          jsonList.map((json) => PostReport.fromJson(json)).toList();
+      return reportsList;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> deletePostsReport(
+      String api, String username, String tokenID, List<String> ids) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.delete(
+      url,
+      headers: _headers,
+      body: json.encode({"ids": ids}),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }

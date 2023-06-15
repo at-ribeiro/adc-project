@@ -91,7 +91,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio4);
-    
+
     Marker edificio5 = Marker(
       markerId: MarkerId('edificio5'),
       position: LatLng(38.663340, -9206874),
@@ -104,7 +104,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio5);
-    
+
     Marker edificio11 = Marker(
       markerId: MarkerId('edificio11'),
       position: LatLng(38.662927, -9.206631),
@@ -117,7 +117,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio11);
-    
+
     Marker departamental = Marker(
       markerId: MarkerId('departamental'),
       position: LatLng(38.662569, -9.207492),
@@ -130,7 +130,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(departamental);
-    
+
     Marker edificio9 = Marker(
       markerId: MarkerId('edificio9'),
       position: LatLng(38.660202, -9.207044),
@@ -143,7 +143,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio9);
-    
+
     Marker edificio8 = Marker(
       markerId: MarkerId('edificio8'),
       position: LatLng(38.660186, -9.206754),
@@ -156,7 +156,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio8);
-    
+
     Marker edificio7 = Marker(
       markerId: MarkerId('edificio7'),
       position: LatLng(38.660769, -9.205788),
@@ -169,7 +169,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio7);
-    
+
     Marker edificio10 = Marker(
       markerId: MarkerId('edificio10'),
       position: LatLng(38.660782, -9.204847),
@@ -182,7 +182,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio10);
-    
+
     Marker edificio6 = Marker(
       markerId: MarkerId('edificio6'),
       position: LatLng(38.660672, -9.203072),
@@ -195,7 +195,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio6);
-    
+
     Marker edificio2 = Marker(
       markerId: MarkerId('edificio2'),
       position: LatLng(38.660816, -9.203644),
@@ -208,7 +208,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(edificio2);
-    
+
     Marker biblioteca = Marker(
       markerId: MarkerId('biblioteca'),
       position: LatLng(38.662580, -9.205425),
@@ -221,7 +221,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(biblioteca);
-    
+
     Marker uninova1 = Marker(
       markerId: MarkerId('uninova1'),
       position: LatLng(38.660046, -9.203937),
@@ -234,7 +234,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(uninova1);
-    
+
     Marker uninova2 = Marker(
       markerId: MarkerId('uninova2'),
       position: LatLng(38.659930, -9.203788),
@@ -247,7 +247,6 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
     _markers.add(uninova2);
-    
   }
 
   void addPublicTransportationMarkers() {
@@ -417,6 +416,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Mapa'),

@@ -26,7 +26,6 @@ import 'calendar/calendar_widget.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
-import 'map_view_pc.dart';
 import 'my_profile.dart';
 import 'news_view.dart';
 
@@ -354,7 +353,7 @@ class _MyHomePageState extends State<MyHomePage> {
           TextButton(
             onPressed: () async {
               await BaseClient().reportPost(
-                "/post/report",
+                "/report",
                 _token.username,
                 _token.tokenID,
                 id,
@@ -403,13 +402,6 @@ class _MyHomePageState extends State<MyHomePage> {
             title: const Text('Mapa'),
             onTap: () {
               context.go(Paths.mapas);
-            },
-          ),
-          ListTile(
-            title: const Text('Mapas pc'),
-            onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => MapScreenPC()));
             },
           ),
           ListTile(

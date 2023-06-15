@@ -104,7 +104,7 @@ Widget build(BuildContext context) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Criador: ${alertData.creator}'),
-                Text('Localizaçã: ${alertData.location}'),
+                Text('Localização: ${alertData.location}'),
                 Text('Descrição:'),
                 Text(alertData.description),
                 Text('Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(

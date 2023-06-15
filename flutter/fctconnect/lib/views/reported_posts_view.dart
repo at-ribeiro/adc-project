@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/models/PostReport.dart';
 
 import '../models/AlertPostData.dart';
 import '../models/Token.dart';
@@ -17,9 +18,8 @@ class ReportedPostsPage extends StatefulWidget {
 class _ReportedPostsPageState extends State<ReportedPostsPage> {
   late Token _token;
   bool _isLoadingToken = true;
-  List<AlertPostData> alertDataList = [];
-  //mudar
-  List<int> reportsToDelete = [];
+  List<PostReport> postReportsList = [];
+  List<String> reportsToDelete = [];
 
   @override
   void initState() {
@@ -27,15 +27,15 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
   }
 
   Future<void> _loadReports() async {
-    List<AlertPostData> posts = await BaseClient().getReports(
-      "/alert",
+    List<PostReport> posts = await BaseClient().getPostsReports(
+      "/report",
       _token.username,
       _token.tokenID,
     );
 
     if (posts.isNotEmpty) {
       setState(() {
-        alertDataList.addAll(posts);
+        postReportsList.addAll(posts);
       });
     }
   }
@@ -45,15 +45,15 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
     super.dispose();
   }
 
-  void addToSelectedReports(int timestamp) {
+  void addToSelectedReports(String postID) {
     setState(() {
-      reportsToDelete.add(timestamp);
+      reportsToDelete.add(postID);
     });
   }
 
-  void removeFromSelectedReports(int timestamp) {
+  void removeFromSelectedReports(String postID) {
     setState(() {
-      reportsToDelete.remove(timestamp);
+      reportsToDelete.remove(postID);
     });
   }
 
@@ -72,18 +72,18 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Lista de Anomalias'),
+          title: Text('Posts Reportados'),
           actions: [
             IconButton(
               onPressed: () async {
-                await BaseClient().deleteReports(
-                  "/alert",
+                await BaseClient().deletePostsReport(
+                  "/report",
                   _token.username,
                   _token.tokenID,
                   reportsToDelete,
                 );
                 setState(() {
-                  alertDataList.clear();
+                  postReportsList.clear();
                   reportsToDelete.clear();
                 });
                 _loadReports();
@@ -93,25 +93,21 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
           ],
         ),
         body: ListView.builder(
-          itemCount: alertDataList.length,
+          itemCount: postReportsList.length,
           itemBuilder: (context, index) {
-            AlertPostData alertData = alertDataList[index];
-            bool isSelected = reportsToDelete.contains(alertData.timestamp);
+            PostReport postsReport = postReportsList[index];
+            bool isSelected = reportsToDelete.contains(postsReport.postId);
             return Card(
               child: ListTile(
-                title: Text(alertData.creator),
+                title: Text(postsReport.postCreator),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Criador: ${alertData.creator}'),
-                    Text('Localizaçã: ${alertData.location}'),
-                    Text('Descrição:'),
-                    Text(alertData.description),
-                    Text('Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                        int.parse(alertData.timestamp.toString()),
-                      ),
-                    )}'),
+                    Text('Post ID: ${postsReport.postId}'),
+                    Text('Número de reports: ${postsReport.count}'),
+                    Text('Reportado por: ${postsReport.reporters}'),
+                    Text('Razões: ${postsReport.reportReason}'),
+                    Text('Comentários: ${postsReport.reportComment}'),
                   ],
                 ),
                 trailing: IconButton(
@@ -122,9 +118,9 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
                   ),
                   onPressed: () {
                     if (isSelected) {
-                      removeFromSelectedReports(alertData.timestamp);
+                      removeFromSelectedReports(postsReport.postId);
                     } else {
-                      addToSelectedReports(alertData.timestamp);
+                      addToSelectedReports(postsReport.postId);
                     }
                   },
                 ),
