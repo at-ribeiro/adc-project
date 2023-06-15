@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.util;
 
-public class ReportData {
+public class ReportPostData {
 
     private String creator;
     private String postId;
@@ -9,9 +9,9 @@ public class ReportData {
     private String comment;
     private String timestamp;
 
-    public ReportData() {}
+    public ReportPostData() {}
 
-    public ReportData(String creator, String postId, String postCreator, String reason, String comment, String timestamp){
+    public ReportPostData(String creator, String postId, String postCreator, String reason, String comment, String timestamp){
         this.creator = creator;
         this.postId = postId;
         this.postCreator = postCreator;

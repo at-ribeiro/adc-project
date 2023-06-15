@@ -165,6 +165,7 @@ public class AlertResource {
 
     @DELETE
     @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteAlert(@HeaderParam("Authorization") String tokenId,
                                 @HeaderParam("User") String username,
                                 AlertDeleteData data){
