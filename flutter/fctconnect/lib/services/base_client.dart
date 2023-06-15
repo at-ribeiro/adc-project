@@ -555,7 +555,7 @@ class BaseClient {
   }
 
   Future<dynamic> reportPost(
-      String api, username, tokenID, id, postUser ,reason, comment) async {
+      String api, username, tokenID, id, postUser, reason, comment) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -714,10 +714,12 @@ class BaseClient {
     );
 
     if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final reportsList =
-          jsonList.map((json) => PostReport.fromJson(json)).toList();
-      return reportsList;
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<PostReport> posts =
+          List<PostReport>.from(data.map((json) => PostReport.fromJson(json)));
+      return posts;
     } else {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");

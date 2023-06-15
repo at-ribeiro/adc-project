@@ -338,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextFormField(
               controller: _commentController,
               decoration: InputDecoration(
-                labelText: 'Comentários Adicionais (opcional)',
+                labelText: 'Comentários (opcional)',
               ),
             ),
           ],
