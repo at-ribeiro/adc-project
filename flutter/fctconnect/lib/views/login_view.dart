@@ -276,7 +276,7 @@ class _LoginViewState extends State<LoginView>
                           },
                           child: RichText(
                             text: TextSpan(
-                              text: 'Don\'t have an account?',
+                              text: 'Não tens uma conta?',
                               children: [
                                 TextSpan(
                                   text: " Sign up",

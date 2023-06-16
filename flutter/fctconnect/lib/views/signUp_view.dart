@@ -32,6 +32,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController roleController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
@@ -49,6 +50,7 @@ class _SignUpViewState extends State<SignUpView> {
     nameController.dispose();
     fullNameController.dispose();
     emailController.dispose();
+    roleController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
     privacyController.dispose();
@@ -211,25 +213,46 @@ class _SignUpViewState extends State<SignUpView> {
                       borderRadius: BorderRadius.all(Radius.circular(15)),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: TextFormField(
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
+                        child: Theme(
+                          data: ThemeData(
+                            canvasColor: Colors.white.withOpacity(0.2),
+                            popupMenuTheme: PopupMenuThemeData(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                            ),
                           ),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.person),
-                            hintText: 'E-mail',
-                            border: InputBorder.none,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 4),
+                            child: DropdownButtonHideUnderline(
+                              child: ExpansionTile(
+                                title: roleController.text.isEmpty
+                                    ? Text(
+                                        "Role",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    : Text(roleController.text, style: TextStyle(color: Colors.white)),
+                                leading: Icon(Icons.work, color: Colors.white),
+                                children: ['Aluno', 'Professor', 'Externo']
+                                    .map<Widget>((String value) {
+                                  return ListTile(
+                                    title: Text(
+                                      value,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        roleController.text = value;
+                                  
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
                           ),
-                          controller: emailController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an e-mail';
-                            } else if (!value.contains('@')) {
-                              return 'please enter valid e-mail';
-                            }
-
-                            return null;
-                          },
                         ),
                       ),
                     ),
@@ -374,7 +397,7 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": "USER",
+              "role": roleController.text.toUpperCase(),
               "state": "ACTIVE",
               "privacy": "PRIVATE",
             };
