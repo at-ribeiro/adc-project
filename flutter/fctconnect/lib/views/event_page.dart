@@ -149,21 +149,7 @@ class _EventPageState extends State<EventPage> {
                             } else {
                               return ElevatedButton(
                                 onPressed: handleButtonPress,
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith<Color>(
-                                    (states) {
-                                      if (states.contains(
-                                              MaterialState.pressed) ||
-                                          isButtonPressed) {
-                                        return Color.fromARGB(255, 170, 170,
-                                            170); // Change to desired pressed color
-                                      }
-                                      return Colors
-                                          .blue; // Change to desired default color
-                                    },
-                                  ),
-                                ),
+                               
                                 child: Text(
                                   _buttonLabel,
                                   style: TextStyle(fontSize: 16),

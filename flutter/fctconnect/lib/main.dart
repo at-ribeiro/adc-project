@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_login_ui/Themes/theme_constant.dart';
+import 'package:responsive_login_ui/Themes/theme_manager.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/services/fcm_services.dart';
 import 'package:responsive_login_ui/services/get_fcm_token.dart';
@@ -39,7 +41,12 @@ void main() async {
 
   getKey();
 
-  runApp(MyApp(session: session));
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeManager(),
+      child: MyApp(session: session),
+    ),
+  );
 }
 
 // class ThemeNotifier extends ChangeNotifier {
@@ -71,102 +78,55 @@ void main() async {
 // final themeNotifierProvider =
 //     ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier());
 
-
 void getKey() async {
   String? fcmKey = await FcmToken.getFcmToken();
   print("TOKEN : $fcmKey");
 }
 
-class MyApp extends StatelessWidget {
+ThemeManager _themeManager = ThemeManager();
+
+class MyApp extends StatefulWidget {
   final String? session;
 
   MyApp({Key? key, this.session}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  void dispose() {
+    _themeManager.removeListener(themeListener);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    Provider.of<ThemeManager>(context, listen: false)
+        .addListener(themeListener);
+    super.initState();
+  }
+
+  themeListener() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     _initializeIsLoggedIn();
-    return MaterialApp.router(
-      routerConfig: AppRouter().router,
-      debugShowCheckedModeBanner: false,
-      // initialRoute: '/',
-      // onGenerateRoute: (RouteSettings settings) {
-      //   return MaterialPageRoute(
-      //     builder: (BuildContext context) {
-      //       return FutureBuilder<Widget>(
-      //         future: _getRouteWidget(_getSession()),
-      //         builder: (context, snapshot) {
-      //           if (snapshot.hasData) {
-      //             return snapshot.data!;
-      //           } else {
-      //             return Scaffold(
-      //               body: Center(
-      //                 child: CircularProgressIndicator(),
-      //               ),
-      //             );
-      //           }
-      //         },
-      //       );
-      //     },
-      //   );
-      // },
-    );
-  }
-
-  // Future<Widget> _getRouteWidget(String routeName) async {
-  //   String? _tokenid;
-  //   String? _username;
-  //   String? _role;
-  //   String? _creationDate;
-  //   String? _expirationDate;
-
-  //   Token? token;
-  //   if (routeName != '/') {
-  //     _tokenid = await CacheDefault.cacheFactory.get('Token');
-  //     _username = await CacheDefault.cacheFactory.get('Username');
-  //     _role = await CacheDefault.cacheFactory.get('Role');
-  //     _creationDate = await CacheDefault.cacheFactory.get('Creationd');
-  //     _expirationDate = await CacheDefault.cacheFactory.get('Expirationd');
-  //     token = Token(
-  //       username: _username!,
-  //       role: _role!,
-  //       tokenID: _tokenid!,
-  //       creationDate: int.parse(_creationDate!),
-  //       expirationDate: int.parse(_expirationDate!),
-  //     );
-  //   } else {
-  //     CacheDefault.cacheFactory.set('Session', '/');
-  //   }
-
-  //   switch (routeName) {
-  //     case '/':
-  //       return LoginView();
-  //     case '/home':
-  //       // Return your home page widget here
-  //       return MyHomePage(token: token!);
-  //     case '/news':
-  //       // Return your profile page widget here
-  //       return NewsView(token: token!);
-  //     // Add more routes as needed
-  //     case '/signup':
-  //       return SignUpView();
-  //     default:
-  //       return LoginView();
-  //   }
-  // }
-
-  String _getSession() {
-    if (session != null && session!.isNotEmpty) {
-      return session!;
-    } else {
-      return '/';
-    }
-  }
-
-  void setLastVisitedPage(String currentPage) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('last_visited_page', currentPage);
+    return Consumer<ThemeManager>(builder: (context, themeManager, child) {
+      return MaterialApp.router(
+        routerConfig: AppRouter().router,
+        debugShowCheckedModeBanner: false,
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: _themeManager.themeMode,
+      );
+    });
   }
 
   Future<String?> isLoggedIn() async {

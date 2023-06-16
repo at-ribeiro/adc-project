@@ -50,24 +50,23 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
+            icon: Icon(Icons.home,),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, color: Colors.black),
+            icon: Icon(Icons.newspaper),
             label: 'Noticias',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.post_add, color: Colors.black),
+            icon: Icon(Icons.post_add),
             label: 'Post',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
+            icon: Icon(Icons.person),
             label: 'Perfil',
           ),
         ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
+       
         showUnselectedLabels: true,
         onTap: (index) {
           if (index == 0) {

@@ -7,12 +7,16 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_login_ui/Themes/theme_manager.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/messages/messages_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
+import '../main.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
@@ -38,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Token _token;
+  late ThemeManager _themeManager;
   bool _isLoadingToken = true;
   String _postText = '';
   Uint8List? _imageData;
@@ -56,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
     CacheDefault.cacheFactory.set("Session", "/homepage");
+    _themeManager = Provider.of<ThemeManager>(context, listen: false);
   }
 
   @override
@@ -76,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+     
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -229,27 +236,27 @@ class _MyHomePageState extends State<MyHomePage> {
                                     top: 8.0,
                                     right: 8.0,
                                     child: Align(
-                                    alignment: Alignment.topRight,
-                                    child: PopupMenuButton(
-                                      icon: Icon(Icons.more_vert),
-                                      onSelected: (value) {
-                                        if (value == 'report') {
-                                          _showReportDialog(context, post.id, post.user);
-                                        }
-                                      },
-                                      itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 'report',
-                                          child: Text('Report'),
-                                        ),
-                                      ],
+                                      alignment: Alignment.topRight,
+                                      child: PopupMenuButton(
+                                        icon: Icon(Icons.more_vert),
+                                        onSelected: (value) {
+                                          if (value == 'report') {
+                                            _showReportDialog(
+                                                context, post.id, post.user);
+                                          }
+                                        },
+                                        itemBuilder: (context) => [
+                                          PopupMenuItem(
+                                            value: 'report',
+                                            child: Text('Report'),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),)
+                                  )
                                 ],
                               ),
-
                               const SizedBox(height: 8.0),
-                              
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: Padding(
@@ -281,99 +288,99 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showReportDialog(BuildContext context, String id, String postUser) {
-  TextEditingController _reasonController = TextEditingController();
-  TextEditingController _commentController = TextEditingController();
+    TextEditingController _reasonController = TextEditingController();
+    TextEditingController _commentController = TextEditingController();
 
-  String? selectedReason;
+    String? selectedReason;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Report Post'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              value: selectedReason,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedReason = newValue;
-                });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Report Post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedReason,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedReason = newValue;
+                  });
+                },
+                items: [
+                  DropdownMenuItem<String>(
+                    value: 'Assédio',
+                    child: Text('Assédio'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Fraude',
+                    child: Text('Fraude'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Spam',
+                    child: Text('Spam'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Desinformação',
+                    child: Text('Desinformação'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Discurso de ódio',
+                    child: Text('Discurso de ódio'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Ameaças ou violência',
+                    child: Text('Ameaças ou violência'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'Conteúdo sexual',
+                    child: Text('Conteúdo sexual'),
+                  ),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'Razão',
+                ),
+              ),
+              TextFormField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: 'Comentários Adicionais (opcional)',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
               },
-              items: [
-                DropdownMenuItem<String>(
-                  value: 'Assédio',
-                  child: Text('Assédio'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Fraude',
-                  child: Text('Fraude'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Spam',
-                  child: Text('Spam'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Desinformação',
-                  child: Text('Desinformação'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Discurso de ódio',
-                  child: Text('Discurso de ódio'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Ameaças ou violência',
-                  child: Text('Ameaças ou violência'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'Conteúdo sexual',
-                  child: Text('Conteúdo sexual'),
-                ),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Razão',
-              ),
+              child: Text('Voltar'),
             ),
-            TextFormField(
-              controller: _commentController,
-              decoration: InputDecoration(
-                labelText: 'Comentários Adicionais (opcional)',
-              ),
+            TextButton(
+              onPressed: () async {
+                await BaseClient().reportPost(
+                  "/report",
+                  _token.username,
+                  _token.tokenID,
+                  id,
+                  postUser,
+                  selectedReason ?? '',
+                  _commentController.text,
+                );
+                Navigator.of(context).pop();
+              },
+              child: Text('Submeter'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Voltar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await BaseClient().reportPost(
-                "/report",
-                _token.username,
-                _token.tokenID,
-                id,
-                postUser,
-                selectedReason ?? '',
-                _commentController.text,
-              );
-              Navigator.of(context).pop();
-            },
-            child: Text('Submeter'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
+        );
+      },
+    );
+  }
 
   Widget _buildDrawer() {
+    ThemeManager themeManager = context.watch<ThemeManager>();
+     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
     String username = _token.username;
     return Drawer(
       child: Column(
@@ -382,7 +389,7 @@ class _MyHomePageState extends State<MyHomePage> {
             stepWidth: double.infinity,
             child: DrawerHeader(
               decoration: const BoxDecoration(
-                color: Colors.blueAccent,
+                
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -392,8 +399,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     backgroundImage: NetworkImage(
                         'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
                   Text(username, style: const TextStyle(fontSize: 18)),
+                  Switch(
+                    value: isDarkModeOn,
+                    onChanged: (value) {
+                      _themeManager.toggleTheme(value);
+                    },
+                  ),
                 ],
               ),
             ), // Set the width of the DrawerHeader to the maximum available width
