@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 @Path("/activity")

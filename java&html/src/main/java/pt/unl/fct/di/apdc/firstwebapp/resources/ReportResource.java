@@ -1,11 +1,12 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
-import pt.unl.fct.di.apdc.firstwebapp.util.AlertDeleteData;
-import pt.unl.fct.di.apdc.firstwebapp.util.AlertGetData;
-import pt.unl.fct.di.apdc.firstwebapp.util.AlertPostData;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.ReportDeleteData;
+import pt.unl.fct.di.apdc.firstwebapp.util.ReportGetData;
+import pt.unl.fct.di.apdc.firstwebapp.util.ReportPostData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -14,17 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Path("/alert")
-public class AlertResource {
+@Path("/report")
+public class ReportResource {
 
-    private static final Logger LOG = Logger.getLogger(AlertResource.class.getName());
+
+    private static final Logger LOG = Logger.getLogger(ActivityResource.class.getName());
+
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
+
     @POST
-    @Path("/{creator}")
+    @Path("/{postId}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createAlert(@HeaderParam("Authorization") String tokenId, @PathParam("creator") String username, AlertPostData data){
+    public Response createReport(@HeaderParam("Authorization") String tokenId,
+                                 @HeaderParam("User") String username,
+                                 @PathParam("postId") String postId,
+                                 ReportPostData data){
 
         Transaction txn = datastore.newTransaction();
 
@@ -57,33 +65,70 @@ public class AlertResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            Key alertKey = datastore.newKeyFactory()
-                    .setKind("Alert")
-                    .newKey(data.getTimestamp());
+            Key postKey = datastore.newKeyFactory()
+                            .setKind("Post")
+                            .addAncestor(PathElement.of("User", data.getPostCreator()))
+                            .newKey(data.getPostId());
 
-            if(txn.get(alertKey) != null){
-                LOG.warning("Alert already exists! Please try again");
-                return Response.status(Response.Status.CONFLICT).build();
+            Entity post = txn.get(postKey);
+
+            if(post == null){
+                LOG.warning("Post doesn't exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            Entity alert = Entity.newBuilder(alertKey)
-                    .set("alert_creator", data.getCreator())
-                    .set("alert_location", data.getLocation())
-                    .set("alert_description", StringValue.newBuilder(data.getDescription()).setExcludeFromIndexes(true).build())
-                    .set("alert_timestamp", data.getTimestamp())
-                    .build();
+            Key reportKey = datastore.newKeyFactory()
+                            .setKind("Report")
+                            .addAncestor(PathElement.of("Post", data.getPostId()))
+                            .newKey("report");
 
-            txn.put(alert);
+            List<Value<String>> reporters = new ArrayList<>();
+            List<Value<String>> reasons = new ArrayList<>();
+            List<Value<String>> comments = new ArrayList<>();
+            long reportCount = 1;
+
+            if(txn.get(reportKey) != null){
+                reporters = new ArrayList<>(txn.get(reportKey).getList("report_reporters"));
+                reasons = new ArrayList<>(txn.get(reportKey).getList("report_reasons"));
+                comments = new ArrayList<>(txn.get(reportKey).getList("report_comments"));
+                reportCount = txn.get(reportKey).getLong("report_count") + 1;
+            }
+
+            StringValue reporter = StringValue.newBuilder(username).build();
+
+            if(!reasons.contains(reporter)){
+                reporters.add(reporter);
+            }
+
+            StringValue reason = StringValue.newBuilder(data.getReason()).build();
+
+            if(!reasons.contains(reason)){
+                reasons.add(reason);
+            }
+
+            comments.add(StringValue.newBuilder(data.getComment()).build());
+
+
+            Entity report = Entity.newBuilder(reportKey)
+                            .set("report_reporters", reporters)
+                            .set("report_post_id", data.getPostId())
+                            .set("report_post_creator", data.getPostCreator())
+                            .set("report_reasons", ListValue.of(reasons))
+                            .set("report_comments", ListValue.of(comments))
+                            .set("report_count", reportCount)
+                            .build();
+
+            txn.put(report);
             txn.commit();
 
             return Response.ok().build();
 
-        }catch (Exception e) {
-            txn.rollback();
-            LOG.severe(e.getMessage());
+        }catch (Exception e){
+            LOG.warning(e.getMessage());
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } finally {
-            if (txn.isActive()) {
+        }finally {
+            if(txn.isActive()) {
                 txn.rollback();
             }
         }
@@ -92,19 +137,19 @@ public class AlertResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlerts(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username){
+    public Response getReports(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username){
 
         Transaction txn = datastore.newTransaction();
 
-        try {
+        try{
 
             Key userKey = userKeyFactory.newKey(username);
             Entity userEntity = txn.get(userKey);
-            if (userEntity == null) {
+            if(userEntity == null){
                 LOG.warning("User doesn't exist.");
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            if (userEntity.getString("user_state").equals("INACTIVE")) {
+            if (userEntity.getString("user_state").equals("INACTIVE")){
                 LOG.warning("Inactive User.");
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -125,39 +170,50 @@ public class AlertResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            StructuredQuery.OrderBy ascTimestamp = StructuredQuery.OrderBy.asc("alert_timestamp");
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                                    .setKind("Report")
+                                    .addOrderBy(StructuredQuery.OrderBy.desc("report_count"))
+                                    .build();
 
-            Query<Entity> alertQuery = Query.newEntityQueryBuilder()
-                    .setKind("Alert")
-                    .addOrderBy(ascTimestamp)
-                    .build();
+            QueryResults<Entity> reports = txn.run(query);
 
-            QueryResults<Entity> alertResults = txn.run(alertQuery);
+            List<ReportGetData> reportsArray = new ArrayList<>();
 
-            List<AlertGetData> toSend = new ArrayList<>();
+            reports.forEachRemaining(report -> {
 
-            alertResults.forEachRemaining(alert -> {
-                toSend.add(new AlertGetData(
-                        alert.getString("alert_creator"),
-                        alert.getString("alert_location"),
-                        alert.getString("alert_description"),
-                        alert.getLong("alert_timestamp")
-                ));
+                List<String> reporters = new ArrayList<>();
+                List<String> reasons = new ArrayList<>();
+                List<String> comments = new ArrayList<>();
 
+                report.getList("report_reporters").forEach(reporter -> {
+                    reporters.add(reporter.get().toString());
+                });
+                report.getList("report_reasons").forEach(reason -> {
+                    reasons.add(reason.get().toString());
+                });
+                report.getList("report_comments").forEach(comment -> {
+                    comments.add(comment.get().toString());
+                });
+
+
+                ReportGetData data = new ReportGetData(
+                        reporters,
+                        report.getString("report_post_id"),
+                        report.getString("report_post_creator"),
+                        reasons,
+                        comments,
+                        report.getLong("report_count"));
+                reportsArray.add(data);
             });
 
-            if(toSend.isEmpty()){
-                return Response.status(Response.Status.PRECONDITION_FAILED).build();
-            }
+            return Response.ok(reportsArray).build();
 
-            return Response.ok(toSend).build();
-
-        }catch (Exception e) {
-            txn.rollback();
+        }catch (Exception e){
+            LOG.warning(e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } finally {
-            if (txn.isActive()) {
+        }finally {
+            if(txn.isActive()) {
                 txn.rollback();
             }
         }
@@ -166,13 +222,14 @@ public class AlertResource {
     @DELETE
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteAlert(@HeaderParam("Authorization") String tokenId,
-                                @HeaderParam("User") String username,
-                                AlertDeleteData data){
+    public Response deleteReport(@HeaderParam("Authorization") String tokenId,
+                                 @HeaderParam("User") String username,
+                                 ReportDeleteData data) {
 
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
+
 
             Key userKey = userKeyFactory.newKey(username);
             Entity userEntity = txn.get(userKey);
@@ -201,13 +258,14 @@ public class AlertResource {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
-            for(Long alert: data.getIds()){
+            for(String id: data.getIds()){
                 Key alertKey = datastore.newKeyFactory()
-                        .setKind("Alert")
-                        .newKey(alert);
+                        .setKind("Report")
+                        .addAncestor(PathElement.of("Post", id))
+                        .newKey("report");
 
                 if(txn.get(alertKey) == null){
-                    LOG.warning("Alert " + alert + " doesn't exist");
+                    LOG.warning("No reports for " + id + " doesn't exist");
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
 
@@ -215,18 +273,19 @@ public class AlertResource {
             }
 
             txn.commit();
+
             return Response.ok().build();
 
-        }catch (Exception e) {
-            txn.rollback();
+        } catch (Exception e) {
+            LOG.warning(e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
             }
-        }
 
+        }
     }
 
 
