@@ -14,12 +14,12 @@ import '../models/FeedData.dart';
 
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/load_token.dart';
 
 class OtherProfile extends StatefulWidget {
-  final Token token;
   final String name;
 
-  const OtherProfile({Key? key, required this.token, required this.name})
+  const OtherProfile({Key? key, required this.name})
       : super(key: key);
 
   @override
@@ -28,6 +28,7 @@ class OtherProfile extends StatefulWidget {
 
 class _OtherProfileState extends State<OtherProfile> {
   late Token _token;
+  bool _isLoadingToken = true;
   final double coverHeight = 200;
   final double profileHeight = 144;
   late String name;
@@ -41,7 +42,6 @@ class _OtherProfileState extends State<OtherProfile> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     name = widget.name;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
@@ -91,7 +91,26 @@ class _OtherProfileState extends State<OtherProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+          });
+        });
+      });
+    }else if(!existsUser()){
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Perfil'),
+        ),
+        body: Center(
+          child: Text("O user $name não existe"),
+        ),
+      );
+    }
+    else{return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil'),
       ),
@@ -116,7 +135,7 @@ class _OtherProfileState extends State<OtherProfile> {
           const SizedBox(height: 32),
         ],
       ),
-    );
+    );}
   }
 
   Widget buildInfoSection() {
@@ -310,6 +329,10 @@ class _OtherProfileState extends State<OtherProfile> {
           'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
         ),
       );
+      
+        bool existsUser() {
+        return true;
+        }
 }
 
 class ContentWidget extends StatefulWidget {

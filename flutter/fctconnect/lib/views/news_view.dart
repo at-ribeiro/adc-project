@@ -14,12 +14,13 @@ import '../models/NewsData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/load_token.dart';
 import 'my_profile.dart';
 
 class NewsView extends StatefulWidget {
-  final Token token;
 
-  const NewsView({Key? key, required this.token}) : super(key: key);
+
+  const NewsView({Key? key}) : super(key: key);
 
   @override
   State<NewsView> createState() => _NewsViewState();
@@ -27,6 +28,7 @@ class NewsView extends StatefulWidget {
 
 class _NewsViewState extends State<NewsView> {
   late Token _token;
+  bool _isLoadingToken = true;
   List<NewsData> _news = [];
   
   String _postText = '';
@@ -36,8 +38,6 @@ class _NewsViewState extends State<NewsView> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
-    _loadNews();
   }
 
   Future<void> _loadNews() async {
@@ -52,7 +52,17 @@ class _NewsViewState extends State<NewsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+            _loadNews();
+          });
+        });
+      });
+    }else{ return Scaffold(
       appBar: AppBar(
         title: const Text('News'),
       ),
@@ -102,8 +112,8 @@ class _NewsViewState extends State<NewsView> {
                 );
               },
             ),
-      bottomNavigationBar: NavigationBody(),
-    );
+
+    );}
   }
 
   Widget NavigationBody() {
@@ -134,7 +144,7 @@ class _NewsViewState extends State<NewsView> {
         onTap: (index) {
           if (index == 0) {
             Navigator.pushReplacement(context,
-                CupertinoPageRoute(builder: (ctx) => MyHomePage(token: _token)));
+                CupertinoPageRoute(builder: (ctx) => MyHomePage()));
           } else if (index == 1) {
             
           } else if (index == 2) {
@@ -145,7 +155,7 @@ class _NewsViewState extends State<NewsView> {
             );
           } else if (index == 3) {
             Navigator.pushReplacement(context,
-                CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
+                CupertinoPageRoute(builder: (ctx) => MyProfile()));
           }
         },
       );

@@ -25,4 +25,6 @@ class FeedData {
       likes:json['likes'],
     );
   }
+
+  get postID => null;
 }

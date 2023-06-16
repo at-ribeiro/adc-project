@@ -10,10 +10,11 @@ public class EventGetData {
     private long start;
     private long end;
     private String id;
+    private String qrCodeUrl;
 
     public EventGetData(){}
 
-    public EventGetData(String creator, String title, String description, String url, long start, long end, String id){
+    public EventGetData(String creator, String title, String description, String url, long start, long end, String id, String qrCodeUrl){
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -21,6 +22,7 @@ public class EventGetData {
         this.start = start;
         this.end = end;
         this.id = id;
+        this.qrCodeUrl = qrCodeUrl;
     }
 
     public String getCreator() {
@@ -49,5 +51,9 @@ public class EventGetData {
     public String getId() {
         return id;
     } 
+
+    public String getQrCodeUrl(){
+        return qrCodeUrl;
+    }
 
 }

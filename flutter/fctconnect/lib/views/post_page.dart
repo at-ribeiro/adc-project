@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/FeedData.dart';
 
 import '../models/CommentData.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
+import '../services/load_token.dart';
 
 class PostPage extends StatefulWidget {
-  final Token token;
   final String postUser;
   final String postID;
   const PostPage(
-      {required this.token, required this.postID, required this.postUser});
+      {required this.postID, required this.postUser});
 
   @override
   _PostPageState createState() => _PostPageState();
@@ -20,6 +19,7 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   final TextEditingController _commentController = TextEditingController();
   late Token _token;
+  bool _isLoadingToken = true;
   late String _postUser;
   late String _postID;
   List<CommentData> _comments = []; // List to store comments
@@ -27,11 +27,10 @@ class _PostPageState extends State<PostPage> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     _postUser = widget.postUser;
     _postID = widget.postID;
 
-    getComments();
+    
   }
 
   @override
@@ -53,12 +52,23 @@ class _PostPageState extends State<PostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+   if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+            getComments();
+          });
+        });
+      });
+    }else
+    {return Scaffold(
       appBar: AppBar(
         title: Text('Comentários'),
       ),
       body: ContentBody(),
-    );
+    );}
   }
 
   Widget ContentBody() {

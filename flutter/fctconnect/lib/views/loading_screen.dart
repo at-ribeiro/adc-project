@@ -1,104 +1,102 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import '../data/cache_factory_provider.dart';
-import 'package:responsive_login_ui/views/login_view.dart';
-import '../models/Token.dart';
-import '../services/session_manager.dart';
-import 'my_home_page.dart';
-import '../data/cache_factory_provider.dart';
+// import 'package:flutter/foundation.dart';
+// import 'package:flutter/material.dart';
+// import '../data/cache_factory_provider.dart';
+// import 'package:responsive_login_ui/views/login_view.dart';
+// import '../models/Token.dart';
+// import '../services/session_manager.dart';
+// import 'my_home_page.dart';
+// import '../data/cache_factory_provider.dart';
 
-class LoadingScreen extends StatefulWidget {
+// class LoadingScreen extends StatefulWidget {
 
-  final Future<Token> token;
+//   const LoadingScreen({Key? key}) : super(key: key);
 
-  const LoadingScreen({Key? key, required this.token}) : super(key: key);
+//   @override
+//   _LoadingScreenState createState() => _LoadingScreenState();
+// }
 
-  @override
-  _LoadingScreenState createState() => _LoadingScreenState();
-}
+// class _LoadingScreenState extends State<LoadingScreen> {
+//   CacheDefault _cacheDefault = CacheDefault();
+//   bool _showError = false;
 
-class _LoadingScreenState extends State<LoadingScreen> {
-  CacheDefault _cacheDefault = CacheDefault();
-  bool _showError = false;
+//   @override
+//   void initState() {
+//     super.initState();
+//   //   fetchData();
+//  }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
+//   // Future<void> fetchData() async {
+//   //   await Future.delayed(
+//   //       Duration(seconds: 1)); // Simulating an asynchronous operation
+//   //   try {
+//   //     final token = await widget.token;
+//   //   } catch (error) {
+//   //     setState(() {
+//   //       _showError = true;
+//   //     });
+//   //     showErrorMessage();
+//   //   }
+//   // }
 
-  Future<void> fetchData() async {
-    await Future.delayed(
-        Duration(seconds: 1)); // Simulating an asynchronous operation
-    try {
-      final token = await widget.token;
-    } catch (error) {
-      setState(() {
-        _showError = true;
-      });
-      showErrorMessage();
-    }
-  }
+//   void showErrorMessage() {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Error'),
+//           content: Text('Username ou password errados! \n Tente outra vez.'),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.pushReplacement(
+//                   context,
+//                   MaterialPageRoute(
+//                     builder: (context) => const LoginView(),
+//                   ),
+//                 );
+//               },
+//               child: Text('Voltar ao Login!'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
 
-  void showErrorMessage() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text('Username ou password errados! \n Tente outra vez.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginView(),
-                  ),
-                );
-              },
-              child: Text('Voltar ao Login!'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: _showError
-            ? CircularProgressIndicator()
-            : FutureBuilder<Token>(
-                future: widget.token,
-                builder: (BuildContext context, AsyncSnapshot<Token> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // While waiting for the future to complete, show a loading indicator
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    // If an error occurred while fetching the token, show the loading indicator and handle the error with showDialog
-                    return CircularProgressIndicator();
-                  } else {
-                    // When the future completes successfully, navigate to the home page
-                    final token = snapshot.data;
+//   // @override
+//   // Widget build(BuildContext context) {
+//   //   return Scaffold(
+//   //     backgroundColor: Colors.white,
+//   //     body: Center(
+//   //       child: _showError
+//   //           ? CircularProgressIndicator()
+//   //           : FutureBuilder<Token>(
+//   //               future: widget.token,
+//   //               builder: (BuildContext context, AsyncSnapshot<Token> snapshot) {
+//   //                 if (snapshot.connectionState == ConnectionState.waiting) {
+//   //                   // While waiting for the future to complete, show a loading indicator
+//   //                   return CircularProgressIndicator();
+//   //                 } else if (snapshot.hasError) {
+//   //                   // If an error occurred while fetching the token, show the loading indicator and handle the error with showDialog
+//   //                   return CircularProgressIndicator();
+//   //                 } else {
+//   //                   // When the future completes successfully, navigate to the home page
+//   //                   final token = snapshot.data;
 
                     
-                      String tokenId = token!.tokenID;
-                      String username = token.username;
-                      String role = token.role;
-                      String cD = token.creationDate.toString();
-                      String eD = token.expirationDate.toString();
+//   //                     String tokenId = token!.tokenID;
+//   //                     String username = token.username;
+//   //                     String role = token.role;
+//   //                     String cD = token.creationDate.toString();
+//   //                     String eD = token.expirationDate.toString();
 
-                      CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
+//   //                     CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
 
                     
-                    return MyHomePage(token: token);
-                  }
-                }),
-      ),
-    );
-  }
-}
+//   //                   return MyHomePage(token: token);
+//   //                 }
+//   //               }),
+//   //     ),
+//   //   );
+//   // }
+// }

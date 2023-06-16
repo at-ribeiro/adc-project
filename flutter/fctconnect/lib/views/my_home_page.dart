@@ -4,19 +4,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/messages/messages_view.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
+import 'package:responsive_login_ui/views/reports_list_view.dart';
 import '../models/FeedData.dart';
 import '../models/Post.dart';
 import '../models/Token.dart';
+import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/costum_search_delegate.dart';
 import '../data/cache_factory_provider.dart';
-
+import '../services/load_token.dart';
+import 'calendar_view.dart';
+import 'calendar/calendar_widget.dart';
 import 'login_view.dart';
 import 'event_view.dart';
 import 'package:intl/intl.dart';
@@ -24,9 +30,7 @@ import 'my_profile.dart';
 import 'news_view.dart';
 
 class MyHomePage extends StatefulWidget {
-  final Token token;
-
-  const MyHomePage({Key? key, required this.token}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -34,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Token _token;
+  bool _isLoadingToken = true;
   String _postText = '';
   Uint8List? _imageData;
   String? _fileName;
@@ -48,11 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _token = widget.token;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    CacheDefault.cacheFactory.set('Session', '/home');
-    _loadPosts();
+    CacheDefault.cacheFactory.set("Session", "/homepage");
   }
 
   @override
@@ -61,87 +64,58 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(MyHomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.token != oldWidget.token) {
-      setState(() {
-        _token = widget.token;
-      });
-    }
-  }
+  // @override
+  // void didUpdateWidget(MyHomePage oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (widget.token != oldWidget.token) {
+  //     setState(() {
+  //       _token = widget.token;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-        actions: [
-          IconButton(
-              onPressed: () {
-                showSearch(context: context, delegate: CustomSearchDelegate("profile"));
-              },
-              icon: Icon(Icons.search))
-        ],
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+    if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted)
+            setState(() {
+              _token = token;
+              _isLoadingToken = false;
+            });
+        });
+      });
+    } else {
+      _loadPosts();
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(''),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showSearch(
+                      context: context,
+                      delegate: CustomSearchDelegate("profile"));
+                },
+                icon: Icon(Icons.search))
+          ],
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            },
+          ),
         ),
-      ),
-      drawer: _buildDrawer(),
-      body: ContentBody(),
-      bottomNavigationBar: NavigationBody(),
-    );
-  }
-
-  Widget NavigationBody() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.shifting,
-      currentIndex: 0, // set the initial index to 0
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home, color: Colors.black),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.newspaper, color: Colors.black),
-          label: 'Noticias',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.post_add, color: Colors.black),
-          label: 'Post',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person, color: Colors.black),
-          label: 'Perfil',
-        ),
-      ],
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.black,
-      showUnselectedLabels: true,
-      onTap: (index) {
-        if (index == 0) {
-        } else if (index == 1) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => NewsView(token: _token)));
-        } else if (index == 2) {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) => _buildPostModal(context),
-          );
-        } else if (index == 3) {
-          Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (ctx) => MyProfile(token: _token)));
-        }
-      },
-    );
+        drawer: _buildDrawer(),
+        body: ContentBody(),
+        // bottomNavigationBar: NavigationBody(),
+      );
+    }
   }
 
   Widget ContentBody() {
@@ -160,104 +134,141 @@ class _MyHomePageState extends State<MyHomePage> {
             return Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Stack(
                   children: [
-                    const CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                      ),
-                    ),
-                    const SizedBox(width: 7.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                          ),
+                        ),
+                        const SizedBox(width: 7.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              const SizedBox(height: 8.0),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.0, 8.0, 0.0),
+                                    8.0, 0.0, 8.0, 8.0),
                                 child: Text(post.user),
                               ),
+                              const SizedBox(height: 8.0),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(
-                                    0.0, 0.0, 8.0, 0.0),
+                                    8.0, 0.0, 8.0, 8.0),
                                 child: Text(
-                                  DateFormat('HH:mm - dd-MM-yyyy').format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                      int.parse(post.timestamp),
+                                  post.text,
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              post.url.isNotEmpty
+                                  ? AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child: Image.network(
+                                          post.url,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              const SizedBox(height: 8.0),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (post.likes
+                                                .contains(_token.username)) {
+                                              post.likes
+                                                  .remove(_token.username);
+                                            } else {
+                                              post.likes.add(_token.username);
+                                            }
+                                            BaseClient().likePost(
+                                              "/feed",
+                                              _token.username,
+                                              _token.tokenID,
+                                              post.id,
+                                              post.user,
+                                            );
+                                          });
+                                        },
+                                        icon: Icon(
+                                          post.likes.contains(_token.username)
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                        ),
+                                      ),
+                                      Text(post.likes.length.toString()),
+                                      IconButton(
+                                        onPressed: () {
+                                          context.push(
+                                            context.namedLocation(Paths.post,
+                                                pathParameters: <String,
+                                                    String>{
+                                                  'id': post.id,
+                                                  'user': post.user,
+                                                }),
+                                          );
+                                        },
+                                        icon: Icon(Icons.comment_outlined),
+                                      ),
+                                    ],
+                                  ),
+                                  Positioned(
+                                    top: 8.0,
+                                    right: 8.0,
+                                    child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: PopupMenuButton(
+                                      icon: Icon(Icons.more_vert),
+                                      onSelected: (value) {
+                                        if (value == 'report') {
+                                          _showReportDialog(context, post.id);
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 'report',
+                                          child: Text('Report'),
+                                        ),
+                                      ],
                                     ),
+                                  ),)
+                                ],
+                              ),
+
+                              const SizedBox(height: 8.0),
+                              
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      8.0, 0.0, 8.0, 8.0),
+                                  child: Text(
+                                    DateFormat('HH:mm - dd-MM-yyyy').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(post.timestamp),
+                                      ),
+                                    ),
+                                    style: TextStyle(fontSize: 12.0),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8.0),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-                            child: Text(post.text),
-                          ),
-                          const SizedBox(height: 8.0),
-                          post.url.isNotEmpty
-                              ? AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: Image.network(
-                                      post.url,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          const SizedBox(height: 8.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (post.likes.contains(_token.username)) {
-                                      post.likes.remove(_token.username);
-                                    } else {
-                                      post.likes.add(_token.username);
-                                    }
-                                    BaseClient().likePost(
-                                        "/feed",
-                                        _token.username,
-                                        _token.tokenID,
-                                        post.id,
-                                        post.user);
-                                  });
-                                },
-                                icon: Icon(
-                                  post.likes.contains(_token.username)
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                ),
-                              ),
-                              Text(post.likes.length.toString()),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (ctx) => PostPage(
-                                          token: _token,
-                                          postID: post.id,
-                                          postUser: post.user),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.comment_outlined),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -266,6 +277,59 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         },
       ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context, String id) {
+    TextEditingController _reasonController = TextEditingController();
+    TextEditingController _commentController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Report Post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _reasonController,
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                ),
+              ),
+              TextFormField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: 'Additional Comments',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await BaseClient().reportPost(
+                  "/post/report",
+                  _token.username,
+                  _token.tokenID,
+                  id,
+                  _reasonController.text,
+                  _commentController.text,
+                );
+                Navigator.of(context).pop();
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -289,7 +353,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
                   ),
                   const SizedBox(height: 10),
-                  Text(username),
+                  Text(username, style: const TextStyle(fontSize: 18)),
                 ],
               ),
             ), // Set the width of the DrawerHeader to the maximum available width
@@ -297,17 +361,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Mapa'),
             onTap: () {
-              Navigator.push(
-                  context, CupertinoPageRoute(builder: (ctx) => MapScreen()));
+              context.go(Paths.mapas);
             },
           ),
           ListTile(
             title: const Text('Eventos'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => EventView(token: _token)));
+              context.go(Paths.events);
             },
           ),
           ListTile(
@@ -319,26 +379,28 @@ class _MyHomePageState extends State<MyHomePage> {
           ListTile(
             title: const Text('Calendário'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => CalendarView(token: _token,)));
             },
           ),
           ListTile(
             title: const Text('Mensagens'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => MessagesView()));
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
             },
           ),
           const Spacer(),
           ListTile(
             title: const Text('Report'),
             onTap: () {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (ctx) => ReportPage(token: _token)));
+              context.go(Paths.report);
+            },
+          ),
+          ListTile(
+            title: const Text('List Reports'),
+            onTap: () {
+              context.go(Paths.listReports);
             },
           ),
           ListTile(
@@ -347,9 +409,9 @@ class _MyHomePageState extends State<MyHomePage> {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
 
               CacheDefault.cacheFactory.logout();
+              CacheDefault.cacheFactory.delete('isLoggedIn');
 
-              Navigator.pushReplacement(context,
-                  CupertinoPageRoute(builder: (ctx) => const LoginView()));
+              context.go(Paths.login);
             },
           ),
         ],
