@@ -17,7 +17,7 @@ import '../services/base_client.dart';
 
 const List<String> privacy = ["private", "public"];
 
-const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
+const String baseUrl = 'fct-connect-estudasses.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({Key? key}) : super(key: key);
@@ -30,6 +30,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController roleController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
@@ -37,9 +38,8 @@ class _SignUpViewState extends State<SignUpView> {
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
-    SessionManager.storeSession('session' ,'/signup');
+    SessionManager.storeSession('session', '/signup');
     super.initState();
-    
   }
 
   @override
@@ -47,6 +47,7 @@ class _SignUpViewState extends State<SignUpView> {
     nameController.dispose();
     fullNameController.dispose();
     emailController.dispose();
+    roleController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
     privacyController.dispose();
@@ -82,7 +83,6 @@ class _SignUpViewState extends State<SignUpView> {
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return Row(
       children: [
-       
         SizedBox(width: size.width * 0.06),
         Expanded(
           flex: 5,
@@ -112,7 +112,6 @@ class _SignUpViewState extends State<SignUpView> {
             ? MainAxisAlignment.center
             : MainAxisAlignment.start,
         children: [
-          
           SizedBox(
             height: size.height * 0.03,
           ),
@@ -157,11 +156,11 @@ class _SignUpViewState extends State<SignUpView> {
                     // The validator receives the text that the user has entered.
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter username';
+                        return 'Selecione um username';
                       } else if (value.length < 4) {
-                        return 'at least enter 4 characters';
-                      } else if (value.length > 13) {
-                        return 'maximum character is 13';
+                        return 'Username tem de ter pelo menos 4 caracteres';
+                      } else if (value.length > 20) {
+                        return 'Username tem um máximo de 20 caracteres';
                       }
                       return null;
                     },
@@ -175,7 +174,7 @@ class _SignUpViewState extends State<SignUpView> {
                     style: kTextFormFieldStyle(),
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.person),
-                      hintText: 'Full Name',
+                      hintText: 'Nome Completo',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -185,7 +184,7 @@ class _SignUpViewState extends State<SignUpView> {
                     // The validator receives the text that the user has entered.
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter username';
+                        return 'Selecione o nome completo';
                       } else {
                         return null;
                       }
@@ -210,13 +209,49 @@ class _SignUpViewState extends State<SignUpView> {
                     // The validator receives the text that the user has entered.
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter an e-mail';
+                        return 'Selecione um email';
                       } else if (!value.contains('@')) {
-                        return 'please enter valid e-mail';
+                        return 'Selecione um email válido';
                       }
                       return null;
                     },
                   ),
+                  SizedBox(
+                    height: size.height * 0.02,
+                  ),
+                  //role
+                  DropdownButtonFormField<String>(
+                    style: kTextFormFieldStyle(),
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.work),
+                      hintText: 'Role',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                    ),
+                    value: roleController.text.isNotEmpty
+                        ? roleController.text
+                        : null,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        roleController.text = newValue ?? '';
+                      });
+                    },
+                    items: ['ALUNO', 'PROFESSOR', 'EXTERNO']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Selecione uma role';
+                      }
+                      return null;
+                    },
+                  ),
+
                   SizedBox(
                     height: size.height * 0.02,
                   ),
@@ -247,11 +282,11 @@ class _SignUpViewState extends State<SignUpView> {
                       // The validator receives the text that the user has entered.
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
+                          return 'Selecione uma password';
                         } else if (value.length < 6) {
-                          return 'at least enter 6 characters';
-                        } else if (value.length > 13) {
-                          return 'maximum character is 13';
+                          return 'Password tem de ter pelo menos 6 caracteres';
+                        } else if (value.length > 30) {
+                          return 'Password tem no máximo 30 caracteres';
                         }
                         return null;
                       },
@@ -279,7 +314,7 @@ class _SignUpViewState extends State<SignUpView> {
                             simpleUIController.isObscureActive();
                           },
                         ),
-                        hintText: 'Password Verification',
+                        hintText: 'Confirmar Password',
                         border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
@@ -287,10 +322,10 @@ class _SignUpViewState extends State<SignUpView> {
                       // The validator receives the text that the user has entered.
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
+                          return 'Selecione uma password';
                         } else if (passwordVerController.text !=
                             passwordController.text) {
-                          return 'Passwords must match';
+                          return 'As passwords não coincidem';
                         }
                         return null;
                       },
@@ -301,7 +336,7 @@ class _SignUpViewState extends State<SignUpView> {
                     height: size.height * 0.01,
                   ),
                   Text(
-                    'Creating an account means you\'re okay with our Terms of Services and our Privacy Policy',
+                    'Ao criar uma conta está a concordar com a nossa Política de Privacidade e Termos de Uso',
                     style: kLoginTermsAndPrivacyStyle(size),
                     textAlign: TextAlign.center,
                   ),
@@ -318,9 +353,9 @@ class _SignUpViewState extends State<SignUpView> {
                   /// Navigate To Login Screen
                   GestureDetector(
                     onTap: () {
-                      
                       nameController.clear();
                       emailController.clear();
+                      roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
 
@@ -330,7 +365,7 @@ class _SignUpViewState extends State<SignUpView> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: 'Already have an account?',
+                        text: 'Já tens uma conta?',
                         style: kHaveAnAccountStyle(size),
                         children: [
                           TextSpan(
@@ -372,8 +407,8 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": "USER",
-              "state": "ACTIVE",
+              "role": roleController.text,
+              "state": "INACTIVE",
               "privacy": "PRIVATE",
             };
 
@@ -428,6 +463,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                           nameController.clear();
                           emailController.clear();
+                          roleController.clear();
                           passwordController.clear();
                           _formKey.currentState?.reset();
                         });

@@ -209,7 +209,7 @@ class _OtherProfileState extends State<OtherProfile> {
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage(
-                    'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                    'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
                   ),
                 ),
                 const SizedBox(width: 7.0),
@@ -315,7 +315,7 @@ class _OtherProfileState extends State<OtherProfile> {
   Widget buildCoverImage() => Container(
         color: Colors.grey,
         child: Image.network(
-          'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/foto-fct.jpg',
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
           height: coverHeight,
           fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
@@ -326,7 +326,7 @@ class _OtherProfileState extends State<OtherProfile> {
         radius: profileHeight / 2,
         backgroundColor: Colors.grey.shade800,
         backgroundImage: const NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
       

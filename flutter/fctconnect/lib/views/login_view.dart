@@ -249,7 +249,7 @@ void initState() {
                     height: size.height * 0.01,
                   ),
                   Text(
-                    'Creating an account means you\'re okay with our Terms of Services and our Privacy Policy',
+                    'Ao criar uma conta está a concordar com a nossa Política de Privacidade e Termos de Uso',
                     style: kLoginTermsAndPrivacyStyle(size),
                     textAlign: TextAlign.center,
                   ),
@@ -275,7 +275,7 @@ void initState() {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: 'Don\'t have an account?',
+                        text: 'Não tens uma conta?',
                         style: kHaveAnAccountStyle(size),
                         children: [
                           TextSpan(

@@ -263,12 +263,11 @@ class BaseClient {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
-      // Replace this with your actual data parsing
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final usersList =
-          jsonList.map((json) => UserQueryData.fromJson(json)).toList();
-
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<UserQueryData> usersList =
+          List<UserQueryData>.from(data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
     } else {
       // If the server did not return a 200 OK response, throw an exception.

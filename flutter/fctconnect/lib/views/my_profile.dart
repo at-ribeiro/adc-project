@@ -117,6 +117,12 @@ class _MyProfileState extends State<MyProfile> {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Perfil'),
+          actions: [
+            IconButton(onPressed:(){
+              context.go(Paths.editProfile);
+            } ,
+             icon: Icon(Icons.settings))
+          ],
         ),
         body: ListView(
           padding: EdgeInsets.zero,
@@ -287,7 +293,7 @@ class _MyProfileState extends State<MyProfile> {
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
                       ),
                     ),
                     const SizedBox(width: 7.0),
@@ -391,7 +397,7 @@ class _MyProfileState extends State<MyProfile> {
   Widget buildCoverImage() => Container(
         color: Colors.grey,
         child: Image.network(
-          'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/foto-fct.jpg',
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
           height: coverHeight,
           fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
@@ -402,7 +408,7 @@ class _MyProfileState extends State<MyProfile> {
         radius: profileHeight / 2,
         backgroundColor: Colors.grey.shade800,
         backgroundImage: const NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
 
@@ -531,28 +537,6 @@ class _ContentWidgetState extends State<ContentWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      context.go(Paths.editProfile);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Edit Profile',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 24),
                   ElevatedButton(
                     onPressed: () {
                       widget.onButtonSelected('Info');

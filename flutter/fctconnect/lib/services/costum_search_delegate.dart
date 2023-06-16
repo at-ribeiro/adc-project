@@ -106,7 +106,7 @@ class CustomSearchDelegate extends SearchDelegate {
                         children: [
                           CircleAvatar(
                             backgroundImage: NetworkImage(
-                              'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                              'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
                             ),
                           ),
                           Padding(padding: EdgeInsets.all(5)),
