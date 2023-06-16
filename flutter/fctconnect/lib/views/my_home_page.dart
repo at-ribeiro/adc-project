@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
@@ -82,7 +83,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-     
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -138,146 +138,175 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           } else {
             FeedData post = _posts[index];
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Stack(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                          ),
-                        ),
-                        const SizedBox(width: 7.0),
-                        Expanded(
-                          child: Column(
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    10.0), // Adjust the radius value as needed
+                color: Colors.white
+                    .withOpacity(0.2), // Adjust the opacity as desired
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(
+                        0.2), // Adjust the shadow color and opacity
+                    blurRadius: 8.0, // Adjust the blur radius as needed
+                    offset: Offset(0, 2), // Adjust the offset if needed
+                  ),
+                ],
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                    sigmaX: 10.0,
+                    sigmaY: 10.0), // Adjust the sigma values as needed
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Stack(
+                        children: [
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 8.0),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.0, 8.0, 8.0),
-                                child: Text(post.user),
-                              ),
-                              const SizedBox(height: 8.0),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.0, 8.0, 8.0),
-                                child: Text(
-                                  post.text,
-                                  style: TextStyle(fontSize: 16.0),
+                              const CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
                                 ),
                               ),
-                              const SizedBox(height: 8.0),
-                              post.url.isNotEmpty
-                                  ? AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        child: Image.network(
-                                          post.url,
-                                          fit: BoxFit.cover,
+                              const SizedBox(width: 7.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 8.0),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          8.0, 0.0, 8.0, 8.0),
+                                      child: Text(post.user),
+                                    ),
+                                    const SizedBox(height: 8.0),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          8.0, 0.0, 8.0, 8.0),
+                                      child: Text(
+                                        post.text,
+                                        style: TextStyle(fontSize: 16.0),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8.0),
+                                    post.url.isNotEmpty
+                                        ? AspectRatio(
+                                            aspectRatio: 16 / 9,
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              child: Image.network(
+                                                post.url,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
+                                    const SizedBox(height: 8.0),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  if (post.likes.contains(
+                                                      _token.username)) {
+                                                    post.likes.remove(
+                                                        _token.username);
+                                                  } else {
+                                                    post.likes
+                                                        .add(_token.username);
+                                                  }
+                                                  BaseClient().likePost(
+                                                    "/feed",
+                                                    _token.username,
+                                                    _token.tokenID,
+                                                    post.id,
+                                                    post.user,
+                                                  );
+                                                });
+                                              },
+                                              icon: Icon(
+                                                post.likes.contains(
+                                                        _token.username)
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                              ),
+                                            ),
+                                            Text(post.likes.length.toString()),
+                                            IconButton(
+                                              onPressed: () {
+                                                context.push(
+                                                  context.namedLocation(
+                                                      Paths.post,
+                                                      pathParameters: <String,
+                                                          String>{
+                                                        'id': post.id,
+                                                        'user': post.user,
+                                                      }),
+                                                );
+                                              },
+                                              icon:
+                                                  Icon(Icons.comment_outlined),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    )
-                                  : const SizedBox.shrink(),
-                              const SizedBox(height: 8.0),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            if (post.likes
-                                                .contains(_token.username)) {
-                                              post.likes
-                                                  .remove(_token.username);
-                                            } else {
-                                              post.likes.add(_token.username);
-                                            }
-                                            BaseClient().likePost(
-                                              "/feed",
-                                              _token.username,
-                                              _token.tokenID,
-                                              post.id,
-                                              post.user,
-                                            );
-                                          });
-                                        },
-                                        icon: Icon(
-                                          post.likes.contains(_token.username)
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                        ),
-                                      ),
-                                      Text(post.likes.length.toString()),
-                                      IconButton(
-                                        onPressed: () {
-                                          context.push(
-                                            context.namedLocation(Paths.post,
-                                                pathParameters: <String,
-                                                    String>{
-                                                  'id': post.id,
-                                                  'user': post.user,
-                                                }),
-                                          );
-                                        },
-                                        icon: Icon(Icons.comment_outlined),
-                                      ),
-                                    ],
-                                  ),
-                                  Positioned(
-                                    top: 8.0,
-                                    right: 8.0,
-                                    child: Align(
-                                      alignment: Alignment.topRight,
-                                      child: PopupMenuButton(
-                                        icon: Icon(Icons.more_vert),
-                                        onSelected: (value) {
-                                          if (value == 'report') {
-                                            _showReportDialog(
-                                                context, post.id, post.user);
-                                          }
-                                        },
-                                        itemBuilder: (context) => [
-                                          PopupMenuItem(
-                                            value: 'report',
-                                            child: Text('Report'),
+                                        Positioned(
+                                          top: 8.0,
+                                          right: 8.0,
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: PopupMenuButton(
+                                              icon: Icon(Icons.more_vert),
+                                              onSelected: (value) {
+                                                if (value == 'report') {
+                                                  _showReportDialog(context,
+                                                      post.id, post.user);
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                PopupMenuItem(
+                                                  value: 'report',
+                                                  child: Text('Report'),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ],
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8.0),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8.0, 0.0, 8.0, 8.0),
+                                        child: Text(
+                                          DateFormat('HH:mm - dd-MM-yyyy')
+                                              .format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                              int.parse(post.timestamp),
+                                            ),
+                                          ),
+                                          style: TextStyle(fontSize: 12.0),
+                                        ),
                                       ),
                                     ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 8.0),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      8.0, 0.0, 8.0, 8.0),
-                                  child: Text(
-                                    DateFormat('HH:mm - dd-MM-yyyy').format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                        int.parse(post.timestamp),
-                                      ),
-                                    ),
-                                    style: TextStyle(fontSize: 12.0),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -380,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildDrawer() {
     ThemeManager themeManager = context.watch<ThemeManager>();
-     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
+    bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
     String username = _token.username;
     return Drawer(
       child: Column(
@@ -388,9 +417,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IntrinsicWidth(
             stepWidth: double.infinity,
             child: DrawerHeader(
-              decoration: const BoxDecoration(
-                
-              ),
+              decoration: const BoxDecoration(),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
