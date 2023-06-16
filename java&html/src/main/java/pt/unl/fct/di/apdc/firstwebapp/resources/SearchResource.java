@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class SearchResource {
 
     @GET
     @Path("/user")
-    @Produces()
+    @Produces(MediaType.APPLICATION_JSON)
     public Response searchUser(@QueryParam("query") String query){
 
         Transaction txn = datastore.newTransaction();
@@ -36,12 +37,14 @@ public class SearchResource {
             Query<Entity> queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
                     .setKind("User")
                     .setFilter(StructuredQuery.PropertyFilter.ge("user_username", lowerBound))
+                    .setLimit(5)
                     .build();
 
             // Query to find users with usernames less than the upper bound
             Query<Entity> queryLessThan = Query.newEntityQueryBuilder()
                     .setKind("User")
                     .setFilter(StructuredQuery.PropertyFilter.lt("user_username", upperBound))
+                    .setLimit(5)
                     .build();
 
             QueryResults<Entity> greaterThanOrEqualResults = txn.run(queryGreaterThanOrEqual);
@@ -59,14 +62,15 @@ public class SearchResource {
                         user2.getString("user_fullname"));
 
                 // If the username matches in both queries, add it to the result list
-                if (user1.getString("user_username").startsWith(query)) {
+                if (user1.getString("user_username").startsWith(query) && !matchedUsers.contains(data1)) {
                     matchedUsers.add(data1);
                 }
-                if(user2.getString("user_username").startsWith(query) && !data1.equals(data2)){
+                if(user2.getString("user_username").startsWith(query) && !matchedUsers.contains(data2)){
                     matchedUsers.add(data2);
                 }
             }
-            return Response.ok(g.toJson(matchedUsers)).build();
+
+            return Response.ok(matchedUsers).build();
         }catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
