@@ -14,7 +14,6 @@ import '../services/base_client.dart';
 import '../services/load_token.dart';
 
 class EditProfile extends StatefulWidget {
-
   const EditProfile({Key? key}) : super(key: key);
 
   @override
@@ -73,24 +72,25 @@ class _EditProfileState extends State<EditProfile> {
           });
         });
       });
-    } 
-    else{return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.zero,
-        controller: _scrollController,
-        children: <Widget>[
-          buildTop(),
-          const SizedBox(height: 16),
-          Divider(
-            color: Colors.grey,
-            thickness: 2.0,
-          ),
-          const SizedBox(height: 16),
-          buildInfoSection(),
-          const SizedBox(height: 32),
-        ],
-      ),
-    );}
+    } else {
+      return Scaffold(
+        body: ListView(
+          padding: EdgeInsets.zero,
+          controller: _scrollController,
+          children: <Widget>[
+            buildTop(),
+            const SizedBox(height: 16),
+            Divider(
+              color: Colors.grey,
+              thickness: 2.0,
+            ),
+            const SizedBox(height: 16),
+            buildInfoSection(),
+            const SizedBox(height: 32),
+          ],
+        ),
+      );
+    }
   }
 
   Widget buildInfoSection() {
@@ -100,7 +100,7 @@ class _EditProfileState extends State<EditProfile> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
-            style: kTextFormFieldStyle(),
+            
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.person),
               hintText: 'Full Name',
@@ -118,9 +118,7 @@ class _EditProfileState extends State<EditProfile> {
               }
             },
           ),
-        
           TextFormField(
-            style: kTextFormFieldStyle(),
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.person),
               hintText: 'Número de telemóvel',
@@ -139,7 +137,6 @@ class _EditProfileState extends State<EditProfile> {
             },
           ),
           TextFormField(
-            style: kTextFormFieldStyle(),
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.person),
               hintText: 'Cidade',
@@ -158,7 +155,6 @@ class _EditProfileState extends State<EditProfile> {
             },
           ),
           TextFormField(
-            style: kTextFormFieldStyle(),
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.person),
               hintText: 'Região',

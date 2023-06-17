@@ -30,4 +30,5 @@ class Paths {
   static String event = '/event';
 
   static String createEvent = '$events/newEvent';
+
 }

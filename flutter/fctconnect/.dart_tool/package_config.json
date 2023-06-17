@@ -338,6 +338,12 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "google_nav_bar",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/google_nav_bar-5.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "html",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/html-0.15.3",
       "packageUri": "lib/",
@@ -710,7 +716,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-06-16T14:08:48.604467Z",
+  "generated": "2023-06-17T15:09:23.482015Z",
   "generator": "pub",
   "generatorVersion": "3.0.5"
 }

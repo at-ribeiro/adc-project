@@ -1,0 +1,162 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_login_ui/constants.dart';
+import 'package:responsive_login_ui/models/paths.dart';
+
+import '../Themes/theme_manager.dart';
+import '../data/cache_factory_provider.dart';
+import '../services/base_client.dart';
+import '../services/load_token.dart';
+import '../views/messages/messages_view.dart';
+import 'Token.dart';
+
+class DrawerModel extends StatefulWidget {
+  const DrawerModel({super.key});
+
+  @override
+  State<DrawerModel> createState() => _DrawerModelState();
+}
+
+class _DrawerModelState extends State<DrawerModel> {
+  ThemeManager _themeManager = ThemeManager();
+  late Token _token;
+  bool _isLoadingToken = true;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted)
+            setState(() {
+              _token = token;
+              _isLoadingToken = false;
+            });
+        });
+      });
+    } else {
+      return _buildDrawer();
+    }
+  }
+
+  Widget _buildDrawer() {
+    ThemeManager themeManager = context.watch<ThemeManager>();
+    bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
+    String username = _token.username;
+    return Drawer(
+      backgroundColor: kPrimaryColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadiusDirectional.horizontal(
+          end: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          IntrinsicWidth(
+            stepWidth: double.infinity,
+            child: DrawerHeader(
+              decoration: const BoxDecoration(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(
+                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(username, style: const TextStyle(fontSize: 18)),
+                  Switch(
+                    value: isDarkModeOn,
+                    onChanged: (value) {
+                      _themeManager.toggleTheme(value);
+                    },
+                  ),
+                ],
+              ),
+            ), // Set the width of the DrawerHeader to the maximum available width
+          ),
+          ListTile(
+            title: const Text('Home'),
+            onTap: () {
+              context.go(Paths.homePage);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Mapa'),
+            onTap: () {
+              context.go(Paths.mapas);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Eventos'),
+            onTap: () {
+              context.go(Paths.events);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Grupos'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Calendário'),
+            onTap: () {
+              context.go(Paths.calendar);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Mensagens'),
+            onTap: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
+              Navigator.pop(context);
+            },
+          ),
+          const Spacer(),
+          ListTile(
+            title: const Text('Report'),
+            onTap: () {
+              context.go(Paths.report);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Lista de Anomalias'),
+            onTap: () {
+              context.go(Paths.listReports);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Posts Reportados'),
+            onTap: () {
+              context.go(Paths.reportedPosts);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: const Text('Sair'),
+            onTap: () async {
+              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
+
+              CacheDefault.cacheFactory.logout();
+              CacheDefault.cacheFactory.delete('isLoggedIn');
+
+              context.go(Paths.login);
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}

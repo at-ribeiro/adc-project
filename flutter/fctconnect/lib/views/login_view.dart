@@ -116,6 +116,7 @@ class _LoginViewState extends State<LoginView>
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 50, 50, 50),
       body: AnimatedBackground(
         behaviour: RandomParticleBehaviour(
           options: ParticleOptions(

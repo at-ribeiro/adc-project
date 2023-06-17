@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/image_up.dart';
 
 import '../models/Post.dart';
@@ -45,44 +47,58 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
         });
       });
     } else {
-      return BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        currentIndex: _currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home,),
-            label: 'Home',
+      return Container(
+        color: kPrimaryColor,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          child: GNav(
+            backgroundColor: kPrimaryColor,
+            activeColor: kIconColorSelected,
+            tabBackgroundColor: kButtonColor,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            
+            onTabChange: (index) {
+              if (index == 0) {
+                context.go(Paths.homePage);
+              } else if (index == 1) {
+                context.go(Paths.noticias);
+              } else if (index == 2) {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: kPostCreator,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(30.0)),
+                  ),
+                  isScrollControlled: true,
+                  builder: (context) => _buildPostModal(context),
+                  
+                );
+              
+              } else if (index == 3) {
+                context.go(Paths.myProfile);
+              }
+            },
+            tabs: [
+              GButton(
+                icon: Icons.home,
+                text: 'Home',
+              ),
+              GButton(
+                icon: Icons.newspaper,
+                text: 'Noticias',
+              ),
+              GButton(
+                icon: Icons.post_add,
+                text: 'Post',
+              ),
+              GButton(
+                icon: Icons.person,
+                text: 'Perfil',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper),
-            label: 'Noticias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.post_add),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
-       
-        showUnselectedLabels: true,
-        onTap: (index) {
-          if (index == 0) {
-            context.go(Paths.homePage);
-          } else if (index == 1) {
-            context.go(Paths.noticias);
-          } else if (index == 2) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => _buildPostModal(context),
-            );
-          } else if (index == 3) {
-            context.go(Paths.myProfile);
-          }
-        },
+        ),
       );
     }
   }
@@ -135,9 +151,9 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
                       _fileName,
                       _token.username,
                       _token.tokenID);
-                      if (response == 200) {
-                        Navigator.pop(context);
-                      }
+                  if (response == 200) {
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text('Post'),
               ),

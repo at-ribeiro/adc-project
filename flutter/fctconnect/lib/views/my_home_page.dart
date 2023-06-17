@@ -96,31 +96,23 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       _loadPosts();
       return Scaffold(
-        appBar: AppBar(
-          title: const Text(''),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  showSearch(
-                      context: context,
-                      delegate: CustomSearchDelegate("profile"));
-                },
-                icon: Icon(Icons.search))
+        extendBody: true,
+        body: Stack(
+          children: [
+            Container(
+              decoration: kGradientDecoration,
+            ),
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+            ContentBody(),
           ],
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-              );
-            },
-          ),
         ),
-        drawer: _buildDrawer(),
-        body: ContentBody(),
-        // bottomNavigationBar: NavigationBody(),
       );
     }
   }
@@ -139,171 +131,141 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             FeedData post = _posts[index];
             return Container(
+              margin: EdgeInsets.all(3),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                    10.0), // Adjust the radius value as needed
-                color: Colors.white
-                    .withOpacity(0.2), // Adjust the opacity as desired
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(
-                        0.2), // Adjust the shadow color and opacity
-                    blurRadius: 8.0, // Adjust the blur radius as needed
-                    offset: Offset(0, 2), // Adjust the offset if needed
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(10.0),
+                border: Border.all(
+                  width: 1.5,
+                  color: Color.fromARGB(255, 120, 119, 119).withOpacity(0.2),
+                ),
               ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                    sigmaX: 10.0,
-                    sigmaY: 10.0), // Adjust the sigma values as needed
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
-                                ),
-                              ),
-                              const SizedBox(width: 7.0),
-                              Expanded(
-                                child: Column(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(167, 71, 86, 125).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(height: 8.0),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          8.0, 0.0, 8.0, 8.0),
+                                    const CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Center(
+                                      heightFactor:
+                                          2.4, // You can adjust this to get the alignment you want
                                       child: Text(post.user),
-                                    ),
-                                    const SizedBox(height: 8.0),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          8.0, 0.0, 8.0, 8.0),
-                                      child: Text(
-                                        post.text,
-                                        style: TextStyle(fontSize: 16.0),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8.0),
-                                    post.url.isNotEmpty
-                                        ? AspectRatio(
-                                            aspectRatio: 16 / 9,
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              child: Image.network(
-                                                post.url,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          )
-                                        : const SizedBox.shrink(),
-                                    const SizedBox(height: 8.0),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  if (post.likes.contains(
-                                                      _token.username)) {
-                                                    post.likes.remove(
-                                                        _token.username);
-                                                  } else {
-                                                    post.likes
-                                                        .add(_token.username);
-                                                  }
-                                                  BaseClient().likePost(
-                                                    "/feed",
-                                                    _token.username,
-                                                    _token.tokenID,
-                                                    post.id,
-                                                    post.user,
-                                                  );
-                                                });
-                                              },
-                                              icon: Icon(
-                                                post.likes.contains(
-                                                        _token.username)
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                              ),
-                                            ),
-                                            Text(post.likes.length.toString()),
-                                            IconButton(
-                                              onPressed: () {
-                                                context.push(
-                                                  context.namedLocation(
-                                                      Paths.post,
-                                                      pathParameters: <String,
-                                                          String>{
-                                                        'id': post.id,
-                                                        'user': post.user,
-                                                      }),
-                                                );
-                                              },
-                                              icon:
-                                                  Icon(Icons.comment_outlined),
-                                            ),
-                                          ],
-                                        ),
-                                        Positioned(
-                                          top: 8.0,
-                                          right: 8.0,
-                                          child: Align(
-                                            alignment: Alignment.topRight,
-                                            child: PopupMenuButton(
-                                              icon: Icon(Icons.more_vert),
-                                              onSelected: (value) {
-                                                if (value == 'report') {
-                                                  _showReportDialog(context,
-                                                      post.id, post.user);
-                                                }
-                                              },
-                                              itemBuilder: (context) => [
-                                                PopupMenuItem(
-                                                  value: 'report',
-                                                  child: Text('Report'),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8.0),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            8.0, 0.0, 8.0, 8.0),
-                                        child: Text(
-                                          DateFormat('HH:mm - dd-MM-yyyy')
-                                              .format(
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                              int.parse(post.timestamp),
-                                            ),
-                                          ),
-                                          style: TextStyle(fontSize: 12.0),
-                                        ),
-                                      ),
                                     ),
                                   ],
                                 ),
+                                PopupMenuButton(
+                                  icon: Icon(Icons.more_vert),
+                                  onSelected: (value) {
+                                    if (value == 'report') {
+                                      _showReportDialog(
+                                          context, post.id, post.user);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: 'report',
+                                      child: Text('Report'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+                            if (post.url.isNotEmpty)
+                              AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Image.network(
+                                    post.url,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                        ],
+                            const SizedBox(height: 8.0),
+                            Text(
+                              post.text,
+                              style: TextStyle(fontSize: 16.0),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          if (post.likes
+                                              .contains(_token.username)) {
+                                            post.likes.remove(_token.username);
+                                          } else {
+                                            post.likes.add(_token.username);
+                                          }
+                                          BaseClient().likePost(
+                                            "/feed",
+                                            _token.username,
+                                            _token.tokenID,
+                                            post.id,
+                                            post.user,
+                                          );
+                                        });
+                                      },
+                                      icon: Icon(
+                                        post.likes.contains(_token.username)
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                      ),
+                                    ),
+                                    Text(post.likes.length.toString()),
+                                    IconButton(
+                                      onPressed: () {
+                                        context.push(
+                                          context.namedLocation(Paths.post,
+                                              pathParameters: <String, String>{
+                                                'id': post.id,
+                                                'user': post.user,
+                                              }),
+                                        );
+                                      },
+                                      icon: Icon(Icons.comment_outlined),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  DateFormat('HH:mm  dd/MM/yyyy').format(
+                                    DateTime.fromMillisecondsSinceEpoch(
+                                      int.parse(post.timestamp),
+                                    ),
+                                  ),
+                                  style: TextStyle(fontSize: 12.0),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -317,7 +279,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showReportDialog(BuildContext context, String id, String postUser) {
-    TextEditingController _reasonController = TextEditingController();
     TextEditingController _commentController = TextEditingController();
 
     String? selectedReason;
@@ -325,83 +286,100 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Report Post'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedReason,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedReason = newValue;
-                  });
-                },
-                items: [
-                  DropdownMenuItem<String>(
-                    value: 'Assédio',
-                    child: Text('Assédio'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Fraude',
-                    child: Text('Fraude'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Spam',
-                    child: Text('Spam'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Desinformação',
-                    child: Text('Desinformação'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Discurso de ódio',
-                    child: Text('Discurso de ódio'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Ameaças ou violência',
-                    child: Text('Ameaças ou violência'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'Conteúdo sexual',
-                    child: Text('Conteúdo sexual'),
-                  ),
-                ],
-                decoration: InputDecoration(
-                  labelText: 'Razão',
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Report Post'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    ExpansionTile(
+                      title: Text(selectedReason ?? 'Select Reason'),
+                      children: [
+                        ListTile(
+                          title: Text('Assédio'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Assédio';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Fraude'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Fraude';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Spam'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Spam';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Desinformação'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Desinformação';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Discurso de ódio'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Discurso de ódio';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Ameaças ou violência'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Ameaças ou violência';
+                            });
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Conteúdo sexual'),
+                          onTap: () {
+                            setState(() {
+                              selectedReason = 'Conteúdo sexual';
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    TextFormField(
+                      controller: _commentController,
+                      decoration: InputDecoration(
+                        labelText: 'Comentários (opcional)',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              TextFormField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  labelText: 'Comentários Adicionais (opcional)',
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Voltar'),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Voltar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await BaseClient().reportPost(
-                  "/report",
-                  _token.username,
-                  _token.tokenID,
-                  id,
-                  postUser,
-                  selectedReason ?? '',
-                  _commentController.text,
-                );
-                Navigator.of(context).pop();
-              },
-              child: Text('Submeter'),
-            ),
-          ],
+                TextButton(
+                  onPressed: () async {
+                    // You should put your function to report post here
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Submeter'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

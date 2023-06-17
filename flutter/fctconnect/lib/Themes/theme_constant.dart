@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:responsive_login_ui/constants.dart';
 
 const PRIMARY_COLOR_DARK = Color.fromARGB(188, 26, 58, 182);
 
@@ -21,17 +22,17 @@ ThemeData lightTheme = ThemeData(
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      backgroundColor: MaterialStateProperty.all<Color>(COLOR_ACCENT),
-      overlayColor: MaterialStateProperty.all<Color>(COLOR_ACCENT),
+      backgroundColor: MaterialStateProperty.all<Color>(kButtonColor),
+      overlayColor: MaterialStateProperty.all<Color>(kButtonColor),
     ),
   ),
 );
 
 ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  primaryColor: PRIMARY_COLOR_DARK,
+  primaryColor: kPrimaryColor,
   floatingActionButtonTheme:
-      FloatingActionButtonThemeData(backgroundColor: COLOR_ACCENT),
+      FloatingActionButtonThemeData(backgroundColor: kButtonColor),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       padding: MaterialStateProperty.all< EdgeInsets>(
@@ -42,8 +43,8 @@ ThemeData darkTheme = ThemeData(
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      backgroundColor: MaterialStateProperty.all<Color>(COLOR_ACCENT),
-      overlayColor: MaterialStateProperty.all<Color>(COLOR_ACCENT),
+      backgroundColor: MaterialStateProperty.all<Color>(kButtonColor),
+      overlayColor: MaterialStateProperty.all<Color>(kButtonColor),
     ),
   ),
 );
