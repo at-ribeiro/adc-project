@@ -29,6 +29,7 @@ public class GetUserResource {
 
     @GET
     @Path("/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("username")String username, @QueryParam("searcher") String searcher, @HeaderParam("Authorization") String tokenId) {
         LOG.fine("Attempt to get user " + username);
 
