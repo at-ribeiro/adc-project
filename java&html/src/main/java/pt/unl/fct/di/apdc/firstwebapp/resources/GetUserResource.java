@@ -125,7 +125,7 @@ public class GetUserResource {
                     break;
                 case "PROFESSOR":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"), nFollowing, nFollowers, nPosts);
+                            role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"), user.getString("user_office"), nFollowing, nFollowers, nPosts);
                     break;
                 case "EXTERNO":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),

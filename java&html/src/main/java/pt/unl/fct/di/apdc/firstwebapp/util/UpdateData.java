@@ -8,6 +8,7 @@ public class UpdateData {
     private String phone;
     private String about_me;
     private String department;
+    private String office;
     private String course;
 
     private String year;
@@ -18,13 +19,14 @@ public class UpdateData {
     public UpdateData(){}
 
     public UpdateData(String username, String fullname, String email, String phone, String about_me, String department,
-                      String course, String year, String city, String purpose){
+                      String office,String course, String year, String city, String purpose){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
         this.phone = phone;
         this.about_me = about_me;
         this.department = department;
+        this.office = office;
         this.course = course;
         this.year = year;
         this.city = city;
@@ -62,5 +64,9 @@ public class UpdateData {
 
     public String getFullname() {
         return fullname;
+    }
+
+    public String getOffice() {
+        return office;
     }
 }

@@ -14,17 +14,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
 
-import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
-import org.apache.commons.codec.binary.Base64;
-
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -91,6 +80,7 @@ public class RegisterResource {
                     .set("user_city", "")
                     .set("user_about_me", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_department", "")
+                    .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_course", "")
                     .set("user_year", "")
                     .set("user_profile_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
@@ -206,11 +196,12 @@ public class RegisterResource {
                     .set("user_city", user.getString("user_city"))
                     .set("user_about_me", user.getString("user_about_me"))
                     .set("user_department", user.getString("user_department"))
+                    .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_course", user.getString("user_course"))
                     .set("user_year", user.getString("user_year"))
                     .set("user_profile_pic", user.getString("user_profile_pic"))
                     .set("user_cover_pic", user.getString("user_cover_pic"))
-                    .set("external_purpose", user.getString("external_purpose"))
+                    .set("user_purpose", user.getString("user_purpose"))
 
 
                     .build();

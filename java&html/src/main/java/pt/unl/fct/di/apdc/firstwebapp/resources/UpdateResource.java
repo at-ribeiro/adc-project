@@ -22,6 +22,7 @@ public class UpdateResource {
     @PUT
     @Path("/{user}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response userUpdate(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String updaterName, @PathParam("user") String username, UpdateData data) {
 
         Transaction txn = datastore.newTransaction();
@@ -79,11 +80,13 @@ public class UpdateResource {
                     .set("user_city", data.getCity())
                     .set("user_about_me", StringValue.newBuilder(data.getAbout()).setExcludeFromIndexes(true).build())
                     .set("user_department", data.getDepartment())
+                    .set("user_office", StringValue.newBuilder(data.getOffice()).setExcludeFromIndexes(true).build())
                     .set("user_course", data.getCourse())
                     .set("user_year",data.getYear())
                     .set("user_profile_pic", user.getString("user_profile_pic"))
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("external_purpose", data.getPurpose())
+
                     .build();;
 
             txn.update(task);

@@ -237,7 +237,7 @@ public class EventsServlet extends HttpServlet {
 
             // QR CODE image creation
 
-            byte[] qrCode = this.generateQRCode("www", 500, 500);
+            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
 
             BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
 
@@ -264,8 +264,7 @@ public class EventsServlet extends HttpServlet {
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
                     .set("event_start", start)
                     .set("event_end", end)
-                    .set("event_image", title + "-" + imageName)
-                    // qr code add
+                    .set("event_image", StringValue.newBuilder(title + "-" + imageName).setExcludeFromIndexes(true).build())
                     .set("event_qr", uniqueEventId + "-qrCode.png")
                     .build();
 
