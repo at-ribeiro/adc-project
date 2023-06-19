@@ -117,18 +117,18 @@ public class GetUserResource {
             String role = user.getString("user_role");
 
             switch (role) {
-                case "STUDENT":
+                case "ALUNO":
                     //TODO: Adicionar nGroups e nNucleos bem
-                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
-                            user.getString("user_role"), user.getString("user_about_me"), user.getString("user_department"),
-                            user.getString("user_course"), user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0);
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
+                            user.getString("user_role"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_course"),
+                            user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0);
                     break;
-                case "PROF":
-                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
+                case "PROFESSOR":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
                             role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"), nFollowing, nFollowers, nPosts);
                     break;
-                case "EXTERNAL":
-                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
+                case "EXTERNO":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
                             role, user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts, user.getString("user_purpose"));
                     break;
                 default:

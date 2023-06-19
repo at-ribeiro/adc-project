@@ -5,6 +5,7 @@ public class UserData {
     private String username;
     private String fullname;
     private String email;
+    private String phone;
     private String role;
     private String about_me;
     private String department;
@@ -21,11 +22,12 @@ public class UserData {
 
     public UserData(){}
 
-    public UserData(String username, String fullname, String email, String role, String about_me, String department,
+    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String department,
                     String course, String year, String city, int nFollowing, int nFollowers, int nPosts, int nGroups, int nNucleos){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
+        this.phone = phone;
         this.role = role;
         this.about_me = about_me;
         this.department = department;
@@ -39,11 +41,12 @@ public class UserData {
         this.nNucleos = nNucleos;
     }
 
-    public UserData(String username, String fullname, String email,String role, String about_me, String department, String city,
+    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String department, String city,
                     int nFollowing, int nFollowers, int nPosts){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
+        this.phone = phone;
         this.role = role;
         this.about_me = about_me;
         this.department = department;
@@ -53,11 +56,12 @@ public class UserData {
         this.nPosts = nPosts;
     }
 
-    public UserData(String username, String fullname, String email, String role, String about_me, String city,
+    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String city,
                     int nFollwing, int nFollowers, int nPosts, String purpose){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
+        this.phone = phone;
         this.role = role;
         this.about_me = about_me;
         this.city = city;

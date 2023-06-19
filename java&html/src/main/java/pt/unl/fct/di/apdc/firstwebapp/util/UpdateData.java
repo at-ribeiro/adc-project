@@ -3,93 +3,64 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 public class UpdateData {
 
     private String username;
-    private String tokenUser;
-    private String tokenRole;
-    private String tokenId;
     private String fullname;
     private String email;
-    private String privacy;
-    private String homephone;
-    private String mobilephone;
-    private String occupation;
-    private String address;
-    private String nif;
-    private String role;
-    private String state;
+    private String phone;
+    private String about_me;
+    private String department;
+    private String course;
+
+    private String year;
+    private String city;
+
+    private String purpose;
 
     public UpdateData(){}
 
-    public UpdateData(String username, String tokenUser, String tokenRole, String tokenId, String fullname, String email, String privacy, String homephone,
-                      String mobilephone, String occupation, String address, String nif, String role, String state){
+    public UpdateData(String username, String fullname, String email, String phone, String about_me, String department,
+                      String course, String year, String city, String purpose){
         this.username = username;
-        this.tokenUser = tokenUser;
-        this.tokenRole = tokenRole;
-        this.tokenId = tokenId;
         this.fullname = fullname;
         this.email = email;
-        this.privacy = privacy;
-        this.homephone = homephone;
-        this.mobilephone = mobilephone;
-        this.occupation = occupation;
-        this.address = address;
-        this.nif = nif;
-        this.role = role;
-        this.state = state;
+        this.phone = phone;
+        this.about_me = about_me;
+        this.department = department;
+        this.course = course;
+        this.year = year;
+        this.city = city;
+        this.purpose = purpose;
+
     }
 
-    public String getUsername(){
-        return username;
-    }
-    public String getEmail() {return email;}
-    public void setUsername(String username) {
-        this.username = username;
+    public String getPhone() {
+        return phone;
     }
 
-    public String getTokenRole() {
-        return tokenRole;
+    public String getCity() {
+        return city;
     }
 
-    public String getPrivacy() {
-        return privacy;
+    public String getAbout() {
+        return about_me;
     }
 
-    public String getHomephone() {
-        return homephone;
+    public String getDepartment() {
+        return department;
     }
 
-    public String getMobilephone() {
-        return mobilephone;
+    public String getCourse() {
+        return course;
     }
 
-    public String getOccupation() {
-        return occupation;
+    public String getYear() {
+        return year;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public String getNif() {
-        return nif;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getState() {
-        return state;
+    public String getPurpose() {
+        return purpose;
     }
 
     public String getFullname() {
         return fullname;
-    }
-
-    public String getTokenUser() {
-        return tokenUser;
-    }
-
-    public String getTokenId() {
-        return tokenId;
     }
 }
