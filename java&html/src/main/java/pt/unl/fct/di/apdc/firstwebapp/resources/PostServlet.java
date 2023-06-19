@@ -128,7 +128,7 @@ public class PostServlet extends HttpServlet {
 
             Entity entity = Entity.newBuilder(postKey)
                     .set("id", username + "-" + timestamp)
-                    .set("text", postText)
+                    .set("text", StringValue.newBuilder(postText).setExcludeFromIndexes(true).build())
                     .set("user", username)
                     .set("timestamp", timestamp)
                     .set("image", imageName)

@@ -111,8 +111,29 @@ public class GetUserResource {
 
             int nPosts = postsList.size();
 
-            UserData data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
-                                            user.getString("user_role"), nFollowing, nFollowers, nPosts);
+
+            UserData data;
+
+            String role = user.getString("user_role");
+
+            switch (role) {
+                case "STUDENT":
+                    //TODO: Adicionar nGroups e nNucleos bem
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
+                            user.getString("user_role"), user.getString("user_about_me"), user.getString("user_department"),
+                            user.getString("user_course"), user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0);
+                    break;
+                case "PROF":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
+                            role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"), nFollowing, nFollowers, nPosts);
+                    break;
+                case "EXTERNAL":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
+                            role, user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts, user.getString("user_purpose"));
+                    break;
+                default:
+                    return Response.status(Response.Status.NOT_FOUND).build();
+            }
 
             return Response.ok(g.toJson(data)).build();
 
