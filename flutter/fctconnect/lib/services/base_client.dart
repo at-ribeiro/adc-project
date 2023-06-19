@@ -248,8 +248,9 @@ class BaseClient {
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final profileInfo = ProfileInfo.fromJson(jsonData);
+      final jsonData = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> parsedJson = json.decode(jsonData);
+      final profileInfo = ProfileInfo.fromJson(parsedJson);
       return profileInfo;
     } else {
       throw Exception(
@@ -266,8 +267,8 @@ class BaseClient {
       final jsonString =
           utf8.decode(response.bodyBytes); // Specify the correct encoding
       final data = jsonDecode(jsonString);
-      final List<UserQueryData> usersList =
-          List<UserQueryData>.from(data.map((json) => UserQueryData.fromJson(json)));
+      final List<UserQueryData> usersList = List<UserQueryData>.from(
+          data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
     } else {
       // If the server did not return a 200 OK response, throw an exception.

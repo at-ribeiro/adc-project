@@ -19,8 +19,7 @@ import '../services/load_token.dart';
 class OtherProfile extends StatefulWidget {
   final String name;
 
-  const OtherProfile({Key? key, required this.name})
-      : super(key: key);
+  const OtherProfile({Key? key, required this.name}) : super(key: key);
 
   @override
   State<OtherProfile> createState() => _OtherProfileState();
@@ -91,7 +90,7 @@ class _OtherProfileState extends State<OtherProfile> {
 
   @override
   Widget build(BuildContext context) {
-     if (_isLoadingToken) {
+    if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           setState(() {
@@ -100,7 +99,7 @@ class _OtherProfileState extends State<OtherProfile> {
           });
         });
       });
-    }else if(!existsUser()){
+    } else if (!existsUser()) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Perfil'),
@@ -109,92 +108,279 @@ class _OtherProfileState extends State<OtherProfile> {
           child: Text("O user $name não existe"),
         ),
       );
-    }
-    else{return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perfil'),
-      ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        controller: _scrollController,
-        children: <Widget>[
-          buildTop(),
-          ContentWidget(
-            loadInfo: _loadInfo,
-            selectedButton: selectedButton,
-            onButtonSelected: selectButton,
-            token: _token,
-          ),
-          const SizedBox(height: 16),
-          Divider(
-            color: Colors.grey,
-            thickness: 2.0,
-          ),
-          const SizedBox(height: 16),
-          buildInfoSection(),
-          const SizedBox(height: 32),
-        ],
-      ),
-    );}
-  }
-
-  Widget buildInfoSection() {
-    if (selectedButton == 'Info') {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sobre mim',
-              style: TextStyle(fontSize: 20),
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Perfil'),
+        ),
+        body: ListView(
+          padding: EdgeInsets.zero,
+          controller: _scrollController,
+          children: <Widget>[
+            buildTop(),
+            ContentWidget(
+              loadInfo: _loadInfo,
+              selectedButton: selectedButton,
+              onButtonSelected: selectButton,
+              token: _token,
             ),
-            Text(
-              'Desenvolvedor profissional de flutter',
-              style: TextStyle(fontSize: 16),
+            const SizedBox(height: 16),
+            Divider(
+              color: Colors.grey,
+              thickness: 2.0,
             ),
-            SizedBox(height: 16),
-            Text(
-              'Departamento',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Informatica',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Ano',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              '3º Ano',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Grupos',
-              style: TextStyle(fontSize: 20),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Eventos',
-              style: TextStyle(fontSize: 20),
-            ),
+            const SizedBox(height: 16),
+            if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
+            if (_token.role == "PROFESSOR") buildInfoProfessorSection(_loadInfo),
+            if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
+            const SizedBox(height: 32),
           ],
         ),
       );
-    } else {
-      if (_posts.isEmpty) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      } else {
-        return Column(
-          children: _posts.map((post) => buildPostCard(post)).toList(),
-        );
-      }
     }
+  }
+
+  Widget buildInfoProfessorSection(Future<ProfileInfo> Function() info) {
+    return FutureBuilder<ProfileInfo>(
+      future: info(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error loading profile info'),
+          );
+        } else if (snapshot.hasData) {
+          ProfileInfo info = snapshot.data!;
+          if (selectedButton == 'Info') {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sobre mim',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.about_me,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Departamento',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.department,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Gabinente',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.office,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Contacto',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.email,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Cidade',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.city,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            );
+          } else {
+            return Column(
+              children: _posts.map((post) => buildPostCard(post)).toList(),
+            );
+          }
+        } else {
+          return Center(
+            child: Text('No profile info available'),
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildInfoAlunoSection(Future<ProfileInfo> Function() info) {
+    return FutureBuilder<ProfileInfo>(
+      future: info(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error loading profile info'),
+          );
+        } else if (snapshot.hasData) {
+          ProfileInfo info = snapshot.data!;
+          if (selectedButton == 'Info') {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sobre mim',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.about_me,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Departamento',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.department,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Curso',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.course,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Ano',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.year,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Cidade',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.city,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "Grupos: ${info.nGroups}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "Núcleos: ${info.nNucleos}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            if (_posts.isEmpty) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return Column(
+                children: _posts.map((post) => buildPostCard(post)).toList(),
+              );
+            }
+          }
+        } else {
+          return Center(
+            child: Text('No profile info available'),
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildInfoExternoSection(Future<ProfileInfo> Function() info) {
+    return FutureBuilder<ProfileInfo>(
+      future: info(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error loading profile info'),
+          );
+        } else if (snapshot.hasData) {
+          ProfileInfo info = snapshot.data!;
+          if (selectedButton == 'Info') {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sobre mim',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.about_me,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Cidade',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.city,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Propósito',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    info.purpose,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            );
+          } else {
+            return Column(
+              children: _posts.map((post) => buildPostCard(post)).toList(),
+            );
+          }
+        } else {
+          return Center(
+            child: Text('No profile info available'),
+          );
+        }
+      },
+    );
   }
 
   Widget buildPostCard(FeedData post) {
@@ -329,10 +515,10 @@ class _OtherProfileState extends State<OtherProfile> {
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
-      
-        bool existsUser() {
-        return true;
-        }
+
+  bool existsUser() {
+    return true;
+  }
 }
 
 class ContentWidget extends StatefulWidget {
@@ -564,28 +750,28 @@ class _ContentWidgetState extends State<ContentWidget> {
     }
   }
 
-Widget buildButton({
-  required String text,
-  required int value,
-}) =>
-    MaterialButton(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      onPressed: () {},
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            '$value',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            text,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
-    );
+  Widget buildButton({
+    required String text,
+    required int value,
+  }) =>
+      MaterialButton(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        onPressed: () {},
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '$value',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      );
 }

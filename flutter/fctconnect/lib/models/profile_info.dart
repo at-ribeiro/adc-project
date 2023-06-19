@@ -6,8 +6,16 @@ class ProfileInfo {
   final int nFollowing;
   final int nFollowers;
   final int nPosts;
-
-
+  final String about_me;
+  final String phone;
+  final String city;
+  final String department;
+  final String course;
+  final String year;
+  final int nGroups;
+  final int nNucleos;
+  final String purpose;
+  final String office;
 
   ProfileInfo({
     required this.username,
@@ -17,7 +25,16 @@ class ProfileInfo {
     required this.nFollowing,
     required this.nFollowers,
     required this.nPosts,
-
+    required this.about_me,
+    required this.phone,
+    required this.city,
+    this.department = '',
+    this.course = '',
+    this.year = '',
+    this.nGroups = 0,
+    this.nNucleos = 0,
+    this.purpose = '',
+    this.office = '',
   });
 
   factory ProfileInfo.fromJson(Map<String, dynamic> json) {
@@ -29,7 +46,16 @@ class ProfileInfo {
       nFollowing: json['nFollowing'],
       nFollowers: json['nFollowers'],
       nPosts: json['nPosts'],
- 
+      phone: json['phone'],
+      about_me: json['about_me'],
+      city: json['city'],
+      department: json['department'] ?? '',
+      course: json['course'] ?? '',
+      year: json['year'] ?? '',
+      nGroups: json['nGroups'] ?? 0,
+      nNucleos: json['nNucleos'] ?? 0,
+      purpose: json['purpose'] ?? '',
+      office: json['office'] ?? '',
     );
   }
 }
