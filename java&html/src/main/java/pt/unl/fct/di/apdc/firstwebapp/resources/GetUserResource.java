@@ -1,6 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
@@ -25,6 +29,9 @@ public class GetUserResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
     private final Gson g = new Gson();
 
     @GET
@@ -112,6 +119,17 @@ public class GetUserResource {
 
             int nPosts = postsList.size();
 
+            String profilePicUrl = "";
+            String coverPicUrl = "";
+
+            BlobId blobId = BlobId.of( bucketName, user.getString("user_profile_pic"));
+            Blob blob = storage.get(blobId);
+            profilePicUrl = blob.getMediaLink();
+
+            blobId = BlobId.of( bucketName, user.getString("user_cover_pic"));
+            blob = storage.get(blobId);
+            coverPicUrl = blob.getMediaLink();
+
 
             UserData data;
 
@@ -122,15 +140,17 @@ public class GetUserResource {
                     //TODO: Adicionar nGroups e nNucleos bem
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
                             user.getString("user_role"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_course"),
-                            user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0);
+                            user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0, profilePicUrl, coverPicUrl);
                     break;
                 case "PROFESSOR":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"), user.getString("user_office"), nFollowing, nFollowers, nPosts);
+                            role, user.getString("user_about_me"), user.getString("user_city"), user.getString("user_department"),
+                            user.getString("user_office"), nFollowing, nFollowers, nPosts, profilePicUrl, coverPicUrl);
                     break;
                 case "EXTERNO":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            role, user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts, user.getString("user_purpose"));
+                            role, user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts,
+                            user.getString("user_purpose"), profilePicUrl, coverPicUrl);
                     break;
                 default:
                     return Response.status(Response.Status.NOT_FOUND).build();

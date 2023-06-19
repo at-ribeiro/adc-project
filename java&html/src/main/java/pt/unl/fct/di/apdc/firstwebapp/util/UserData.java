@@ -18,14 +18,17 @@ public class UserData {
     private int nPosts;
     private int nGroups;
     private int nNucleos;
-
     private String purpose;
+    private String profilePicUrl;
+    private String coverPicUrl;
+
 
     public UserData(){}
 
     //STUDENT
     public UserData(String username, String fullname, String email, String phone, String role, String about_me, String department,
-                    String course, String year, String city, int nFollowing, int nFollowers, int nPosts, int nGroups, int nNucleos){
+                    String course, String year, String city, int nFollowing, int nFollowers, int nPosts, int nGroups,
+                    int nNucleos, String profilePicUrl, String coverPicUrl){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
@@ -41,11 +44,14 @@ public class UserData {
         this.nPosts = nPosts;
         this.nGroups = nGroups;
         this.nNucleos = nNucleos;
+        this.profilePicUrl = profilePicUrl;
+        this.coverPicUrl = coverPicUrl;
     }
 
     //TEACHER
-    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String department, String office, String city,
-                    int nFollowing, int nFollowers, int nPosts){
+    public UserData(String username, String fullname, String email, String phone, String role, String about_me,
+                    String department, String office, String city, int nFollowing, int nFollowers, int nPosts,
+                    String profilePicUrl, String coverPicUrl){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
@@ -58,11 +64,13 @@ public class UserData {
         this.nFollowing = nFollowing;
         this.nFollowers = nFollowers;
         this.nPosts = nPosts;
+        this.profilePicUrl = profilePicUrl;
+        this.coverPicUrl = coverPicUrl;
     }
 
     //EXTERNAL
     public UserData(String username, String fullname, String email, String phone, String role, String about_me, String city,
-                    int nFollowing, int nFollowers, int nPosts, String purpose){
+                    int nFollowing, int nFollowers, int nPosts, String purpose, String profilePicUrl, String coverPicUrl){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
@@ -74,6 +82,8 @@ public class UserData {
         this.nFollowers = nFollowers;
         this.nPosts = nPosts;
         this.purpose = purpose;
+        this.profilePicUrl = profilePicUrl;
+        this.coverPicUrl = coverPicUrl;
     }
 
 }
