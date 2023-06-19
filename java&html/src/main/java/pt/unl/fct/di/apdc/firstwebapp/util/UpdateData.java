@@ -10,16 +10,15 @@ public class UpdateData {
     private String department;
     private String office;
     private String course;
-
     private String year;
     private String city;
-
     private String purpose;
+    private String privacy;
 
     public UpdateData(){}
 
     public UpdateData(String username, String fullname, String email, String phone, String about_me, String department,
-                      String office,String course, String year, String city, String purpose){
+                      String office,String course, String year, String city, String purpose, String privacy){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
@@ -31,7 +30,7 @@ public class UpdateData {
         this.year = year;
         this.city = city;
         this.purpose = purpose;
-
+        this.privacy = privacy;
     }
 
     public String getPhone() {
@@ -68,5 +67,9 @@ public class UpdateData {
 
     public String getOffice() {
         return office;
+    }
+
+    public String getPrivacy() {
+        return privacy;
     }
 }

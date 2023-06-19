@@ -83,8 +83,8 @@ public class RegisterResource {
                     .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_course", "")
                     .set("user_year", "")
-                    .set("user_profile_pic", StringValue.newBuilder("default-profile").setExcludeFromIndexes(true).build())
-                    .set("user_cover_pic", StringValue.newBuilder("foto-fct").setExcludeFromIndexes(true).build())
+                    .set("user_profile_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_cover_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("external_purpose","")
                     .build();
 
