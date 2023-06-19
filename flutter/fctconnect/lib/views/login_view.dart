@@ -193,7 +193,6 @@ class _LoginViewState extends State<LoginView>
                           ),
                         ),
                       ),
-
                       // ),
                       SizedBox(
                         height: size.height * 0.01,
@@ -235,6 +234,7 @@ class _LoginViewState extends State<LoginView>
                                   return null;
                                 },
                               ),
+
                             ),
                           ),
                         ),

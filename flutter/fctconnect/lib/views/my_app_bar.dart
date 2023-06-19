@@ -50,7 +50,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                   const CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
+                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg'),
                   ),
                   const SizedBox(height: 10),
                   Text(token.username),

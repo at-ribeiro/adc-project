@@ -205,6 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     post.url,
                                     fit: BoxFit.cover,
                                   ),
+
                                 ),
                               ),
                             const SizedBox(height: 8.0),
@@ -388,6 +389,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+
   Widget _buildDrawer() {
     ThemeManager themeManager = context.watch<ThemeManager>();
     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
@@ -405,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg'),
+                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg'),
                   ),
                   const SizedBox(height: 5),
                   Text(username, style: const TextStyle(fontSize: 18)),

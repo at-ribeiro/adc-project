@@ -19,7 +19,7 @@ import '../services/base_client.dart';
 
 const List<String> privacy = ["private", "public"];
 
-const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
+const String baseUrl = 'fct-connect-estudasses.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({Key? key}) : super(key: key);
@@ -401,6 +401,7 @@ class _SignUpViewState extends State<SignUpView> {
                     onTap: () {
                       nameController.clear();
                       emailController.clear();
+                      roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
                       simpleUIController.isObscure.value = true;
@@ -441,7 +442,7 @@ class _SignUpViewState extends State<SignUpView> {
               "passwordV": passwordVerController.text,
               "email": emailController.text,
               "role": roleController.text.toUpperCase(),
-              "state": "ACTIVE",
+              "state": "INACTIVE",
               "privacy": "PRIVATE",
             };
 
@@ -496,6 +497,7 @@ class _SignUpViewState extends State<SignUpView> {
 
                           nameController.clear();
                           emailController.clear();
+                          roleController.clear();
                           passwordController.clear();
                           _formKey.currentState?.reset();
                         });

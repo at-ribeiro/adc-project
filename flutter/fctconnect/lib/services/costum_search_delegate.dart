@@ -129,7 +129,7 @@ class CustomSearchDelegate extends SearchDelegate {
                             child: CircleAvatar(
                               radius: 30,
                               backgroundImage: NetworkImage(
-                                'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
                               ),
                             ),
                           ),

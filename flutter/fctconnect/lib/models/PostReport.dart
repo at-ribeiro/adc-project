@@ -18,11 +18,11 @@ class PostReport{
 
   factory PostReport.fromJson(Map<String, dynamic> json) {
     return PostReport(
-      reporters: json['reporters'],
+      reporters: List<String>.from(json['reporters']),
       postId: json['postId'],
       postCreator: json['postCreator'],
-      reportReason: json['reportReason'],
-      reportComment: json['reportComment'],
+      reportReason: List<String>.from(json['reportReason']),
+      reportComment: List<String>.from(json['reportComment']),
       count: json['count'],
     );
   }

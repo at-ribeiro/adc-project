@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
-
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/profile_info.dart';
 import '../constants.dart';
 
 import '../models/Token.dart';
@@ -316,7 +313,7 @@ class _EditProfileState extends State<EditProfile> {
         child: Container(
           color: Colors.grey,
           child: Image.network(
-            'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/foto-fct.jpg',
+            'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
             width: double.infinity,
             height: coverHeight,
             fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
@@ -345,7 +342,7 @@ class _EditProfileState extends State<EditProfile> {
             radius: profileHeight / 2,
             backgroundColor: Colors.grey.shade800,
             backgroundImage: const NetworkImage(
-              'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+              'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
             ),
           ),
         ),
