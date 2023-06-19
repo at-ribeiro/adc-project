@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +38,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController privacyController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     SessionManager.storeSession('session', '/signup');
@@ -61,29 +64,34 @@ class _SignUpViewState extends State<SignUpView> {
     var size = MediaQuery.of(context).size;
     var theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-          backgroundColor: Colors.white,
+    return Container(
+      decoration: kGradientDecoration,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
           resizeToAvoidBottomInset: false,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return _buildLargeScreen(size, simpleUIController, theme);
-              } else {
-                return _buildSmallScreen(size, simpleUIController, theme);
-              }
-            },
-          )),
+          body: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  return _buildLargeScreen(size, simpleUIController, theme);
+                } else {
+                  return _buildSmallScreen(size, simpleUIController, theme);
+                }
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  /// For large screens
   Widget _buildLargeScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SizedBox(width: size.width * 0.06),
         Expanded(
           flex: 5,
           child: _buildMainBody(size, simpleUIController, theme),
@@ -92,7 +100,6 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  /// For Small screens
   Widget _buildSmallScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return SingleChildScrollView(
@@ -102,255 +109,294 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  /// Main Body
   Widget _buildMainBody(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     return SingleChildScrollView(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: size.width > 600
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.start,
         children: [
-          SizedBox(
-            height: size.height * 0.03,
-          ),
+          SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Sign Up',
-              style: kLoginTitleStyle(size),
+              style: textTheme.headline2!.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Conecta-te aos teus colegas!',
-              style: kLoginSubtitleStyle(size),
+              style: textTheme.headline5!.copyWith(
+                color: kAccentColor0,
+              ),
             ),
           ),
-          SizedBox(
-            height: size.height * 0.03,
-          ),
+          SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0, right: 20),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  /// username
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      hintText: 'Username',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person),
+                            hintText: 'Username',
+                            border: InputBorder.none,
+                          ),
+                          controller: nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione um username';
+                            } else if (value.length < 4) {
+                              return 'Username tem de ter pelo menos 4 caracteres';
+                            } else if (value.length > 20) {
+                              return 'Username tem um máximo de 20 caracteres';
+                            }
+
+                            return null;
+                          },
+                        ),
                       ),
                     ),
-
-                    controller: nameController,
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecione um username';
-                      } else if (value.length < 4) {
-                        return 'Username tem de ter pelo menos 4 caracteres';
-                      } else if (value.length > 20) {
-                        return 'Username tem um máximo de 20 caracteres';
-                      }
-                      return null;
-                    },
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      hintText: 'Nome Completo',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person),
+                            hintText: 'Nome Completo',
+                            border: InputBorder.none,
+                          ),
+                          controller: fullNameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione o nome completo';
+                            } else {
+                              return null;
+                            }
+                          },
+                        ),
                       ),
                     ),
-
-                    controller: fullNameController,
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecione o nome completo';
-                      } else {
-                        return null;
-                      }
-                    },
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
+                  SizedBox(height: size.height * 0.02),
 
                   /// Email
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.email_rounded),
-                      hintText: 'E-mail',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
                     ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecione um email';
-                      } else if (!value.contains('@')) {
-                        return 'Selecione um email válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-                  //role
-                  DropdownButtonFormField<String>(
-                    style: kTextFormFieldStyle(),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.work),
-                      hintText: 'Role',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                    ),
-                    value: roleController.text.isNotEmpty
-                        ? roleController.text
-                        : null,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        roleController.text = newValue ?? '';
-                      });
-                    },
-                    items: ['ALUNO', 'PROFESSOR', 'EXTERNO']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Selecione uma role';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  /// password
-                  Obx(
-                    () => TextFormField(
-                      style: kTextFormFieldStyle(),
-                      controller: passwordController,
-                      obscureText: simpleUIController.isObscure.value,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_open),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            simpleUIController.isObscure.value
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
                           ),
-                          onPressed: () {
-                            simpleUIController.isObscureActive();
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person),
+                            hintText: 'Email',
+                            border: InputBorder.none,
+                          ),
+                          controller: emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione um email';
+                            } else if (!value.contains('@')) {
+                              return 'Selecione um email válido';
+                            }
+                            return null;
                           },
                         ),
-                        hintText: 'Password',
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
                       ),
-                      // The validator receives the text that the user has entered.
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Selecione uma password';
-                        } else if (value.length < 6) {
-                          return 'Password tem de ter pelo menos 6 caracteres';
-                        } else if (value.length > 30) {
-                          return 'Password tem no máximo 30 caracteres';
-                        }
-                        return null;
-                      },
                     ),
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  Obx(
-                    () => TextFormField(
-                      style: kTextFormFieldStyle(),
-                      controller: passwordVerController,
-                      obscureText: simpleUIController.isObscure.value,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_open),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            simpleUIController.isObscure.value
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Theme(
+                          data: ThemeData(
+                            canvasColor: kAccentColor0,
+                            popupMenuTheme: PopupMenuThemeData(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            simpleUIController.isObscureActive();
-                          },
-                        ),
-                        hintText: 'Confirmar Password',
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 4),
+                            child: DropdownButtonHideUnderline(
+                              child: ExpansionTile(
+                                title: roleController.text.isEmpty
+                                    ? Text(
+                                        "Role",
+                                        style: TextStyle(color: kAccentColor0),
+                                      )
+                                    : Text(roleController.text,
+                                        style: TextStyle(color: kAccentColor0)),
+                                leading: Icon(Icons.work, color: kAccentColor0),
+                                children: ['Aluno', 'Professor', 'Externo']
+                                    .map<Widget>((String value) {
+                                  return ListTile(
+                                    title: Text(
+                                      value,
+                                      style: TextStyle(color: kAccentColor0),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        roleController.text = value;
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      // The validator receives the text that the user has entered.
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Selecione uma password';
-                        } else if (passwordVerController.text !=
-                            passwordController.text) {
-                          return 'As passwords não coincidem';
-                        }
-                        return null;
-                      },
                     ),
                   ),
+                  SizedBox(height: size.height * 0.02),
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: kAccentColor0.withOpacity(0.2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: TextFormField(
+                            controller: passwordController,
+                            obscureText: simpleUIController.isObscure.value,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.lock_open),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  simpleUIController.isObscure.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  simpleUIController.isObscureActive();
+                                },
+                              ),
+                              hintText: 'Password',
+                              border: InputBorder.none,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Selecione uma password';
+                              } else if (value.length < 6) {
+                                return 'Password tem de ter pelo menos 6 caracteres';
+                              } else if (value.length > 30) {
+                                return 'Password tem no máximo 30 caracteres';
+                              }
 
-                  SizedBox(
-                    height: size.height * 0.01,
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
+                  SizedBox(height: size.height * 0.02),
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: kAccentColor0.withOpacity(0.2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: TextFormField(
+                            controller: passwordVerController,
+                            obscureText: simpleUIController.isObscure.value,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.lock_open,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  simpleUIController.isObscure.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  simpleUIController.isObscureActive();
+                                },
+                              ),
+                              hintText: 'Verificação da Password',
+                              border: InputBorder.none,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Selecione uma password';
+                              } else if (passwordVerController.text !=
+                                  passwordController.text) {
+                                return 'As passwords não coincidem';
+                              }
+
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.01),
                   Text(
                     'Ao criar uma conta está a concordar com a nossa Política de Privacidade e Termos de Uso',
-                    style: kLoginTermsAndPrivacyStyle(size),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                   ),
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  /// SignUp Button
+                  SizedBox(height: size.height * 0.02),
                   signUpButton(theme),
-                  SizedBox(
-                    height: size.height * 0.03,
-                  ),
-
-                  /// Navigate To Login Screen
+                  SizedBox(height: size.height * 0.03),
                   GestureDetector(
                     onTap: () {
                       nameController.clear();
@@ -358,19 +404,17 @@ class _SignUpViewState extends State<SignUpView> {
                       roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
-
                       simpleUIController.isObscure.value = true;
-
                       context.go("/login");
                     },
                     child: RichText(
                       text: TextSpan(
                         text: 'Já tens uma conta?',
-                        style: kHaveAnAccountStyle(size),
                         children: [
                           TextSpan(
-                              text: " Login",
-                              style: kLoginOrSignUpTextStyle(size)),
+                            text: " Log In",
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ],
                       ),
                     ),
@@ -384,21 +428,11 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  // SignUp Button
   Widget signUpButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-          ),
-        ),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             var _body = {
@@ -407,7 +441,7 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": roleController.text,
+              "role": roleController.text.toUpperCase(),
               "state": "INACTIVE",
               "privacy": "PRIVATE",
             };

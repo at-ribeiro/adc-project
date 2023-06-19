@@ -267,6 +267,7 @@ class BaseClient {
       final jsonString =
           utf8.decode(response.bodyBytes); // Specify the correct encoding
       final data = jsonDecode(jsonString);
+
       final List<UserQueryData> usersList = List<UserQueryData>.from(
           data.map((json) => UserQueryData.fromJson(json)));
       return usersList;

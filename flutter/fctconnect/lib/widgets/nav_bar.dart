@@ -1,9 +1,12 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/image_up.dart';
 
 import '../models/Post.dart';
@@ -45,45 +48,63 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
         });
       });
     } else {
-      return BottomNavigationBar(
-        type: BottomNavigationBarType.shifting,
-        currentIndex: _currentIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black),
-            label: 'Home',
+      return Container(
+        color: kPrimaryColor,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          child: GNav(
+            backgroundColor: kPrimaryColor,
+            activeColor: kAccentColor1,
+            
+            tabBackgroundColor: kSecondaryColor,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            
+            onTabChange: (index) {
+              if (index == 0) {
+                context.go(Paths.homePage);
+              } else if (index == 1) {
+                context.go(Paths.noticias);
+              } else if (index == 2) {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: kPrimaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(30.0)),
+                  ),
+                  isScrollControlled: true,
+                  builder: (context) => _buildPostModal(context),
+                  
+                );
+              
+              } else if (index == 3) {
+                context.go(Paths.myProfile);
+              }
+            },
+            tabs: [
+              GButton(
+                iconColor: kAccentColor0,
+                icon: Icons.home,
+                text: 'Home',
+              ),
+              GButton(
+                iconColor: kAccentColor0,
+                icon: Icons.newspaper,
+                text: 'Noticias',
+              ),
+              GButton(
+                iconColor: kAccentColor0,
+                icon: Icons.post_add,
+                text: 'Post',
+              ),
+              GButton(
+                iconColor: kAccentColor0,
+                icon: Icons.person,
+                text: 'Perfil',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper, color: Colors.black),
-            label: 'Noticias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.post_add, color: Colors.black),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.black),
-            label: 'Perfil',
-          ),
-        ],
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.black,
-        showUnselectedLabels: true,
-        onTap: (index) {
-          if (index == 0) {
-            context.go(Paths.homePage);
-          } else if (index == 1) {
-            context.go(Paths.noticias);
-          } else if (index == 2) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => _buildPostModal(context),
-            );
-          } else if (index == 3) {
-            context.go(Paths.myProfile);
-          }
-        },
+        ),
       );
     }
   }
@@ -103,24 +124,39 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
           const Padding(padding: EdgeInsets.all(16.0)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextFormField(
-              controller: _postTextController,
-              decoration: const InputDecoration(
-                hintText: 'O que se passa na FCT?',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Diga alguma coisa';
-                }
-                return null;
-              },
-              minLines: 5,
-              maxLines: 10,
-            ),
+            child:  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    height: 150,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(20),
+                            hintText: 'O que se passa na FCT?',
+                            border: InputBorder.none,
+                          ),
+                          controller: _postTextController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Diga alguma coisa...';
+                            } 
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
           ),
           const SizedBox(height: 30.0),
-          const SizedBox(height: 16.0),
+      
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -136,9 +172,9 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
                       _fileName,
                       _token.username,
                       _token.tokenID);
-                      if (response == 200) {
-                        Navigator.pop(context);
-                      }
+                  if (response == 200) {
+                    Navigator.pop(context);
+                  }
                 },
                 child: const Text('Post'),
               ),

@@ -39,6 +39,10 @@ dependencies:
   syncfusion_flutter_calendar: ^21.2.9
   provider: ^6.0.5
   flutter_colorpicker: ^1.0.3
+  animated_background: ^2.0.0
+  google_nav_bar: ^5.0.6
+  flutter_native_splash: ^2.3.1
+
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +55,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/background.jpg
 
   # fonts:
   #   - family: Schyler
