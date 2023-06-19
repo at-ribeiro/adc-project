@@ -20,6 +20,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "args",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/args-2.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "async",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
@@ -218,6 +224,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "flutter_native_splash",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/flutter_native_splash-2.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "flutter_platform_widgets",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/flutter_platform_widgets-3.3.2",
       "packageUri": "lib/",
@@ -360,6 +372,12 @@
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/http_parser-4.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "image",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/image-4.0.17",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "image_picker",
@@ -524,6 +542,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "petitparser",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/petitparser-5.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "platform",
       "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/platform-3.1.0",
       "packageUri": "lib/",
@@ -681,9 +705,9 @@
     },
     {
       "name": "universal_io",
-      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/universal_io-2.2.0",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/universal_io-2.2.2",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "2.17"
     },
     {
       "name": "url_strategy",
@@ -710,13 +734,25 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "xml",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/xml-6.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "yaml",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/yaml-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "responsive_login_ui",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-06-17T15:09:23.482015Z",
+  "generated": "2023-06-19T14:48:42.972854Z",
   "generator": "pub",
   "generatorVersion": "3.0.5"
 }

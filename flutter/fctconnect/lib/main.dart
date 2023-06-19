@@ -122,7 +122,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp.router(
         routerConfig: AppRouter().router,
         debugShowCheckedModeBanner: false,
-        theme: lightTheme,
+        theme: darkTheme,
         darkTheme: darkTheme,
         themeMode: _themeManager.themeMode,
       );

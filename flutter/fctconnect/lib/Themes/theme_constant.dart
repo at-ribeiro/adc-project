@@ -22,8 +22,8 @@ ThemeData lightTheme = ThemeData(
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      backgroundColor: MaterialStateProperty.all<Color>(kButtonColor),
-      overlayColor: MaterialStateProperty.all<Color>(kButtonColor),
+      backgroundColor: MaterialStateProperty.all<Color>(kSecondaryColor),
+      overlayColor: MaterialStateProperty.all<Color>(kSecondaryColor),
     ),
   ),
 );
@@ -32,7 +32,7 @@ ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: kPrimaryColor,
   floatingActionButtonTheme:
-      FloatingActionButtonThemeData(backgroundColor: kButtonColor),
+      FloatingActionButtonThemeData(backgroundColor: kSecondaryColor),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       padding: MaterialStateProperty.all< EdgeInsets>(
@@ -43,8 +43,8 @@ ThemeData darkTheme = ThemeData(
           borderRadius: BorderRadius.circular(20.0),
         ),
       ),
-      backgroundColor: MaterialStateProperty.all<Color>(kButtonColor),
-      overlayColor: MaterialStateProperty.all<Color>(kButtonColor),
+      backgroundColor: MaterialStateProperty.all<Color>(kSecondaryColor),
+      overlayColor: MaterialStateProperty.all<Color>(kSecondaryColor),
     ),
   ),
 );

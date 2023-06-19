@@ -64,19 +64,23 @@ class _SignUpViewState extends State<SignUpView> {
     var size = MediaQuery.of(context).size;
     var theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return _buildLargeScreen(size, simpleUIController, theme);
-              } else {
-                return _buildSmallScreen(size, simpleUIController, theme);
-              }
-            },
+    return Container(
+      decoration: kGradientDecoration,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: false,
+          body: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  return _buildLargeScreen(size, simpleUIController, theme);
+                } else {
+                  return _buildSmallScreen(size, simpleUIController, theme);
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -129,6 +133,9 @@ class _SignUpViewState extends State<SignUpView> {
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Conecta-te aos teus colegas!',
+              style: textTheme.headline5!.copyWith(
+                color: kAccentColor0,
+              ),
             ),
           ),
           SizedBox(height: size.height * 0.03),
@@ -141,7 +148,7 @@ class _SignUpViewState extends State<SignUpView> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      color: Colors.white.withOpacity(0.2),
+                      color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -149,7 +156,7 @@ class _SignUpViewState extends State<SignUpView> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
                           style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: kAccentColor0,
                           ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.person),
@@ -159,11 +166,11 @@ class _SignUpViewState extends State<SignUpView> {
                           controller: nameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter username';
+                              return 'Selecione um username';
                             } else if (value.length < 4) {
-                              return 'at least enter 4 characters';
-                            } else if (value.length > 13) {
-                              return 'maximum character is 13';
+                              return 'Username tem de ter pelo menos 4 caracteres';
+                            } else if (value.length > 20) {
+                              return 'Username tem um máximo de 20 caracteres';
                             }
 
                             return null;
@@ -176,7 +183,7 @@ class _SignUpViewState extends State<SignUpView> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      color: Colors.white.withOpacity(0.2),
+                      color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -184,7 +191,7 @@ class _SignUpViewState extends State<SignUpView> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
                           style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: kAccentColor0,
                           ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.person),
@@ -194,7 +201,7 @@ class _SignUpViewState extends State<SignUpView> {
                           controller: fullNameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter username';
+                              return 'Selecione o nome completo';
                             } else {
                               return null;
                             }
@@ -204,10 +211,44 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
+
+                  /// Email
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                      color: Colors.white.withOpacity(0.2),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person),
+                            hintText: 'Email',
+                            border: InputBorder.none,
+                          ),
+                          controller: emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione um email';
+                            } else if (!value.contains('@')) {
+                              return 'Selecione um email válido';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -215,7 +256,7 @@ class _SignUpViewState extends State<SignUpView> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Theme(
                           data: ThemeData(
-                            canvasColor: Colors.white.withOpacity(0.2),
+                            canvasColor: kAccentColor0,
                             popupMenuTheme: PopupMenuThemeData(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
@@ -231,21 +272,21 @@ class _SignUpViewState extends State<SignUpView> {
                                 title: roleController.text.isEmpty
                                     ? Text(
                                         "Role",
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: kAccentColor0),
                                       )
-                                    : Text(roleController.text, style: TextStyle(color: Colors.white)),
-                                leading: Icon(Icons.work, color: Colors.white),
+                                    : Text(roleController.text,
+                                        style: TextStyle(color: kAccentColor0)),
+                                leading: Icon(Icons.work, color: kAccentColor0),
                                 children: ['Aluno', 'Professor', 'Externo']
                                     .map<Widget>((String value) {
                                   return ListTile(
                                     title: Text(
                                       value,
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(color: kAccentColor0),
                                     ),
                                     onTap: () {
                                       setState(() {
                                         roleController.text = value;
-                                  
                                       });
                                     },
                                   );
@@ -262,7 +303,7 @@ class _SignUpViewState extends State<SignUpView> {
                     () => Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
-                        color: Colors.white.withOpacity(0.2),
+                        color: kAccentColor0.withOpacity(0.2),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -288,11 +329,11 @@ class _SignUpViewState extends State<SignUpView> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Selecione uma password';
                               } else if (value.length < 6) {
-                                return 'at least enter 6 characters';
-                              } else if (value.length > 13) {
-                                return 'maximum character is 13';
+                                return 'Password tem de ter pelo menos 6 caracteres';
+                              } else if (value.length > 30) {
+                                return 'Password tem no máximo 30 caracteres';
                               }
 
                               return null;
@@ -307,7 +348,7 @@ class _SignUpViewState extends State<SignUpView> {
                     () => Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
-                        color: Colors.white.withOpacity(0.2),
+                        color: kAccentColor0.withOpacity(0.2),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -317,7 +358,9 @@ class _SignUpViewState extends State<SignUpView> {
                             controller: passwordVerController,
                             obscureText: simpleUIController.isObscure.value,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_open),
+                              prefixIcon: const Icon(
+                                Icons.lock_open,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   simpleUIController.isObscure.value
@@ -328,15 +371,15 @@ class _SignUpViewState extends State<SignUpView> {
                                   simpleUIController.isObscureActive();
                                 },
                               ),
-                              hintText: 'Password Verification',
+                              hintText: 'Verificação da Password',
                               border: InputBorder.none,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Selecione uma password';
                               } else if (passwordVerController.text !=
                                   passwordController.text) {
-                                return 'Passwords must match';
+                                return 'As passwords não coincidem';
                               }
 
                               return null;
@@ -348,7 +391,7 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                   SizedBox(height: size.height * 0.01),
                   Text(
-                    'Creating an account means you\'re okay with our Terms of Services and our Privacy Policy',
+                    'Ao criar uma conta está a concordar com a nossa Política de Privacidade e Termos de Uso',
                     textAlign: TextAlign.left,
                   ),
                   SizedBox(height: size.height * 0.02),
@@ -365,7 +408,7 @@ class _SignUpViewState extends State<SignUpView> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: 'Already have an account?',
+                        text: 'Já tens uma conta?',
                         children: [
                           TextSpan(
                             text: " Log In",

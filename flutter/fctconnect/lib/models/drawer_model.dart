@@ -80,6 +80,7 @@ class _DrawerModelState extends State<DrawerModel> {
             ), // Set the width of the DrawerHeader to the maximum available width
           ),
           ListTile(
+            leading: Icon(Icons.home, color: kAccentColor1),
             title: const Text('Home'),
             onTap: () {
               context.go(Paths.homePage);
@@ -87,6 +88,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.map, color: kAccentColor1),
             title: const Text('Mapa'),
             onTap: () {
               context.go(Paths.mapas);
@@ -94,6 +96,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.event, color: kAccentColor1),
             title: const Text('Eventos'),
             onTap: () {
               context.go(Paths.events);
@@ -101,12 +104,14 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.group, color: kAccentColor1),
             title: const Text('Grupos'),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
+            leading: Icon(Icons.calendar_month, color: kAccentColor1),
             title: const Text('Calendário'),
             onTap: () {
               context.go(Paths.calendar);
@@ -114,6 +119,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.message, color: kAccentColor1),
             title: const Text('Mensagens'),
             onTap: () {
               Navigator.push(context,
@@ -123,6 +129,7 @@ class _DrawerModelState extends State<DrawerModel> {
           ),
           const Spacer(),
           ListTile(
+            leading: Icon(Icons.report, color: kAccentColor1),
             title: const Text('Report'),
             onTap: () {
               context.go(Paths.report);
@@ -130,6 +137,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.report_problem_outlined, color: kAccentColor1),
             title: const Text('Lista de Anomalias'),
             onTap: () {
               context.go(Paths.listReports);
@@ -137,6 +145,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.report_gmailerrorred, color: kAccentColor1),
             title: const Text('Posts Reportados'),
             onTap: () {
               context.go(Paths.reportedPosts);
@@ -144,7 +153,8 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
-            title: const Text('Sair'),
+            leading: Icon(Icons.exit_to_app, color: kAccentColor1),
+            title: const Text('Sair', style: TextStyle(color: Colors.red)),
             onTap: () async {
               BaseClient().doLogout("/logout", _token.username, _token.tokenID);
 

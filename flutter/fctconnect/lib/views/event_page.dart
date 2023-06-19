@@ -74,9 +74,7 @@ class _EventPageState extends State<EventPage> {
       return loadEvent();
     } else {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Event Details'),
-        ),
+       
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

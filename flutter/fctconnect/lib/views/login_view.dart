@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:animated_background/animated_background.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -59,18 +58,22 @@ class _LoginViewState extends State<LoginView>
 
     var size = MediaQuery.of(context).size;
 
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth > 600) {
-              return _buildLargeScreen(size, simpleUIController);
-            } else {
-              return _buildSmallScreen(size, simpleUIController);
-            }
-          },
+    return Container(
+      decoration: kGradientDecoration,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          resizeToAvoidBottomInset: false,
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 600) {
+                return _buildLargeScreen(size, simpleUIController);
+              } else {
+                return _buildSmallScreen(size, simpleUIController);
+              }
+            },
+          ),
         ),
       ),
     );
@@ -116,84 +119,118 @@ class _LoginViewState extends State<LoginView>
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 50, 50, 50),
-      body: AnimatedBackground(
-        behaviour: RandomParticleBehaviour(
-          options: ParticleOptions(
-            baseColor: Color.fromARGB(92, 65, 90, 255),
-            spawnOpacity: 0.05,
-            opacityChangeRate: 0.05,
-            minOpacity: 0.05,
-            maxOpacity: 0.2,
-            spawnMinSpeed: 20.0,
-            spawnMaxSpeed: 30.0,
-            spawnMinRadius: 1.0,
-            spawnMaxRadius: 4.0,
-            particleCount: 1000,
-          ),
-        ),
-        vsync: this,
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: size.width > 600
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: size.height * 0.03,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    'Login',
-                    style: textTheme.headline2!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: size.width > 600
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: size.height * 0.03,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text(
+                  'Login',
+                  style: textTheme.headline2!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: kAccentColor0,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                child: Text(
+                  'Bem vindo de volta!',
+                  style: textTheme.headline5!.copyWith(
+                  
+                    color: kAccentColor0,
+                  ),  
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    'Bem vindo de volta!',
-                  ),
-                ),
-                SizedBox(
-                  height: size.height * 0.03,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        /// username or Gmail
-                        Container(
+              ),
+              SizedBox(
+                height: size.height * 0.03,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      /// username or Gmail
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          color: kAccentColor0.withOpacity(0.3),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: TextFormField(
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.person),
+                                hintText: 'Username',
+                                border: InputBorder.none,
+                              ),
+                              controller: nameController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter username';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // ),
+                      SizedBox(
+                        height: size.height * 0.01,
+                      ),
+
+                      /// password
+                      Obx(
+                        () => Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(15)),
-                            color: Colors.white.withOpacity(0.2),
+                            color: kAccentColor0.withOpacity(0.3),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                ),
+                                controller: passwordController,
+                                obscureText: simpleUIController.isObscure.value,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person),
-                                  hintText: 'Username',
+                                  prefixIcon: const Icon(Icons.lock_open),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      simpleUIController.isObscure.value
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      simpleUIController.isObscureActive();
+                                    },
+                                  ),
+                                  hintText: 'Password',
                                   border: InputBorder.none,
                                 ),
-                                controller: nameController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter username';
+                                    return 'Please enter some text';
                                   }
                                   return null;
                                 },
@@ -201,98 +238,48 @@ class _LoginViewState extends State<LoginView>
                             ),
                           ),
                         ),
+                      ),
+                      SizedBox(
+                        height: size.height * 0.01,
+                      ),
 
-                        // ),
-                        SizedBox(
-                          height: size.height * 0.01,
-                        ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
 
-                        /// password
-                        Obx(
-                          () => Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              color: Colors.white.withOpacity(0.2),
-                            ),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                child: TextFormField(
-                                  controller: passwordController,
-                                  obscureText:
-                                      simpleUIController.isObscure.value,
-                                  decoration: InputDecoration(
-                                    prefixIcon: const Icon(Icons.lock_open),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        simpleUIController.isObscure.value
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        simpleUIController.isObscureActive();
-                                      },
-                                    ),
-                                    hintText: 'Password',
-                                    border: InputBorder.none,
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter some text';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                      /// Login Button
+                      loginButton(),
+                      SizedBox(
+                        height: size.height * 0.03,
+                      ),
+
+                      /// Navigate To Login Screen
+                      GestureDetector(
+                        onTap: () {
+                          context.go(Paths.signUp);
+                          nameController.clear();
+                          emailController.clear();
+                          passwordController.clear();
+                          _formKey.currentState?.reset();
+                          simpleUIController.isObscure.value = true;
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'Não tens uma conta?',
+                            children: [
+                              TextSpan(
+                                text: " Sign up",
+                                style: TextStyle(color: Colors.blue),
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                        SizedBox(
-                          height: size.height * 0.01,
-                        ),
-
-                        SizedBox(
-                          height: size.height * 0.02,
-                        ),
-
-                        /// Login Button
-                        loginButton(),
-                        SizedBox(
-                          height: size.height * 0.03,
-                        ),
-
-                        /// Navigate To Login Screen
-                        GestureDetector(
-                          onTap: () {
-                            context.go(Paths.signUp);
-                            nameController.clear();
-                            emailController.clear();
-                            passwordController.clear();
-                            _formKey.currentState?.reset();
-                            simpleUIController.isObscure.value = true;
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              text: 'Não tens uma conta?',
-                              children: [
-                                TextSpan(
-                                  text: " Sign up",
-                                  style: TextStyle(color: Colors.blue),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -375,7 +362,7 @@ class _LoginViewState extends State<LoginView>
               });
           // Call the login funct
         },
-        child: const Text('Login'),
+        child: const Text('Login', style: TextStyle(color:kAccentColor0)),
       ),
     );
   }

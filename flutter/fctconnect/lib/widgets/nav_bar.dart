@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -53,8 +54,9 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           child: GNav(
             backgroundColor: kPrimaryColor,
-            activeColor: kIconColorSelected,
-            tabBackgroundColor: kButtonColor,
+            activeColor: kAccentColor1,
+            
+            tabBackgroundColor: kSecondaryColor,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             
             onTabChange: (index) {
@@ -65,7 +67,7 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
               } else if (index == 2) {
                 showModalBottomSheet(
                   context: context,
-                  backgroundColor: kPostCreator,
+                  backgroundColor: kPrimaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(30.0)),
@@ -81,18 +83,22 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
             },
             tabs: [
               GButton(
+                iconColor: kAccentColor0,
                 icon: Icons.home,
                 text: 'Home',
               ),
               GButton(
+                iconColor: kAccentColor0,
                 icon: Icons.newspaper,
                 text: 'Noticias',
               ),
               GButton(
+                iconColor: kAccentColor0,
                 icon: Icons.post_add,
                 text: 'Post',
               ),
               GButton(
+                iconColor: kAccentColor0,
                 icon: Icons.person,
                 text: 'Perfil',
               ),
@@ -118,24 +124,39 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
           const Padding(padding: EdgeInsets.all(16.0)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextFormField(
-              controller: _postTextController,
-              decoration: const InputDecoration(
-                hintText: 'O que se passa na FCT?',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Diga alguma coisa';
-                }
-                return null;
-              },
-              minLines: 5,
-              maxLines: 10,
-            ),
+            child:  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    height: 150,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(20),
+                            hintText: 'O que se passa na FCT?',
+                            border: InputBorder.none,
+                          ),
+                          controller: _postTextController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Diga alguma coisa...';
+                            } 
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
           ),
           const SizedBox(height: 30.0),
-          const SizedBox(height: 16.0),
+      
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[

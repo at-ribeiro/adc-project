@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../models/Token.dart';
@@ -9,7 +10,6 @@ import 'activity_data_source.dart';
 import 'activity_provider.dart';
 
 class CalendarWidget extends StatefulWidget {
-
   const CalendarWidget({Key? key}) : super(key: key);
 
   @override
@@ -53,80 +53,101 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         provider.initializeActivities(_token);
         _isInitialized = true;
       }
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("Calendário"),
-          actions: [
-            IconButton(
-              onPressed: () {
-                provider.addActivity(context, _token);
-              },
-              icon: const Icon(Icons.add),
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      calendarView = CalendarView.month;
-                      calendarController.view = calendarView;
-                    });
-                  },
-                  child: Text("Por Mês"),
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      calendarView = CalendarView.week;
-                      calendarController.view = calendarView;
-                    });
-                  },
-                  child: Text("Por Semana"),
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      calendarView = CalendarView.day;
-                      calendarController.view = calendarView;
-                    });
-                  },
-                  child: Text("Por Dia"),
-                ),
-              ],
-            ),
-            Expanded(
-              child: SfCalendar(
-                view: calendarView,
-                showNavigationArrow: true,
-                initialSelectedDate: DateTime.now(),
-                controller: calendarController,
-                dataSource: ActivityDataSource(provider.activities),
-                selectionDecoration: BoxDecoration(
-                  color: Colors.transparent,
-                  border: Border.all(color: Colors.blueAccent, width: 2),
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  shape: BoxShape.rectangle,
-                ),
-                monthViewSettings: const MonthViewSettings(
-                  appointmentDisplayMode: MonthAppointmentDisplayMode.indicator,
-                  showAgenda: true,
-                ),
-                onTap: (CalendarTapDetails details) {
-                  if (details.targetElement == CalendarElement.appointment) {
-                    final Activity tappedActivity =
-                        details.appointments!.first as Activity;
-                    provider.updateActivity(context, tappedActivity, _token);
-                  }
-                },
+      return Container(
+        decoration: kGradientDecorationDown,
+        child: Scaffold(
+          backgroundColor:
+              Colors.transparent, // Make the scaffold background transparent
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: kPrimaryColor,
+            onPressed: () {
+              provider.addActivity(context, _token);
+            },
+            child: const Icon(Icons.add, color: kAccentColor0),
+          ),
+          body: Column(
+            children: [
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        calendarView = CalendarView.month;
+                        calendarController.view = calendarView;
+                      });
+                    },
+                    child: Text("Por Mês"),
+                  ),
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        calendarView = CalendarView.week;
+                        calendarController.view = calendarView;
+                      });
+                    },
+                    child: Text("Por Semana"),
+                  ),
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        calendarView = CalendarView.day;
+                        calendarController.view = calendarView;
+                      });
+                    },
+                    child: Text("Por Dia"),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Expanded(
+                child: SfCalendar(
+                  view: calendarView,
+                  showNavigationArrow: true,
+                  initialSelectedDate: DateTime.now(),
+                  controller: calendarController,
+                  dataSource: ActivityDataSource(provider.activities),
+                  selectionDecoration: BoxDecoration(
+                    color: kAccentColor2.withOpacity(0.1),
+                    border: Border.all(color: kSecondaryColor, width: 3),
+                    borderRadius: const BorderRadius.all(Radius.circular(7)),
+                    shape: BoxShape.rectangle,
+                  ),
+                  monthViewSettings: const MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.indicator,
+                    showAgenda: true,
+                    monthCellStyle: MonthCellStyle(
+                      textStyle: TextStyle(
+                        color: kAccentColor0,
+                        fontSize: 16,
+                      ),
+                      trailingDatesTextStyle: TextStyle(
+                        color: kAccentColor0,
+                        fontSize: 16,
+                      ),
+                      leadingDatesTextStyle: TextStyle(
+                        color: kAccentColor0,
+                        fontSize: 16,
+                      ),
+                      todayTextStyle: TextStyle(
+                        color: kAccentColor0,
+                        fontSize: 16,
+                      ),
+                      
+                    ),
+                  ),
+                  onTap: (CalendarTapDetails details) {
+                    if (details.targetElement == CalendarElement.appointment) {
+                      final Activity tappedActivity =
+                          details.appointments!.first as Activity;
+                      provider.updateActivity(context, tappedActivity, _token);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

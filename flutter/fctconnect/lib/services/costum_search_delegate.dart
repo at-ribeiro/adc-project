@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
@@ -22,6 +23,7 @@ class CustomSearchDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
+        color: kAccentColor0,
         icon: Icon(Icons.clear),
       ),
     ];
@@ -33,6 +35,7 @@ class CustomSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
+      color: kAccentColor0,
       icon: Icon(Icons.arrow_back_ios),
     );
   }
@@ -44,7 +47,20 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   @override
-  Widget buildSuggestions(BuildContext context) {
+  ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context).copyWith(
+      appBarTheme: AppBarTheme(
+        color: kPrimaryColor, // Set AppBar color here
+        iconTheme: IconThemeData(
+            color: kAccentColor0), // Set AppBar icon colors if needed
+      ),
+      textTheme: TextTheme(
+        headline6: TextStyle(color: kAccentColor0, fontSize: 18.0),
+      ),
+    );
+  }
+
+  Widget _buildSearchContent(BuildContext context) {
     if (query.isEmpty) {
       return Center(child: Text('Start typing to search'));
     } else {
@@ -61,7 +77,11 @@ class CustomSearchDelegate extends SearchDelegate {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 return Card(
-                  elevation: 2,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15), // Rounded corners
+                  ),
+                  color: kAccentColor2.withOpacity(0.1), // Translucent effect
                   child: InkWell(
                     onTap: () async {
                       var cd = await CacheDefault.cacheFactory.get('Creationd');
@@ -80,40 +100,51 @@ class CustomSearchDelegate extends SearchDelegate {
                         tokenID: tokenID!,
                         username: username!,
                       );
-                 switch(type){
-                          case 'msg':
-                            Navigator.pushReplacement(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (ctx) => NewMessage(
-                                ),
-                              ),
-                            );
-                            break;
-                            case "profile":
-                        
-                        if (_token.username == snapshot.data![index].username) {
-                          context.go(Paths.myProfile);
-                        } else {
-                          context.go(Paths.otherProfile+"?username=${snapshot.data![index].username}" );
-                      }
-                      break;
+                      switch (type) {
+                        case 'msg':
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (ctx) => NewMessage(),
+                            ),
+                          );
+                          break;
+                        case "profile":
+                          if (_token.username ==
+                              snapshot.data![index].username) {
+                            context.go(Paths.myProfile);
+                          } else {
+                            context.go(Paths.otherProfile +
+                                "?username=${snapshot.data![index].username}");
+                          }
+                          break;
                       }
                     },
                     child: Container(
-                      margin: EdgeInsets.all(8),
+                      margin: EdgeInsets.all(20), // Make card bigger
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                          Padding(
+                            padding: const EdgeInsets.all(0.2),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(
+                                'https://storage.googleapis.com/staging.fct-connect-2023.appspot.com/default_profile.jpg',
+                              ),
                             ),
                           ),
-                          Padding(padding: EdgeInsets.all(5)),
-                          Column(children: [
-                            Text(snapshot.data![index].fullname),
-                            Text(snapshot.data![index].username),
-                          ]),
+                          Padding(
+                              padding: EdgeInsets.all(
+                                  10)), // Increase padding between Avatar and Text
+                          Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(snapshot.data![index].username,
+                                    style: TextStyle(fontSize: 18)),
+                                Text(
+                                  snapshot.data![index].fullname,
+                                ),
+                              ]),
                         ],
                       ),
                     ),
@@ -125,5 +156,14 @@ class CustomSearchDelegate extends SearchDelegate {
         },
       );
     }
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container(
+      // Setting the gradient background
+      decoration: kGradientDecorationUp,
+      child: _buildSearchContent(context), // The actual search content
+    );
   }
 }

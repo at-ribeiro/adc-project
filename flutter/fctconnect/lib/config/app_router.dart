@@ -13,6 +13,7 @@ import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
+import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
@@ -28,7 +29,6 @@ import '../views/reported_posts_view.dart';
 
 class AppRouter {
   NavigationBarModel navigationBarModel = NavigationBarModel();
-  AppBarModel appBarModel = AppBarModel();
   DrawerModel drawerModel = DrawerModel();
 
   late final GoRouter router = GoRouter(
@@ -40,29 +40,6 @@ class AppRouter {
           ShellRoute(
             navigatorKey: GlobalKey<NavigatorState>(),
             routes: [
-              GoRoute(
-                path: '/',
-                builder: (BuildContext context, GoRouterState state) {
-                  return FutureBuilder<dynamic>(
-                    future: CacheDefault.cacheFactory.get('isLoggedIn'),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        String isLoggedInAsString = snapshot.data as String;
-                        bool isLoggedIn =
-                            isLoggedInAsString.toLowerCase() == 'true';
-                        if (isLoggedIn) {
-                          return const MyHomePage();
-                        } else {
-                          return const LoginView();
-                        }
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  );
-                },
-              ),
               GoRoute(
                 path: Paths.homePage,
                 builder: (BuildContext context, GoRouterState state) {
@@ -113,27 +90,6 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.event + "/:id",
-                name: Paths.event,
-                builder: (BuildContext context, GoRouterState state) {
-                  return EventPage(
-                    eventId: state.pathParameters['id']!,
-                  );
-                },
-              ),
-              GoRoute(
-                path: Paths.events,
-                builder: (BuildContext context, GoRouterState state) {
-                  return EventView();
-                },
-              ),
-              GoRoute(
-                path: Paths.createEvent,
-                builder: (BuildContext context, GoRouterState state) {
-                  return EventCreator();
-                },
-              ),
-              GoRoute(
                 path: Paths.report,
                 builder: (BuildContext context, GoRouterState state) {
                   return ReportPage();
@@ -178,6 +134,27 @@ class AppRouter {
               return ListReportsPage();
             },
           ),
+          GoRoute(
+            path: Paths.event + "/:id",
+            name: Paths.event,
+            builder: (BuildContext context, GoRouterState state) {
+              return EventPage(
+                eventId: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: Paths.events,
+            builder: (BuildContext context, GoRouterState state) {
+              return EventView();
+            },
+          ),
+          GoRoute(
+            path: Paths.createEvent,
+            builder: (BuildContext context, GoRouterState state) {
+              return EventCreator();
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -186,14 +163,20 @@ class AppRouter {
             appBar: AppBar(
               backgroundColor: kPrimaryColor,
               elevation: 0,
-              title: Text(_getTitleBasedOnRoute(state.location)),
+              title: Text(
+                _getTitleBasedOnRoute(state.location),
+                style: TextStyle(color: kAccentColor0),
+              ),
               actions: [
                 _getButtonsBasedOnRoute(state.location, context),
               ],
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
-                    icon: const Icon(Icons.menu),
+                    icon: const Icon(
+                      Icons.menu,
+                      color: kAccentColor0,
+                    ),
                     onPressed: () {
                       Scaffold.of(context).openDrawer();
                     },
@@ -217,6 +200,67 @@ class AppRouter {
           return const SignUpView();
         },
       ),
+      GoRoute(
+        path: Paths.splash,
+        builder: (BuildContext context, GoRouterState state) {
+          return Splash();
+        },
+      ),
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) {
+          return FutureBuilder<dynamic>(
+            future: CacheDefault.cacheFactory.get('isLoggedIn'),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                dynamic isLoggedInAsString = snapshot.data;
+
+                if (isLoggedInAsString != null) {
+                  bool isLoggedIn = isLoggedInAsString.toLowerCase() == 'true';
+                  if (isLoggedIn) {
+                    return Scaffold(
+                      extendBody: true,
+                      extendBodyBehindAppBar: true,
+                      appBar: AppBar(
+                        backgroundColor: kPrimaryColor,
+                        elevation: 0,
+                        title: Text(
+                          _getTitleBasedOnRoute(state.location),
+                          style: TextStyle(color: kAccentColor0),
+                        ),
+                        actions: [
+                          _getButtonsBasedOnRoute(state.location, context),
+                        ],
+                        leading: Builder(
+                          builder: (BuildContext context) {
+                            return IconButton(
+                              icon: const Icon(
+                                Icons.menu,
+                                color: kAccentColor0,
+                              ),
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      bottomNavigationBar: navigationBarModel,
+                      body: MyHomePage(),
+                    );
+                  } else {
+                    return LoginView();
+                  }
+                } else {
+                  return LoginView();
+                }
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
+          );
+        },
+      ),
     ],
   );
 
@@ -235,6 +279,16 @@ class AppRouter {
       return 'Noticias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
+    } else if (location == Paths.events) {
+      return 'Eventos';
+    } else if (location == Paths.createEvent) {
+      return 'Criar Evento';
+    } else if (location == Paths.report) {
+      return 'Reportar';
+    } else if (location == Paths.calendar) {
+      return 'Calendário';
+    } else if (location == Paths.reportedPosts) {
+      return 'Posts Reportados';
     }
     // add more conditions for other routes
 
@@ -245,7 +299,8 @@ class AppRouter {
     if (location == Paths.homePage ||
         location == '/' ||
         location == Paths.myProfile ||
-        location == Paths.noticias) {
+        location == Paths.noticias ||
+        location == Paths.events) {
       return IconButton(
         onPressed: () {
           showSearch(
@@ -255,7 +310,7 @@ class AppRouter {
         },
         icon: Icon(Icons.search),
       );
-    } else{
+    } else {
       return Container();
     }
     // add more conditions for other routes

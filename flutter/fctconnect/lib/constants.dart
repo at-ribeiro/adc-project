@@ -2,32 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const kPrimaryColor = Color.fromARGB(255, 34, 38, 62);
+const kPrimaryColor = Color.fromARGB(255, 27, 32, 53);
 
-const kPrimaryLightColor = Color.fromARGB(255, 43, 46, 76);
+const kSecondaryColor = Color.fromARGB(145, 33, 59, 151);
 
-const kSecondaryColor = Color.fromARGB(255, 71, 169, 74);
+const kAccentColor0 =
+    Color.fromARGB(255, 221, 244, 255); //if light mode troccar com a primaria
 
-const kIconColorUnselected = Color.fromARGB(218, 204, 209, 253);
+const kAccentColor1 = Color.fromARGB(245, 133, 198, 147);
 
-const kIconColorSelected = Color.fromARGB(255, 125, 255, 164);
+const kAccentColor2 = Color.fromARGB(234, 118, 171, 185);
 
-const kTransparancyColor = Color.fromARGB(177, 36, 43, 80);
+const kCardColor = Color.fromARGB(108, 100, 106, 124);
+const kCardBorderColor = Color.fromARGB(255, 109, 116, 136);
 
-const kPostCreator = Color.fromARGB(255, 46, 46, 60);
-
-const kButtonColor = Color.fromARGB(124, 49, 57, 128);
-
- dynamic kGradientDecoration = BoxDecoration(
+dynamic kGradientDecoration = BoxDecoration(
   gradient: LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
     colors: [
       kSecondaryColor.withOpacity(0.6),
-      kPrimaryLightColor.withOpacity(0.4),
-      kPrimaryLightColor.withOpacity(0.4),
-      kPrimaryLightColor.withOpacity(0.4),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
       kSecondaryColor.withOpacity(0.6),
     ],
   ),
 );
+dynamic kGradientDecorationUp = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      kSecondaryColor.withOpacity(0.6),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+    ],
+  ),
+);
+
+dynamic kGradientDecorationDown = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kSecondaryColor.withOpacity(0.6),
+    ],
+  ),
+);
+
+const kBorderRadius = BorderRadius.all(Radius.circular(15));

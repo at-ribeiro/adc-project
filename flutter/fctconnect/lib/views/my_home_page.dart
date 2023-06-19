@@ -99,8 +99,11 @@ class _MyHomePageState extends State<MyHomePage> {
         extendBody: true,
         body: Stack(
           children: [
-            Container(
-              decoration: kGradientDecoration,
+            // Here's where you add the gradient
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: kGradientDecoration
+              ),
             ),
             Positioned.fill(
               child: BackdropFilter(
@@ -136,17 +139,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
                   width: 1.5,
-                  color: Color.fromARGB(255, 120, 119, 119).withOpacity(0.2),
+                  color: kAccentColor0.withOpacity(0.0),
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(167, 71, 86, 125).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10.0),
+                      color: kAccentColor2.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: Material(
                       color: Colors.transparent,

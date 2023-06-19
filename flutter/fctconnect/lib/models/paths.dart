@@ -31,4 +31,6 @@ class Paths {
 
   static String createEvent = '$events/newEvent';
 
+  static var splash = '/splash';
+
 }
