@@ -21,14 +21,12 @@ import java.util.logging.Logger;
 @Path("/update")
 public class UpdateResource {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(UpdateResource.class.getName());
 
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
-    private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     @PUT
     @Path("/{user}")
@@ -77,6 +75,7 @@ public class UpdateResource {
                 LOG.warning("User does not exist: " + username);
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+
 
             Entity task = Entity.newBuilder(user)
                     .set("user_username", user.getString("user_username"))

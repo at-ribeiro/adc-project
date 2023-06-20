@@ -122,14 +122,16 @@ public class GetUserResource {
             String profilePicUrl = "";
             String coverPicUrl = "";
 
-            BlobId blobId = BlobId.of( bucketName, user.getString("user_profile_pic"));
-            Blob blob = storage.get(blobId);
-            profilePicUrl = blob.getMediaLink();
-
-            blobId = BlobId.of( bucketName, user.getString("user_cover_pic"));
-            blob = storage.get(blobId);
-            coverPicUrl = blob.getMediaLink();
-
+            if(!user.getString("user_profile_pic").equals("")) {
+                BlobId blobId = BlobId.of(bucketName, user.getString("user_profile_pic"));
+                Blob blob = storage.get(blobId);
+                profilePicUrl = blob.getMediaLink();
+            }
+            if(!user.getString("user_cover_pic").equals("")) {
+                BlobId blobId = BlobId.of(bucketName, user.getString("user_cover_pic"));
+                Blob blob = storage.get(blobId);
+                coverPicUrl = blob.getMediaLink();
+            }
 
             UserData data;
 
@@ -139,17 +141,17 @@ public class GetUserResource {
                 case "ALUNO":
                     //TODO: Adicionar nGroups e nNucleos bem
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            user.getString("user_role"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_course"),
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_course"),
                             user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0, profilePicUrl, coverPicUrl);
                     break;
                 case "PROFESSOR":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            role, user.getString("user_about_me"), user.getString("user_department"), user.getString("user_office"),
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_office"),
                             user.getString("user_city"), nFollowing, nFollowers, nPosts, profilePicUrl, coverPicUrl);
                     break;
                 case "EXTERNO":
                     data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
-                            role, user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts,
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts,
                             user.getString("user_purpose"), profilePicUrl, coverPicUrl);
                     break;
                 default:

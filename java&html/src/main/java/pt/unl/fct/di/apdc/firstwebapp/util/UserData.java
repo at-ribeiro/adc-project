@@ -7,6 +7,7 @@ public class UserData {
     private String email;
     private String phone;
     private String role;
+    private String privacy;
     private String about_me;
     private String department;
     private String office;
@@ -26,7 +27,7 @@ public class UserData {
     public UserData(){}
 
     //STUDENT
-    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String department,
+    public UserData(String username, String fullname, String email, String phone, String role, String privacy, String about_me, String department,
                     String course, String year, String city, int nFollowing, int nFollowers, int nPosts, int nGroups,
                     int nNucleos, String profilePicUrl, String coverPicUrl){
         this.username = username;
@@ -34,6 +35,7 @@ public class UserData {
         this.email = email;
         this.phone = phone;
         this.role = role;
+        this.privacy = privacy;
         this.about_me = about_me;
         this.department = department;
         this.course = course;
@@ -49,7 +51,7 @@ public class UserData {
     }
 
     //TEACHER
-    public UserData(String username, String fullname, String email, String phone, String role, String about_me,
+    public UserData(String username, String fullname, String email, String phone, String role, String privacy, String about_me,
                     String department, String office, String city, int nFollowing, int nFollowers, int nPosts,
                     String profilePicUrl, String coverPicUrl){
         this.username = username;
@@ -57,6 +59,7 @@ public class UserData {
         this.email = email;
         this.phone = phone;
         this.role = role;
+        this.privacy = privacy;
         this.about_me = about_me;
         this.department = department;
         this.office = office;
@@ -69,13 +72,14 @@ public class UserData {
     }
 
     //EXTERNAL
-    public UserData(String username, String fullname, String email, String phone, String role, String about_me, String city,
+    public UserData(String username, String fullname, String email, String phone, String role, String privacy, String about_me, String city,
                     int nFollowing, int nFollowers, int nPosts, String purpose, String profilePicUrl, String coverPicUrl){
         this.username = username;
         this.fullname = fullname;
         this.email = email;
         this.phone = phone;
         this.role = role;
+        this.privacy = privacy;
         this.about_me = about_me;
         this.city = city;
         this.nFollowing = nFollowing;
