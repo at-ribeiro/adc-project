@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
-import '../constants.dart';
 
+import '../constants.dart';
 import '../models/Token.dart';
+
+import '../models/update_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 
@@ -23,13 +25,20 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController fullNameController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController homeTownController = TextEditingController();
-  TextEditingController homeRegionController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController aboutMeController = TextEditingController();
+  TextEditingController departmentController = TextEditingController();
+  TextEditingController officeController = TextEditingController();
+  TextEditingController courseController = TextEditingController();
+  TextEditingController yearController = TextEditingController();
+  TextEditingController purposeController = TextEditingController();
+
   late Token _token;
   final double coverHeight = 200;
   final double profileHeight = 144;
   late ScrollController _scrollController;
-  late Future<ProfileInfo> _profielInfo;
+  late Future<ProfileInfo> _profileInfo;
 
   @override
   void initState() {
@@ -43,8 +52,14 @@ class _EditProfileState extends State<EditProfile> {
     fullNameController.dispose();
     phoneNumberController.dispose();
     homeTownController.dispose();
-    homeRegionController.dispose();
     privacyController.dispose();
+    emailController.dispose();
+    aboutMeController.dispose();
+    departmentController.dispose();
+    officeController.dispose();
+    courseController.dispose();
+    yearController.dispose();
+    purposeController.dispose();
     super.dispose();
   }
 
@@ -54,6 +69,16 @@ class _EditProfileState extends State<EditProfile> {
     ProfileInfo info = await BaseClient().fetchInfo(
         "/profile", _token.tokenID, _token.username, _token.username);
     fullNameController.text = info.fullname;
+    phoneNumberController.text = info.phone;
+    homeTownController.text = info.city;
+    privacyController.text = info.privacy;
+    emailController.text = info.email;
+    aboutMeController.text = info.about_me;
+    departmentController.text = info.department;
+    officeController.text = info.office;
+    courseController.text = info.course;
+    yearController.text = info.year;
+    purposeController.text = info.purpose;
     return info;
   }
 
@@ -65,7 +90,7 @@ class _EditProfileState extends State<EditProfile> {
           setState(() {
             _token = token;
             _isLoadingToken = false;
-            _profielInfo = _loadInfo();
+            _profileInfo = _loadInfo();
           });
         });
       });
@@ -75,14 +100,10 @@ class _EditProfileState extends State<EditProfile> {
           padding: EdgeInsets.zero,
           controller: _scrollController,
           children: <Widget>[
-            buildTop(),
-            const SizedBox(height: 16),
-            Divider(
-              color: Colors.grey,
-              thickness: 2.0,
-            ),
-            const SizedBox(height: 16),
-            buildInfoSection(),
+            const SizedBox(height: 40),
+            if (_token.role == "ALUNO") buildInfoAlunoSection(),
+            if (_token.role == "PROFESSOR") buildInfoProfessorSection(),
+            if (_token.role == "EXTERNO") buildInfoExternoSection(),
             const SizedBox(height: 32),
           ],
         ),
@@ -90,88 +111,601 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Widget buildInfoSection() {
+  Widget buildInfoExternoSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
-              hintText: 'Full Name',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Full Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: fullNameController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Selecione o seu nome completo';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.mail),
+                hintText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: emailController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Seleciona o seu email';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.phone),
+                hintText: 'Número de telemóvel',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: phoneNumberController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona o seu número de telemóvel';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.location_city),
+                hintText: 'Cidade',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: homeTownController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona a sua cidade';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Sobre Mim',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: aboutMeController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Selecione o seu Sobre Mim';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: privacyController.text.isEmpty
+                    ? Text(
+                        "Privacidade",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(privacyController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        privacyController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
-            controller: fullNameController,
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter username';
-              } else {
-                return null;
-              }
-            },
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
-              hintText: 'Número de telemóvel',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.school),
+                hintText: 'Pro´pósito da visita',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: purposeController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Selecione o seu motivo de visita';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            confirmButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildInfoProfessorSection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Full Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: fullNameController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Selecione o seu nome completo';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.mail),
+                hintText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: emailController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Seleciona o seu email';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.phone),
+                hintText: 'Número de telemóvel',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: phoneNumberController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona o seu número de telemóvel';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.location_city),
+                hintText: 'Cidade',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: homeTownController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona a sua cidade';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Sobre Mim',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: aboutMeController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Selecione o seu Sobre Mim';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: privacyController.text.isEmpty
+                    ? Text(
+                        "Privacidade",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(privacyController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        privacyController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
-            controller: phoneNumberController,
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter telemovel';
-              } else {
-                return null;
-              }
-            },
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
-              hintText: 'Cidade',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: departmentController.text.isEmpty
+                    ? Text(
+                        "Departamento",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(departmentController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: [
+                  'Ciências e Engenharia do Ambiente',
+                  'Ciência dos Materiais',
+                  'Conservação e Restauro',
+                  'Ciências Sociais Aplicadas',
+                  'Ciências da Terra',
+                  'Ciências da Vida',
+                  'Engenharia Civil',
+                  'Engenharia Eletrotécnica e de Computadores',
+                  'Engenharia Mecânica e Industrial',
+                  'Física',
+                  'Informática',
+                  'Matemática',
+                  'Química'
+                ].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        departmentController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
-            controller: homeTownController,
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter Cidade';
-              } else {
-                return null;
-              }
-            },
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.person),
-              hintText: 'Região',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.local_post_office),
+                hintText: 'Escritório',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: officeController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Selecione o seu escritório';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            confirmButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildInfoAlunoSection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Full Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: fullNameController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Selecione o seu nome completo';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.mail),
+                hintText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: emailController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Seleciona o seu email';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.phone),
+                hintText: 'Número de telemóvel',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: phoneNumberController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona o seu número de telemóvel';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.location_city),
+                hintText: 'Cidade',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: homeTownController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Seleciona a sua cidade';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                hintText: 'Sobre Mim',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                ),
+              ),
+              controller: aboutMeController,
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null) {
+                  return 'Selecione o seu Sobre Mim';
+                } else {
+                  return null;
+                }
+              },
+            ),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: privacyController.text.isEmpty
+                    ? Text(
+                        "Privacidade",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(privacyController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        privacyController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
-            controller: homeRegionController,
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter Região';
-              } else {
-                return null;
-              }
-            },
-          ),
-          SizedBox(height: 16),
-          confirmButton(),
-        ],
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: departmentController.text.isEmpty
+                    ? Text(
+                        "Departamento",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(departmentController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: [
+                  'Ciências e Engenharia do Ambiente',
+                  'Ciência dos Materiais',
+                  'Conservação e Restauro',
+                  'Ciências Sociais Aplicadas',
+                  'Ciências da Terra',
+                  'Ciências da Vida',
+                  'Engenharia Civil',
+                  'Engenharia Eletrotécnica e de Computadores',
+                  'Engenharia Mecânica e Industrial',
+                  'Física',
+                  'Informática',
+                  'Matemática',
+                  'Química'
+                ].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        departmentController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: courseController.text.isEmpty
+                    ? Text(
+                        "Curso",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(courseController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: [
+                  'Biologia Celular e Molecular',
+                  'Bioquímica',
+                  'Conservação-Restauro',
+                  'Engenharia do Ambiente',
+                  'Engenharia Biomédica',
+                  'Engenharia Civil',
+                  'Engenharia Eletrotécnica e de Computadores',
+                  'Engenharia Física',
+                  'Engenharia Geológica',
+                  'Engenharia e Gestão Industrial',
+                  'Engenharia Informática',
+                  'Engenharia de Materiais',
+                  'Engenharia Mecânica',
+                  'Engenharia de Micro e Nanotecnologias',
+                  'Engenharia Química e Biológica',
+                  'Matemática',
+                  'Matemática Aplicada à Gestão do Risco',
+                  'Tecnologia Agro-Industrial',
+                  'Química Aplicada'
+                ].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        courseController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 16),
+            DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: yearController.text.isEmpty
+                    ? Text(
+                        "Ano",
+                        style: TextStyle(color: kAccentColor0),
+                      )
+                    : Text(yearController.text,
+                        style: TextStyle(color: kAccentColor0)),
+                leading: Icon(Icons.work, color: kAccentColor0),
+                children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
+                    .map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      style: TextStyle(color: kAccentColor0),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        yearController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            SizedBox(height: 16),
+            confirmButton(),
+          ],
+        ),
       ),
     );
   }
@@ -189,16 +723,27 @@ class _EditProfileState extends State<EditProfile> {
       ),
       onPressed: () {
         if (_formKey.currentState!.validate()) {
-          var _body = {
-            "fullname": fullNameController.text,
-          };
-
+          UpdateData data = UpdateData(
+            username: _token.username,
+            fullname: fullNameController.text,
+            email: emailController.text,
+            about_me: aboutMeController.text,
+            phone: phoneNumberController.text,
+            city: homeTownController.text,
+            privacy: privacyController.text,
+            department: departmentController.text,
+            course: courseController.text,
+            year: yearController.text,
+            purpose: purposeController.text,
+            office: officeController.text,
+          );
           showDialog(
             context: context,
             barrierDismissible: false,
             builder: (BuildContext context) {
               return FutureBuilder(
-                future: BaseClient().post("/register/", _body),
+                future: BaseClient().updateUser(
+                    "/update", data, _token.tokenID, _token.username),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return AlertDialog(
@@ -224,7 +769,6 @@ class _EditProfileState extends State<EditProfile> {
                               "Algo não está certo, tente outra vez!";
                           break;
                       }
-
                       return AlertDialog(
                         title: Text('Error'),
                         content: Text(showErrorMessage),
@@ -262,25 +806,6 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Widget buildTop() {
-    final top = coverHeight - profileHeight / 2;
-    final bottom = profileHeight / 2;
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        Container(
-          margin: EdgeInsets.only(bottom: bottom),
-          child: buildCoverImage(),
-        ),
-        Positioned(
-          top: top,
-          child: buildProfileImage(),
-        ),
-      ],
-    );
-  }
-
   Widget buildButton({
     required String text,
     required int value,
@@ -303,48 +828,6 @@ class _EditProfileState extends State<EditProfile> {
               style: const TextStyle(fontSize: 16),
             ),
           ],
-        ),
-      );
-
-  Widget buildCoverImage() => GestureDetector(
-        onTap: () {
-          _pickImage();
-        },
-        child: Container(
-          color: Colors.grey,
-          child: Image.network(
-            'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
-            width: double.infinity,
-            height: coverHeight,
-            fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
-          ),
-        ),
-      );
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final fileData = await pickedFile.readAsBytes();
-      setState(() {
-        // _imageData = Uint8List.fromList(fileData);
-        // _fileName = pickedFile.path.split('/').last;
-      });
-    }
-  }
-
-  Widget buildProfileImage() => GestureDetector(
-        onTap: () {
-          _pickImage();
-        },
-        child: Center(
-          child: CircleAvatar(
-            radius: profileHeight / 2,
-            backgroundColor: Colors.grey.shade800,
-            backgroundImage: const NetworkImage(
-              'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-            ),
-          ),
         ),
       );
 }

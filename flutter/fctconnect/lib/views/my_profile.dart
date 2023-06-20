@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -101,16 +102,6 @@ class _MyProfileState extends State<MyProfile> {
       });
     } else {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Perfil'),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  context.go(Paths.editProfile);
-                },
-                icon: Icon(Icons.settings))
-          ],
-        ),
         body: ListView(
           padding: EdgeInsets.zero,
           controller: _scrollController,
@@ -124,12 +115,13 @@ class _MyProfileState extends State<MyProfile> {
             ),
             const SizedBox(height: 16),
             Divider(
-              color: Colors.grey,
+              color: kAccentColor0,
               thickness: 2.0,
             ),
             const SizedBox(height: 16),
             if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
-            if (_token.role == "PROFESSOR") buildInfoProfessorSection(_loadInfo),
+            if (_token.role == "PROFESSOR")
+              buildInfoProfessorSection(_loadInfo),
             if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
             const SizedBox(height: 32),
           ],
@@ -487,14 +479,35 @@ class _MyProfileState extends State<MyProfile> {
                           ),
                           const SizedBox(height: 8.0),
                           post.url.isNotEmpty
-                              ? AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: Image.network(
-                                      post.url,
-                                      fit: BoxFit.cover,
-                                    ),
+                              ? GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return Dialog(
+                                          child: Container(
+                                            child: Image.network(
+                                              post.url,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return Image.network(
+                                        post.url,
+                                        fit: constraints.maxHeight > 600.0
+                                            ? BoxFit.cover
+                                            : BoxFit.scaleDown,
+                                        width: constraints.maxWidth,
+                                        height: constraints.maxHeight > 600.0
+                                            ? 600.0
+                                            : constraints.maxHeight,
+                                      );
+                                    },
                                   ),
                                 )
                               : const SizedBox.shrink(),
@@ -661,14 +674,14 @@ class _ContentWidgetState extends State<ContentWidget> {
             children: [
               const SizedBox(height: 8),
               Text(
-                info.fullname,
+                info.username,
                 style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
               ),
               const SizedBox(height: 8),
               Text(
                 info.role,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
+                style: const TextStyle(fontSize: 20, color: kAccentColor2),
               ),
               const SizedBox(height: 16),
               Row(

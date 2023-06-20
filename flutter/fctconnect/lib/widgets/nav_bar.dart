@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/image_up.dart';
+import 'package:responsive_login_ui/views/my_home_page.dart';
 
 import '../models/Post.dart';
 import '../models/Token.dart';

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,10 +59,14 @@ class _EventViewState extends State<EventView> {
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                context.push(Paths.createEvent);
+              },
+              child: const Icon(Icons.add)),
           backgroundColor: Colors.transparent,
           body: Column(
             children: [
-              
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _refreshEvents,
@@ -79,67 +84,79 @@ class _EventViewState extends State<EventView> {
                           onTap: () {
                             context.go(Paths.event + '/${event.id}');
                           },
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (event.url != null)
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.network(
-                                        event.url!,
-                                        width: 220,
-                                        height: 150,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  const SizedBox(width: 7.0),
-                                  Expanded(
-                                    child: Column(
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: ClipRRect(
+                              borderRadius: kBorderRadius,
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(
+                                    sigmaX: 50.0, sigmaY: 50.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: kAccentColor2.withOpacity(0.1),
+                                    borderRadius: kBorderRadius,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          event.title,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
+                                        if (event.url != null)
+                                          ClipRRect(
+                                            borderRadius: kBorderRadius,
+                                            child: Image.network(
+                                              event.url!,
+                                              width: 220,
+                                              height: 150,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8.0),
-                                        Text(
-                                          'Start Date & Time: ' +
-                                              DateFormat('dd-MM-yyyy HH:mm:ss')
-                                                  .format(
-                                                DateTime
-                                                    .fromMillisecondsSinceEpoch(
-                                                  event.start,
+                                        const SizedBox(width: 7.0),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                event.title,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kAccentColor0,
                                                 ),
                                               ),
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8.0),
-                                        Text(
-                                          'End Date & Time: ' +
-                                              DateFormat('dd-MM-yyyy HH:mm:ss')
-                                                  .format(
-                                                DateTime
-                                                    .fromMillisecondsSinceEpoch(
-                                                  event.end,
+                                              const SizedBox(height: 8.0),
+                                              Text(
+                                                'Start Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    event.start,
+                                                  ),
+                                                )}',
+                                                style: const TextStyle(
+                                                  color: kAccentColor2,
                                                 ),
                                               ),
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
+                                              const SizedBox(height: 8.0),
+                                              Text(
+                                                'End Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    event.end,
+                                                  ),
+                                                )}',
+                                                style: const TextStyle(
+                                                  color: kAccentColor2,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8.0),
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(height: 8.0),
                                       ],
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -152,26 +169,23 @@ class _EventViewState extends State<EventView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchEventView(),
-                        ),
-                      );
-                    },
-                    child: const Text('Pesquisar outros eventos'),
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchEventView(),
+                          ),
+                        );
+                      },
+                      child: const Text('Pesquisar outros eventos'),
+                    ),
                   ),
-                  SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.push(Paths.createEvent);
-                    },
-                    child: const Text('Registar Evento'),
-                  )
                 ],
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

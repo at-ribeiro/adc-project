@@ -1,20 +1,16 @@
 import 'dart:ui';
 
-import 'package:fluro/fluro.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-import 'package:responsive_login_ui/models/register_user.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 
 import '../models/paths.dart';
-import '../views/login_view.dart';
+
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
-import '../models/register_user.dart';
+
 import '../services/base_client.dart';
 
 const List<String> privacy = ["private", "public"];
@@ -158,10 +154,18 @@ class _SignUpViewState extends State<SignUpView> {
                           style: TextStyle(
                             color: kAccentColor0,
                           ),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.person),
+                          decoration: const InputDecoration(
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
                             hintText: 'Username',
                             border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
                           ),
                           controller: nameController,
                           validator: (value) {
@@ -194,9 +198,17 @@ class _SignUpViewState extends State<SignUpView> {
                             color: kAccentColor0,
                           ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.person),
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
                             hintText: 'Nome Completo',
                             border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
                           ),
                           controller: fullNameController,
                           validator: (value) {
@@ -227,9 +239,17 @@ class _SignUpViewState extends State<SignUpView> {
                             color: kAccentColor0,
                           ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.person),
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
                             hintText: 'Email',
                             border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
                           ),
                           controller: emailController,
                           validator: (value) {
@@ -276,7 +296,7 @@ class _SignUpViewState extends State<SignUpView> {
                                       )
                                     : Text(roleController.text,
                                         style: TextStyle(color: kAccentColor0)),
-                                leading: Icon(Icons.work, color: kAccentColor0),
+                                leading: Icon(Icons.work, color: kAccentColor1),
                                 children: ['Aluno', 'Professor', 'Externo']
                                     .map<Widget>((String value) {
                                   return ListTile(
@@ -313,12 +333,14 @@ class _SignUpViewState extends State<SignUpView> {
                             controller: passwordController,
                             obscureText: simpleUIController.isObscure.value,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_open),
+                              prefixIcon: const Icon(Icons.lock_open,
+                                  color: kAccentColor1),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   simpleUIController.isObscure.value
                                       ? Icons.visibility
                                       : Icons.visibility_off,
+                                  color: kAccentColor1,
                                 ),
                                 onPressed: () {
                                   simpleUIController.isObscureActive();
@@ -326,6 +348,13 @@ class _SignUpViewState extends State<SignUpView> {
                               ),
                               hintText: 'Password',
                               border: InputBorder.none,
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: kBorderRadius,
+                                borderSide: BorderSide(
+                                  color:
+                                      kAccentColor1, // Set your desired focused color here
+                                ),
+                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -360,12 +389,14 @@ class _SignUpViewState extends State<SignUpView> {
                             decoration: InputDecoration(
                               prefixIcon: const Icon(
                                 Icons.lock_open,
+                                color: kAccentColor1,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   simpleUIController.isObscure.value
                                       ? Icons.visibility
                                       : Icons.visibility_off,
+                                  color: kAccentColor1,
                                 ),
                                 onPressed: () {
                                   simpleUIController.isObscureActive();
@@ -373,6 +404,13 @@ class _SignUpViewState extends State<SignUpView> {
                               ),
                               hintText: 'Verificação da Password',
                               border: InputBorder.none,
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: kBorderRadius,
+                                borderSide: BorderSide(
+                                  color:
+                                      kAccentColor1, // Set your desired focused color here
+                                ),
+                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -410,10 +448,11 @@ class _SignUpViewState extends State<SignUpView> {
                     child: RichText(
                       text: TextSpan(
                         text: 'Já tens uma conta?',
+                        style: TextStyle(color: kAccentColor0),
                         children: [
                           TextSpan(
                             text: " Log In",
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: kAccentColor1),
                           ),
                         ],
                       ),
@@ -455,40 +494,56 @@ class _SignUpViewState extends State<SignUpView> {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return AlertDialog(
-                        content: Row(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: kBorderRadius,
+                        ),
+                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        content: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(),
+                            CircularProgressIndicator(
+                              color: kAccentColor1,
+                            ),
                             SizedBox(width: 10),
-                            Text('Loading...'),
+                            Text('Loading...',
+                                style: TextStyle(color: kAccentColor0)),
                           ],
                         ),
                       );
                     } else {
-                      String showErrorMessage;
+                      String errorText;
                       if (snapshot.hasError) {
                         switch (snapshot.error) {
                           case '409':
-                            showErrorMessage = "username ou email já existem!";
+                            errorText = "Username ou email já existem!";
                             break;
                           default:
-                            showErrorMessage =
-                                "Algo não está certo, tente outra vez!";
+                            errorText = "Algo não correu bem!";
                             break;
                         }
 
                         return AlertDialog(
-                          title: Text('Error'),
-                          content: Text(showErrorMessage),
-                          actions: <Widget>[
-                            ElevatedButton(
-                              child: Text('OK'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: kBorderRadius,
+                          ),
+                          backgroundColor: kAccentColor0.withOpacity(0.3),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                errorText,
+                                style: TextStyle(color: kAccentColor0),
+                              ),
+                              SizedBox(height: 15),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Tentar novamente'),
+                              ),
+                            ],
+                          ),
                         );
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {

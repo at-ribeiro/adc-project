@@ -16,6 +16,7 @@ class ProfileInfo {
   final int nNucleos;
   final String purpose;
   final String office;
+  final String privacy;
 
   ProfileInfo({
     required this.username,
@@ -35,6 +36,7 @@ class ProfileInfo {
     this.nNucleos = 0,
     this.purpose = '',
     this.office = '',
+    required this.privacy,
   });
 
   factory ProfileInfo.fromJson(Map<String, dynamic> json) {
@@ -56,6 +58,7 @@ class ProfileInfo {
       nNucleos: json['nNucleos'] ?? 0,
       purpose: json['purpose'] ?? '',
       office: json['office'] ?? '',
+      privacy: json['privacy'],
     );
   }
 }

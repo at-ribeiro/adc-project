@@ -3,7 +3,7 @@ class Paths {
 
   static String signUp = '/signUp';
 
-  static String homePage = '/homePage';
+  static String homePage = '/';
 
   static String myProfile = '/profile';
 

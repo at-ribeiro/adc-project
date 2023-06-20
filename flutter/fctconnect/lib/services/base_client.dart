@@ -18,6 +18,7 @@ import 'package:path/path.dart';
 
 import '../models/event_data.dart';
 import '../models/profile_info.dart';
+import '../models/update_data.dart';
 
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
 
@@ -218,14 +219,16 @@ class BaseClient {
     }
   }
 
-  Future<EventData> getEvent(String api, String tokenID, String id) async {
-    var _headers = {
+  Future<EventData> getEvent(String api, id, tokenID, user) async {
+    Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": user,
     };
     var url = Uri.parse('$baseUrl$api/$id');
 
     var response = await http.get(url, headers: _headers);
+
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final event = EventData.fromJson(jsonData);
@@ -749,6 +752,41 @@ class BaseClient {
       // Throw exception
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> updateUser(
+      String api, UpdateData data, String tokenID, String username) async {
+
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var userJson = jsonEncode({
+      'username': data.username,
+      'fullname': data.fullname,
+      'email': data.email,
+      'phone': data.phone,
+      'about_me': data.about_me,
+      'city': data.city,
+      'department': data.department,
+      'course': data.course,
+      'year': data.year,
+      'purpose': data.purpose,
+      'office': data.office,
+      'privacy': data.privacy,
+    });
+
+    var response =
+        await http.put(url, headers: _headers, body: userJson);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else if (response.statusCode == 409) {
+      //throw exception
+      throw '409';
     }
   }
 }

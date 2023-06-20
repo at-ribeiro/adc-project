@@ -62,7 +62,7 @@ class CustomSearchDelegate extends SearchDelegate {
 
   Widget _buildSearchContent(BuildContext context) {
     if (query.isEmpty) {
-      return Center(child: Text('Start typing to search'));
+      return Center(child: Text('Escreva alguma coisa para pesquisar', style: TextStyle(color: kAccentColor0),));
     } else {
       return FutureBuilder<List<UserQueryData>>(
         future: BaseClient().searchUser(query, "/search"),
@@ -112,10 +112,13 @@ class CustomSearchDelegate extends SearchDelegate {
                         case "profile":
                           if (_token.username ==
                               snapshot.data![index].username) {
+                                 close(context, null) ;
                             context.go(Paths.myProfile);
                           } else {
+                           close(context, null) ;
                             context.go(Paths.otherProfile +
                                 "?username=${snapshot.data![index].username}");
+                                
                           }
                           break;
                       }

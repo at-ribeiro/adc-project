@@ -101,9 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             // Here's where you add the gradient
             Positioned.fill(
-              child: DecoratedBox(
-                decoration: kGradientDecoration
-              ),
+              child: DecoratedBox(decoration: kGradientDecoration),
             ),
             Positioned.fill(
               child: BackdropFilter(
@@ -113,7 +111,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            ContentBody(),
+            Center(
+              // Center the ContentBody widget
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 800), // Set max width
+                child: ContentBody(),
+              ),
+            ),
           ],
         ),
       );
@@ -134,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             FeedData post = _posts[index];
             return Container(
-              margin: EdgeInsets.all(3),
+              margin: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
@@ -149,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: kAccentColor2.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(15.0),
+                      borderRadius: kBorderRadius,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -197,15 +201,46 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             const SizedBox(height: 8.0),
                             if (post.url.isNotEmpty)
-                              AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  child: Image.network(
-                                    post.url,
-                                    fit: BoxFit.cover,
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return ClipRRect(
+                                          borderRadius: kBorderRadius,
+                                          child: Dialog(
+                                            child: Container(
+                                              child: ClipRRect(
+                                                borderRadius: kBorderRadius,
+                                                child: Image.network(
+                                                  post.url,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return ClipRRect(
+                                        borderRadius: kBorderRadius,
+                                        child: Image.network(
+                                          post.url,
+                                          fit: constraints.maxHeight > 600.0
+                                              ? BoxFit.cover
+                                              : BoxFit.scaleDown,
+                                          width: constraints.maxWidth,
+                                          height: constraints.maxHeight > 600.0
+                                              ? 600.0
+                                              : constraints.maxHeight,
+                                        ),
+                                      );
+                                    },
                                   ),
-
                                 ),
                               ),
                             const SizedBox(height: 8.0),
@@ -388,7 +423,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
 
   Widget _buildDrawer() {
     ThemeManager themeManager = context.watch<ThemeManager>();

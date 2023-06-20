@@ -1,23 +1,19 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
-import 'package:responsive_login_ui/views/loading_screen.dart';
-import 'package:responsive_login_ui/views/signUp_view.dart';
 
+import 'package:responsive_login_ui/services/session_manager.dart';
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
 import '../data/cache_factory_provider.dart';
-import '../main.dart';
+
 import '../models/paths.dart';
 import '../services/base_client.dart';
-import 'my_home_page.dart';
-import 'loading_screen.dart';
 
 class LoginView extends StatefulWidget {
   final String? session;
@@ -33,6 +29,7 @@ class _LoginViewState extends State<LoginView>
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool _showErrorDetails = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -149,9 +146,8 @@ class _LoginViewState extends State<LoginView>
                 child: Text(
                   'Bem vindo de volta!',
                   style: textTheme.headline5!.copyWith(
-                  
                     color: kAccentColor0,
-                  ),  
+                  ),
                 ),
               ),
               SizedBox(
@@ -163,24 +159,33 @@ class _LoginViewState extends State<LoginView>
                   key: _formKey,
                   child: Column(
                     children: [
-                      /// username or Gmail
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderRadius: kBorderRadius,
                           color: kAccentColor0.withOpacity(0.3),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderRadius: kBorderRadius,
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                             child: TextFormField(
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 255, 255, 255),
+                              style: const TextStyle(
+                                color: kAccentColor0,
                               ),
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.person),
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: kAccentColor1,
+                                ),
                                 hintText: 'Username',
                                 border: InputBorder.none,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: kBorderRadius,
+                                  borderSide: BorderSide(
+                                    color:
+                                        kAccentColor1, // Set your desired focused color here
+                                  ),
+                                ),
                               ),
                               controller: nameController,
                               validator: (value) {
@@ -202,23 +207,27 @@ class _LoginViewState extends State<LoginView>
                       Obx(
                         () => Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderRadius: kBorderRadius,
                             color: kAccentColor0.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                            borderRadius: kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
                                 controller: passwordController,
                                 obscureText: simpleUIController.isObscure.value,
                                 decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.lock_open),
+                                  prefixIcon: const Icon(
+                                    Icons.lock_open,
+                                    color: kAccentColor1,
+                                  ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       simpleUIController.isObscure.value
                                           ? Icons.visibility
                                           : Icons.visibility_off,
+                                      color: kAccentColor1,
                                     ),
                                     onPressed: () {
                                       simpleUIController.isObscureActive();
@@ -226,15 +235,21 @@ class _LoginViewState extends State<LoginView>
                                   ),
                                   hintText: 'Password',
                                   border: InputBorder.none,
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius: kBorderRadius,
+                                    borderSide: BorderSide(
+                                      color:
+                                          kAccentColor1, // Set your desired focused color here
+                                    ),
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter some text';
+                                    return 'Insira a password?';
                                   }
                                   return null;
                                 },
                               ),
-
                             ),
                           ),
                         ),
@@ -264,12 +279,15 @@ class _LoginViewState extends State<LoginView>
                           simpleUIController.isObscure.value = true;
                         },
                         child: RichText(
-                          text: TextSpan(
+                          text: const TextSpan(
                             text: 'Não tens uma conta?',
+                            style: TextStyle(
+                              color: kAccentColor0,
+                            ),
                             children: [
                               TextSpan(
                                 text: " Sign up",
-                                style: TextStyle(color: Colors.blue),
+                                style: TextStyle(color: kAccentColor1),
                               ),
                             ],
                           ),
@@ -288,12 +306,12 @@ class _LoginViewState extends State<LoginView>
 
   // Login Button
   Future<dynamic> _performLogin() async {
-    var _body = {
+    var body = {
       "username": nameController.text,
       "password": passwordController.text,
     };
 
-    var response = await BaseClient().postLogin("/login/", _body);
+    var response = await BaseClient().postLogin("/login/", body);
 
     String tokenId = response.tokenID;
     String username = response.username;
@@ -304,8 +322,6 @@ class _LoginViewState extends State<LoginView>
     CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
     CacheDefault.cacheFactory.set('isLoggedIn', 'true');
 
-    print(response);
-
     context.go(Paths.homePage);
 
     return response;
@@ -315,33 +331,64 @@ class _LoginViewState extends State<LoginView>
     return FutureBuilder<void>(
       future: _performLogin(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    const Text('Something went wrong'),
-                    Text(snapshot.error.toString()),
-                  ],
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+              borderRadius: kBorderRadius,
+            ),
+            backgroundColor: kAccentColor0.withOpacity(0.3),
+            content: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: kAccentColor1,
                 ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Ok'),
-                  onPressed: () {
-                    context.go("/login");
-                  },
-                ),
+                SizedBox(width: 10),
+                Text('Loading...', style: TextStyle(color: kAccentColor0)),
               ],
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            String errorText = snapshot.error.toString();
+            if (errorText.contains('401') ||
+                errorText.contains('404') ||
+                errorText.contains('403')) {
+              errorText = 'Username ou password errados!';
+            } else if (errorText.contains('SocketException')) {
+              errorText = 'Sem ligação à internet!';
+            } else {
+              errorText = 'Algo não correu bem!';
+            }
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: kBorderRadius,
+              ),
+              backgroundColor: kAccentColor0.withOpacity(0.3),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    errorText,
+                    style: const TextStyle(color: kAccentColor0),
+                  ),
+                  const SizedBox(height: 15),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
             );
           } else {
-            context.go("/homepage");
+            context.go(Paths.homePage);
             return Container();
           }
         } else {
-          return const CircularProgressIndicator();
+          return Container();
         }
       },
     );
@@ -362,7 +409,7 @@ class _LoginViewState extends State<LoginView>
               });
           // Call the login funct
         },
-        child: const Text('Login', style: TextStyle(color:kAccentColor0)),
+        child: const Text('Login', style: TextStyle(color: kAccentColor0)),
       ),
     );
   }

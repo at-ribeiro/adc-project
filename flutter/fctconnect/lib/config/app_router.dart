@@ -41,12 +41,6 @@ class AppRouter {
             navigatorKey: GlobalKey<NavigatorState>(),
             routes: [
               GoRoute(
-                path: Paths.homePage,
-                builder: (BuildContext context, GoRouterState state) {
-                  return const MyHomePage();
-                },
-              ),
-              GoRoute(
                 path: Paths.myProfile,
                 builder: (BuildContext context, GoRouterState state) {
                   return const MyProfile();
@@ -95,10 +89,21 @@ class AppRouter {
                   return ReportPage();
                 },
               ),
+              GoRoute(
+                path: Paths.editProfile,
+                builder: (BuildContext context, GoRouterState state) {
+                  return EditProfile();
+                },
+              ),
+              GoRoute(
+                path: '/',
+                builder: (BuildContext context, GoRouterState state) {
+                  return  MyHomePage();
+                },
+              ),
             ],
             builder: (context, state, child) {
               return Scaffold(
-                extendBody: true,
                 bottomNavigationBar: navigationBarModel,
                 body: child,
               );
@@ -108,12 +113,6 @@ class AppRouter {
             path: Paths.mapas,
             builder: (BuildContext context, GoRouterState state) {
               return MapScreen();
-            },
-          ),
-          GoRoute(
-            path: Paths.editProfile,
-            builder: (BuildContext context, GoRouterState state) {
-              return EditProfile();
             },
           ),
           GoRoute(
@@ -159,7 +158,6 @@ class AppRouter {
         builder: (context, state, child) {
           return Scaffold(
             drawer: drawerModel,
-            extendBodyBehindAppBar: true,
             appBar: AppBar(
               backgroundColor: kPrimaryColor,
               elevation: 0,
@@ -206,61 +204,6 @@ class AppRouter {
           return Splash();
         },
       ),
-      GoRoute(
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) {
-          return FutureBuilder<dynamic>(
-            future: CacheDefault.cacheFactory.get('isLoggedIn'),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                dynamic isLoggedInAsString = snapshot.data;
-
-                if (isLoggedInAsString != null) {
-                  bool isLoggedIn = isLoggedInAsString.toLowerCase() == 'true';
-                  if (isLoggedIn) {
-                    return Scaffold(
-                      extendBody: true,
-                      extendBodyBehindAppBar: true,
-                      appBar: AppBar(
-                        backgroundColor: kPrimaryColor,
-                        elevation: 0,
-                        title: Text(
-                          _getTitleBasedOnRoute(state.location),
-                          style: TextStyle(color: kAccentColor0),
-                        ),
-                        actions: [
-                          _getButtonsBasedOnRoute(state.location, context),
-                        ],
-                        leading: Builder(
-                          builder: (BuildContext context) {
-                            return IconButton(
-                              icon: const Icon(
-                                Icons.menu,
-                                color: kAccentColor0,
-                              ),
-                              onPressed: () {
-                                Scaffold.of(context).openDrawer();
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      bottomNavigationBar: navigationBarModel,
-                      body: MyHomePage(),
-                    );
-                  } else {
-                    return LoginView();
-                  }
-                } else {
-                  return LoginView();
-                }
-              } else {
-                return CircularProgressIndicator();
-              }
-            },
-          );
-        },
-      ),
     ],
   );
 
@@ -289,6 +232,8 @@ class AppRouter {
       return 'Calendário';
     } else if (location == Paths.reportedPosts) {
       return 'Posts Reportados';
+    } else if (location == Paths.editProfile) {
+      return 'Editar Perfil';
     }
     // add more conditions for other routes
 
@@ -298,7 +243,6 @@ class AppRouter {
   Widget _getButtonsBasedOnRoute(String location, BuildContext context) {
     if (location == Paths.homePage ||
         location == '/' ||
-        location == Paths.myProfile ||
         location == Paths.noticias ||
         location == Paths.events) {
       return IconButton(
@@ -310,6 +254,18 @@ class AppRouter {
         },
         icon: Icon(Icons.search),
       );
+    } else if (location == Paths.myProfile) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.editProfile);
+          },
+          icon: Icon(Icons.settings));
+    } else if (location == Paths.editProfile) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.myProfile);
+          },
+          icon: Icon(Icons.arrow_back));
     } else {
       return Container();
     }
