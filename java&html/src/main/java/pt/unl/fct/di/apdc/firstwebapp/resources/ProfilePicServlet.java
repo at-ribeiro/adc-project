@@ -59,7 +59,7 @@ public class ProfilePicServlet extends HttpServlet {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
                 return;

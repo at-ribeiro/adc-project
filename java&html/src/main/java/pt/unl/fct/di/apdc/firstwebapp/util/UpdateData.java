@@ -2,7 +2,7 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class UpdateData {
 
-    private String username;
+   private String username;
     private String fullname;
     private String email;
     private String phone;
@@ -14,6 +14,8 @@ public class UpdateData {
     private String city;
     private String purpose;
     private String privacy;
+
+
 
     public UpdateData(){}
 
@@ -41,7 +43,7 @@ public class UpdateData {
         return city;
     }
 
-    public String getAbout() {
+    public String getAbout_me() {
         return about_me;
     }
 
@@ -72,4 +74,15 @@ public class UpdateData {
     public String getPrivacy() {
         return privacy;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+
+
 }

@@ -110,8 +110,6 @@ public class FeedServlet extends HttpServlet {
             QueryResults<Entity> postResults = txn.run(postQuery);
 
             postResults.forEachRemaining(post -> {
-                        if (post.getLong("timestamp") < Long.parseLong(timestamp))
-                            LOG.info("timestamp comperator: " + timestamp);
 
                         String url = "";
 

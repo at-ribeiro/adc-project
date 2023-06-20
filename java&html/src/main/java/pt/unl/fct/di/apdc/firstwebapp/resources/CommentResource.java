@@ -69,11 +69,11 @@ public class CommentResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key commentKey = datastore.newKeyFactory()
@@ -156,11 +156,11 @@ public class CommentResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");

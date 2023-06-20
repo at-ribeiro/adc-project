@@ -31,7 +31,6 @@ public class UpdateResource {
     @PUT
     @Path("/{user}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response userUpdate(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String updaterName, @PathParam("user") String username, UpdateData data) {
 
         Transaction txn = datastore.newTransaction();
@@ -58,14 +57,14 @@ public class UpdateResource {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key userKey = userKeyFactory.newKey(username);
@@ -88,7 +87,7 @@ public class UpdateResource {
                     .set("user_privacy", data.getPrivacy())
                     .set("user_phone", StringValue.newBuilder(data.getPhone()).setExcludeFromIndexes(true).build())
                     .set("user_city", data.getCity())
-                    .set("user_about_me", StringValue.newBuilder(data.getAbout()).setExcludeFromIndexes(true).build())
+                    .set("user_about_me", StringValue.newBuilder(data.getAbout_me()).setExcludeFromIndexes(true).build())
                     .set("user_department", data.getDepartment())
                     .set("user_office", StringValue.newBuilder(data.getOffice()).setExcludeFromIndexes(true).build())
                     .set("user_course", data.getCourse())

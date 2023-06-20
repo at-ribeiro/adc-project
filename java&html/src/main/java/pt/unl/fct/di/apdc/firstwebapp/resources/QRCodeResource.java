@@ -50,19 +50,18 @@ public class QRCodeResource {
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key eventKey = datastore.newKeyFactory()
                     .setKind("Event")
-                    .addAncestor(PathElement.of("User", username))
                     .newKey(eventId);
 
             Entity event = txn.get(eventKey);
@@ -110,5 +109,70 @@ public class QRCodeResource {
         }
     }
 
+
+    @POST
+    @Path("/{eventId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response enterEvent(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username, @PathParam("eventId") String eventId){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist: " + username);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if(user.getString("user_state").equals("INACTIVE")){
+                LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key eventKey = datastore.newKeyFactory()
+                    .setKind("Event")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(eventId);
+
+            Entity event = txn.get(eventKey);
+
+            if(event == null){
+                LOG.warning("Event does not exist: " + eventId);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+
+
+            return Response.ok().build();
+
+        }catch (Exception e) {
+            LOG.info("Failed to enter event: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+
+    }
 
 }
