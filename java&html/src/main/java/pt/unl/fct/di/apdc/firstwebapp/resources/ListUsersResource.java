@@ -45,12 +45,12 @@ public class ListUsersResource {
 
             if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key userKey = userKeyFactory.newKey(data.getUsername());

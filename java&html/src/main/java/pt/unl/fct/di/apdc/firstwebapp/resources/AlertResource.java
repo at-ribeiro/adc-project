@@ -50,11 +50,11 @@ public class AlertResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key alertKey = datastore.newKeyFactory()
@@ -118,11 +118,11 @@ public class AlertResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             StructuredQuery.OrderBy ascTimestamp = StructuredQuery.OrderBy.asc("alert_timestamp");
@@ -194,11 +194,11 @@ public class AlertResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             for(Long alert: data.getIds()){

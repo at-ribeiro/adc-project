@@ -86,6 +86,11 @@ public class FeedServlet extends HttpServlet {
                 followeesKeys.add(StringValue.of(followeeString));
             });
 
+            if (followeesKeys.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
             LOG.info("followees: " + followeesKeys);
 
             ListValue followeesKeysValues = ListValue.of(followeesKeys);
@@ -110,8 +115,6 @@ public class FeedServlet extends HttpServlet {
             QueryResults<Entity> postResults = txn.run(postQuery);
 
             postResults.forEachRemaining(post -> {
-                        if (post.getLong("timestamp") < Long.parseLong(timestamp))
-                            LOG.info("timestamp comperator: " + timestamp);
 
                         String url = "";
 
