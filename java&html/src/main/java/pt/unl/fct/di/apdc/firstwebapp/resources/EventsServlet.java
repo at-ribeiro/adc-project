@@ -106,8 +106,16 @@ public class EventsServlet extends HttpServlet {
                 Blob blob = storage.get(blobId);
                 qrCodeUrl = blob.getMediaLink();
 
+                List<String> participants = new ArrayList<>();
+
+                for(Value<?> value : event.getList("event_participants")){
+                    Key userKey = (Key) value.get();
+                    Entity entity = txn.get(userKey);
+                    participants.add(entity.getString("user_username"));
+                }
+
                 // TODO: Check with frontend
-                EventGetData newsInstance = new EventGetData(
+                EventGetData eventInstance = new EventGetData(
                         event.getString("event_creator"),
                         event.getString("event_title"),
                         event.getString("event_description"),
@@ -115,13 +123,14 @@ public class EventsServlet extends HttpServlet {
                         event.getLong("event_start"),
                         event.getLong("event_end"),
                         event.getString("id"),
-                        qrCodeUrl);
+                        qrCodeUrl,
+                        participants);
 
-                eventList.add(newsInstance);
+                eventList.add(eventInstance);
             });
 
             if (eventList.isEmpty()) {
-                LOG.info("events: " + eventList);
+                LOG.info("no events found");
                 response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
             }
@@ -235,8 +244,6 @@ public class EventsServlet extends HttpServlet {
                 storage.create(blobInfo, imageBytes);
             }
 
-            // QR CODE image creation
-
             byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
 
             BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
@@ -251,7 +258,7 @@ public class EventsServlet extends HttpServlet {
 
             storage.create(blobInfo, qrCode);
 
-            // end of qr code
+            List<Value<String>> participants = new ArrayList<>();
 
             Key eventKey = datastore.newKeyFactory()
                     .setKind("Event")
@@ -266,6 +273,7 @@ public class EventsServlet extends HttpServlet {
                     .set("event_end", end)
                     .set("event_image", StringValue.newBuilder(title + "-" + imageName).setExcludeFromIndexes(true).build())
                     .set("event_qr", uniqueEventId + "-qrCode.png")
+                    .set("event_participants", participants)
                     .build();
 
             txn.put(entity);

@@ -1,5 +1,7 @@
 package pt.unl.fct.di.apdc.firstwebapp.util;
 
+import java.util.List;
+
 public class EventGetData {
 
     private String creator;
@@ -11,10 +13,11 @@ public class EventGetData {
     private long end;
     private String id;
     private String qrCodeUrl;
+    private List<String> participants;
 
     public EventGetData(){}
 
-    public EventGetData(String creator, String title, String description, String url, long start, long end, String id, String qrCodeUrl){
+    public EventGetData(String creator, String title, String description, String url, long start, long end, String id, String qrCodeUrl, List<String> participants) {
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -23,6 +26,7 @@ public class EventGetData {
         this.end = end;
         this.id = id;
         this.qrCodeUrl = qrCodeUrl;
+        this.participants = participants;
     }
 
     public String getCreator() {
@@ -54,6 +58,10 @@ public class EventGetData {
 
     public String getQrCodeUrl(){
         return qrCodeUrl;
+    }
+
+    public List<String> getParticipants(){
+        return participants;
     }
 
 }

@@ -114,7 +114,7 @@ public class ProfilePicServlet extends HttpServlet {
             // Close the thumbnail output stream
             thumbnailOutputStream.close();
 
-            Entity task = Entity.newBuilder(user)
+            Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
                     .set("user_fullname", user.getString("user_fullname"))
                     .set("user_pwd", user.getString("user_pwd"))
@@ -133,6 +133,7 @@ public class ProfilePicServlet extends HttpServlet {
                     .set("user_profile_pic", StringValue.newBuilder(imageName).setExcludeFromIndexes(true).build())
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", user.getString("user_purpose"))
+                    .set("user_events", user.getList("user_events"))
                     .build();
 
             txn.update(task);

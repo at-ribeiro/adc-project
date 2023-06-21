@@ -98,48 +98,91 @@ public class PostServlet extends HttpServlet {
             String imageName = "";
 
             if (request.getPart("image") != null) {
-                String imageNameJPG = request.getPart("image").getSubmittedFileName();
-                imageName = imageNameJPG.substring(0, imageNameJPG.lastIndexOf("."));
+                LOG.warning("IMAGE RECEIVED");
+                imageName = request.getPart("image").getSubmittedFileName();
                 InputStream imageStream = request.getPart("image").getInputStream();
 
-                // Read the original image
-                BufferedImage originalImage = ImageIO.read(imageStream);
+                String contentType = request.getPart("image").getContentType();
 
-                int thumbnailWidth;
-                int thumbnailHeight;
+                LOG.warning("IMAGE STREAM: " + imageStream.toString());
+                LOG.warning("CONTENT TYPE: " + contentType);
+
+                if(contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType.equals("image/png")) {
+
+                    LOG.warning("CONTENT TYPE IS IMAGE");
+
+                    // Read the original image
+                    BufferedImage originalImage = ImageIO.read(imageStream);
+
+                    int thumbnailWidth;
+                    int thumbnailHeight;
 
 
-                //Check image size and set thumbnail size accordingly
-                if(originalImage.getWidth() > originalImage.getHeight()){
-                    thumbnailWidth = 1350;
-                    thumbnailHeight = 1080;
-                }else if(originalImage.getWidth() < originalImage.getHeight()){
-                    thumbnailWidth = 1080;
-                    thumbnailHeight = 1350;
+                    //Check image size and set thumbnail size accordingly
+                    if (originalImage.getWidth() > originalImage.getHeight()) {
+                        thumbnailWidth = 1350;
+                        thumbnailHeight = 1080;
+                    } else if (originalImage.getWidth() < originalImage.getHeight()) {
+                        thumbnailWidth = 1080;
+                        thumbnailHeight = 1350;
+                    } else {
+                        thumbnailWidth = 1080;
+                        thumbnailHeight = 1080;
+                    }
+
+                    // Create a thumbnail image using the original image
+                    BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
+                    resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+                    // Save the thumbnail image to a byte array
+                    ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(resizedImage, contentType.substring(contentType.lastIndexOf('/') +1), thumbnailOutputStream);
+                    byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
+
+                    LOG.warning("CONTENT TYPE OF IMG: " + contentType.substring(contentType.lastIndexOf('/')) +1);
+                    LOG.warning("THUMBNAIL BYTES: " + thumbnailBytes.toString());
+
+                    // Upload the thumbnail image to your storage service (similar to the original image)
+                    BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
+
+                    if(storage.get(thumbnailBlobId)!=null){
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        return;
+                    }
+
+                    BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
+                            .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
+                            .build();
+
+                    storage.create(thumbnailBlobInfo, thumbnailBytes);
+
+                    // Close the thumbnail output stream
+                    thumbnailOutputStream.close();
+
                 }else{
-                    thumbnailWidth = 1080;
-                    thumbnailHeight = 1080;
+
+                    LOG.warning("CONTENT TYPE IS VIDEO");
+
+                    BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
+
+                    if(storage.get(blobId)!=null){
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        return;
+                    }
+
+                    byte[] imageBytes = IOUtils.toByteArray(imageStream);
+
+                    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
+                            Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
+
+
+                    storage.create(blobInfo, imageBytes);
+
                 }
 
-                // Create a thumbnail image using the original image
-                BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
-                resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
-
-                // Save the thumbnail image to a byte array
-                ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-                ImageIO.write(resizedImage, "jpg", thumbnailOutputStream);
-                byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
-
-                // Upload the thumbnail image to your storage service (similar to the original image)
-                BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
-                BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
-                        .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
-                        .build();
-                storage.create(thumbnailBlobInfo, thumbnailBytes);
-
-                // Close the thumbnail output stream
-                thumbnailOutputStream.close();
             }
+
+            LOG.info("IMAGE NAME: " + imageName);
 
             Key postKey = datastore.newKeyFactory()
                                 .setKind("Post")
