@@ -2,8 +2,8 @@ class Token {
   String username;
   String role;
   String tokenID;
-  double creationDate;
-  double expirationDate;
+  int creationDate;
+  int expirationDate;
 
   Token({
     required this.username,

@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
 import javax.servlet.*;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,25 +19,47 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+// qr code imports
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.io.ByteArrayOutputStream;
+
+@MultipartConfig
+
 public class EventsServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(EventsServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+
+    public byte[] generateQRCode(String data, int width, int height) throws IOException, WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
+        byte[] png;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+            png = baos.toByteArray();
+        }
+        return png;
+    }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
 
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
+            String username = request.getPathInfo().substring(1);
 
-            LOG.fine("Attempt get news");
+            LOG.fine("Attempt get events");
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
@@ -56,43 +79,48 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
+            StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("event_start");
 
-            Query<Entity> newsQuery = Query.newEntityQueryBuilder()
+            Query<Entity> eventsQuery = Query.newEntityQueryBuilder()
                     .setKind("Event")
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> eventResults = datastore.run(newsQuery);
+            QueryResults<Entity> eventResults = txn.run(eventsQuery);
 
             List<EventGetData> eventList = new ArrayList<>();
 
-
             eventResults.forEachRemaining(event -> {
                 String url = "";
+                String qrCodeUrl = "";
 
-                if (!event.getString("img").equals("")) {
+                if (!event.getString("event_image").equals("")) {
 
                     BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
                     Blob blob = storage.get(blobId);
                     url = blob.getMediaLink();
+
                 }
 
+                BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));
+                Blob blob = storage.get(blobId);
+                qrCodeUrl = blob.getMediaLink();
 
-                //TODO: Check with frontend
+                // TODO: Check with frontend
                 EventGetData newsInstance = new EventGetData(
                         event.getString("event_creator"),
                         event.getString("event_title"),
                         event.getString("event_description"),
                         url,
-                        Long.toString(event.getLong("event_start")),
-                        Long.toString(event.getLong("event_end"))
-                );
+                        event.getLong("event_start"),
+                        event.getLong("event_end"),
+                        event.getString("id"),
+                        qrCodeUrl);
 
                 eventList.add(newsInstance);
-            } );
+            });
 
-            if(eventList.isEmpty()){
+            if (eventList.isEmpty()) {
                 LOG.info("events: " + eventList);
                 response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return;
@@ -108,7 +136,7 @@ public class EventsServlet extends HttpServlet {
             response.getWriter().write(json);
             response.setStatus(HttpServletResponse.SC_OK);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -123,7 +151,9 @@ public class EventsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         Transaction txn = datastore.newTransaction();
 
-        try{
+        try {
+
+            String creator = request.getPathInfo().substring(1);
 
             String jsonPart = IOUtils.toString(request.getPart("event").getInputStream(), StandardCharsets.UTF_8);
             ObjectMapper mapper = new ObjectMapper();
@@ -137,39 +167,38 @@ public class EventsServlet extends HttpServlet {
             EventPostData data = mapper.readValue(jsonPart, EventPostData.class);
 
             String tokenId = request.getHeader("Authorization");
-            String username = request.getParameter("username");
             String title = data.getTitle();
-            String creator = data.getCreator();
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
+            String uniqueEventId = title + System.currentTimeMillis();
 
-            LOG.fine("Attempt to create event with user " + username);
+            LOG.fine("Attempt to create event with user " + creator);
 
-            //verifications
-            Key userKey = userKeyFactory.newKey(username);
+            // verifications
+            Key userKey = userKeyFactory.newKey(creator);
             Entity user = txn.get(userKey);
-            if (user == null){
+            if (user == null) {
                 LOG.warning("User does not exist.");
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            if (user.getString("user_state").equals("INACTIVE")){
+            if (user.getString("user_state").equals("INACTIVE")) {
                 LOG.warning("Inactive User.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
-            //TODO:Check user's role
+            // TODO:Check user's role
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", username))
+                    .addAncestor(PathElement.of("User", creator))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(tokenId))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
@@ -191,9 +220,9 @@ public class EventsServlet extends HttpServlet {
             if (imageStream != null) {
 
                 imageName = request.getPart("image").getSubmittedFileName();
-                BlobId blobId = BlobId.of(bucketName,  title + "-" + imageName);
+                BlobId blobId = BlobId.of(bucketName, title + "-" + imageName);
 
-                if(storage.get(blobId)==null){
+                if (storage.get(blobId) != null) {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     return;
                 }
@@ -206,17 +235,37 @@ public class EventsServlet extends HttpServlet {
                 storage.create(blobInfo, imageBytes);
             }
 
+            // QR CODE image creation
+
+            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
+
+            BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
+
+            if (storage.get(blobId) != null) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    return;
+            }
+
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
+                        Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
+
+            storage.create(blobInfo, qrCode);
+
+            // end of qr code
+
             Key eventKey = datastore.newKeyFactory()
                     .setKind("Event")
-                    .newKey(title);
+                    .newKey(uniqueEventId);
 
             Entity entity = Entity.newBuilder(eventKey)
+                    .set("id", uniqueEventId)
                     .set("event_title", title)
                     .set("event_creator", creator)
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
                     .set("event_start", start)
                     .set("event_end", end)
-                    .set("event_image", title + "-" + imageName)
+                    .set("event_image", StringValue.newBuilder(title + "-" + imageName).setExcludeFromIndexes(true).build())
+                    .set("event_qr", uniqueEventId + "-qrCode.png")
                     .build();
 
             txn.put(entity);
@@ -224,7 +273,7 @@ public class EventsServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

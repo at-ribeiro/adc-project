@@ -1,5 +1,6 @@
-package pt.unl.fct.di.apdc.firstwebapp.resources;
 
+package pt.unl.fct.di.apdc.firstwebapp.resources;
+/*
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
@@ -44,12 +45,12 @@ public class ListUsersResource {
 
             if (token == null || !token.getString("token_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key userKey = userKeyFactory.newKey(data.getUsername());
@@ -102,7 +103,7 @@ public class ListUsersResource {
                         StructuredQuery.PropertyFilter.eq("user_privacy", "public")
                 )
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_email"), user.getString("user_fullname"));
@@ -114,7 +115,7 @@ public class ListUsersResource {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                 StructuredQuery.PropertyFilter.eq("user_role", "USER")
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -127,7 +128,7 @@ public class ListUsersResource {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                         StructuredQuery.PropertyFilter.eq("user_role", "USER")
         ).build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -139,7 +140,7 @@ public class ListUsersResource {
                 StructuredQuery.PropertyFilter.eq("user_role", "GBO")
         ).build();
 
-        users = datastore.run(query);
+        users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -150,7 +151,7 @@ public class ListUsersResource {
 
     private void caseSU(List<UserData> userList) {
         Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
-        QueryResults<Entity> users = datastore.run(query);
+        QueryResults<Entity> users = txn.run(query);
 
         users.forEachRemaining(user ->{
             UserData toAdd = new UserData(user.getString("user_username"), user.getString("user_fullname"), user.getString("user_email"),
@@ -160,3 +161,4 @@ public class ListUsersResource {
     }
 
 }
+*/
