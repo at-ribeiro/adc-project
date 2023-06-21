@@ -126,12 +126,12 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+                borderRadius: kBorderRadius,
                 color: kAccentColor0.withOpacity(0.3),
               ),
               height: 150,
               child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
+                borderRadius: kBorderRadius,
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: TextFormField(

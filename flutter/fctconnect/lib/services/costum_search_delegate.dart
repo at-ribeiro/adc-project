@@ -143,9 +143,10 @@ class CustomSearchDelegate extends SearchDelegate {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(snapshot.data![index].username,
-                                    style: TextStyle(fontSize: 18)),
+                                    style: TextStyle(fontSize: 18, color: kAccentColor0),),
                                 Text(
                                   snapshot.data![index].fullname,
+                                  style: TextStyle(fontSize: 12, color: kAccentColor2),
                                 ),
                               ]),
                         ],

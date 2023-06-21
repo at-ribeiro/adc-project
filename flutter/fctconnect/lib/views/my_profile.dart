@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -101,30 +103,34 @@ class _MyProfileState extends State<MyProfile> {
         });
       });
     } else {
-      return Scaffold(
-        body: ListView(
-          padding: EdgeInsets.zero,
-          controller: _scrollController,
-          children: <Widget>[
-            buildTop(),
-            ContentWidget(
-              loadInfo: _loadInfo,
-              selectedButton: selectedButton,
-              onButtonSelected: selectButton,
-              token: _token,
-            ),
-            const SizedBox(height: 16),
-            Divider(
-              color: kAccentColor0,
-              thickness: 2.0,
-            ),
-            const SizedBox(height: 16),
-            if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
-            if (_token.role == "PROFESSOR")
-              buildInfoProfessorSection(_loadInfo),
-            if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
-            const SizedBox(height: 32),
-          ],
+      return Container(
+        decoration: kGradientDecoration,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: ListView(
+            padding: EdgeInsets.zero,
+            controller: _scrollController,
+            children: <Widget>[
+              buildTop(),
+              ContentWidget(
+                loadInfo: _loadInfo,
+                selectedButton: selectedButton,
+                onButtonSelected: selectButton,
+                token: _token,
+              ),
+              const SizedBox(height: 16),
+              Divider(
+                color: kAccentColor0,
+                thickness: 2.0,
+              ),
+              const SizedBox(height: 16),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
+              if (_token.role == "PROFESSOR")
+                buildInfoProfessorSection(_loadInfo),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       );
     }
@@ -445,108 +451,117 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget buildPostCard(FeedData post) {
-    return Card(
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return Container(
+      margin: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          width: 1.5,
+          color: kAccentColor0.withOpacity(0.0),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: kAccentColor2.withOpacity(0.1),
+              borderRadius: kBorderRadius,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+                              ),
+                            ),
+                            SizedBox(width: 8.0),
+                            Center(
+                              heightFactor:
+                                  2.4, // You can adjust this to get the alignment you want
+                              child: Text(post.user),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 7.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                            child: Text(post.user),
-                          ),
-                          const SizedBox(height: 8.0),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(25.0, 8.0, 8.0, 8.0),
-                            child: Text(post.text),
-                          ),
-                          const SizedBox(height: 8.0),
-                          post.url.isNotEmpty
-                              ? GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Dialog(
-                                          child: Container(
-                                            child: Image.network(
-                                              post.url,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      return Image.network(
-                                        post.url,
-                                        fit: constraints.maxHeight > 600.0
-                                            ? BoxFit.cover
-                                            : BoxFit.scaleDown,
-                                        width: constraints.maxWidth,
-                                        height: constraints.maxHeight > 600.0
-                                            ? 600.0
-                                            : constraints.maxHeight,
-                                      );
-                                    },
+                    const SizedBox(height: 8.0),
+                    if (post.url.isNotEmpty)
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ClipRRect(
+                                  borderRadius: kBorderRadius,
+                                  child: Dialog(
+                                    child: Container(
+                                      child: ClipRRect(
+                                        borderRadius: kBorderRadius,
+                                        child: Image.network(
+                                          post.url,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                )
-                              : const SizedBox.shrink(),
-                          const SizedBox(height: 8.0),
-                          Positioned(
-                            bottom: 8.0,
-                            right: 8.0,
-                            child: Text(
-                              DateFormat('dd-MM-yyyy HH:mm:ss').format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                  int.parse(post.timestamp),
+                                );
+                              },
+                            );
+                          },
+                          child: SizedBox(
+                            height: 300.0, // Replace with your desired height
+                            child: AspectRatio(
+                              aspectRatio: 16 /
+                                  9, // Replace with the actual aspect ratio of the image
+                              child: FittedBox(
+                                fit: BoxFit
+                                    .contain, // Adjust the fit property as needed
+                                child: Image.network(
+                                  post.url,
                                 ),
                               ),
                             ),
-                          )
-                        ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      post.text,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        DateFormat('HH:mm  dd/MM/yyyy').format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            int.parse(post.timestamp),
+                          ),
+                        ),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-          Positioned(
-            top: 8.0,
-            right: 8.0,
-            child: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                // Delete button pressed
-                PostActions.deletePost(post.id, post.user, _token.tokenID);
-                setState(() {
-                  // Update the UI by removing the post from the list
-                  _posts.remove(post);
-                });
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -577,7 +592,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget buildCoverImage() => Container(
-        color: Colors.grey,
+        color: kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
@@ -588,7 +603,7 @@ class _MyProfileState extends State<MyProfile> {
 
   Widget buildProfileImage() => CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: Colors.grey.shade800,
+        backgroundColor: kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
@@ -605,7 +620,7 @@ class _MyProfileState extends State<MyProfile> {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: kAccentColor0,
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -675,8 +690,10 @@ class _ContentWidgetState extends State<ContentWidget> {
               const SizedBox(height: 8),
               Text(
                 info.username,
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
+                style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: kAccentColor0),
               ),
               const SizedBox(height: 8),
               Text(
@@ -689,7 +706,7 @@ class _ContentWidgetState extends State<ContentWidget> {
                 children: [
                   Divider(
                     thickness: 2.0,
-                    color: Colors.grey,
+                    color: kAccentColor0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
@@ -697,7 +714,7 @@ class _ContentWidgetState extends State<ContentWidget> {
                   ),
                   Divider(
                     thickness: 2.0,
-                    color: Colors.grey,
+                    color: kAccentColor0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0, left: 8.0),
@@ -706,7 +723,7 @@ class _ContentWidgetState extends State<ContentWidget> {
                   ),
                   Divider(
                     thickness: 2.0,
-                    color: Colors.grey,
+                    color: kAccentColor0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
@@ -723,20 +740,12 @@ class _ContentWidgetState extends State<ContentWidget> {
                     onPressed: () {
                       widget.onButtonSelected('Info');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
                     child: Text(
                       'Info',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: kAccentColor0,
                       ),
                     ),
                   ),
@@ -748,20 +757,12 @@ class _ContentWidgetState extends State<ContentWidget> {
                           context.findAncestorStateOfType<_MyProfileState>()!;
                       myProfileState._loadPosts();
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
                     child: Text(
                       'Posts',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: kAccentColor0,
                       ),
                     ),
                   ),

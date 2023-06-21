@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/PostReport.dart';
 
 import '../models/AlertPostData.dart';
@@ -70,63 +71,89 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
         });
       });
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Posts Reportados'),
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await BaseClient().deletePostsReport(
-                  "/report",
-                  _token.username,
-                  _token.tokenID,
-                  reportsToDelete,
-                );
-                setState(() {
-                  postReportsList.clear();
-                  reportsToDelete.clear();
-                });
-                _loadReports();
-              },
-              icon: Icon(Icons.delete),
-            ),
-          ],
-        ),
-        body: ListView.builder(
-          itemCount: postReportsList.length,
-          itemBuilder: (context, index) {
-            PostReport postsReport = postReportsList[index];
-            bool isSelected = reportsToDelete.contains(postsReport.postId);
-            return Card(
-              child: ListTile(
-                title: Text(postsReport.postCreator),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Post ID: ${postsReport.postId}'),
-                    Text('Número de reports: ${postsReport.count}'),
-                    Text('Reportado por: ${postsReport.reporters}'),
-                    Text('Razões: ${postsReport.reportReason}'),
-                    Text('Comentários: ${postsReport.reportComment}'),
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: Icon(
-                    isSelected
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank,
+      return Container(
+        decoration: kGradientDecorationUp,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              await BaseClient().deletePostsReport(
+                "/report",
+                _token.username,
+                _token.tokenID,
+                reportsToDelete,
+              );
+              setState(() {
+                postReportsList.clear();
+                reportsToDelete.clear();
+              });
+              _loadReports();
+            },
+            child: Icon(Icons.delete, color: kAccentColor0),
+          ),
+          body: ListView.builder(
+            itemCount: postReportsList.length,
+            itemBuilder: (context, index) {
+              PostReport postsReport = postReportsList[index];
+              bool isSelected = reportsToDelete.contains(postsReport.postId);
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius:
+                      kBorderRadius, // Setting the border radius
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: kAccentColor0
+                          .withOpacity(0.3), // Glass effect by using opacity
+                      borderRadius: kBorderRadius,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10.0,
+                          spreadRadius: 2.0,
+                        ),
+                      ],
+                    ),
+                    child: Card(
+                      color: Colors
+                          .transparent, // To make sure Card takes the glass effect
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: kBorderRadius,
+                      ),
+                      child: ListTile(
+                        title: Text(postsReport.postCreator),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Post ID: ${postsReport.postId}'),
+                            Text('Número de reports: ${postsReport.count}'),
+                            Text('Reportado por: ${postsReport.reporters}'),
+                            Text('Razões: ${postsReport.reportReason}'),
+                            Text('Comentários: ${postsReport.reportComment}'),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(
+                            isSelected
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank,
+                          ),
+                          onPressed: () {
+                            if (isSelected) {
+                              removeFromSelectedReports(postsReport.postId);
+                            } else {
+                              addToSelectedReports(postsReport.postId);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    if (isSelected) {
-                      removeFromSelectedReports(postsReport.postId);
-                    } else {
-                      addToSelectedReports(postsReport.postId);
-                    }
-                  },
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       );
     }

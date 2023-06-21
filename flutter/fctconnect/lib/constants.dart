@@ -39,6 +39,8 @@ dynamic kGradientDecorationUp = BoxDecoration(
       kPrimaryColor.withOpacity(1),
       kPrimaryColor.withOpacity(1),
       kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
     ],
   ),
 );
@@ -48,6 +50,8 @@ dynamic kGradientDecorationDown = BoxDecoration(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
       kPrimaryColor.withOpacity(1),
       kPrimaryColor.withOpacity(1),
       kPrimaryColor.withOpacity(1),

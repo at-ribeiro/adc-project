@@ -46,27 +46,7 @@ class AppRouter {
                   return const MyProfile();
                 },
               ),
-              GoRoute(
-                path: Paths.otherProfile,
-                builder: (BuildContext context, GoRouterState state) {
-                  String? username = state.queryParameters['username']!;
-                  return FutureBuilder<bool>(
-                    future: isSessionUser(username),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == false) {
-                          return OtherProfile(name: username);
-                        } else {
-                          return MyProfile();
-                        }
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  );
-                },
-              ),
+             
               GoRoute(
                 path: Paths.noticias,
                 builder: (BuildContext context, GoRouterState state) {
@@ -84,21 +64,9 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.report,
-                builder: (BuildContext context, GoRouterState state) {
-                  return ReportPage();
-                },
-              ),
-              GoRoute(
-                path: Paths.editProfile,
-                builder: (BuildContext context, GoRouterState state) {
-                  return EditProfile();
-                },
-              ),
-              GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
-                  return  MyHomePage();
+                  return MyHomePage();
                 },
               ),
             ],
@@ -154,6 +122,39 @@ class AppRouter {
               return EventCreator();
             },
           ),
+          GoRoute(
+            path: Paths.editProfile,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfile();
+            },
+          ),
+          GoRoute(
+            path: Paths.report,
+            builder: (BuildContext context, GoRouterState state) {
+              return ReportPage();
+            },
+          ),
+           GoRoute(
+                path: Paths.otherProfile,
+                builder: (BuildContext context, GoRouterState state) {
+                  String? username = state.queryParameters['username']!;
+                  return FutureBuilder<bool>(
+                    future: isSessionUser(username),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == false) {
+                          return OtherProfile(name: username);
+                        } else {
+                          return MyProfile();
+                        }
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  );
+                },
+              ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -264,6 +265,18 @@ class AppRouter {
       return IconButton(
           onPressed: () {
             context.go(Paths.myProfile);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location == Paths.createEvent) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.events);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.otherProfile)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
     } else {

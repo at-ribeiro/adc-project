@@ -60,10 +60,12 @@ class _EventViewState extends State<EventView> {
         decoration: kGradientDecorationUp,
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
+              backgroundColor: kSecondaryColor,
+
               onPressed: () {
-                context.push(Paths.createEvent);
+                context.go(Paths.createEvent);
               },
-              child: const Icon(Icons.add)),
+              child: const Icon(Icons.add, color: kAccentColor0)),
           backgroundColor: Colors.transparent,
           body: Column(
             children: [

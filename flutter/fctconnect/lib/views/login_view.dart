@@ -14,6 +14,7 @@ import '../data/cache_factory_provider.dart';
 
 import '../models/paths.dart';
 import '../services/base_client.dart';
+import '../widgets/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   final String? session;
@@ -36,8 +37,6 @@ class _LoginViewState extends State<LoginView>
   @override
   void initState() {
     super.initState();
-
-    SessionManager.storeSession('session', '/');
   }
 
   @override
@@ -361,28 +360,7 @@ class _LoginViewState extends State<LoginView>
             } else {
               errorText = 'Algo não correu bem!';
             }
-            return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                borderRadius: kBorderRadius,
-              ),
-              backgroundColor: kAccentColor0.withOpacity(0.3),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    errorText,
-                    style: const TextStyle(color: kAccentColor0),
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
-              ),
-            );
+            return ErrorDialog(errorText,'Tentar novamente', context);
           } else {
             context.go(Paths.homePage);
             return Container();
@@ -393,6 +371,7 @@ class _LoginViewState extends State<LoginView>
       },
     );
   }
+
 
   Widget loginButton() {
     return SizedBox(

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
@@ -54,12 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted)
-            setState(() {
-              _token = token;
-              _isLoadingToken = false;
-            });
+        setState(() {
+          _token = token;
+          _isLoadingToken = false;
         });
       });
     } else {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../models/paths.dart';
 
@@ -25,6 +26,7 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpViewState extends State<SignUpView> {
+  bool isExpandedRole = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -143,11 +145,11 @@ class _SignUpViewState extends State<SignUpView> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
@@ -186,11 +188,11 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(height: size.height * 0.02),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
@@ -227,11 +229,11 @@ class _SignUpViewState extends State<SignUpView> {
                   /// Email
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
@@ -267,11 +269,11 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(height: size.height * 0.02),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       color: kAccentColor0.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      borderRadius: kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Theme(
@@ -280,7 +282,7 @@ class _SignUpViewState extends State<SignUpView> {
                             popupMenuTheme: PopupMenuThemeData(
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                                    kBorderRadius,
                               ),
                             ),
                           ),
@@ -289,6 +291,7 @@ class _SignUpViewState extends State<SignUpView> {
                                 horizontal: 9, vertical: 4),
                             child: DropdownButtonHideUnderline(
                               child: ExpansionTile(
+                                initiallyExpanded: isExpandedRole,
                                 title: roleController.text.isEmpty
                                     ? Text(
                                         "Role",
@@ -307,6 +310,7 @@ class _SignUpViewState extends State<SignUpView> {
                                     onTap: () {
                                       setState(() {
                                         roleController.text = value;
+                                        isExpandedRole = false;
                                       });
                                     },
                                   );
@@ -322,11 +326,11 @@ class _SignUpViewState extends State<SignUpView> {
                   Obx(
                     () => Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderRadius: kBorderRadius,
                         color: kAccentColor0.withOpacity(0.2),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderRadius: kBorderRadius,
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: TextFormField(
@@ -376,11 +380,11 @@ class _SignUpViewState extends State<SignUpView> {
                   Obx(
                     () => Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderRadius: kBorderRadius,
                         color: kAccentColor0.withOpacity(0.2),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        borderRadius: kBorderRadius,
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: TextFormField(
@@ -523,28 +527,7 @@ class _SignUpViewState extends State<SignUpView> {
                             break;
                         }
 
-                        return AlertDialog(
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: kBorderRadius,
-                          ),
-                          backgroundColor: kAccentColor0.withOpacity(0.3),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                errorText,
-                                style: TextStyle(color: kAccentColor0),
-                              ),
-                              SizedBox(height: 15),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Tentar novamente'),
-                              ),
-                            ],
-                          ),
-                        );
+                        return ErrorDialog(errorText, 'Voltar a tentar', context);
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();

@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
+import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
@@ -95,17 +98,29 @@ class _EditProfileState extends State<EditProfile> {
         });
       });
     } else {
-      return Scaffold(
-        body: ListView(
-          padding: EdgeInsets.zero,
-          controller: _scrollController,
-          children: <Widget>[
-            const SizedBox(height: 40),
-            if (_token.role == "ALUNO") buildInfoAlunoSection(),
-            if (_token.role == "PROFESSOR") buildInfoProfessorSection(),
-            if (_token.role == "EXTERNO") buildInfoExternoSection(),
-            const SizedBox(height: 32),
-          ],
+      return Container(
+        decoration: kGradientDecorationUp,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            // Use Center here to center SingleChildScrollView
+            child: SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              controller: _scrollController,
+              child: Column(
+                // This Column centers its children vertically
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 40),
+                  if (_token.role == "ALUNO") buildInfoAlunoSection(),
+                  if (_token.role == "PROFESSOR") buildInfoProfessorSection(),
+                  if (_token.role == "EXTERNO") buildInfoExternoSection(),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -119,145 +134,21 @@ class _EditProfileState extends State<EditProfile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Full Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: fullNameController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Selecione o seu nome completo';
-                } else {
-                  return null;
-                }
-              },
+            fullNameWidget(
+              fullNameController: fullNameController,
             ),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.mail),
-                hintText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: emailController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Seleciona o seu email';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            emailWidget(emailController: emailController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.phone),
-                hintText: 'Número de telemóvel',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: phoneNumberController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona o seu número de telemóvel';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            phoneNumberWidget(phoneNumberController: phoneNumberController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.location_city),
-                hintText: 'Cidade',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: homeTownController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona a sua cidade';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            cityWidget(homeTownController: homeTownController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Sobre Mim',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: aboutMeController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Selecione o seu Sobre Mim';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            aboutMeWidget(aboutMeController: aboutMeController),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: privacyController.text.isEmpty
-                    ? Text(
-                        "Privacidade",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(privacyController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        privacyController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            privacyWidget(),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.school),
-                hintText: 'Pro´pósito da visita',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: purposeController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Selecione o seu motivo de visita';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            visitWidget(purposeController: purposeController),
             SizedBox(height: 16),
             confirmButton(),
           ],
@@ -274,188 +165,144 @@ class _EditProfileState extends State<EditProfile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Full Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: fullNameController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Selecione o seu nome completo';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            fullNameWidget(fullNameController: fullNameController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.mail),
-                hintText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: emailController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Seleciona o seu email';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            emailWidget(emailController: emailController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.phone),
-                hintText: 'Número de telemóvel',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: phoneNumberController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona o seu número de telemóvel';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            phoneNumberWidget(phoneNumberController: phoneNumberController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.location_city),
-                hintText: 'Cidade',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: homeTownController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona a sua cidade';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            cityWidget(homeTownController: homeTownController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Sobre Mim',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: aboutMeController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Selecione o seu Sobre Mim';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            aboutMeWidget(aboutMeController: aboutMeController),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: privacyController.text.isEmpty
-                    ? Text(
-                        "Privacidade",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(privacyController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        privacyController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            privacyWidget(),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: departmentController.text.isEmpty
-                    ? Text(
-                        "Departamento",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(departmentController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: [
-                  'Ciências e Engenharia do Ambiente',
-                  'Ciência dos Materiais',
-                  'Conservação e Restauro',
-                  'Ciências Sociais Aplicadas',
-                  'Ciências da Terra',
-                  'Ciências da Vida',
-                  'Engenharia Civil',
-                  'Engenharia Eletrotécnica e de Computadores',
-                  'Engenharia Mecânica e Industrial',
-                  'Física',
-                  'Informática',
-                  'Matemática',
-                  'Química'
-                ].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        departmentController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            departmentWidget(),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.local_post_office),
-                hintText: 'Escritório',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: officeController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Selecione o seu escritório';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            officeWidget(officeController: officeController),
             SizedBox(height: 16),
             confirmButton(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Container privacyWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Theme(
+            data: ThemeData(
+              canvasColor: kAccentColor0,
+              popupMenuTheme: PopupMenuThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: kBorderRadius,
+                ),
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              child: DropdownButtonHideUnderline(
+                child: ExpansionTile(
+                  title: privacyController.text.isEmpty
+                      ? Text(
+                          "Privacidade",
+                          style: TextStyle(color: kAccentColor0),
+                        )
+                      : Text(privacyController.text,
+                          style: TextStyle(color: kAccentColor0)),
+                  leading: Icon(Icons.work, color: kAccentColor1),
+                  children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
+                    return ListTile(
+                      title: Text(
+                        value,
+                        style: TextStyle(color: kAccentColor0),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          privacyController.text = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container departmentWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Theme(
+            data: ThemeData(
+              canvasColor: kAccentColor0,
+              popupMenuTheme: PopupMenuThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: kBorderRadius,
+                ),
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              child: DropdownButtonHideUnderline(
+                child: ExpansionTile(
+                  title: departmentController.text.isEmpty
+                      ? Text(
+                          "Departamento",
+                          style: TextStyle(color: kAccentColor0),
+                        )
+                      : Text(departmentController.text,
+                          style: TextStyle(color: kAccentColor0)),
+                  leading: Icon(Icons.work, color: kAccentColor1),
+                  children: [
+                    'Ciências e Engenharia do Ambiente',
+                    'Ciência dos Materiais',
+                    'Conservação e Restauro',
+                    'Ciências Sociais Aplicadas',
+                    'Ciências da Terra',
+                    'Ciências da Vida',
+                    'Engenharia Civil',
+                    'Engenharia Eletrotécnica e de Computadores',
+                    'Engenharia Mecânica e Industrial',
+                    'Física',
+                    'Informática',
+                    'Matemática',
+                    'Química'
+                  ].map<Widget>((String value) {
+                    return ListTile(
+                      title: Text(
+                        value,
+                        style: TextStyle(color: kAccentColor0),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          departmentController.text = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -469,239 +316,23 @@ class _EditProfileState extends State<EditProfile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Full Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: fullNameController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Selecione o seu nome completo';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            fullNameWidget(fullNameController: fullNameController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.mail),
-                hintText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: emailController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Seleciona o seu email';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            emailWidget(emailController: emailController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.phone),
-                hintText: 'Número de telemóvel',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: phoneNumberController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona o seu número de telemóvel';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            phoneNumberWidget(phoneNumberController: phoneNumberController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.location_city),
-                hintText: 'Cidade',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: homeTownController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleciona a sua cidade';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            cityWidget(homeTownController: homeTownController),
             SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.person),
-                hintText: 'Sobre Mim',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                ),
-              ),
-              controller: aboutMeController,
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null) {
-                  return 'Selecione o seu Sobre Mim';
-                } else {
-                  return null;
-                }
-              },
-            ),
+            aboutMeWidget(aboutMeController: aboutMeController),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: privacyController.text.isEmpty
-                    ? Text(
-                        "Privacidade",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(privacyController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        privacyController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            privacyWidget(),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: departmentController.text.isEmpty
-                    ? Text(
-                        "Departamento",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(departmentController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: [
-                  'Ciências e Engenharia do Ambiente',
-                  'Ciência dos Materiais',
-                  'Conservação e Restauro',
-                  'Ciências Sociais Aplicadas',
-                  'Ciências da Terra',
-                  'Ciências da Vida',
-                  'Engenharia Civil',
-                  'Engenharia Eletrotécnica e de Computadores',
-                  'Engenharia Mecânica e Industrial',
-                  'Física',
-                  'Informática',
-                  'Matemática',
-                  'Química'
-                ].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        departmentController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            departmentWidget(),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: courseController.text.isEmpty
-                    ? Text(
-                        "Curso",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(courseController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: [
-                  'Biologia Celular e Molecular',
-                  'Bioquímica',
-                  'Conservação-Restauro',
-                  'Engenharia do Ambiente',
-                  'Engenharia Biomédica',
-                  'Engenharia Civil',
-                  'Engenharia Eletrotécnica e de Computadores',
-                  'Engenharia Física',
-                  'Engenharia Geológica',
-                  'Engenharia e Gestão Industrial',
-                  'Engenharia Informática',
-                  'Engenharia de Materiais',
-                  'Engenharia Mecânica',
-                  'Engenharia de Micro e Nanotecnologias',
-                  'Engenharia Química e Biológica',
-                  'Matemática',
-                  'Matemática Aplicada à Gestão do Risco',
-                  'Tecnologia Agro-Industrial',
-                  'Química Aplicada'
-                ].map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        courseController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            courseWidget(),
             SizedBox(height: 16),
-            DropdownButtonHideUnderline(
-              child: ExpansionTile(
-                title: yearController.text.isEmpty
-                    ? Text(
-                        "Ano",
-                        style: TextStyle(color: kAccentColor0),
-                      )
-                    : Text(yearController.text,
-                        style: TextStyle(color: kAccentColor0)),
-                leading: Icon(Icons.work, color: kAccentColor0),
-                children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
-                    .map<Widget>((String value) {
-                  return ListTile(
-                    title: Text(
-                      value,
-                      style: TextStyle(color: kAccentColor0),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        yearController.text = value;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
+            yearWidget(),
             SizedBox(height: 16),
             confirmButton(),
           ],
@@ -710,17 +341,135 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  ElevatedButton confirmButton() {
-    return ElevatedButton(
-      style: ButtonStyle(
-        backgroundColor:
-            MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
-        shape: MaterialStateProperty.all(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
+  Container yearWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Theme(
+            data: ThemeData(
+              canvasColor: kAccentColor0,
+              popupMenuTheme: PopupMenuThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: kBorderRadius,
+                ),
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              child: DropdownButtonHideUnderline(
+                child: ExpansionTile(
+                  title: yearController.text.isEmpty
+                      ? Text(
+                          "Ano",
+                          style: TextStyle(color: kAccentColor0),
+                        )
+                      : Text(yearController.text,
+                          style: TextStyle(color: kAccentColor0)),
+                  leading: Icon(Icons.work, color: kAccentColor1),
+                  children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
+                      .map<Widget>((String value) {
+                    return ListTile(
+                      title: Text(
+                        value,
+                        style: TextStyle(color: kAccentColor0),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          yearController.text = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Container courseWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Theme(
+            data: ThemeData(
+              canvasColor: kAccentColor0,
+              popupMenuTheme: PopupMenuThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: kBorderRadius,
+                ),
+              ),
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              child: DropdownButtonHideUnderline(
+                child: ExpansionTile(
+                  title: courseController.text.isEmpty
+                      ? Text(
+                          "Curso",
+                          style: TextStyle(color: kAccentColor0),
+                        )
+                      : Text(courseController.text,
+                          style: TextStyle(color: kAccentColor0)),
+                  leading: Icon(Icons.work, color: kAccentColor1),
+                  children: [
+                    'Biologia Celular e Molecular',
+                    'Bioquímica',
+                    'Conservação-Restauro',
+                    'Engenharia do Ambiente',
+                    'Engenharia Biomédica',
+                    'Engenharia Civil',
+                    'Engenharia Eletrotécnica e de Computadores',
+                    'Engenharia Física',
+                    'Engenharia Geológica',
+                    'Engenharia e Gestão Industrial',
+                    'Engenharia Informática',
+                    'Engenharia de Materiais',
+                    'Engenharia Mecânica',
+                    'Engenharia de Micro e Nanotecnologias',
+                    'Engenharia Química e Biológica',
+                    'Matemática',
+                    'Matemática Aplicada à Gestão do Risco',
+                    'Tecnologia Agro-Industrial',
+                    'Química Aplicada'
+                  ].map<Widget>((String value) {
+                    return ListTile(
+                      title: Text(
+                        value,
+                        style: TextStyle(color: kAccentColor0),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          courseController.text = value;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton confirmButton() {
+    return ElevatedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           UpdateData data = UpdateData(
@@ -769,18 +518,7 @@ class _EditProfileState extends State<EditProfile> {
                               "Algo não está certo, tente outra vez!";
                           break;
                       }
-                      return AlertDialog(
-                        title: Text('Error'),
-                        content: Text(showErrorMessage),
-                        actions: <Widget>[
-                          ElevatedButton(
-                            child: Text('OK'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
+                      return ErrorDialog(showErrorMessage, 'ok', context);
                     } else {
                       AlertDialog(
                         content: Row(
@@ -830,4 +568,347 @@ class _EditProfileState extends State<EditProfile> {
           ],
         ),
       );
+}
+
+class visitWidget extends StatelessWidget {
+  const visitWidget({
+    super.key,
+    required this.purposeController,
+  });
+
+  final TextEditingController purposeController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.school, color: kAccentColor1),
+              hintText: 'Propósito da visita',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: purposeController,
+            validator: (value) {
+              if (value == null) {
+                return 'Selecione o seu motivo de visita';
+              } else {
+                return null;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class officeWidget extends StatelessWidget {
+  const officeWidget({
+    super.key,
+    required this.officeController,
+  });
+
+  final TextEditingController officeController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon:
+                  Icon(Icons.local_post_office_outlined, color: kAccentColor1),
+              hintText: 'Escritório',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: officeController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione o seu escritório';
+              } else
+                return null;
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class aboutMeWidget extends StatelessWidget {
+  const aboutMeWidget({
+    super.key,
+    required this.aboutMeController,
+  });
+
+  final TextEditingController aboutMeController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.person, color: kAccentColor1),
+              hintText: 'Sobre Mim',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: aboutMeController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione o seu Sobre Mim';
+              } else
+                return null;
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class cityWidget extends StatelessWidget {
+  const cityWidget({
+    super.key,
+    required this.homeTownController,
+  });
+
+  final TextEditingController homeTownController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.location_city, color: kAccentColor1),
+              hintText: 'Cidade',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: homeTownController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione a sua cidade';
+              } else {
+                return null;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class phoneNumberWidget extends StatelessWidget {
+  const phoneNumberWidget({
+    super.key,
+    required this.phoneNumberController,
+  });
+
+  final TextEditingController phoneNumberController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.phone, color: kAccentColor1),
+              hintText: 'Número de telemóvel',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: phoneNumberController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione um número de telemóvel';
+              } else {
+                return null;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class emailWidget extends StatelessWidget {
+  const emailWidget({
+    super.key,
+    required this.emailController,
+  });
+
+  final TextEditingController emailController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.email, color: kAccentColor1),
+              hintText: 'Email',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: emailController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione um email';
+              } else if (!value.contains('@')) {
+                return 'Selecione um email válido';
+              }
+              return null;
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class fullNameWidget extends StatelessWidget {
+  const fullNameWidget({
+    super.key,
+    required this.fullNameController,
+  });
+
+  final TextEditingController fullNameController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: kBorderRadius,
+        color: kAccentColor0.withOpacity(0.3),
+      ),
+      child: ClipRRect(
+        borderRadius: kBorderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: TextFormField(
+            style: TextStyle(
+              color: kAccentColor0,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.person, color: kAccentColor1),
+              hintText: 'Nome Completo',
+              border: InputBorder.none,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: kBorderRadius,
+                borderSide: BorderSide(
+                  color: kAccentColor1, // Set your desired focused color here
+                ),
+              ),
+            ),
+            controller: fullNameController,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Selecione o nome completo';
+              } else {
+                return null;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }

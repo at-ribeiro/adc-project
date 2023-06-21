@@ -1,8 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
@@ -13,6 +17,7 @@ import 'package:responsive_login_ui/models/profile_info.dart';
 import '../models/FeedData.dart';
 
 import '../models/Token.dart';
+import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 
@@ -100,41 +105,64 @@ class _OtherProfileState extends State<OtherProfile> {
         });
       });
     } else if (!existsUser()) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Perfil'),
-        ),
-        body: Center(
-          child: Text("O user $name não existe"),
+      return Container(
+        decoration: kGradientDecoration,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // Centers vertically
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // Centers horizontally
+              children: [
+                Text(
+                  "O user $name não existe",
+                  style: TextStyle(fontSize: 20, color: kAccentColor0),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    context.go(Paths.homePage);
+                  },
+                  child: Text(
+                    "Voltar à home page",
+                    style: TextStyle(color: kAccentColor0),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       );
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Perfil'),
-        ),
-        body: ListView(
-          padding: EdgeInsets.zero,
-          controller: _scrollController,
-          children: <Widget>[
-            buildTop(),
-            ContentWidget(
-              loadInfo: _loadInfo,
-              selectedButton: selectedButton,
-              onButtonSelected: selectButton,
-              token: _token,
-            ),
-            const SizedBox(height: 16),
-            Divider(
-              color: Colors.grey,
-              thickness: 2.0,
-            ),
-            const SizedBox(height: 16),
-            if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
-            if (_token.role == "PROFESSOR") buildInfoProfessorSection(_loadInfo),
-            if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
-            const SizedBox(height: 32),
-          ],
+      return Container(
+        decoration: kGradientDecorationUp,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: ListView(
+            padding: EdgeInsets.zero,
+            controller: _scrollController,
+            children: <Widget>[
+              buildTop(),
+              ContentWidget(
+                loadInfo: _loadInfo,
+                selectedButton: selectedButton,
+                onButtonSelected: selectButton,
+                token: _token,
+              ),
+              const SizedBox(height: 16),
+              Divider(
+                color: kAccentColor0,
+                thickness: 2.0,
+              ),
+              const SizedBox(height: 16),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
+              if (_token.role == "PROFESSOR")
+                buildInfoProfessorSection(_loadInfo),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       );
     }
@@ -384,65 +412,116 @@ class _OtherProfileState extends State<OtherProfile> {
   }
 
   Widget buildPostCard(FeedData post) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                  ),
-                ),
-                const SizedBox(width: 7.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                        child: Text(post.user),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(25.0, 8.0, 8.0, 8.0),
-                        child: Text(post.text),
-                      ),
-                      const SizedBox(height: 8.0),
-                      post.url.isNotEmpty
-                          ? AspectRatio(
-                              aspectRatio: 16 / 9,
-                              child: Container(
-                                alignment: Alignment.center,
+    return Container(
+      margin: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          width: 1.5,
+          color: kAccentColor0.withOpacity(0.0),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: kAccentColor2.withOpacity(0.1),
+              borderRadius: kBorderRadius,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+                              ),
+                            ),
+                            SizedBox(width: 8.0),
+                            Center(
+                              heightFactor:
+                                  2.4, // You can adjust this to get the alignment you want
+                              child: Text(post.user),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8.0),
+                    if (post.url.isNotEmpty)
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ClipRRect(
+                                  borderRadius: kBorderRadius,
+                                  child: Dialog(
+                                    child: Container(
+                                      child: ClipRRect(
+                                        borderRadius: kBorderRadius,
+                                        child: Image.network(
+                                          post.url,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: SizedBox(
+                            height: 300.0, // Replace with your desired height
+                            child: AspectRatio(
+                              aspectRatio: 16 /
+                                  9, // Replace with the actual aspect ratio of the image
+                              child: FittedBox(
+                                fit: BoxFit
+                                    .contain, // Adjust the fit property as needed
                                 child: Image.network(
                                   post.url,
-                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            )
-                          : const SizedBox.shrink(),
-                      const SizedBox(height: 8.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          DateFormat('dd-MM-yyyy HH:mm:ss').format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(post.timestamp),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8.0),
-                    ],
-                  ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      post.text,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        DateFormat('HH:mm  dd/MM/yyyy').format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                            int.parse(post.timestamp),
+                          ),
+                        ),
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -499,7 +578,7 @@ class _OtherProfileState extends State<OtherProfile> {
       );
 
   Widget buildCoverImage() => Container(
-        color: Colors.grey,
+        color: kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
@@ -510,7 +589,7 @@ class _OtherProfileState extends State<OtherProfile> {
 
   Widget buildProfileImage() => CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: Colors.grey.shade800,
+        backgroundColor: kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
@@ -577,13 +656,15 @@ class _ContentWidgetState extends State<ContentWidget> {
               const SizedBox(height: 8),
               Text(
                 info.fullname,
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: kAccentColor0),
               ),
               const SizedBox(height: 8),
               Text(
                 info.role,
-                style: const TextStyle(fontSize: 20, color: Colors.black),
+                style: const TextStyle(fontSize: 20, color: kAccentColor2),
               ),
               const SizedBox(height: 16),
               FutureBuilder<bool>(
@@ -603,17 +684,16 @@ class _ContentWidgetState extends State<ContentWidget> {
                             MaterialStateProperty.resolveWith<Color>(
                           (states) {
                             if (_follows) {
-                              return Colors
-                                  .grey; // Set the button background color to grey if following
+                              return kAccentColor1; // Set the button background color to grey if following
                             }
-                            return Colors
-                                .blue; // Set the button background color to blue if not following
+                            return kAccentColor0; // Set the button background color to blue if not following
                           },
                         ),
                       ),
                       child: Text(
                         _follows ? 'Unfollow' : 'Follow',
-                        style: TextStyle(fontSize: 16),
+                        style:
+                            const TextStyle(fontSize: 16, color: kPrimaryColor),
                       ),
                     );
                   }
@@ -629,7 +709,7 @@ class _ContentWidgetState extends State<ContentWidget> {
                   ),
                   Divider(
                     thickness: 2.0,
-                    color: Colors.grey,
+                    color: kAccentColor0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0, left: 8.0),
@@ -638,7 +718,7 @@ class _ContentWidgetState extends State<ContentWidget> {
                   ),
                   Divider(
                     thickness: 2.0,
-                    color: Colors.grey,
+                    color: kAccentColor0,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
@@ -655,20 +735,12 @@ class _ContentWidgetState extends State<ContentWidget> {
                     onPressed: () {
                       widget.onButtonSelected('Info');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
                     child: Text(
                       'Info',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: kAccentColor0,
                       ),
                     ),
                   ),
@@ -680,20 +752,12 @@ class _ContentWidgetState extends State<ContentWidget> {
                           .findAncestorStateOfType<_OtherProfileState>()!;
                       otherProfileState._loadPosts();
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
                     child: Text(
                       'Posts',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: kAccentColor0,
                       ),
                     ),
                   ),
