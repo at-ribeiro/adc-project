@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/image_up.dart';
+import 'package:responsive_login_ui/services/media_up.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 
 import '../models/Post.dart';
@@ -56,10 +57,8 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
           child: GNav(
             backgroundColor: kPrimaryColor,
             activeColor: kAccentColor1,
-            
             tabBackgroundColor: kSecondaryColor,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            
             onTabChange: (index) {
               if (index == 0) {
                 context.go(Paths.homePage);
@@ -75,9 +74,7 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
                   ),
                   isScrollControlled: true,
                   builder: (context) => _buildPostModal(context),
-                  
                 );
-              
               } else if (index == 3) {
                 context.go(Paths.myProfile);
               }
@@ -112,9 +109,11 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
 
   Widget _buildPostModal(BuildContext context) {
     TextEditingController _postTextController = TextEditingController();
-    ImageUp _imageUp = ImageUp();
-    Uint8List? _imageData;
+    MediaUp _mediaUp = MediaUp();
+    Uint8List? _data;
     String? _fileName;
+    String? _mediaType;
+    String? _type;
 
     return SingleChildScrollView(
       child: Container(
@@ -125,43 +124,41 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
           const Padding(padding: EdgeInsets.all(16.0)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child:  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      color: kAccentColor0.withOpacity(0.3),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                color: kAccentColor0.withOpacity(0.3),
+              ),
+              height: 150,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: TextFormField(
+                    style: TextStyle(
+                      color: kAccentColor0,
                     ),
-                    height: 150,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(20),
-                            hintText: 'O que se passa na FCT?',
-                            border: InputBorder.none,
-                          ),
-                          controller: _postTextController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Diga alguma coisa...';
-                            } 
-                            return null;
-                          },
-                        ),
-                      ),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(20),
+                      hintText: 'O que se passa na FCT?',
+                      border: InputBorder.none,
                     ),
+                    controller: _postTextController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Diga alguma coisa...';
+                      }
+                      return null;
+                    },
                   ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 30.0),
-      
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
               ElevatedButton(
                 onPressed: () async {
                   if (_postTextController.text.isEmpty) {
@@ -169,8 +166,10 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
                   }
                   int response = await PostActions.doPost(
                       _postTextController.text,
-                      _imageData,
+                      _data,
                       _fileName,
+                      _mediaType,
+                      _type,
                       _token.username,
                       _token.tokenID);
                   if (response == 200) {
@@ -179,32 +178,50 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
                 },
                 child: const Text('Post'),
               ),
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
+              SizedBox(width: 30.0),
               ElevatedButton(
                 onPressed: () async {
-                  var imageDataMap = await _imageUp.pickImage();
+                  var imageDataMap = await _mediaUp.pickFile(MediaType.image);
                   if (imageDataMap.isNotEmpty) {
-                    _imageData = imageDataMap['imageData'];
+                    _data = imageDataMap['fileData'];
                     _fileName = imageDataMap['fileName'];
+                    _mediaType = imageDataMap['mediaType'];
+                    _type = imageDataMap['type'];
                   }
                 },
-                child: const Text('Select Image'),
+                child: const Text('Selecione a Imagem'),
               ),
-              const Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
+              SizedBox(width: 30.0),
+              ElevatedButton(
+                onPressed: () async {
+                  var videoDataMap = await _mediaUp.pickFile(MediaType.video);
+                  if (videoDataMap.isNotEmpty) {
+                    _data = videoDataMap['fileData'];
+                    _fileName = videoDataMap['fileName'];
+                    _mediaType = videoDataMap['mediaType'];
+                    _type = videoDataMap['type'];
+                  }
+                },
+                child: const Text('Selecione o Video'),
+              ),
               if (!kIsWeb)
                 ElevatedButton(
                   onPressed: () async {
-                    var imageDataMap = await _imageUp.takePicture();
+                    var imageDataMap = await _mediaUp.takePicture();
                     if (imageDataMap.isNotEmpty) {
-                      _imageData = imageDataMap['imageData'];
+                      _data = imageDataMap['fileData'];
                       _fileName = imageDataMap['fileName'];
+                      _mediaType = imageDataMap['mediaType'];
+                      _type = imageDataMap['type'];
                     }
                   },
-                  child: const Text('Take Photo'),
+                  child: const Text('Tire uma Foto'),
                 ),
-              if (_imageData != null) Image.memory(_imageData!),
+              if (_data != null) Image.memory(_data!),
+              SizedBox(width: 30.0),
             ],
           ),
+          SizedBox(height: 20.0)
         ]),
       ),
     );

@@ -1,38 +1,20 @@
-import 'dart:collection';
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
-import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
 import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
-import 'package:responsive_login_ui/views/map_view.dart';
 import 'package:responsive_login_ui/views/messages/messages_view.dart';
-import 'package:responsive_login_ui/views/post_page.dart';
-import 'package:responsive_login_ui/views/report_view.dart';
-import 'package:responsive_login_ui/views/reports_list_view.dart';
-import '../main.dart';
 import '../models/FeedData.dart';
-import '../models/Post.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
-import '../services/costum_search_delegate.dart';
 import '../data/cache_factory_provider.dart';
 import '../services/load_token.dart';
-import 'calendar_view.dart';
-import 'calendar/calendar_widget.dart';
-import 'login_view.dart';
-import 'event_view.dart';
 import 'package:intl/intl.dart';
-import 'my_profile.dart';
-import 'news_view.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -45,9 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
   late Token _token;
   late ThemeManager _themeManager;
   bool _isLoadingToken = true;
-  String _postText = '';
-  Uint8List? _imageData;
-  String? _fileName;
   List<FeedData> _posts = [];
   bool _loadingMore = false;
   String _lastDisplayedMessageTimestamp =
@@ -70,16 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _scrollController.removeListener(_onScroll);
     super.dispose();
   }
-
-  // @override
-  // void didUpdateWidget(MyHomePage oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   if (widget.token != oldWidget.token) {
-  //     setState(() {
-  //       _token = widget.token;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -224,22 +193,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                       },
                                     );
                                   },
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      return ClipRRect(
-                                        borderRadius: kBorderRadius,
+                                  child: SizedBox(
+                                    height:
+                                        300.0, // Replace with your desired height
+                                    child: AspectRatio(
+                                      aspectRatio: 16 /
+                                          9, // Replace with the actual aspect ratio of the image
+                                      child: FittedBox(
+                                        fit: BoxFit
+                                            .contain, // Adjust the fit property as needed
                                         child: Image.network(
                                           post.url,
-                                          fit: constraints.maxHeight > 600.0
-                                              ? BoxFit.cover
-                                              : BoxFit.scaleDown,
-                                          width: constraints.maxWidth,
-                                          height: constraints.maxHeight > 600.0
-                                              ? 600.0
-                                              : constraints.maxHeight,
                                         ),
-                                      );
-                                    },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

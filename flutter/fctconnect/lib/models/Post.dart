@@ -3,11 +3,19 @@ import 'dart:typed_data';
 
 class Post {
   String post;
-  Uint8List? imageData;
-  String? fileName;
   String username;
+  Uint8List? fileData;
+  String? fileName;
+  String? mediaType;
+  String? type;
 
-  Post({required this.post, this.imageData, required this.username, this.fileName});
+  Post(
+      {required this.post,
+      required this.username,
+      this.fileData,
+      this.fileName,
+      this.mediaType,
+      this.type});
 
   Map<String, dynamic> toMap() {
     return {

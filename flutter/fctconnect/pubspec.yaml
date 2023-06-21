@@ -17,7 +17,7 @@ dependencies:
   google_fonts: ^4.0.4
   lottie: ^1.4.2
   http: ^0.13.1
-  file_picker: ^5.3.0
+  file_picker: ^5.3.2
   flutter_dropzone: ^3.0.5
   flutter_platform_widgets: ^3.3.2
   fluro: ^2.0.5
@@ -42,7 +42,6 @@ dependencies:
   animated_background: ^2.0.0
   google_nav_bar: ^5.0.6
   flutter_native_splash: ^2.3.1
-
 
 dev_dependencies:
   flutter_test:

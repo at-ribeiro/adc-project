@@ -101,31 +101,28 @@ class BaseClient {
   }
 
   Future<int> createPost(String api, String tokenID, Post post) async {
-    var _headers = {
-      "Content-Type": "multipart/form-data",
-      "Authorization": tokenID,
-    };
+  var _headers = {
+    "Authorization": tokenID,
+  };
 
-    var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
-    request.headers.addAll(_headers);
+  var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
+  request.headers.addAll(_headers);
 
-    request.fields['post'] = json.encode(post.toJson());
-    request.fields['username'] = post.username;
+  request.fields['post'] = json.encode(post.toJson());
+  request.fields['username'] = post.username;
 
-    if (post.imageData != null) {
-      var multipartFile = http.MultipartFile.fromBytes(
-        'image',
-        post.imageData!,
-        filename: "${post.fileName}.jpg",
-        contentType: MediaType('image', 'jpeg'),
-      );
-      request.files.add(multipartFile);
-    }
-
-    var response = await request.send();
-
-    return response.statusCode;
+  if (post.fileData != null) {
+    var multipartFile = http.MultipartFile.fromBytes(
+      post.type!,
+      post.fileData!,
+      filename: "${post.fileName}.${post.mediaType}",
+      contentType: MediaType(post.type! , post.mediaType!),
+    );
+    request.files.add(multipartFile);
   }
+  var response = await request.send();
+  return response.statusCode;
+}
 
   Future<List<FeedData>> getFeedorPost(String api, String tokenID,
       String username, String time, String searching) async {
