@@ -76,7 +76,7 @@ void main() async {
 // }
 
 // final themeNotifierProvider =
-//     ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier());
+//     ChangeNotifierProvider<ThemeNotifier>(create: (_ ) => ThemeNotifier());
 
 void getKey() async {
   String? fcmKey = await FcmToken.getFcmToken();

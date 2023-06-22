@@ -10,6 +10,7 @@ import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import '../constants.dart';
 import '../models/Token.dart';
 import '../models/event_data.dart';
+import '../models/paths.dart';
 import '../services/load_token.dart';
 
 class EventCreator extends StatefulWidget {
@@ -336,21 +337,28 @@ class _EventCreatorState extends State<EventCreator> {
                   // Do the same for the ending date...
 
                   const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  ElevatedButton(
-                    onPressed: () {
-                      _pickImage();
-                    },
-                    child:
-                        const Text('Selecion uma foto para o icon do Evento'),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          _pickImage();
+                        },
+                        child: const Text(
+                            'Selecion um icon para Evento'),
+                      ),
+                      SizedBox(width: 20),
+                      const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.0)),
+                      if (!kIsWeb)
+                        ElevatedButton(
+                          onPressed: () {
+                            _takePicture();
+                          },
+                          child: const Text('Take Photo'),
+                        ),
+                    ],
                   ),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  if (!kIsWeb)
-                    ElevatedButton(
-                      onPressed: () {
-                        _takePicture();
-                      },
-                      child: const Text('Take Photo'),
-                    ),
+
                   _buildImagePreview(),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -376,14 +384,13 @@ class _EventCreatorState extends State<EventCreator> {
 
                         // TODO: Handle event creation
                         if (response == 200 || response == 204) {
-                          context.pop();
+                          context.go(Paths.events);
                         } else {
                           showDialog(
                               context: context,
                               builder: (context) => ErrorDialog(
                                   'Erro ao criar evento.', 'ok', context));
-                          context.pop();
-                          context.pop();
+                          
                         }
                       } else {
                         // Dates are invalid, show an error message

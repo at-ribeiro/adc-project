@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -11,6 +12,7 @@ import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import '../constants.dart';
 import '../models/Token.dart';
 
+import '../models/paths.dart';
 import '../models/update_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
@@ -496,13 +498,21 @@ class _EditProfileState extends State<EditProfile> {
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return AlertDialog(
-                      content: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: kBorderRadius,
+                      ),
+                      backgroundColor: kAccentColor0.withOpacity(0.3),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircularProgressIndicator(),
-                          SizedBox(width: 10),
-                          Text('Loading...'),
+                          Text(
+                            'A carregar...',
+                            style: const TextStyle(color: kAccentColor0),
+                          ),
+                          const SizedBox(height: 15),
+                          const CircularProgressIndicator(
+                            color: kAccentColor1,
+                          ),
                         ],
                       ),
                     );
@@ -520,14 +530,26 @@ class _EditProfileState extends State<EditProfile> {
                       }
                       return ErrorDialog(showErrorMessage, 'ok', context);
                     } else {
-                      AlertDialog(
-                        content: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                      return AlertDialog(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: kBorderRadius,
+                        ),
+                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 10),
-                            Text('A sua informação foi mudada com sucesso!'),
+                            Text(
+                              'Perfil atualizado com sucesso!',
+                              style: const TextStyle(color: kAccentColor0),
+                            ),
+                            const SizedBox(height: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                context.go(Paths.myProfile);
+                              },
+                              child: Text('ok'),
+                            ),
                           ],
                         ),
                       );
@@ -540,7 +562,7 @@ class _EditProfileState extends State<EditProfile> {
           );
         }
       },
-      child: const Text('Confirmar'),
+      child: const Text('Guardar'),
     );
   }
 
@@ -605,13 +627,6 @@ class visitWidget extends StatelessWidget {
               ),
             ),
             controller: purposeController,
-            validator: (value) {
-              if (value == null) {
-                return 'Selecione o seu motivo de visita';
-              } else {
-                return null;
-              }
-            },
           ),
         ),
       ),
@@ -655,12 +670,6 @@ class officeWidget extends StatelessWidget {
               ),
             ),
             controller: officeController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione o seu escritório';
-              } else
-                return null;
-            },
           ),
         ),
       ),
@@ -800,13 +809,6 @@ class phoneNumberWidget extends StatelessWidget {
               ),
             ),
             controller: phoneNumberController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione um número de telemóvel';
-              } else {
-                return null;
-              }
-            },
           ),
         ),
       ),
@@ -849,14 +851,6 @@ class emailWidget extends StatelessWidget {
               ),
             ),
             controller: emailController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione um email';
-              } else if (!value.contains('@')) {
-                return 'Selecione um email válido';
-              }
-              return null;
-            },
           ),
         ),
       ),
@@ -899,13 +893,6 @@ class fullNameWidget extends StatelessWidget {
               ),
             ),
             controller: fullNameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione o nome completo';
-              } else {
-                return null;
-              }
-            },
           ),
         ),
       ),
