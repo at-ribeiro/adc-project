@@ -11,7 +11,7 @@ class ActivityDataSource extends CalendarDataSource{
 
   @override
   DateTime getStartTime(int index){
-    return appointments![index].from;
+    return appointments![index].from; 
   }
 
   @override

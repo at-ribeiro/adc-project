@@ -1,22 +1,22 @@
-import 'package:fluro/fluro.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-import 'package:responsive_login_ui/models/register_user.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
-import '../views/login_view.dart';
+import '../models/paths.dart';
+
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
-import '../models/register_user.dart';
+
 import '../services/base_client.dart';
 
 const List<String> privacy = ["private", "public"];
 
-const String baseUrl = 'fct-connect-2023.oa.r.appspot.com/rest';
+const String baseUrl = 'fct-connect-estudasses.oa.r.appspot.com/rest';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({Key? key}) : super(key: key);
@@ -26,19 +26,21 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpViewState extends State<SignUpView> {
+  bool isExpandedRole = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController roleController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
-    SessionManager.storeSession('session' ,'/signup');
+    SessionManager.storeSession('session', '/signup');
     super.initState();
-    
   }
 
   @override
@@ -46,6 +48,7 @@ class _SignUpViewState extends State<SignUpView> {
     nameController.dispose();
     fullNameController.dispose();
     emailController.dispose();
+    roleController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
     privacyController.dispose();
@@ -59,30 +62,34 @@ class _SignUpViewState extends State<SignUpView> {
     var size = MediaQuery.of(context).size;
     var theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-          backgroundColor: Colors.white,
+    return Container(
+      decoration: kGradientDecoration,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
           resizeToAvoidBottomInset: false,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return _buildLargeScreen(size, simpleUIController, theme);
-              } else {
-                return _buildSmallScreen(size, simpleUIController, theme);
-              }
-            },
-          )),
+          body: Center(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  return _buildLargeScreen(size, simpleUIController, theme);
+                } else {
+                  return _buildSmallScreen(size, simpleUIController, theme);
+                }
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  /// For large screens
   Widget _buildLargeScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-       
-        SizedBox(width: size.width * 0.06),
         Expanded(
           flex: 5,
           child: _buildMainBody(size, simpleUIController, theme),
@@ -91,7 +98,6 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  /// For Small screens
   Widget _buildSmallScreen(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     return SingleChildScrollView(
@@ -101,240 +107,357 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  /// Main Body
   Widget _buildMainBody(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     return SingleChildScrollView(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: size.width > 600
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.start,
         children: [
-          
-          SizedBox(
-            height: size.height * 0.03,
-          ),
+          SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Sign Up',
-              style: kLoginTitleStyle(size),
+              style: textTheme.headline2!.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(
               'Conecta-te aos teus colegas!',
-              style: kLoginSubtitleStyle(size),
+              style: textTheme.headline5!.copyWith(
+                color: kAccentColor0,
+              ),
             ),
           ),
-          SizedBox(
-            height: size.height * 0.03,
-          ),
+          SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0, right: 20),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  /// username
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      hintText: 'Username',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: kBorderRadius,
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: const InputDecoration(
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
+                            hintText: 'Username',
+                            border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
+                          ),
+                          controller: nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione um username';
+                            } else if (value.length < 4) {
+                              return 'Username tem de ter pelo menos 4 caracteres';
+                            } else if (value.length > 20) {
+                              return 'Username tem um máximo de 20 caracteres';
+                            }
+
+                            return null;
+                          },
+                        ),
                       ),
                     ),
-
-                    controller: nameController,
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter username';
-                      } else if (value.length < 4) {
-                        return 'at least enter 4 characters';
-                      } else if (value.length > 13) {
-                        return 'maximum character is 13';
-                      }
-                      return null;
-                    },
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.person),
-                      hintText: 'Full Name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: kBorderRadius,
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
+                          ),
+                          decoration: InputDecoration(
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
+                            hintText: 'Nome Completo',
+                            border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
+                          ),
+                          controller: fullNameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione o nome completo';
+                            } else {
+                              return null;
+                            }
+                          },
+                        ),
                       ),
                     ),
-
-                    controller: fullNameController,
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter username';
-                      } else {
-                        return null;
-                      }
-                    },
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
+                  SizedBox(height: size.height * 0.02),
 
                   /// Email
-                  TextFormField(
-                    style: kTextFormFieldStyle(),
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.email_rounded),
-                      hintText: 'E-mail',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: kBorderRadius,
+                      color: kAccentColor0.withOpacity(0.3),
                     ),
-                    // The validator receives the text that the user has entered.
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an e-mail';
-                      } else if (!value.contains('@')) {
-                        return 'please enter valid e-mail';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  /// password
-                  Obx(
-                    () => TextFormField(
-                      style: kTextFormFieldStyle(),
-                      controller: passwordController,
-                      obscureText: simpleUIController.isObscure.value,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_open),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            simpleUIController.isObscure.value
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                    child: ClipRRect(
+                      borderRadius: kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: TextFormField(
+                          style: TextStyle(
+                            color: kAccentColor0,
                           ),
-                          onPressed: () {
-                            simpleUIController.isObscureActive();
+                          decoration: InputDecoration(
+                            prefixIcon:
+                                Icon(Icons.person, color: kAccentColor1),
+                            hintText: 'Email',
+                            border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: kBorderRadius,
+                              borderSide: BorderSide(
+                                color:
+                                    kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
+                          ),
+                          controller: emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Selecione um email';
+                            } else if (!value.contains('@')) {
+                              return 'Selecione um email válido';
+                            }
+                            return null;
                           },
                         ),
-                        hintText: 'Password',
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
                       ),
-                      // The validator receives the text that the user has entered.
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        } else if (value.length < 6) {
-                          return 'at least enter 6 characters';
-                        } else if (value.length > 13) {
-                          return 'maximum character is 13';
-                        }
-                        return null;
-                      },
                     ),
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  Obx(
-                    () => TextFormField(
-                      style: kTextFormFieldStyle(),
-                      controller: passwordVerController,
-                      obscureText: simpleUIController.isObscure.value,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_open),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            simpleUIController.isObscure.value
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: kBorderRadius,
+                      color: kAccentColor0.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Theme(
+                          data: ThemeData(
+                            canvasColor: kAccentColor0,
+                            popupMenuTheme: PopupMenuThemeData(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    kBorderRadius,
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            simpleUIController.isObscureActive();
-                          },
-                        ),
-                        hintText: 'Password Verification',
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 4),
+                            child: DropdownButtonHideUnderline(
+                              child: ExpansionTile(
+                                initiallyExpanded: isExpandedRole,
+                                title: roleController.text.isEmpty
+                                    ? Text(
+                                        "Role",
+                                        style: TextStyle(color: kAccentColor0),
+                                      )
+                                    : Text(roleController.text,
+                                        style: TextStyle(color: kAccentColor0)),
+                                leading: Icon(Icons.work, color: kAccentColor1),
+                                children: ['Aluno', 'Professor', 'Externo']
+                                    .map<Widget>((String value) {
+                                  return ListTile(
+                                    title: Text(
+                                      value,
+                                      style: TextStyle(color: kAccentColor0),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        roleController.text = value;
+                                        isExpandedRole = false;
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      // The validator receives the text that the user has entered.
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        } else if (passwordVerController.text !=
-                            passwordController.text) {
-                          return 'Passwords must match';
-                        }
-                        return null;
-                      },
                     ),
                   ),
+                  SizedBox(height: size.height * 0.02),
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: kBorderRadius,
+                        color: kAccentColor0.withOpacity(0.2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: kBorderRadius,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: TextFormField(
+                            controller: passwordController,
+                            obscureText: simpleUIController.isObscure.value,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.lock_open,
+                                  color: kAccentColor1),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  simpleUIController.isObscure.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: kAccentColor1,
+                                ),
+                                onPressed: () {
+                                  simpleUIController.isObscureActive();
+                                },
+                              ),
+                              hintText: 'Password',
+                              border: InputBorder.none,
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: kBorderRadius,
+                                borderSide: BorderSide(
+                                  color:
+                                      kAccentColor1, // Set your desired focused color here
+                                ),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Selecione uma password';
+                              } else if (value.length < 6) {
+                                return 'Password tem de ter pelo menos 6 caracteres';
+                              } else if (value.length > 30) {
+                                return 'Password tem no máximo 30 caracteres';
+                              }
 
-                  SizedBox(
-                    height: size.height * 0.01,
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
+                  SizedBox(height: size.height * 0.02),
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        borderRadius: kBorderRadius,
+                        color: kAccentColor0.withOpacity(0.2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: kBorderRadius,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: TextFormField(
+                            controller: passwordVerController,
+                            obscureText: simpleUIController.isObscure.value,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(
+                                Icons.lock_open,
+                                color: kAccentColor1,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  simpleUIController.isObscure.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: kAccentColor1,
+                                ),
+                                onPressed: () {
+                                  simpleUIController.isObscureActive();
+                                },
+                              ),
+                              hintText: 'Verificação da Password',
+                              border: InputBorder.none,
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: kBorderRadius,
+                                borderSide: BorderSide(
+                                  color:
+                                      kAccentColor1, // Set your desired focused color here
+                                ),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Selecione uma password';
+                              } else if (passwordVerController.text !=
+                                  passwordController.text) {
+                                return 'As passwords não coincidem';
+                              }
+
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.01),
                   Text(
-                    'Creating an account means you\'re okay with our Terms of Services and our Privacy Policy',
-                    style: kLoginTermsAndPrivacyStyle(size),
-                    textAlign: TextAlign.center,
+                    'Ao criar uma conta está a concordar com a nossa Política de Privacidade e Termos de Uso',
+                    textAlign: TextAlign.left,
                   ),
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  /// SignUp Button
+                  SizedBox(height: size.height * 0.02),
                   signUpButton(theme),
-                  SizedBox(
-                    height: size.height * 0.03,
-                  ),
-
-                  /// Navigate To Login Screen
+                  SizedBox(height: size.height * 0.03),
                   GestureDetector(
                     onTap: () {
-                      
                       nameController.clear();
                       emailController.clear();
+                      roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
-
                       simpleUIController.isObscure.value = true;
-
                       context.go("/login");
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: 'Already have an account?',
-                        style: kHaveAnAccountStyle(size),
+                        text: 'Já tens uma conta?',
+                        style: TextStyle(color: kAccentColor0),
                         children: [
                           TextSpan(
-                              text: " Login",
-                              style: kLoginOrSignUpTextStyle(size)),
+                            text: " Log In",
+                            style: TextStyle(color: kAccentColor1),
+                          ),
                         ],
                       ),
                     ),
@@ -348,21 +471,11 @@ class _SignUpViewState extends State<SignUpView> {
     );
   }
 
-  // SignUp Button
   Widget signUpButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Color.fromARGB(198, 0, 54, 250)),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-          ),
-        ),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             var _body = {
@@ -371,8 +484,8 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": "USER",
-              "state": "ACTIVE",
+              "role": roleController.text.toUpperCase(),
+              "state": "INACTIVE",
               "privacy": "PRIVATE",
             };
 
@@ -385,52 +498,44 @@ class _SignUpViewState extends State<SignUpView> {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return AlertDialog(
-                        content: Row(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: kBorderRadius,
+                        ),
+                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        content: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(),
+                            CircularProgressIndicator(
+                              color: kAccentColor1,
+                            ),
                             SizedBox(width: 10),
-                            Text('Loading...'),
+                            Text('Loading...',
+                                style: TextStyle(color: kAccentColor0)),
                           ],
                         ),
                       );
                     } else {
-                      String showErrorMessage;
+                      String errorText;
                       if (snapshot.hasError) {
                         switch (snapshot.error) {
                           case '409':
-                            showErrorMessage = "username ou email já existem!";
+                            errorText = "Username ou email já existem!";
                             break;
                           default:
-                            showErrorMessage =
-                                "Algo não está certo, tente outra vez!";
+                            errorText = "Algo não correu bem!";
                             break;
                         }
 
-                        return AlertDialog(
-                          title: Text('Error'),
-                          content: Text(showErrorMessage),
-                          actions: <Widget>[
-                            ElevatedButton(
-                              child: Text('OK'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
+                        return ErrorDialog(errorText, 'Voltar a tentar', context);
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();
-                          Navigator.pushReplacement(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (ctx) => const LoginView()),
-                          );
+                          context.go(Paths.login);
 
                           nameController.clear();
                           emailController.clear();
+                          roleController.clear();
                           passwordController.clear();
                           _formKey.currentState?.reset();
                         });

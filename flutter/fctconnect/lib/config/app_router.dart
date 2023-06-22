@@ -13,14 +13,23 @@ import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
+import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
+import '../constants.dart';
+import '../models/appbar_model.dart';
+import '../models/drawer_model.dart';
 import '../models/paths.dart';
+import '../services/costum_search_delegate.dart';
+import '../views/calendar_view.dart';
+import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
+import '../views/reported_posts_view.dart';
 
 class AppRouter {
   NavigationBarModel navigationBarModel = NavigationBarModel();
+  DrawerModel drawerModel = DrawerModel();
 
   late final GoRouter router = GoRouter(
     debugLogDiagnostics: true,
@@ -28,81 +37,73 @@ class AppRouter {
       ShellRoute(
         navigatorKey: GlobalKey<NavigatorState>(),
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (BuildContext context, GoRouterState state) {
-              return FutureBuilder<dynamic>(
-                future: CacheDefault.cacheFactory.get('isLoggedIn'),
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    String isLoggedInAsString = snapshot.data as String;
-                    bool isLoggedIn =
-                        isLoggedInAsString.toLowerCase() == 'true';
-                    if (isLoggedIn) {
-                      return const MyHomePage();
-                    } else {
-                      return const LoginView();
-                    }
-                  } else {
-                    return CircularProgressIndicator(); // Show loading indicator while waiting for future to complete
-                  }
+          ShellRoute(
+            navigatorKey: GlobalKey<NavigatorState>(),
+            routes: [
+              GoRoute(
+                path: Paths.myProfile,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const MyProfile();
                 },
-              );
-            },
-          ),
-
-          GoRoute(
-            path: Paths.homePage,
-            builder: (BuildContext context, GoRouterState state) {
-              return const MyHomePage();
-            },
-          ),
-          GoRoute(
-            path: Paths.myProfile,
-            builder: (BuildContext context, GoRouterState state) {
-              return const MyProfile();
-            },
-          ),
-          GoRoute(
-            path: Paths.otherProfile,
-            builder: (BuildContext context, GoRouterState state) {
-              String? username = state.queryParameters['username']!;
-              return FutureBuilder<bool>(
-                future: isSessionUser(username),
-                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.data == false) {
-                      return OtherProfile(name: username);
-                    } else {
-                      return MyProfile();
-                    }
-                  } else {
-                    return CircularProgressIndicator(); // Show loading indicator while waiting for future to complete
-                  }
+              ),
+             
+              GoRoute(
+                path: Paths.noticias,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const NewsView();
                 },
+              ),
+              GoRoute(
+                path: Paths.post + "/:id/:user",
+                name: Paths.post,
+                builder: (BuildContext context, GoRouterState state) {
+                  return PostPage(
+                    postID: state.pathParameters['id']!,
+                    postUser: state.pathParameters['user']!,
+                  );
+                },
+              ),
+              GoRoute(
+                path: '/',
+                builder: (BuildContext context, GoRouterState state) {
+                  return MyHomePage();
+                },
+              ),
+            ],
+            builder: (context, state, child) {
+              return Scaffold(
+                bottomNavigationBar: navigationBarModel,
+                body: child,
               );
             },
           ),
           GoRoute(
-            path: Paths.noticias,
+            path: Paths.mapas,
             builder: (BuildContext context, GoRouterState state) {
-              return const NewsView();
+              return MapScreen();
             },
           ),
           GoRoute(
-            path: Paths.post + "/:id/:user",
-            name: Paths.post,
+            path: Paths.calendar,
             builder: (BuildContext context, GoRouterState state) {
-              return PostPage(
-                postID: state.pathParameters['id']!,
-                postUser: state.pathParameters['user']!,
-              );
+              return const CalendarView();
             },
           ),
           GoRoute(
-            path: Paths.events + "/:id",
-            name: Paths.events,
+            path: Paths.reportedPosts,
+            builder: (BuildContext context, GoRouterState state) {
+              return const ReportedPostsPage();
+            },
+          ),
+          GoRoute(
+            path: Paths.listReports,
+            builder: (BuildContext context, GoRouterState state) {
+              return ListReportsPage();
+            },
+          ),
+          GoRoute(
+            path: Paths.event + "/:id",
+            name: Paths.event,
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
                 eventId: state.pathParameters['id']!,
@@ -116,23 +117,73 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: Paths.createEvent,
+            builder: (BuildContext context, GoRouterState state) {
+              return EventCreator();
+            },
+          ),
+          GoRoute(
+            path: Paths.editProfile,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfile();
+            },
+          ),
+          GoRoute(
             path: Paths.report,
             builder: (BuildContext context, GoRouterState state) {
               return ReportPage();
             },
           ),
-          GoRoute(
-            path: Paths.listReports,
-            builder: (BuildContext context, GoRouterState state) {
-              return ListReportsPage();
-            },
-          ),
-          // Add other GoRoutes here for which you want the navigation bar to appear
+           GoRoute(
+                path: Paths.otherProfile,
+                builder: (BuildContext context, GoRouterState state) {
+                  String? username = state.queryParameters['username']!;
+                  return FutureBuilder<bool>(
+                    future: isSessionUser(username),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.data == false) {
+                          return OtherProfile(name: username);
+                        } else {
+                          return MyProfile();
+                        }
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  );
+                },
+              ),
         ],
         builder: (context, state, child) {
           return Scaffold(
+            drawer: drawerModel,
+            appBar: AppBar(
+              backgroundColor: kPrimaryColor,
+              elevation: 0,
+              title: Text(
+                _getTitleBasedOnRoute(state.location),
+                style: TextStyle(color: kAccentColor0),
+              ),
+              actions: [
+                _getButtonsBasedOnRoute(state.location, context),
+              ],
+              leading: Builder(
+                builder: (BuildContext context) {
+                  return IconButton(
+                    icon: const Icon(
+                      Icons.menu,
+                      color: kAccentColor0,
+                    ),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  );
+                },
+              ),
+            ),
             body: child,
-            bottomNavigationBar: navigationBarModel,
           );
         },
       ),
@@ -149,15 +200,9 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: Paths.mapas,
+        path: Paths.splash,
         builder: (BuildContext context, GoRouterState state) {
-          return MapScreen();
-        },
-      ),
-      GoRoute(
-        path: Paths.editProfile,
-        builder: (BuildContext context, GoRouterState state) {
-          return EditProfile();
+          return Splash();
         },
       ),
     ],
@@ -167,5 +212,78 @@ class AppRouter {
     String? user = await CacheDefault.cacheFactory.get('Username');
     if (user == username) return true;
     return false;
+  }
+
+  String _getTitleBasedOnRoute(String location) {
+    if (location == Paths.homePage || location == '/') {
+      return 'Home';
+    } else if (location == Paths.myProfile) {
+      return 'Meu Perfil';
+    } else if (location == Paths.noticias) {
+      return 'Noticias';
+    } else if (location == Paths.mapas) {
+      return 'Mapa';
+    } else if (location == Paths.events) {
+      return 'Eventos';
+    } else if (location == Paths.createEvent) {
+      return 'Criar Evento';
+    } else if (location == Paths.report) {
+      return 'Reportar';
+    } else if (location == Paths.calendar) {
+      return 'Calendário';
+    } else if (location == Paths.reportedPosts) {
+      return 'Posts Reportados';
+    } else if (location == Paths.editProfile) {
+      return 'Editar Perfil';
+    }
+    // add more conditions for other routes
+
+    return ''; // fallback title
+  }
+
+  Widget _getButtonsBasedOnRoute(String location, BuildContext context) {
+    if (location == Paths.homePage ||
+        location == '/' ||
+        location == Paths.noticias ||
+        location == Paths.events) {
+      return IconButton(
+        onPressed: () {
+          showSearch(
+            context: context,
+            delegate: CustomSearchDelegate("profile"),
+          );
+        },
+        icon: Icon(Icons.search),
+      );
+    } else if (location == Paths.myProfile) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.editProfile);
+          },
+          icon: Icon(Icons.settings));
+    } else if (location == Paths.editProfile) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.myProfile);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location == Paths.createEvent) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.events);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.otherProfile)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.homePage);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else {
+      return Container();
+    }
+    // add more conditions for other routes
+
+    // return ''; // fallback title
   }
 }

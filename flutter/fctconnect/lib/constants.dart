@@ -2,32 +2,62 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 
- var brightness = SchedulerBinding.instance.window.platformBrightness;
- bool isDarkMode = brightness == Brightness.dark;
+const kPrimaryColor = Color.fromARGB(255, 27, 32, 53);
 
+const kSecondaryColor = Color.fromARGB(145, 33, 59, 151);
 
-TextStyle kLoginTitleStyle(Size size) => GoogleFonts.ubuntu(
-      fontSize: size.height * 0.060,
-      fontWeight: FontWeight.bold,
-    );
+const kAccentColor0 =
+    Color.fromARGB(255, 221, 244, 255); //if light mode troccar com a primaria
 
-TextStyle kLoginSubtitleStyle(Size size) => GoogleFonts.ubuntu(
-      fontSize: size.height * 0.030,
-    );
+const kAccentColor1 = Color.fromARGB(245, 133, 198, 147);
 
-TextStyle kLoginTermsAndPrivacyStyle(Size size) =>
-    GoogleFonts.ubuntu(fontSize: 15, color: Colors.grey, height: 1.5);
+const kAccentColor2 = Color.fromARGB(234, 118, 171, 185);
 
-TextStyle kHaveAnAccountStyle(Size size) =>
-    GoogleFonts.ubuntu(fontSize: size.height * 0.022, color: Colors.black);
+const kCardColor = Color.fromARGB(108, 100, 106, 124);
+const kCardBorderColor = Color.fromARGB(255, 109, 116, 136);
 
-TextStyle kLoginOrSignUpTextStyle(
-  Size size,
-) =>
-    GoogleFonts.ubuntu(
-      fontSize: size.height * 0.022,
-      fontWeight: FontWeight.w500,
-      color: Color.fromARGB(150, 0, 72, 238),
-    );
+dynamic kGradientDecoration = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      kSecondaryColor.withOpacity(0.6),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kSecondaryColor.withOpacity(0.6),
+    ],
+  ),
+);
+dynamic kGradientDecorationUp = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      kSecondaryColor.withOpacity(0.6),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+    ],
+  ),
+);
 
-TextStyle kTextFormFieldStyle() => const TextStyle(color: Colors.black);
+dynamic kGradientDecorationDown = BoxDecoration(
+  gradient: LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kPrimaryColor.withOpacity(1),
+      kSecondaryColor.withOpacity(0.6),
+    ],
+  ),
+);
+
+const kBorderRadius = BorderRadius.all(Radius.circular(15));
