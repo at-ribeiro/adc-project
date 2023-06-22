@@ -69,11 +69,11 @@ public class CommentResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key commentKey = datastore.newKeyFactory()
@@ -81,8 +81,6 @@ public class CommentResource {
                     .addAncestor(PathElement.of("User", creator))
                     .addAncestor(PathElement.of("Post", postId))
                     .newKey(data.getTimestamp());
-
-            LOG.warning("DEBUG COMENTÁRIOOOS keyPost = " + commentKey);
 
             Entity comment = Entity.newBuilder(commentKey)
                     .set("user", data.getUser())
@@ -158,11 +156,11 @@ public class CommentResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             StructuredQuery.OrderBy descendingTimestamp = StructuredQuery.OrderBy.desc("timestamp");
@@ -174,15 +172,11 @@ public class CommentResource {
                                         .build();
 
 
-            LOG.warning("DEBUG DO COMENTÁRIOOOOOOOOO key = " + postKey);
-
-            QueryResults<Entity> commentResults = datastore.run(commentQuery);
+            QueryResults<Entity> commentResults = txn.run(commentQuery);
 
             List<CommentGetData> toSend = new ArrayList<>();
 
             commentResults.forEachRemaining(comment -> {
-                LOG.warning("DEBUG DO COMENTÁRIOOOOOOOOO comment = " + comment);
-
                 toSend.add(new CommentGetData(
                         comment.getString("user"),
                         comment.getString("text"),

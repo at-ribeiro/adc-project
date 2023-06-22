@@ -19,6 +19,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+// qr code imports
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.io.ByteArrayOutputStream;
+
 @MultipartConfig
 
 public class EventsServlet extends HttpServlet {
@@ -27,7 +35,19 @@ public class EventsServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-2023.appspot.com";
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+
+    public byte[] generateQRCode(String data, int width, int height) throws IOException, WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
+        byte[] png;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+            png = baos.toByteArray();
+        }
+        return png;
+    }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -66,19 +86,25 @@ public class EventsServlet extends HttpServlet {
                     .addOrderBy(descendingTimestamp)
                     .build();
 
-            QueryResults<Entity> eventResults = datastore.run(eventsQuery);
+            QueryResults<Entity> eventResults = txn.run(eventsQuery);
 
             List<EventGetData> eventList = new ArrayList<>();
 
             eventResults.forEachRemaining(event -> {
                 String url = "";
+                String qrCodeUrl = "";
 
                 if (!event.getString("event_image").equals("")) {
 
                     BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
                     Blob blob = storage.get(blobId);
                     url = blob.getMediaLink();
+
                 }
+
+                BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));
+                Blob blob = storage.get(blobId);
+                qrCodeUrl = blob.getMediaLink();
 
                 // TODO: Check with frontend
                 EventGetData newsInstance = new EventGetData(
@@ -88,7 +114,8 @@ public class EventsServlet extends HttpServlet {
                         url,
                         event.getLong("event_start"),
                         event.getLong("event_end"),
-                        event.getString("id"));
+                        event.getString("id"),
+                        qrCodeUrl);
 
                 eventList.add(newsInstance);
             });
@@ -208,6 +235,24 @@ public class EventsServlet extends HttpServlet {
                 storage.create(blobInfo, imageBytes);
             }
 
+            // QR CODE image creation
+
+            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
+
+            BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
+
+            if (storage.get(blobId) != null) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    return;
+            }
+
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
+                        Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
+
+            storage.create(blobInfo, qrCode);
+
+            // end of qr code
+
             Key eventKey = datastore.newKeyFactory()
                     .setKind("Event")
                     .newKey(uniqueEventId);
@@ -219,7 +264,8 @@ public class EventsServlet extends HttpServlet {
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
                     .set("event_start", start)
                     .set("event_end", end)
-                    .set("event_image", title + "-" + imageName)
+                    .set("event_image", StringValue.newBuilder(title + "-" + imageName).setExcludeFromIndexes(true).build())
+                    .set("event_qr", uniqueEventId + "-qrCode.png")
                     .build();
 
             txn.put(entity);

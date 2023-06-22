@@ -14,17 +14,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.RegisterData;
 import pt.unl.fct.di.apdc.firstwebapp.util.VerificationToken;
 
-import com.google.api.client.googleapis.json.GoogleJsonError;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
-import org.apache.commons.codec.binary.Base64;
-
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -65,7 +54,7 @@ public class RegisterResource {
             Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                     StructuredQuery.PropertyFilter.eq("user_email", data.getEmail())
             ).build();
-            QueryResults<Entity> users = datastore.run(query);
+            QueryResults<Entity> users = txn.run(query);
 
             List<Entity> userList = new ArrayList<>();
 
@@ -86,12 +75,17 @@ public class RegisterResource {
                     .set("user_creation_time", Timestamp.now())
                     .set("user_role", data.getRole())
                     .set("user_state", "INACTIVE")
-                    .set("user_privacy", data.getPrivacy())
-                    .set("user_homephone", "")
-                    .set("user_mobilephone", "")
-                    .set("user_occupation", "")
-                    .set("user_address", "")
-                    .set("user_nif", "")
+                    .set("user_privacy", "PUBLIC")
+                    .set("user_phone", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_city", "")
+                    .set("user_about_me", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_department", "")
+                    .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_course", "")
+                    .set("user_year", "")
+                    .set("user_profile_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_cover_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("external_purpose","")
                     .build();
 
             txn.add(user);
@@ -198,11 +192,18 @@ public class RegisterResource {
                     .set("user_role", user.getString("user_role"))
                     .set("user_state", "ACTIVE")
                     .set("user_privacy", user.getString("user_privacy"))
-                    .set("user_homephone", user.getString("user_homephone"))
-                    .set("user_mobilephone", user.getString("user_mobilephone"))
-                    .set("user_occupation", user.getString("user_occupation"))
-                    .set("user_address", user.getString("user_address"))
-                    .set("user_nif", user.getString("user_nif"))
+                    .set("user_phone", user.getString("user_phone"))
+                    .set("user_city", user.getString("user_city"))
+                    .set("user_about_me", user.getString("user_about_me"))
+                    .set("user_department", user.getString("user_department"))
+                    .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_course", user.getString("user_course"))
+                    .set("user_year", user.getString("user_year"))
+                    .set("user_profile_pic", user.getString("user_profile_pic"))
+                    .set("user_cover_pic", user.getString("user_cover_pic"))
+                    .set("user_purpose", user.getString("user_purpose"))
+
+
                     .build();
 
             txn.put(user);
