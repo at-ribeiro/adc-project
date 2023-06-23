@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
@@ -14,10 +13,7 @@ import '../models/FeedData.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
-import '../services/image_up.dart';
 import '../services/load_token.dart';
-import '../services/post_actions.dart';
-import '../widgets/error_dialog.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);

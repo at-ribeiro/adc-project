@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
-import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
@@ -17,7 +16,6 @@ import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
-import '../models/appbar_model.dart';
 import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';

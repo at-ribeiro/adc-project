@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../Themes/theme_manager.dart';
 import '../data/cache_factory_provider.dart';

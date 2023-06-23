@@ -12,14 +12,7 @@ import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/profile_info.dart';
-import 'package:responsive_login_ui/widgets/error_dialog.dart';
-import '../models/FeedData.dart';
-
-import '../models/Token.dart';
 import '../models/paths.dart';
-import '../services/base_client.dart';
 import '../services/load_token.dart';
 
 class OtherProfile extends StatefulWidget {

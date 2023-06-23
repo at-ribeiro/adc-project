@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
 
@@ -115,9 +114,9 @@ class BaseClient {
 
     if (post.fileData != null) {
       var multipartFile = http.MultipartFile.fromBytes(
-        post.type!,
+        'image',
         post.fileData!,
-        filename: "${post.fileName}.${post.mediaType}",
+        filename: "${post.fileName}",
         contentType: MediaType(post.type!, post.mediaType!),
       );
       request.files.add(multipartFile);

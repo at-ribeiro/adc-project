@@ -3,20 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
-import 'package:responsive_login_ui/views/event_creator.dart';
-import 'package:responsive_login_ui/views/my_home_page.dart';
-import 'package:responsive_login_ui/views/search_event_view.dart';
+
 
 import '../models/NewsData.dart';
-import '../models/Post.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'my_profile.dart';
 
 class NewsView extends StatefulWidget {
   const NewsView({Key? key}) : super(key: key);
@@ -29,10 +23,6 @@ class _NewsViewState extends State<NewsView> {
   late Token _token;
   bool _isLoadingToken = true;
   List<NewsData> _news = [];
-
-  String _postText = '';
-  Uint8List? _imageData;
-  String? _fileName;
 
   @override
   void initState() {

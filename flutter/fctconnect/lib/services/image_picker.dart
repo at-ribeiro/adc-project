@@ -1,9 +1,5 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_dropzone/flutter_dropzone.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 
 class ImageGetter{

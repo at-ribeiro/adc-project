@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:responsive_login_ui/services/session_manager.dart';
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
 import '../data/cache_factory_provider.dart';

@@ -1,21 +1,17 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/events_list_data.dart';
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/views/event_creator.dart';
-import 'package:responsive_login_ui/views/search_event_view.dart';
+
 
 import '../constants.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../models/event_data.dart';
 import '../services/load_token.dart';
-import 'event_page.dart';
 
 class EventView extends StatefulWidget {
   const EventView({Key? key}) : super(key: key);

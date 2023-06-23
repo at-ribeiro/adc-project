@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
 import '../models/AlertPostData.dart';
