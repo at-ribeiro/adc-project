@@ -65,6 +65,7 @@ public class FeedServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
+
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);

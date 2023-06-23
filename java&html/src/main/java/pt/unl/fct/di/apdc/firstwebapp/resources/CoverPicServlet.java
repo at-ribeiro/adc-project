@@ -7,6 +7,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 
 import javax.imageio.ImageIO;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.logging.Logger;
+@MultipartConfig
+
 
 public class CoverPicServlet extends HttpServlet {
 
@@ -105,7 +108,7 @@ public class CoverPicServlet extends HttpServlet {
             byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
 
             // Upload the thumbnail image to your storage service (similar to the original image)
-            BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
+            BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageNameFull);
             BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
                     .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
                     .build();
@@ -114,7 +117,7 @@ public class CoverPicServlet extends HttpServlet {
             // Close the thumbnail output stream
             thumbnailOutputStream.close();
 
-            Entity task = Entity.newBuilder(user)
+            Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
                     .set("user_fullname", user.getString("user_fullname"))
                     .set("user_pwd", user.getString("user_pwd"))
@@ -131,8 +134,9 @@ public class CoverPicServlet extends HttpServlet {
                     .set("user_course", user.getString("user_course"))
                     .set("user_year", user.getString("user_year"))
                     .set("user_profile_pic", user.getString("user_profile_pic"))
-                    .set("user_cover_pic", StringValue.newBuilder(imageName).setExcludeFromIndexes(true).build())
+                    .set("user_cover_pic", StringValue.newBuilder(username+"-"+imageNameFull).setExcludeFromIndexes(true).build())
                     .set("user_purpose", user.getString("user_purpose"))
+                    .set("user_events", user.getList("user_events"))
                     .build();
 
             txn.update(task);
@@ -143,6 +147,7 @@ public class CoverPicServlet extends HttpServlet {
         }catch (Exception e){
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
             response.setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         }finally {
             if (txn.isActive()) {
@@ -154,11 +159,13 @@ public class CoverPicServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response){
 
+        Transaction txn = datastore.newTransaction();
+
         try{
             String username = request.getPathInfo().substring(1);
 
             Key userKey = userKeyFactory.newKey(username);
-            Entity user = datastore.get(userKey);
+            Entity user = txn.get(userKey);
 
             if (user == null) {
                 LOG.warning("User does not exist: " + username);
@@ -190,7 +197,12 @@ public class CoverPicServlet extends HttpServlet {
 
         }catch (Exception e){
             LOG.severe(e.getMessage());
+            e.printStackTrace();
             response.setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
 
     }

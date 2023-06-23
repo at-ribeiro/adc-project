@@ -78,11 +78,11 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ProfilePicServlet</servlet-name>
-		<url-pattern>/rest/profilePic</url-pattern>
+		<url-pattern>/rest/profilePic/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>CoverPicServlet</servlet-name>
-		<url-pattern>/rest/coverPic</url-pattern>
+		<url-pattern>/rest/coverPic/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>
