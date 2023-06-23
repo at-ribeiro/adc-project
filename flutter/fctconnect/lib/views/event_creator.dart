@@ -358,7 +358,6 @@ class _EventCreatorState extends State<EventCreator> {
                         ),
                     ],
                   ),
-
                   _buildImagePreview(),
                   SizedBox(height: 20),
                   ElevatedButton(

@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
@@ -11,14 +10,8 @@ import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/profile_info.dart';
-import '../models/FeedData.dart';
-
-import '../models/Token.dart';
-import '../models/paths.dart';
-import '../services/base_client.dart';
 import '../services/load_token.dart';
 
 class OtherProfile extends StatefulWidget {
@@ -31,17 +24,23 @@ class OtherProfile extends StatefulWidget {
 }
 
 class _OtherProfileState extends State<OtherProfile> {
+  late String name;
+  String onButtonSelected = 'Info';
+  Uint8List? _imageData;
   late Token _token;
+  bool _isLoading = false;
+  bool _infoIsLoading = true;
   bool _isLoadingToken = true;
   final double coverHeight = 200;
   final double profileHeight = 144;
-  late String name;
-  String selectedButton = 'Info';
   List<FeedData> _posts = [];
   bool _loadingMore = false;
   String _lastDisplayedMessageTimestamp =
       DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
+  late ProfileInfo info;
+  late bool _followStatus;
+  String followButton = '';
 
   @override
   void initState() {
@@ -52,9 +51,10 @@ class _OtherProfileState extends State<OtherProfile> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
+    if (onButtonSelected != 'Info' &&
+        _scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
-        selectedButton != 'Info') {
+        !_loadingMore) {
       _loadPosts();
     }
   }
@@ -88,9 +88,31 @@ class _OtherProfileState extends State<OtherProfile> {
   }
 
   Future<ProfileInfo> _loadInfo() async {
-    ProfileInfo info = await BaseClient()
+    ProfileInfo infoAux = await BaseClient()
         .fetchInfo("/profile", _token.tokenID, name, _token.username);
-    return info;
+    return infoAux;
+  }
+
+  Future<bool> _isFollowing() async {
+    bool _followStatuAux = await BaseClient().doesUserFollow(
+        "/follow", _token.username, _token.tokenID, widget.name);
+    return _followStatuAux;
+  }
+
+  Widget _loadProfilePic() {
+    if (info == null || info.profilePicUrl.isEmpty) {
+      return const CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(
+          info.profilePicUrl,
+        ),
+      );
+    }
   }
 
   @override
@@ -104,39 +126,38 @@ class _OtherProfileState extends State<OtherProfile> {
           });
         });
       });
-    } else if (!existsUser()) {
-      return Container(
-        decoration: kGradientDecoration,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // Centers vertically
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // Centers horizontally
-              children: [
-                Text(
-                  "O user $name não existe",
-                  style: TextStyle(fontSize: 20, color: kAccentColor0),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    context.go(Paths.homePage);
-                  },
-                  child: Text(
-                    "Voltar à home page",
-                    style: TextStyle(color: kAccentColor0),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+    } else if (_infoIsLoading) {
+      return FutureBuilder(
+          future: Future.wait([_loadInfo(), _isFollowing()]),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                const Text('Algo correu mal.');
+                return Container(
+                  decoration: kGradientDecoration,
+                );
+              } else {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  setState(() {
+                    info = snapshot.data![0];
+                    _followStatus = snapshot.data![1];
+                    _infoIsLoading = false;
+                  });
+                });
+                return Container(
+                  decoration: kGradientDecorationUp,
+                );
+              }
+            } else {
+              return Container(
+                  decoration: kGradientDecorationUp,
+                  child: const Center(child: CircularProgressIndicator()));
+            }
+          });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+        decoration: kGradientDecoration,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: ListView(
@@ -144,23 +165,17 @@ class _OtherProfileState extends State<OtherProfile> {
             controller: _scrollController,
             children: <Widget>[
               buildTop(),
-              ContentWidget(
-                loadInfo: _loadInfo,
-                selectedButton: selectedButton,
-                onButtonSelected: selectButton,
-                token: _token,
-              ),
               const SizedBox(height: 16),
+              buildButtons(context),
               Divider(
                 color: kAccentColor0,
                 thickness: 2.0,
               ),
               const SizedBox(height: 16),
-              if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
-              if (_token.role == "PROFESSOR")
-                buildInfoProfessorSection(_loadInfo),
-              if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
-              const SizedBox(height: 32),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(info),
+              if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(info),
+              SizedBox(height: 30),
             ],
           ),
         ),
@@ -168,247 +183,186 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Widget buildInfoProfessorSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Departamento',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.department,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Gabinente',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.office,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Contacto',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.email,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            );
-          } else {
-            return Column(
-              children: _posts.map((post) => buildPostCard(post)).toList(),
-            );
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+  Widget buildInfoProfessorSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Departamento',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.department,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Gabinente',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.office,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Contacto',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.email,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+      );
+    } else {
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
+    }
   }
 
-  Widget buildInfoAlunoSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Departamento',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.department,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Curso',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.course,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Ano',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.year,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "Grupos: ${info.nGroups}",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "Núcleos: ${info.nNucleos}",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            if (_posts.isEmpty) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return Column(
-                children: _posts.map((post) => buildPostCard(post)).toList(),
-              );
-            }
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+  Widget buildInfoAlunoSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Departamento',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.department,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Curso',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.course,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Ano',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.year,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Grupos: ${info.nGroups}",
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Núcleos: ${info.nNucleos}",
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
+      );
+    } else {
+      if (_posts.isEmpty) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
+    }
   }
 
-  Widget buildInfoExternoSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Propósito',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.purpose,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            );
-          } else {
-            return Column(
-              children: _posts.map((post) => buildPostCard(post)).toList(),
-            );
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+  Widget buildInfoExternoSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Propósito',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.purpose,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+      );
+    } else {
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
+    }
   }
 
   Widget buildPostCard(FeedData post) {
@@ -444,11 +398,7 @@ class _OtherProfileState extends State<OtherProfile> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                              ),
-                            ),
+                            _loadProfilePic(),
                             SizedBox(width: 8.0),
                             Center(
                               heightFactor:
@@ -461,6 +411,19 @@ class _OtherProfileState extends State<OtherProfile> {
                     ),
                     const SizedBox(height: 8.0),
                     if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if (!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv'))
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -527,12 +490,6 @@ class _OtherProfileState extends State<OtherProfile> {
     );
   }
 
-  void selectButton(String buttonName) {
-    setState(() {
-      selectedButton = buttonName;
-    });
-  }
-
   Widget buildTop() {
     final top = coverHeight - profileHeight / 2;
     final bottom = profileHeight / 2;
@@ -542,42 +499,23 @@ class _OtherProfileState extends State<OtherProfile> {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: bottom),
-          child: buildCoverImage(),
+          child: Center(
+            child: buildCoverImage(),
+          ),
         ),
         Positioned(
           top: top,
-          child: buildProfileImage(),
+          child: Center(
+            child: buildProfileImage(),
+          ),
         ),
       ],
     );
   }
 
-  Widget buildButton({
-    required String text,
-    required int value,
-  }) =>
-      MaterialButton(
-        padding: EdgeInsets.symmetric(vertical: 4),
-        onPressed: () {},
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '$value',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              text,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      );
-
-  Widget buildCoverImage() => Container(
+  Widget buildCoverImage() {
+    if (info.coverPicUrl.isEmpty) {
+      return Container(
         color: kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
@@ -586,232 +524,172 @@ class _OtherProfileState extends State<OtherProfile> {
           fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
         ),
       );
+    } else {
+      return Container(
+        color: kAccentColor0,
+        child: Image.network(
+          info.coverPicUrl,
+          width: double.infinity,
+          height: coverHeight,
+          fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
+        ),
+      );
+    }
+  }
 
-  Widget buildProfileImage() => CircleAvatar(
+  Widget buildProfileImage() {
+    if (info.profilePicUrl.isEmpty) {
+      return CircleAvatar(
         radius: profileHeight / 2,
         backgroundColor: kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
-
-  bool existsUser() {
-    return true;
-  }
-}
-
-class ContentWidget extends StatefulWidget {
-  final Future<ProfileInfo> Function() loadInfo;
-  final Token token;
-
-  final String selectedButton;
-  final void Function(String) onButtonSelected;
-
-  const ContentWidget({
-    Key? key,
-    required this.loadInfo,
-    required this.selectedButton,
-    required this.onButtonSelected,
-    required this.token,
-  }) : super(key: key);
-
-  @override
-  _ContentWidgetState createState() => _ContentWidgetState();
-}
-
-class _ContentWidgetState extends State<ContentWidget> {
-  late Future<ProfileInfo> _infoFuture;
-  late Future<bool> _followStatusFuture;
-  late Token _token;
-  bool _follows = false;
-  bool _processing =
-      false; // To check if the follow/unfollow operation is in progress.
-
-  @override
-  void initState() {
-    super.initState();
-    _infoFuture = widget.loadInfo();
-    _token = widget.token;
+    } else {
+      return CircleAvatar(
+        radius: profileHeight / 2,
+        backgroundColor: kAccentColor0,
+        backgroundImage: NetworkImage(
+          info.profilePicUrl,
+        ),
+      );
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<ProfileInfo>(
-      future: _infoFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          _followStatusFuture = BaseClient().doesUserFollow(
-              "/follow", _token.username, _token.tokenID, info.username);
-          return Column(
-            children: [
-              const SizedBox(height: 8),
-              Text(
-                info.fullname,
-                style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: kAccentColor0),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                info.role,
-                style: const TextStyle(fontSize: 20, color: kAccentColor2),
-              ),
-              const SizedBox(height: 16),
-              FutureBuilder<bool>(
-                future: _followStatusFuture,
-                builder: (context, AsyncSnapshot<bool> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error retrieving follow status');
-                  } else {
-                    _follows = snapshot.data!;
+  Widget _buildImagePreview() {
+    if (_isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    } else if (_imageData != null) {
+      return Container(
+        width: 400,
+        height: 400,
+        child: ClipRRect(
+            borderRadius: kBorderRadius,
+            child: Image.memory(_imageData!, fit: BoxFit.fill)),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
+  }
 
-                    return ElevatedButton(
-                      onPressed: _follows ? _unfollow(info) : _follow(info),
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith<Color>(
-                          (states) {
-                            if (_follows) {
-                              return kAccentColor1; // Set the button background color to grey if following
-                            }
-                            return kAccentColor0; // Set the button background color to blue if not following
-                          },
-                        ),
-                      ),
-                      child: Text(
-                        _follows ? 'Unfollow' : 'Follow',
-                        style:
-                            const TextStyle(fontSize: 16, color: kPrimaryColor),
-                      ),
-                    );
-                  }
-                },
+  Widget buildButtons(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          info.username,
+          style: const TextStyle(
+              fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          info.role,
+          style: const TextStyle(fontSize: 20, color: kAccentColor2),
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: ElevatedButton(
+            onPressed: _toggleFollow,
+            child: Text(
+              _followStatus ? 'Unfollow' : 'Follow',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kAccentColor0,
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: buildButton(text: 'Posts', value: info.nPosts),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: kAccentColor0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                    child:
-                        buildButton(text: 'Following', value: info.nFollowing),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: kAccentColor0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child:
-                        buildButton(text: 'Followers', value: info.nFollowers),
-                  ),
-                ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: buildButton(text: 'Posts', value: info.nPosts),
+            ),
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+              child: buildButton(text: 'Following', value: info.nFollowing),
+            ),
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: buildButton(text: 'Followers', value: info.nFollowers),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  onButtonSelected = 'Info';
+                });
+              },
+              child: Text(
+                'Info',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: kAccentColor0,
+                ),
               ),
-              const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onButtonSelected('Info');
-                    },
-                    child: Text(
-                      'Info',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kAccentColor0,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onButtonSelected('Posts');
-                      _OtherProfileState otherProfileState = context
-                          .findAncestorStateOfType<_OtherProfileState>()!;
-                      otherProfileState._loadPosts();
-                    },
-                    child: Text(
-                      'Posts',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kAccentColor0,
-                      ),
-                    ),
-                  ),
-                ],
+            ),
+            SizedBox(width: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  onButtonSelected = 'Posts';
+                });
+                _loadPosts();
+              },
+              child: Text(
+                'Posts',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: kAccentColor0,
+                ),
               ),
-            ],
-          );
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+      ],
     );
   }
 
-  Function()? _follow(ProfileInfo info) {
-    if (_processing) {
-      return null;
+  void _toggleFollow() {
+    if (_followStatus == true) {
+      BaseClient()
+          .unfollow("/follow", _token.username, _token.tokenID, info.username);
+      info.nFollowers--;
     } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient()
-            .follow("/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = true;
-          _processing = false;
-        });
-      };
+      BaseClient()
+          .follow("/follow", _token.username, _token.tokenID, info.username);
+      info.nFollowers++;
     }
-  }
 
-  Function()? _unfollow(ProfileInfo info) {
-    if (_processing) {
-      return null;
-    } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient().unfollow(
-            "/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = false;
-          _processing = false;
-        });
-      };
-    }
+    setState(() {
+      _followStatus = !_followStatus;
+    });
   }
 
   Widget buildButton({

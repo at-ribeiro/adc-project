@@ -7,7 +7,6 @@ import 'package:responsive_login_ui/services/session_manager.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
-import '../models/events_list_data.dart';
 import '../models/paths.dart';
 import '../services/load_token.dart';
 
@@ -104,19 +103,20 @@ class _EventPageState extends State<EventPage> {
                       Text(
                         _event.title,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 35,
                           fontWeight: FontWeight.bold,
+                          color: kAccentColor0
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Description: ${_event.description}',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Creator: ${_event.creator}',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -126,7 +126,7 @@ class _EventPageState extends State<EventPage> {
                                 _event.start,
                               ),
                             ),
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -136,34 +136,10 @@ class _EventPageState extends State<EventPage> {
                                 _event.end,
                               ),
                             ),
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          FutureBuilder<void>(
-                            future: checkIfButtonShouldBePressed(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<void> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                return ElevatedButton(
-                                  onPressed: handleButtonPress,
-                                  child: Text(
-                                    _buttonLabel,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+                      showQrcodeOrnot(),
                     ],
                   ),
                 ),
@@ -171,6 +147,48 @@ class _EventPageState extends State<EventPage> {
             ),
           ),
         ),
+      );
+    }
+  }
+
+  showQrcodeOrnot() {
+    if (_event.creator == _token.username) {
+      return Column(
+        children: [
+          SizedBox(height: 8),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return ClipRRect(
+                    borderRadius: kBorderRadius,
+                    child: Dialog(
+                      backgroundColor: Colors.transparent,
+                      child: Container(
+                        child: ClipRRect(
+                          borderRadius: kBorderRadius,
+                          child: Image.network(
+                            _event.qrcodeUrl!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            child: SizedBox(
+              height: 100.0, // Replace with your desired height
+              // Adjust the fit property as needed
+              child: Image.network(
+                _event.qrcodeUrl!,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+        ],
       );
     }
   }
@@ -189,7 +207,7 @@ class _EventPageState extends State<EventPage> {
             else if (errorText.contains('500'))
               errorText = 'Erro interno do servidor';
             else
-              errorText = 'Algo não correu bem';   
+              errorText = 'Algo não correu bem';
 
             return Container(
               decoration: kGradientDecorationUp,
@@ -217,11 +235,13 @@ class _EventPageState extends State<EventPage> {
               ),
             );
           } else {
-            EventData event = snapshot.data;
-            // Use the event data directly here
-            // Instead of calling setState, you can build the widget using the event data
-            // For example:
-            return Text('Event loaded: ${event.title}');
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              setState(() {
+                _event = snapshot.data;
+                isEventLoading = false;
+              });
+            });
+            return Container();
           }
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -233,7 +253,7 @@ class _EventPageState extends State<EventPage> {
   Future<EventData> _loadEvent() async {
     try {
       EventData event = await BaseClient()
-          .getEvent("/qrcode", _eventId, _token.tokenID, _token.username);
+          .getEvent("/qrcode/get", _eventId, _token.tokenID, _token.username);
       return event;
     } catch (e) {
       return Future.error(e);

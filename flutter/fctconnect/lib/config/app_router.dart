@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
-import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
@@ -17,7 +16,6 @@ import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
-import '../models/appbar_model.dart';
 import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';
@@ -28,7 +26,6 @@ import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
 
 class AppRouter {
-  NavigationBarModel navigationBarModel = NavigationBarModel();
   DrawerModel drawerModel = DrawerModel();
 
   late final GoRouter router = GoRouter(
@@ -46,7 +43,6 @@ class AppRouter {
                   return const MyProfile();
                 },
               ),
-             
               GoRoute(
                 path: Paths.noticias,
                 builder: (BuildContext context, GoRouterState state) {
@@ -72,7 +68,10 @@ class AppRouter {
             ],
             builder: (context, state, child) {
               return Scaffold(
-                bottomNavigationBar: navigationBarModel,
+                extendBody: true,
+                bottomNavigationBar: NavigationBarModel(
+                  location: state.location,
+                ),
                 body: child,
               );
             },
@@ -102,8 +101,7 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: Paths.event + "/:id",
-            name: Paths.event,
+            path: '/event/:id',
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
                 eventId: state.pathParameters['id']!,
@@ -134,27 +132,26 @@ class AppRouter {
               return ReportPage();
             },
           ),
-           GoRoute(
-                path: Paths.otherProfile,
-                builder: (BuildContext context, GoRouterState state) {
-                  String? username = state.queryParameters['username']!;
-                  return FutureBuilder<bool>(
-                    future: isSessionUser(username),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == false) {
-                          return OtherProfile(name: username);
-                        } else {
-                          return MyProfile();
-                        }
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  );
+          GoRoute(
+            path: '${Paths.otherProfile}/:username',
+            builder: (BuildContext context, GoRouterState state) {
+              String? username = state.pathParameters['username'];
+              return FutureBuilder<bool>(
+                future: isSessionUser(username!),
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == false) {
+                      return OtherProfile(name: username);
+                    } else {
+                      return MyProfile();
+                    }
+                  } else {
+                    return CircularProgressIndicator();
+                  }
                 },
-              ),
+              );
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -235,6 +232,12 @@ class AppRouter {
       return 'Posts Reportados';
     } else if (location == Paths.editProfile) {
       return 'Editar Perfil';
+    } else if (location == Paths.listReports) {
+      return 'Lista de Anomalias';
+    } else if (location.contains(Paths.otherProfile)) {
+      return 'Perfil';
+    } else if (location.contains(Paths.event)) {
+      return 'Evento';
     }
     // add more conditions for other routes
 

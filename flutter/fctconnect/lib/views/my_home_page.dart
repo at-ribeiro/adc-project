@@ -3,12 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
-import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
 import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/views/messages/messages_view.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 import '../models/FeedData.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
@@ -168,6 +167,15 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             const SizedBox(height: 8.0),
                             if (post.url.isNotEmpty)
+                              if(post.url.contains('.mp4') || post.url.contains('.mov') 
+                              || post.url.contains('.avi') || post.url.contains('.mkv'))
+                                Center(
+                                  child: VideoPlayerWidget(
+                                    videoUrl: post.url,
+                                  ),
+                                ),
+                              if(!post.url.contains('.mp4') && !post.url.contains('.mov') 
+                              && !post.url.contains('.avi') && !post.url.contains('.mkv'))
                               Center(
                                 child: GestureDetector(
                                   onTap: () {
@@ -282,6 +290,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Future<String> getProfilePicPost(String username) async {
+    String profilePic = '';
+    await BaseClient()
+        .getProfilePic(
+      "/profilePic",
+      username,
+      _token.tokenID,
+    )
+        .then((value) {
+      profilePic = value;
+    });
+    return profilePic;
+  }
+
   void _showReportDialog(BuildContext context, String id, String postUser) {
     TextEditingController _commentController = TextEditingController();
 
@@ -386,103 +408,6 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         );
       },
-    );
-  }
-
-  Widget _buildDrawer() {
-    ThemeManager themeManager = context.watch<ThemeManager>();
-    bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
-    String username = _token.username;
-    return Drawer(
-      child: Column(
-        children: [
-          IntrinsicWidth(
-            stepWidth: double.infinity,
-            child: DrawerHeader(
-              decoration: const BoxDecoration(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(
-                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg'),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(username, style: const TextStyle(fontSize: 18)),
-                  Switch(
-                    value: isDarkModeOn,
-                    onChanged: (value) {
-                      _themeManager.toggleTheme(value);
-                    },
-                  ),
-                ],
-              ),
-            ), // Set the width of the DrawerHeader to the maximum available width
-          ),
-          ListTile(
-            title: const Text('Mapa'),
-            onTap: () {
-              context.go(Paths.mapas);
-            },
-          ),
-          ListTile(
-            title: const Text('Eventos'),
-            onTap: () {
-              context.go(Paths.events);
-            },
-          ),
-          ListTile(
-            title: const Text('Grupos'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: const Text('Calendário'),
-            onTap: () {
-              context.go(Paths.calendar);
-            },
-          ),
-          ListTile(
-            title: const Text('Mensagens'),
-            onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
-            },
-          ),
-          const Spacer(),
-          ListTile(
-            title: const Text('Report'),
-            onTap: () {
-              context.go(Paths.report);
-            },
-          ),
-          ListTile(
-            title: const Text('Lista de Anomalias'),
-            onTap: () {
-              context.go(Paths.listReports);
-            },
-          ),
-          ListTile(
-            title: const Text('Posts Reportados'),
-            onTap: () {
-              context.go(Paths.reportedPosts);
-            },
-          ),
-          ListTile(
-            title: const Text('Sair'),
-            onTap: () async {
-              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
-
-              CacheDefault.cacheFactory.logout();
-              CacheDefault.cacheFactory.delete('isLoggedIn');
-
-              context.go(Paths.login);
-            },
-          ),
-        ],
-      ),
     );
   }
 

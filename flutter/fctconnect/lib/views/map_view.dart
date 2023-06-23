@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/models/paths.dart';
 import 'package:responsive_login_ui/views/directions_repository.dart';
 
 import '../models/directions_model.dart';

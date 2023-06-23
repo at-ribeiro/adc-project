@@ -4,18 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/data/cache_factory_provider.dart';
-
+import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
+import '../constants.dart';
 import '../models/FeedData.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import '../services/post_actions.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
@@ -25,17 +24,21 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> {
+  String onButtonSelected = 'Info';
+  Uint8List? _imageData;
+  String? _fileName;
   late Token _token;
+  bool _isLoading = false;
+  bool _infoIsLoading = true;
   bool _isLoadingToken = true;
   final double coverHeight = 200;
   final double profileHeight = 144;
-  String selectedButton = 'Info';
   List<FeedData> _posts = [];
   bool _loadingMore = false;
   String _lastDisplayedMessageTimestamp =
       DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
-  ProfileInfo? info;
+  late ProfileInfo info;
 
   @override
   void initState() {
@@ -45,7 +48,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void _onScroll() {
-    if (selectedButton != 'Info' &&
+    if (onButtonSelected != 'Info' &&
         _scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent &&
         !_loadingMore) {
@@ -82,13 +85,58 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Future<ProfileInfo> _loadInfo() async {
-    ProfileInfo info = await BaseClient().fetchInfo(
+    ProfileInfo infoAux = await BaseClient().fetchInfo(
       "/profile",
       _token.tokenID,
       _token.username,
       _token.username,
     );
-    return info;
+    return infoAux;
+  }
+
+  Widget _loadProfilePic() {
+    if (info == null || info.profilePicUrl.isEmpty) {
+      return const CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(
+          info.profilePicUrl,
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickImage() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final fileData = await pickedFile.readAsBytes();
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile.path.split('/').last;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _takePicture() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      final fileData = await pickedFile.readAsBytes();
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile.path.split('/').last;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -102,6 +150,33 @@ class _MyProfileState extends State<MyProfile> {
           });
         });
       });
+    } else if (_infoIsLoading) {
+      return FutureBuilder(
+          future: _loadInfo(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                const Text('Algo correu mal.');
+                return Container(
+                  decoration: kGradientDecoration,
+                );
+              } else {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  setState(() {
+                    info = snapshot.data;
+                    _infoIsLoading = false;
+                  });
+                });
+                return Container(
+                  decoration: kGradientDecorationUp,
+                );
+              }
+            } else {
+              return Container(
+                  decoration: kGradientDecorationUp,
+                  child: const Center(child: CircularProgressIndicator()));
+            }
+          });
     } else {
       return Container(
         decoration: kGradientDecoration,
@@ -112,23 +187,17 @@ class _MyProfileState extends State<MyProfile> {
             controller: _scrollController,
             children: <Widget>[
               buildTop(),
-              ContentWidget(
-                loadInfo: _loadInfo,
-                selectedButton: selectedButton,
-                onButtonSelected: selectButton,
-                token: _token,
-              ),
               const SizedBox(height: 16),
+              buildButtons(context),
               Divider(
                 color: kAccentColor0,
                 thickness: 2.0,
               ),
               const SizedBox(height: 16),
-              if (_token.role == "ALUNO") buildInfoAlunoSection(_loadInfo),
-              if (_token.role == "PROFESSOR")
-                buildInfoProfessorSection(_loadInfo),
-              if (_token.role == "EXTERNO") buildInfoExternoSection(_loadInfo),
-              const SizedBox(height: 32),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(info),
+              if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(info),
+              SizedBox(height: 100),
             ],
           ),
         ),
@@ -136,318 +205,186 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Widget tokenGetter() {
-    return FutureBuilder(
-        future: _loadToken(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return AlertDialog(
-                title: Text('Não estás logado!'),
-                content: Text('Volta para trás e faz login.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      context.go("/login");
-                    },
-                    child: Text('Voltar ao login.'),
-                  ),
-                ],
-              );
-            } else {
-              Token token = snapshot.data;
-              if (token.expirationDate <
-                  DateTime.now().millisecondsSinceEpoch) {
-                return AlertDialog(
-                  title: Text('Sessão expirada!'),
-                  content: Text('Volta para trás e faz login.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        context.go("/login");
-                      },
-                      child: Text('Voltar ao login.'),
-                    ),
-                  ],
-                );
-              }
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                setState(() {
-                  _token = token;
-                  _isLoadingToken = false;
-                });
-              });
-              return Container();
-            }
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-
-  Future<Token> _loadToken() async {
-    try {
-      String username =
-          await CacheDefault.cacheFactory.get("Username") as String;
-      String role = await CacheDefault.cacheFactory.get("Role") as String;
-      String tokenID = await CacheDefault.cacheFactory.get("Token") as String;
-      String creationDate =
-          await CacheDefault.cacheFactory.get("Creationd") as String;
-      String expirationDate =
-          await CacheDefault.cacheFactory.get("Expirationd") as String;
-      Token token = Token(
-          username: username,
-          role: role,
-          tokenID: tokenID,
-          creationDate: int.parse(creationDate),
-          expirationDate: int.parse(expirationDate));
-      return token;
-    } catch (e) {
-      return Future.error(e);
+  Widget buildInfoProfessorSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Departamento',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.department,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Gabinente',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.office,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Contacto',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.email,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+      );
+    } else {
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
     }
   }
 
-  Widget buildInfoProfessorSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Departamento',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.department,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Gabinente',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.office,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Contacto',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.email,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            );
-          } else {
-            return Column(
-              children: _posts.map((post) => buildPostCard(post)).toList(),
-            );
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+  Widget buildInfoAlunoSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Departamento',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.department,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Curso',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.course,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Ano',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.year,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Grupos: ${info.nGroups}",
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "Núcleos: ${info.nNucleos}",
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
+      );
+    } else {
+      if (_posts.isEmpty) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
+    }
   }
 
-  Widget buildInfoAlunoSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Departamento',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.department,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Curso',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.course,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Ano',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.year,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "Grupos: ${info.nGroups}",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    "Núcleos: ${info.nNucleos}",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            if (_posts.isEmpty) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return Column(
-                children: _posts.map((post) => buildPostCard(post)).toList(),
-              );
-            }
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
-  }
-
-  Widget buildInfoExternoSection(Future<ProfileInfo> Function() info) {
-    return FutureBuilder<ProfileInfo>(
-      future: info(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          if (selectedButton == 'Info') {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sobre mim',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.about_me,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cidade',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.city,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Propósito',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    info.purpose,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-            );
-          } else {
-            return Column(
-              children: _posts.map((post) => buildPostCard(post)).toList(),
-            );
-          }
-        } else {
-          return Center(
-            child: Text('No profile info available'),
-          );
-        }
-      },
-    );
+  Widget buildInfoExternoSection(ProfileInfo info) {
+    if (onButtonSelected == 'Info') {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Sobre mim',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.about_me,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Cidade',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.city,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Propósito',
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              info.purpose,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+      );
+    } else {
+      return Column(
+        children: _posts.map((post) => buildPostCard(post)).toList(),
+      );
+    }
   }
 
   Widget buildPostCard(FeedData post) {
@@ -483,11 +420,7 @@ class _MyProfileState extends State<MyProfile> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                              ),
-                            ),
+                            _loadProfilePic(),
                             SizedBox(width: 8.0),
                             Center(
                               heightFactor:
@@ -500,6 +433,19 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                     const SizedBox(height: 8.0),
                     if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if (!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv'))
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -566,12 +512,6 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  void selectButton(String buttonName) {
-    setState(() {
-      selectedButton = buttonName;
-    });
-  }
-
   Widget buildTop() {
     final top = coverHeight - profileHeight / 2;
     final bottom = profileHeight / 2;
@@ -581,7 +521,7 @@ class _MyProfileState extends State<MyProfile> {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: bottom),
-          child: buildCoverImage(),
+          child: buildCover(),
         ),
         Positioned(
           top: top,
@@ -591,7 +531,86 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  Widget buildCoverImage() => Container(
+  Widget buildCover() => Stack(
+        children: <Widget>[
+          Center(
+            child: GestureDetector(
+              child: buildCoverImage(),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: kBorderRadius,
+                      ),
+                      backgroundColor: kAccentColor0.withOpacity(0.3),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Mudar a imagem de capa',
+                            style: const TextStyle(color: kAccentColor0),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    _pickImage();
+                                  },
+                                  child: Text(
+                                    'Carregar imagem',
+                                    style: TextStyle(color: kAccentColor0),
+                                  )),
+                              if (!kIsWeb) SizedBox(width: 16),
+                              if (!kIsWeb)
+                                ElevatedButton(
+                                    onPressed: () {
+                                      _takePicture();
+                                    },
+                                    child: Text(
+                                      'Tirar foto',
+                                      style: TextStyle(color: kAccentColor0),
+                                    ))
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          _buildImagePreview(),
+                          SizedBox(height: 16),
+                          Center(
+                            child: Row(
+                              children: [
+                                saveButton(context, '/coverPic'),
+                                SizedBox(
+                                  width: 16,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    'Cancelar',
+                                    style: TextStyle(color: kAccentColor0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      );
+
+  Widget buildCoverImage() {
+    if (info.coverPicUrl.isEmpty) {
+      return Container(
         color: kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
@@ -600,182 +619,338 @@ class _MyProfileState extends State<MyProfile> {
           fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
         ),
       );
+    } else {
+      return Container(
+        color: kAccentColor0,
+        child: Image.network(
+          info.coverPicUrl,
+          width: double.infinity,
+          height: coverHeight,
+          fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
+        ),
+      );
+    }
+  }
 
-  Widget buildProfileImage() => CircleAvatar(
+  Widget buildProfileImage() {
+    if (info.profilePicUrl.isEmpty) {
+      return CircleAvatar(
         radius: profileHeight / 2,
         backgroundColor: kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
+    } else {
+      return CircleAvatar(
+        radius: profileHeight / 2,
+        backgroundColor: kAccentColor0,
+        backgroundImage: NetworkImage(
+          info.profilePicUrl,
+        ),
+      );
+    }
+  }
+
+  Widget _buildImagePreview() {
+    if (_isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    } else if (_imageData != null) {
+      return Container(
+        width: 400,
+        height: 400,
+        child: ClipRRect(
+            borderRadius: kBorderRadius,
+            child: Image.memory(_imageData!, fit: BoxFit.fill)),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
+  }
 
   Widget buildProfileAndEditButton() => Stack(
         children: <Widget>[
-          Center(child: buildProfileImage()),
-          Positioned(
-            left: 200,
-            bottom: 10,
-            child: Padding(
-              padding: const EdgeInsets.all(0),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kAccentColor0,
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'editar perfil',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
+          Center(
+            child: GestureDetector(
+              child: buildProfileImage(),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: kBorderRadius,
+                      ),
+                      backgroundColor: kAccentColor0.withOpacity(0.3),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Mudar Imagem de perfil',
+                            style: const TextStyle(color: kAccentColor0),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    _pickImage();
+                                  },
+                                  child: Text(
+                                    'Carregar imagem',
+                                    style: TextStyle(color: kAccentColor0),
+                                  )),
+                              if (!kIsWeb) SizedBox(width: 16),
+                              if (!kIsWeb)
+                                ElevatedButton(
+                                    onPressed: () {
+                                      _takePicture();
+                                    },
+                                    child: Text(
+                                      'Tirar foto',
+                                      style: TextStyle(color: kAccentColor0),
+                                    ))
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          _buildImagePreview(),
+                          SizedBox(height: 16),
+                          Center(
+                            child: Row(
+                              children: [
+                                saveButton(context, '/profilePic'),
+                                SizedBox(
+                                  width: 16,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    'Cancelar',
+                                    style: TextStyle(color: kAccentColor0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
       );
-}
 
-class ContentWidget extends StatefulWidget {
-  final Future<ProfileInfo> Function() loadInfo;
-  final String selectedButton;
-  final void Function(String) onButtonSelected;
-  final Token token;
-
-  const ContentWidget({
-    Key? key,
-    required this.loadInfo,
-    required this.selectedButton,
-    required this.onButtonSelected,
-    required this.token,
-  }) : super(key: key);
-
-  @override
-  _ContentWidgetState createState() => _ContentWidgetState();
-}
-
-class _ContentWidgetState extends State<ContentWidget> {
-  late Future<ProfileInfo> _infoFuture;
-  late Token _token;
-
-  @override
-  void initState() {
-    super.initState();
-    _token = widget.token;
-    _infoFuture = widget.loadInfo();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<ProfileInfo>(
-      future: _infoFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading profile info'),
-          );
-        } else if (snapshot.hasData) {
-          ProfileInfo info = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(height: 8),
-              Text(
-                info.username,
-                style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: kAccentColor0),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                info.role,
-                style: const TextStyle(fontSize: 20, color: kAccentColor2),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Divider(
-                    thickness: 2.0,
-                    color: kAccentColor0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: buildButton(text: 'Posts', value: info.nPosts),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: kAccentColor0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-                    child:
-                        buildButton(text: 'Following', value: info.nFollowing),
-                  ),
-                  Divider(
-                    thickness: 2.0,
-                    color: kAccentColor0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child:
-                        buildButton(text: 'Followers', value: info.nFollowers),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+  ElevatedButton saveButton(BuildContext context, String api) {
+    return ElevatedButton(
+      onPressed: () {
+        if (_imageData == null) {
+          // Show a dialog telling the user to select an image
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content:
+                    Text("Por favor, selecione uma imagem antes de salvar."),
+                actions: [
                   ElevatedButton(
                     onPressed: () {
-                      widget.onButtonSelected('Info');
+                      Navigator.of(context).pop();
                     },
-                    child: Text(
-                      'Info',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kAccentColor0,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.onButtonSelected('Posts');
-                      _MyProfileState myProfileState =
-                          context.findAncestorStateOfType<_MyProfileState>()!;
-                      myProfileState._loadPosts();
-                    },
-                    child: Text(
-                      'Posts',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kAccentColor0,
-                      ),
-                    ),
+                    child: Text('Ok'),
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           );
         } else {
-          return Center(
-            child: Text('No profile info available'),
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return FutureBuilder<int>(
+                future: BaseClient.updatePic(api, _token.tokenID,
+                    _token.username, _fileName, _imageData!),
+                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: kBorderRadius,
+                      ),
+                      content: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(width: 16),
+                          Text("Uploading..."),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData && snapshot.data == 200) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: kBorderRadius,
+                        ),
+                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Imagem mudada com sucesso',
+                              style: TextStyle(color: kAccentColor0),
+                            ),
+                            SizedBox(height: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                                context.go(Paths.myProfile);
+                              },
+                              child: Text(
+                                'Ok',
+                                style: TextStyle(color: kAccentColor0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: kBorderRadius,
+                        ),
+                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Algo não correu bem!',
+                              style: TextStyle(color: kAccentColor0),
+                            ),
+                            SizedBox(height: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Voltar',
+                                style: TextStyle(color: kAccentColor0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    setState(() {
+                      _imageData = null;
+                    });
+                  } else {
+                    return Container();
+                  }
+                },
+              );
+            },
           );
         }
       },
+      child: Text(
+        'Guardar',
+        style: TextStyle(color: kAccentColor0),
+      ),
+    );
+  }
+
+  Widget buildButtons(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          info.username,
+          style: const TextStyle(
+              fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          info.role,
+          style: const TextStyle(fontSize: 20, color: kAccentColor2),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: buildButton(text: 'Posts', value: info.nPosts),
+            ),
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0, left: 8.0),
+              child: buildButton(text: 'Following', value: info.nFollowing),
+            ),
+            Divider(
+              thickness: 2.0,
+              color: kAccentColor0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: buildButton(text: 'Followers', value: info.nFollowers),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  onButtonSelected = 'Info';
+                });
+              },
+              child: Text(
+                'Info',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: kAccentColor0,
+                ),
+              ),
+            ),
+            SizedBox(width: 24),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  onButtonSelected = 'Posts';
+                });
+                _loadPosts();
+              },
+              child: Text(
+                'Posts',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: kAccentColor0,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+      ],
     );
   }
 
