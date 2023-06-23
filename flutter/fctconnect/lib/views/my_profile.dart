@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 import '../constants.dart';
 import '../models/FeedData.dart';
 import '../models/Token.dart';
@@ -196,7 +197,7 @@ class _MyProfileState extends State<MyProfile> {
               if (_token.role == "ALUNO") buildInfoAlunoSection(info),
               if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
               if (_token.role == "EXTERNO") buildInfoExternoSection(info),
-              const SizedBox(height: 32),
+              SizedBox(height: 100),
             ],
           ),
         ),
@@ -432,6 +433,19 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                     const SizedBox(height: 8.0),
                     if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if (!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv'))
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -936,6 +950,7 @@ class _MyProfileState extends State<MyProfile> {
             ),
           ],
         ),
+        SizedBox(height: 16),
       ],
     );
   }

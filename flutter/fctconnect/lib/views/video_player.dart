@@ -5,7 +5,7 @@ import 'package:video_player/video_player.dart';
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
 
-  const VideoPlayerWidget({super.key, required this.videoUrl});
+  const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
@@ -21,18 +21,18 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _videoController = VideoPlayerController.network(widget.videoUrl);
 
     _videoController.initialize().then(
-          (_) => setState(
-            () => _chewieController = ChewieController(
-              autoInitialize: true,
-              videoPlayerController: _videoController,
-              aspectRatio: _videoController.value.aspectRatio,
-            ),
-          ),
-        );
+      (_) => setState(
+        () => _chewieController = ChewieController(
+          autoInitialize: true,
+          videoPlayerController: _videoController,
+          aspectRatio: _videoController.value.aspectRatio,
+        ),
+      ),
+    );
   }
 
   @override
-  void dispose() { 
+  void dispose() {
     _videoController.dispose();
     _chewieController.dispose();
     super.dispose();
@@ -44,13 +44,17 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _videoController.value.isInitialized
-         ? AspectRatio(
-          aspectRatio: _videoController.value.aspectRatio,
-          child: Chewie(
-            controller: _chewieController,
-          ),
-        )
-        : const SizedBox.shrink()
+            ? Container(
+                constraints: BoxConstraints(maxHeight: 350), // Set maximum height here
+                child: AspectRatio(
+                  aspectRatio: _videoController.value.aspectRatio,
+                  child: Chewie(
+                    key: UniqueKey(),
+                    controller: _chewieController,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink()
       ],
     );
   }

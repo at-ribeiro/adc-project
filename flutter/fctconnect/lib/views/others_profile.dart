@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
@@ -11,6 +12,7 @@ import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 
 import '../models/paths.dart';
 import '../services/load_token.dart';
@@ -41,29 +43,13 @@ class _OtherProfileState extends State<OtherProfile> {
       DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
   late ProfileInfo info;
-  Future<bool>? _followStatusFuture;
-
-  bool _follows = false;
-  bool _processing =
-      false; // To check if the follow/unfollow operation is in progress.
 
   @override
   void initState() {
-    name = widget.name;
     super.initState();
+    name = widget.name;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-
-    _loadInitialData(); // add this line
-  }
-
-  void _loadInitialData() async {
-    // Assuming your _token is available before this point.
-    // If not, you need to make sure it is before using it here.
-    _followStatusFuture = BaseClient()
-        .doesUserFollow("/follow", _token.username, _token.tokenID, name);
-
-    // Add any other initial asynchronous loading here if needed.
   }
 
   void _onScroll() {
@@ -125,43 +111,32 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Function()? _follow(ProfileInfo info) {
-    if (_processing) {
-      return null;
-    } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient()
-            .follow("/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = true;
-          _processing = false;
-        });
-      };
+  Future<void> _pickImage() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final fileData = await pickedFile.readAsBytes();
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile.path.split('/').last;
+        _isLoading = false;
+      });
     }
   }
 
-  Function()? _unfollow(ProfileInfo info) {
-    if (_processing) {
-      return null;
-    } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient().unfollow(
-            "/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = false;
-          _processing = false;
-        });
-      };
+  Future<void> _takePicture() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      final fileData = await pickedFile.readAsBytes();
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile.path.split('/').last;
+        _isLoading = false;
+      });
     }
   }
 
@@ -177,7 +152,6 @@ class _OtherProfileState extends State<OtherProfile> {
         });
       });
     } else if (_infoIsLoading) {
-      
       return FutureBuilder(
           future: _loadInfo(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -188,14 +162,12 @@ class _OtherProfileState extends State<OtherProfile> {
                   decoration: kGradientDecoration,
                 );
               } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
                   setState(() {
                     info = snapshot.data;
                     _infoIsLoading = false;
                   });
                 });
-                _followStatusFuture = BaseClient().doesUserFollow(
-                    "/follow", _token.username, _token.tokenID, info.username);
                 return Container(
                   decoration: kGradientDecorationUp,
                 );
@@ -210,73 +182,26 @@ class _OtherProfileState extends State<OtherProfile> {
       return Container(
         decoration: kGradientDecoration,
         child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: ListView(
-              padding: EdgeInsets.zero,
-              controller: _scrollController,
-              children: <Widget>[
-                buildTop(),
-                const SizedBox(height: 16),
-                buildButtons(context),
-                const SizedBox(height: 16),
-                Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Text(
-                      info.fullname,
-                      style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: kAccentColor0),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      info.role,
-                      style:
-                          const TextStyle(fontSize: 20, color: kAccentColor2),
-                    ),
-                    const SizedBox(height: 16),
-                    FutureBuilder<bool>(
-                      future: _followStatusFuture,
-                      builder: (context, AsyncSnapshot<bool> snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error retrieving follow status');
-                        } else {
-                          _follows = snapshot.data!;
-
-                          return ElevatedButton(
-                            onPressed:
-                                _follows ? _unfollow(info) : _follow(info),
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                (states) {
-                                  if (_follows) {
-                                    return kAccentColor1; // Set the button background color to grey if following
-                                  }
-                                  return kAccentColor0; // Set the button background color to blue if not following
-                                },
-                              ),
-                            ),
-                            child: Text(
-                              _follows ? 'Unfollow' : 'Follow',
-                              style: const TextStyle(
-                                  fontSize: 16, color: kPrimaryColor),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    const SizedBox(height: 28),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ],
-            )),
+          backgroundColor: Colors.transparent,
+          body: ListView(
+            padding: EdgeInsets.zero,
+            controller: _scrollController,
+            children: <Widget>[
+              buildTop(),
+              const SizedBox(height: 16),
+              buildButtons(context),
+              Divider(
+                color: kAccentColor0,
+                thickness: 2.0,
+              ),
+              const SizedBox(height: 16),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(info),
+              if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(info),
+              SizedBox(height: 100),
+            ],
+          ),
+        ),
       );
     }
   }
@@ -509,6 +434,19 @@ class _OtherProfileState extends State<OtherProfile> {
                     ),
                     const SizedBox(height: 8.0),
                     if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if (!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv'))
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -584,23 +522,19 @@ class _OtherProfileState extends State<OtherProfile> {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: bottom),
-          child: buildCover(),
+          child: Center(
+            child: buildCoverImage(),
+          ),
         ),
         Positioned(
           top: top,
-          child: buildProfileAndEditButton(),
+          child: Center(
+            child: buildProfileImage(),
+          ),
         ),
       ],
     );
   }
-
-  Widget buildCover() => Stack(
-        children: <Widget>[
-          Center(
-            child: buildCoverImage(),
-          ),
-        ],
-      );
 
   Widget buildCoverImage() {
     if (info.coverPicUrl.isEmpty) {
@@ -667,7 +601,9 @@ class _OtherProfileState extends State<OtherProfile> {
   Widget buildProfileAndEditButton() => Stack(
         children: <Widget>[
           Center(
-            child: buildProfileImage(),
+            child: GestureDetector(
+              child: buildProfileImage(),
+            ),
           ),
         ],
       );
@@ -875,6 +811,7 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
           ],
         ),
+        SizedBox(height: 16),
       ],
     );
   }

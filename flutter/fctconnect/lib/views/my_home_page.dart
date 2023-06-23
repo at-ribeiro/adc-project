@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
 import 'package:responsive_login_ui/constants.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 import '../models/FeedData.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
@@ -166,6 +167,15 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             const SizedBox(height: 8.0),
                             if (post.url.isNotEmpty)
+                              if(post.url.contains('.mp4') || post.url.contains('.mov') 
+                              || post.url.contains('.avi') || post.url.contains('.mkv'))
+                                Center(
+                                  child: VideoPlayerWidget(
+                                    videoUrl: post.url,
+                                  ),
+                                ),
+                              if(!post.url.contains('.mp4') && !post.url.contains('.mov') 
+                              && !post.url.contains('.avi') && !post.url.contains('.mkv'))
                               Center(
                                 child: GestureDetector(
                                   onTap: () {
