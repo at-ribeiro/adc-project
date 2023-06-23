@@ -51,6 +51,14 @@
 		<servlet-name>EventsServlet</servlet-name>
 		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.EventsServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>ProfilePicServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.ProfilePicServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>CoverPicServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.CoverPicServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>PostServlet</servlet-name>
@@ -67,6 +75,14 @@
 	<servlet-mapping>
 		<servlet-name>EventsServlet</servlet-name>
 		<url-pattern>/rest/events/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ProfilePicServlet</servlet-name>
+		<url-pattern>/rest/profilePic</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CoverPicServlet</servlet-name>
+		<url-pattern>/rest/coverPic</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>

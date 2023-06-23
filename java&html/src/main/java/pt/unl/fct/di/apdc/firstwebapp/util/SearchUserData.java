@@ -12,14 +12,9 @@ public class SearchUserData {
         this.username = username;
         this.fullname = fullname;
     }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof SearchUserData)) {
-            return false;
-        }
         SearchUserData other = (SearchUserData) obj;
         return this.username.equals(other.getUsername()) && this.fullname.equals(other.getFullname());
     }

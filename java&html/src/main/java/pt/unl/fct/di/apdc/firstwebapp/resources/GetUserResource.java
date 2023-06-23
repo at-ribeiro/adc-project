@@ -1,6 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.UpdateData;
@@ -25,10 +29,14 @@ public class GetUserResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
     private final Gson g = new Gson();
 
     @GET
     @Path("/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("username")String username, @QueryParam("searcher") String searcher, @HeaderParam("Authorization") String tokenId) {
         LOG.fine("Attempt to get user " + username);
 
@@ -80,7 +88,7 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followingResults = datastore.run(followingQuery);
+            QueryResults<Entity> followingResults = txn.run(followingQuery);
 
             List<Entity> followeesList = new ArrayList<>();
             followingResults.forEachRemaining(followeesList::add);
@@ -92,7 +100,7 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> followersResults = datastore.run(followersQuery);
+            QueryResults<Entity> followersResults = txn.run(followersQuery);
 
             List<Entity> followerList = new ArrayList<>();
             followersResults.forEachRemaining(followerList::add);
@@ -104,15 +112,51 @@ public class GetUserResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
                     .build();
 
-            QueryResults<Entity> postResults = datastore.run(postsQuery);
+            QueryResults<Entity> postResults = txn.run(postsQuery);
 
             List<Entity> postsList = new ArrayList<>();
             postResults.forEachRemaining(postsList::add);
 
             int nPosts = postsList.size();
 
-            UserData data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"),
-                                            user.getString("user_role"), nFollowing, nFollowers, nPosts);
+            String profilePicUrl = "";
+            String coverPicUrl = "";
+
+            if(!user.getString("user_profile_pic").equals("")) {
+                BlobId blobId = BlobId.of(bucketName, user.getString("user_profile_pic"));
+                Blob blob = storage.get(blobId);
+                profilePicUrl = blob.getMediaLink();
+            }
+            if(!user.getString("user_cover_pic").equals("")) {
+                BlobId blobId = BlobId.of(bucketName, user.getString("user_cover_pic"));
+                Blob blob = storage.get(blobId);
+                coverPicUrl = blob.getMediaLink();
+            }
+
+            UserData data;
+
+            String role = user.getString("user_role");
+
+            switch (role) {
+                case "ALUNO":
+                    //TODO: Adicionar nGroups e nNucleos bem
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_course"),
+                            user.getString("user_year"), user.getString("user_city"), nFollowing, nFollowers, nPosts, 0, 0, profilePicUrl, coverPicUrl);
+                    break;
+                case "PROFESSOR":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_department"), user.getString("user_office"),
+                            user.getString("user_city"), nFollowing, nFollowers, nPosts, profilePicUrl, coverPicUrl);
+                    break;
+                case "EXTERNO":
+                    data = new UserData(username, user.getString("user_fullname"), user.getString("user_email"), user.getString("user_phone"),
+                            role, user.getString("user_privacy"), user.getString("user_about_me"), user.getString("user_city"), nFollowing, nFollowers, nPosts,
+                            user.getString("user_purpose"), profilePicUrl, coverPicUrl);
+                    break;
+                default:
+                    return Response.status(Response.Status.NOT_FOUND).build();
+            }
 
             return Response.ok(g.toJson(data)).build();
 
