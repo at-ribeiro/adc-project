@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
 
@@ -101,28 +103,28 @@ class BaseClient {
   }
 
   Future<int> createPost(String api, String tokenID, Post post) async {
-  var _headers = {
-    "Authorization": tokenID,
-  };
+    var _headers = {
+      "Authorization": tokenID,
+    };
 
-  var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
-  request.headers.addAll(_headers);
+    var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api));
+    request.headers.addAll(_headers);
 
-  request.fields['post'] = json.encode(post.toJson());
-  request.fields['username'] = post.username;
+    request.fields['post'] = json.encode(post.toJson());
+    request.fields['username'] = post.username;
 
-  if (post.fileData != null) {
-    var multipartFile = http.MultipartFile.fromBytes(
-      post.type!,
-      post.fileData!,
-      filename: "${post.fileName}.${post.mediaType}",
-      contentType: MediaType(post.type! , post.mediaType!),
-    );
-    request.files.add(multipartFile);
+    if (post.fileData != null) {
+      var multipartFile = http.MultipartFile.fromBytes(
+        post.type!,
+        post.fileData!,
+        filename: "${post.fileName}.${post.mediaType}",
+        contentType: MediaType(post.type!, post.mediaType!),
+      );
+      request.files.add(multipartFile);
+    }
+    var response = await request.send();
+    return response.statusCode;
   }
-  var response = await request.send();
-  return response.statusCode;
-}
 
   Future<List<FeedData>> getFeedorPost(String api, String tokenID,
       String username, String time, String searching) async {
@@ -754,7 +756,6 @@ class BaseClient {
 
   Future<dynamic> updateUser(
       String api, UpdateData data, String tokenID, String username) async {
-
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -777,13 +778,48 @@ class BaseClient {
       'privacy': data.privacy,
     });
 
-    var response =
-        await http.put(url, headers: _headers, body: userJson);
+    var response = await http.put(url, headers: _headers, body: userJson);
     if (response.statusCode == 200) {
       return response.body;
     } else if (response.statusCode == 409) {
       //throw exception
       throw '409';
+    }
+  }
+
+  static Future<int> updatePic(
+      String api, tokenID, username, filename, Uint8List image) async {
+    Map<String, String> _headers = {"Authorization": tokenID, "User": username};
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(baseUrl + api + "/" + username));
+    request.headers.addAll(_headers);
+
+    // Attach the image as a multipart file to the request
+    request.files.add(http.MultipartFile.fromBytes(
+      'image', // field name of the file
+      image,
+      filename: "$filename.jpg",
+      contentType: MediaType('image', 'jpeg'),
+    ));
+
+    // Send the request
+    var response = await request.send();
+
+    return response.statusCode;
+  }
+
+  Future<dynamic> getProfilePic(
+      String api, String tokenID, String username) async {
+    Map<String, String> _headers = {"Authorization": tokenID, "User": username};
+
+    var url = Uri.parse(baseUrl + api + "/" + username);
+    var response = await client.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw extension("Something went wrong");
     }
   }
 }

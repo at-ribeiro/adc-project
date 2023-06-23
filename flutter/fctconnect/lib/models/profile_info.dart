@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class ProfileInfo {
   final String username;
   final String fullname;
@@ -17,6 +19,12 @@ class ProfileInfo {
   final String purpose;
   final String office;
   final String privacy;
+  final String profilePicUrl;
+  final String coverPicUrl;
+  Uint8List? profilePic;
+  String? profilePicFileName;
+  Uint8List? coverPic;
+  String? coverPicFileName;
 
   ProfileInfo({
     required this.username,
@@ -37,6 +45,12 @@ class ProfileInfo {
     this.purpose = '',
     this.office = '',
     required this.privacy,
+    this.profilePic,
+    this.coverPic,
+    this.profilePicFileName,
+    this.coverPicFileName,
+    required this.profilePicUrl,
+    required this.coverPicUrl,
   });
 
   factory ProfileInfo.fromJson(Map<String, dynamic> json) {
@@ -59,6 +73,11 @@ class ProfileInfo {
       purpose: json['purpose'] ?? '',
       office: json['office'] ?? '',
       privacy: json['privacy'],
+      profilePicFileName: json['profilePicFileName'],
+      coverPicFileName: json['coverPicFileName'],
+      profilePicUrl: json['profilePicUrl'],
+      coverPicUrl: json['coverPicUrl'],
+
     );
   }
 }

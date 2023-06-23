@@ -117,7 +117,7 @@ class CustomSearchDelegate extends SearchDelegate {
                           } else {
                            close(context, null) ;
                             context.go(Paths.otherProfile +
-                                "?username=${snapshot.data![index].username}");
+                                "/${snapshot.data![index].username}");
                                 
                           }
                           break;

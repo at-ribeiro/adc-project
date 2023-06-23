@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 class ImageUp {
   
-  Future<Map<String, dynamic>> pickImage() async {
+  static Future<Map<String, dynamic>> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     
@@ -19,7 +19,7 @@ class ImageUp {
     return {};
   }
 
-  Future<Map<String, dynamic>> takePicture() async {
+  static Future<Map<String, dynamic>> takePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     

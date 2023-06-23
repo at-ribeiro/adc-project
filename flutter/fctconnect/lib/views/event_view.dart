@@ -59,13 +59,6 @@ class _EventViewState extends State<EventView> {
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-              backgroundColor: kSecondaryColor,
-
-              onPressed: () {
-                context.go(Paths.createEvent);
-              },
-              child: const Icon(Icons.add, color: kAccentColor0)),
           backgroundColor: Colors.transparent,
           body: Column(
             children: [
@@ -168,30 +161,11 @@ class _EventViewState extends State<EventView> {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SearchEventView(),
-                          ),
-                        );
-                      },
-                      child: const Text('Pesquisar outros eventos'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
       );
+      
     }
   }
 

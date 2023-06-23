@@ -28,7 +28,6 @@ import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
 
 class AppRouter {
-  NavigationBarModel navigationBarModel = NavigationBarModel();
   DrawerModel drawerModel = DrawerModel();
 
   late final GoRouter router = GoRouter(
@@ -46,7 +45,6 @@ class AppRouter {
                   return const MyProfile();
                 },
               ),
-             
               GoRoute(
                 path: Paths.noticias,
                 builder: (BuildContext context, GoRouterState state) {
@@ -72,7 +70,10 @@ class AppRouter {
             ],
             builder: (context, state, child) {
               return Scaffold(
-                bottomNavigationBar: navigationBarModel,
+                extendBody: true,
+                bottomNavigationBar: NavigationBarModel(
+                  location: state.location,
+                ),
                 body: child,
               );
             },
@@ -102,8 +103,7 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: Paths.event + "/:id",
-            name: Paths.event,
+            path: '/event/:id',
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
                 eventId: state.pathParameters['id']!,
@@ -134,27 +134,26 @@ class AppRouter {
               return ReportPage();
             },
           ),
-           GoRoute(
-                path: Paths.otherProfile,
-                builder: (BuildContext context, GoRouterState state) {
-                  String? username = state.queryParameters['username']!;
-                  return FutureBuilder<bool>(
-                    future: isSessionUser(username),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.data == false) {
-                          return OtherProfile(name: username);
-                        } else {
-                          return MyProfile();
-                        }
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  );
+          GoRoute(
+            path: '${Paths.otherProfile}/:username',
+            builder: (BuildContext context, GoRouterState state) {
+              String? username = state.pathParameters['username'];
+              return FutureBuilder<bool>(
+                future: isSessionUser(username!),
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.data == false) {
+                      return OtherProfile(name: username);
+                    } else {
+                      return MyProfile();
+                    }
+                  } else {
+                    return CircularProgressIndicator();
+                  }
                 },
-              ),
+              );
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -235,6 +234,12 @@ class AppRouter {
       return 'Posts Reportados';
     } else if (location == Paths.editProfile) {
       return 'Editar Perfil';
+    } else if (location == Paths.listReports) {
+      return 'Lista de Anomalias';
+    } else if (location.contains(Paths.otherProfile)) {
+      return 'Perfil';
+    } else if (location.contains(Paths.event)) {
+      return 'Evento';
     }
     // add more conditions for other routes
 
