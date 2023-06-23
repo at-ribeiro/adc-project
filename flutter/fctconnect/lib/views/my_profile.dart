@@ -867,7 +867,6 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  @override
   Widget buildButtons(BuildContext context) {
     return Column(
       children: [
