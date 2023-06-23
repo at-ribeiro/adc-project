@@ -98,18 +98,13 @@ public class PostServlet extends HttpServlet {
             String imageName = "";
 
             if (request.getPart("image") != null) {
-                LOG.warning("IMAGE RECEIVED");
                 imageName = request.getPart("image").getSubmittedFileName();
                 InputStream imageStream = request.getPart("image").getInputStream();
 
                 String contentType = request.getPart("image").getContentType();
 
-                LOG.warning("IMAGE STREAM: " + imageStream.toString());
-                LOG.warning("CONTENT TYPE: " + contentType);
 
                 if(contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType.equals("image/png")) {
-
-                    LOG.warning("CONTENT TYPE IS IMAGE");
 
                     // Read the original image
                     BufferedImage originalImage = ImageIO.read(imageStream);
@@ -139,8 +134,6 @@ public class PostServlet extends HttpServlet {
                     ImageIO.write(resizedImage, contentType.substring(contentType.lastIndexOf('/') +1), thumbnailOutputStream);
                     byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
 
-                    LOG.warning("CONTENT TYPE OF IMG: " + contentType.substring(contentType.lastIndexOf('/')) +1);
-                    LOG.warning("THUMBNAIL BYTES: " + thumbnailBytes.toString());
 
                     // Upload the thumbnail image to your storage service (similar to the original image)
                     BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
@@ -161,8 +154,6 @@ public class PostServlet extends HttpServlet {
 
                 }else{
 
-                    LOG.warning("CONTENT TYPE IS VIDEO");
-
                     BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
 
                     if(storage.get(blobId)!=null){
@@ -181,8 +172,6 @@ public class PostServlet extends HttpServlet {
                 }
 
             }
-
-            LOG.info("IMAGE NAME: " + imageName);
 
             Key postKey = datastore.newKeyFactory()
                                 .setKind("Post")

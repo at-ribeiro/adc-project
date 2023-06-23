@@ -7,7 +7,6 @@ public class EventGetData {
     private String creator;
     private String title;
     private String description;
-
     private String url;
     private long start;
     private long end;

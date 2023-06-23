@@ -1,5 +1,5 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
-
+/*
 import com.google.cloud.datastore.*;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.RemoveData;
@@ -102,4 +102,8 @@ public class RemoveResource {
         return false;
 
     }
+
+
 }
+
+ */

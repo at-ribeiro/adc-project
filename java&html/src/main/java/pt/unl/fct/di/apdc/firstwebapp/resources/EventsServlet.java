@@ -8,9 +8,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
+import javax.imageio.ImageIO;
 import javax.servlet.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -180,7 +182,7 @@ public class EventsServlet extends HttpServlet {
             String description = data.getDescription();
             long start = data.getStart();
             long end = data.getEnd();
-            String uniqueEventId = title + System.currentTimeMillis();
+            String uniqueEventId = (title + System.currentTimeMillis()).replace(' ', '-');
 
             LOG.fine("Attempt to create event with user " + creator);
 
@@ -218,15 +220,13 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            InputStream imageStream = null;
-
-            if (request.getPart("image") != null) {
-                imageStream = request.getPart("image").getInputStream();
-            }
-
             String imageName = "";
 
-            if (imageStream != null) {
+            if (request.getPart("image") != null) {
+                imageName = request.getPart("image").getSubmittedFileName();
+                InputStream imageStream = request.getPart("image").getInputStream();
+
+                String contentType = request.getPart("image").getContentType();
 
                 imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName, title + "-" + imageName);
@@ -236,12 +236,51 @@ public class EventsServlet extends HttpServlet {
                     return;
                 }
 
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
-                        Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
+                BufferedImage originalImage = ImageIO.read(imageStream);
 
-                byte[] imageBytes = IOUtils.toByteArray(imageStream);
+                int thumbnailWidth;
+                int thumbnailHeight;
 
-                storage.create(blobInfo, imageBytes);
+
+                //Check image size and set thumbnail size accordingly
+                if (originalImage.getWidth() > originalImage.getHeight()) {
+                    thumbnailWidth = 1350;
+                    thumbnailHeight = 1080;
+                } else if (originalImage.getWidth() < originalImage.getHeight()) {
+                    thumbnailWidth = 1080;
+                    thumbnailHeight = 1350;
+                } else {
+                    thumbnailWidth = 1080;
+                    thumbnailHeight = 1080;
+                }
+
+                // Create a thumbnail image using the original image
+                BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
+                resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+                // Save the thumbnail image to a byte array
+                ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(resizedImage, contentType.substring(contentType.lastIndexOf('/') +1), thumbnailOutputStream);
+                byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
+
+
+                // Upload the thumbnail image to your storage service (similar to the original image)
+                BlobId thumbnailBlobId = BlobId.of(bucketName, uniqueEventId + "-" + imageName);
+
+                if(storage.get(thumbnailBlobId)!=null){
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    return;
+                }
+
+                BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
+                        .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
+                        .build();
+
+                storage.create(thumbnailBlobInfo, thumbnailBytes);
+
+                // Close the thumbnail output stream
+                thumbnailOutputStream.close();
+
             }
 
             byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
@@ -271,12 +310,12 @@ public class EventsServlet extends HttpServlet {
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
                     .set("event_start", start)
                     .set("event_end", end)
-                    .set("event_image", StringValue.newBuilder(title + "-" + imageName).setExcludeFromIndexes(true).build())
-                    .set("event_qr", uniqueEventId + "-qrCode.png")
-                    .set("event_participants", participants)
+                    .set("event_image", StringValue.newBuilder(uniqueEventId + "-" + imageName).setExcludeFromIndexes(true).build())
+                    .set("event_qr", StringValue.newBuilder(uniqueEventId + "-qrCode.png").setExcludeFromIndexes(true).build())
+                    .set("event_participants", ListValue.of(participants))
                     .build();
 
-            txn.put(entity);
+            txn.add(entity);
             txn.commit();
 
             response.setStatus(HttpServletResponse.SC_OK);
