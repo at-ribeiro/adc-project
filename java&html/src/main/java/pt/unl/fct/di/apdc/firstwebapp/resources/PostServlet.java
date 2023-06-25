@@ -294,7 +294,8 @@ public class PostServlet extends HttpServlet {
                                 post.getString("user"),
                                 url,
                                 post.getString("id").split("-")[1],
-                                likes
+                                likes,
+                                ""//null because we already have the profilePic
                         );
 
                         posts.add(feedPost);

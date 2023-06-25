@@ -13,6 +13,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.FeedData;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -135,13 +136,35 @@ public class FeedServlet extends HttpServlet {
                             likes.add(likedEntity.getString("user_username"));
                         }
 
+                        Key creatorKey = userKeyFactory.newKey(post.getString("user"));
+
+                        LOG.warning("creatorKey: " + creatorKey.toString());
+
+                        Entity creator = txn.get(creatorKey);
+
+                        String imageName = creator.getString("user_profile_pic");
+
+                        LOG.warning("imageName: " + imageName);
+
+                        BlobId blobId;
+
+                        if(imageName == null || imageName.equals(""))
+                            blobId = BlobId.of(bucketName, "default_profile.jpg");
+                        else
+                            blobId = BlobId.of(bucketName, imageName);
+
+                        Blob blob = storage.get(blobId);
+
+                        String profilePic = blob.getMediaLink();
+
                         FeedData feedPost = new FeedData(
                                 post.getString("id"),
                                 post.getString("text"),
                                 post.getString("user"),
                                 url,
                                 post.getString("id").split("-")[1],
-                                likes
+                                likes,
+                                profilePic
                         );
 
                         posts.add(feedPost);
