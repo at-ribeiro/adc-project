@@ -49,16 +49,7 @@ class AppRouter {
                   return const NewsView();
                 },
               ),
-              GoRoute(
-                path: Paths.post + "/:id/:user",
-                name: Paths.post,
-                builder: (BuildContext context, GoRouterState state) {
-                  return PostPage(
-                    postID: state.pathParameters['id']!,
-                    postUser: state.pathParameters['user']!,
-                  );
-                },
-              ),
+            
               GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
@@ -152,6 +143,16 @@ class AppRouter {
               );
             },
           ),
+            GoRoute(
+                path: Paths.post + "/:id/:user",
+                name: Paths.post,
+                builder: (BuildContext context, GoRouterState state) {
+                  return PostPage(
+                    postID: state.pathParameters['id']!,
+                    postUser: state.pathParameters['user']!,
+                  );
+                },
+              ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -238,6 +239,8 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
+    } else if(location.contains(Paths.post)){
+      return 'Comentários';
     }
     // add more conditions for other routes
 
@@ -276,13 +279,14 @@ class AppRouter {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location.contains(Paths.otherProfile)) {
+    } else if (location.contains(Paths.otherProfile) || location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
-    } else {
+    }
+     else {
       return Container();
     }
     // add more conditions for other routes

@@ -22,7 +22,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   CalendarView calendarView = CalendarView.month;
   CalendarController calendarController = CalendarController();
   TextEditingController activityNameController = TextEditingController();
-  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -49,106 +48,128 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     } else {
       final provider = Provider.of<ActivityProvider>(context);
 
-      if (!_isInitialized) {
-        provider.initializeActivities(_token);
-        _isInitialized = true;
-      }
-      return Container(
-        decoration: kGradientDecorationDown,
-        child: Scaffold(
-          backgroundColor:
-              Colors.transparent, // Make the scaffold background transparent
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: kPrimaryColor,
-            onPressed: () {
-              provider.addActivity(context, _token);
-            },
-            child: const Icon(Icons.add, color: kAccentColor0),
-          ),
-          body: Column(
-            children: [
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      return FutureBuilder(
+        future: provider.initializeActivities(_token),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                borderRadius: kBorderRadius,
+              ),
+              backgroundColor: kAccentColor0.withOpacity(0.3),
+              content: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        calendarView = CalendarView.month;
-                        calendarController.view = calendarView;
-                      });
-                    },
-                    child: Text("Por Mês"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        calendarView = CalendarView.week;
-                        calendarController.view = calendarView;
-                      });
-                    },
-                    child: Text("Por Semana"),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        calendarView = CalendarView.day;
-                        calendarController.view = calendarView;
-                      });
-                    },
-                    child: Text("Por Dia"),
+                  CircularProgressIndicator(
+                    color: kAccentColor1,
                   ),
                 ],
               ),
-              Expanded(
-                child: SfCalendar(
-                  view: calendarView,
-                  showNavigationArrow: true,
-                  initialSelectedDate: DateTime.now(),
-                  controller: calendarController,
-                  dataSource: ActivityDataSource(provider.activities),
-                  selectionDecoration: BoxDecoration(
-                    color: kAccentColor2.withOpacity(0.1),
-                    border: Border.all(color: kSecondaryColor, width: 3),
-                    borderRadius: const BorderRadius.all(Radius.circular(7)),
-                    shape: BoxShape.rectangle,
-                  ),
-                  monthViewSettings: const MonthViewSettings(
-                    appointmentDisplayMode:
-                        MonthAppointmentDisplayMode.indicator,
-                    showAgenda: true,
-                    monthCellStyle: MonthCellStyle(
-                      textStyle: TextStyle(
-                        color: kAccentColor0,
-                        fontSize: 16,
-                      ),
-                      trailingDatesTextStyle: TextStyle(
-                        color: kAccentColor0,
-                        fontSize: 16,
-                      ),
-                      leadingDatesTextStyle: TextStyle(
-                        color: kAccentColor0,
-                        fontSize: 16,
-                      ),
-                      todayTextStyle: TextStyle(
-                        color: kAccentColor0,
-                        fontSize: 16,
-                      ),
-                      
-                    ),
-                  ),
-                  onTap: (CalendarTapDetails details) {
-                    if (details.targetElement == CalendarElement.appointment) {
-                      final Activity tappedActivity =
-                          details.appointments!.first as Activity;
-                      provider.updateActivity(context, tappedActivity, _token);
-                    }
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error initializing activities: ${snapshot.error}');
+          } else {
+            return Container(
+              decoration: kGradientDecorationDown,
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                floatingActionButton: FloatingActionButton(
+                  backgroundColor: kPrimaryColor,
+                  onPressed: () {
+                    provider.addActivity(context, _token);
                   },
+                  child: const Icon(Icons.add, color: kAccentColor0),
+                ),
+                body: Column(
+                  children: [
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              calendarView = CalendarView.month;
+                              calendarController.view = calendarView;
+                            });
+                          },
+                          child: Text("Por Mês"),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              calendarView = CalendarView.week;
+                              calendarController.view = calendarView;
+                            });
+                          },
+                          child: Text("Por Semana"),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              calendarView = CalendarView.day;
+                              calendarController.view = calendarView;
+                            });
+                          },
+                          child: Text("Por Dia"),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: SfCalendar(
+                        view: calendarView,
+                        showNavigationArrow: true,
+                        initialSelectedDate: DateTime.now(),
+                        controller: calendarController,
+                        dataSource: ActivityDataSource(provider.activities),
+                        selectionDecoration: BoxDecoration(
+                          color: kAccentColor2.withOpacity(0.1),
+                          border: Border.all(color: kSecondaryColor, width: 3),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(7)),
+                          shape: BoxShape.rectangle,
+                        ),
+                        monthViewSettings: const MonthViewSettings(
+                          appointmentDisplayMode:
+                              MonthAppointmentDisplayMode.indicator,
+                          showAgenda: true,
+                          monthCellStyle: MonthCellStyle(
+                            textStyle: TextStyle(
+                              color: kAccentColor0,
+                              fontSize: 16,
+                            ),
+                            trailingDatesTextStyle: TextStyle(
+                              color: kAccentColor0,
+                              fontSize: 16,
+                            ),
+                            leadingDatesTextStyle: TextStyle(
+                              color: kAccentColor0,
+                              fontSize: 16,
+                            ),
+                            todayTextStyle: TextStyle(
+                              color: kAccentColor0,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        onTap: (CalendarTapDetails details) {
+                          if (details.targetElement ==
+                              CalendarElement.appointment) {
+                            final Activity tappedActivity =
+                                details.appointments!.first as Activity;
+                            provider.updateActivity(
+                                context, tappedActivity, _token);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+        },
       );
     }
   }
