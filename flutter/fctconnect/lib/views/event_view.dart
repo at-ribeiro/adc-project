@@ -12,8 +12,8 @@ import 'package:responsive_login_ui/views/search_event_view.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
+import '../models/event_get_data.dart';
 import '../services/base_client.dart';
-import '../models/event_data.dart';
 import '../services/load_token.dart';
 import 'event_page.dart';
 
@@ -25,7 +25,7 @@ class EventView extends StatefulWidget {
 }
 
 class _EventViewState extends State<EventView> {
-  List<EventData> _events = [];
+  List<EventGetData> _events = [];
   late Token _token;
   bool _isLoadingToken = true;
   bool _loadingMore = false;
@@ -74,7 +74,7 @@ class _EventViewState extends State<EventView> {
                           child: CircularProgressIndicator(),
                         );
                       } else {
-                        EventData event = _events[index];
+                        EventGetData event = _events[index];
                         return GestureDetector(
                           onTap: () {
                             context.go(Paths.event + '/${event.id}');
@@ -170,7 +170,7 @@ class _EventViewState extends State<EventView> {
   }
 
   void _loadEvents() async {
-    List<EventData> events = await BaseClient().getEvents(
+    List<EventGetData> events = await BaseClient().getEvents(
       "/events",
       _token.tokenID,
       _token.username,
@@ -188,7 +188,7 @@ class _EventViewState extends State<EventView> {
 
   Future<void> _refreshEvents() async {
     _lastDisplayedEventTimestamp = DateTime.now().millisecondsSinceEpoch;
-    List<EventData> latestEvents = await BaseClient().getEvents(
+    List<EventGetData> latestEvents = await BaseClient().getEvents(
       "/events",
       _token.tokenID,
       _token.username,

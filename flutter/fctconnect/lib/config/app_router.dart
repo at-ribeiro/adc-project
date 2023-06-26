@@ -250,8 +250,7 @@ class AppRouter {
   Widget _getButtonsBasedOnRoute(String location, BuildContext context) {
     if (location == Paths.homePage ||
         location == '/' ||
-        location == Paths.noticias ||
-        location == Paths.events) {
+        location == Paths.noticias) {
       return IconButton(
         onPressed: () {
           showSearch(
@@ -273,7 +272,14 @@ class AppRouter {
             context.go(Paths.myProfile);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location == Paths.createEvent) {
+    } else if (location == Paths.events) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createEvent);
+          },
+          icon: Icon(Icons.add));
+    }
+     else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
@@ -286,9 +292,9 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     }
-     else {
+   
       return Container();
-    }
+    
     // add more conditions for other routes
 
     // return ''; // fallback title

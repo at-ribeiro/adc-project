@@ -86,6 +86,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+  @override
   void dispose() {
     _themeManager.removeListener(themeListener);
     super.dispose();
