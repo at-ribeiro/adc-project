@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
@@ -11,15 +10,8 @@ import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/profile_info.dart';
-import 'package:responsive_login_ui/widgets/error_dialog.dart';
-import '../models/FeedData.dart';
-
-import '../models/Token.dart';
-import '../models/paths.dart';
-import '../services/base_client.dart';
 import '../services/load_token.dart';
 
 class OtherProfile extends StatefulWidget {
@@ -35,7 +27,6 @@ class _OtherProfileState extends State<OtherProfile> {
   late String name;
   String onButtonSelected = 'Info';
   Uint8List? _imageData;
-  String? _fileName;
   late Token _token;
   bool _isLoading = false;
   bool _infoIsLoading = true;
@@ -48,29 +39,15 @@ class _OtherProfileState extends State<OtherProfile> {
       DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
   late ProfileInfo info;
-  Future<bool>? _followStatusFuture;
-
-  bool _follows = false;
-  bool _processing =
-      false; // To check if the follow/unfollow operation is in progress.
+  late bool _followStatus;
+  String followButton = '';
 
   @override
   void initState() {
-    name = widget.name;
     super.initState();
+    name = widget.name;
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-
-    _loadInitialData(); // add this line
-  }
-
-  void _loadInitialData() async {
-    // Assuming your _token is available before this point.
-    // If not, you need to make sure it is before using it here.
-    _followStatusFuture = BaseClient()
-        .doesUserFollow("/follow", _token.username, _token.tokenID, name);
-
-    // Add any other initial asynchronous loading here if needed.
   }
 
   void _onScroll() {
@@ -116,6 +93,12 @@ class _OtherProfileState extends State<OtherProfile> {
     return infoAux;
   }
 
+  Future<bool> _isFollowing() async {
+    bool _followStatuAux = await BaseClient().doesUserFollow(
+        "/follow", _token.username, _token.tokenID, widget.name);
+    return _followStatuAux;
+  }
+
   Widget _loadProfilePic() {
     if (info == null || info.profilePicUrl.isEmpty) {
       return const CircleAvatar(
@@ -132,46 +115,6 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Function()? _follow(ProfileInfo info) {
-    if (_processing) {
-      return null;
-    } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient()
-            .follow("/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = true;
-          _processing = false;
-        });
-      };
-    }
-  }
-
-  Function()? _unfollow(ProfileInfo info) {
-    if (_processing) {
-      return null;
-    } else {
-      return () async {
-        setState(() {
-          _processing = true;
-        });
-
-        await BaseClient().unfollow(
-            "/follow", _token.username, _token.tokenID, info.username);
-
-        setState(() {
-          _follows = false;
-          _processing = false;
-        });
-      };
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
@@ -184,10 +127,10 @@ class _OtherProfileState extends State<OtherProfile> {
         });
       });
     } else if (_infoIsLoading) {
-      
       return FutureBuilder(
-          future: _loadInfo(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          future: Future.wait([_loadInfo(), _isFollowing()]),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 const Text('Algo correu mal.');
@@ -195,14 +138,13 @@ class _OtherProfileState extends State<OtherProfile> {
                   decoration: kGradientDecoration,
                 );
               } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
                   setState(() {
-                    info = snapshot.data;
+                    info = snapshot.data![0];
+                    _followStatus = snapshot.data![1];
                     _infoIsLoading = false;
                   });
                 });
-                _followStatusFuture = BaseClient().doesUserFollow(
-                    "/follow", _token.username, _token.tokenID, info.username);
                 return Container(
                   decoration: kGradientDecorationUp,
                 );
@@ -217,73 +159,26 @@ class _OtherProfileState extends State<OtherProfile> {
       return Container(
         decoration: kGradientDecoration,
         child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: ListView(
-              padding: EdgeInsets.zero,
-              controller: _scrollController,
-              children: <Widget>[
-                buildTop(),
-                const SizedBox(height: 16),
-                buildButtons(context),
-                const SizedBox(height: 16),
-                Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    Text(
-                      info.fullname,
-                      style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: kAccentColor0),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      info.role,
-                      style:
-                          const TextStyle(fontSize: 20, color: kAccentColor2),
-                    ),
-                    const SizedBox(height: 16),
-                    FutureBuilder<bool>(
-                      future: _followStatusFuture,
-                      builder: (context, AsyncSnapshot<bool> snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error retrieving follow status');
-                        } else {
-                          _follows = snapshot.data!;
-
-                          return ElevatedButton(
-                            onPressed:
-                                _follows ? _unfollow(info) : _follow(info),
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                (states) {
-                                  if (_follows) {
-                                    return kAccentColor1; // Set the button background color to grey if following
-                                  }
-                                  return kAccentColor0; // Set the button background color to blue if not following
-                                },
-                              ),
-                            ),
-                            child: Text(
-                              _follows ? 'Unfollow' : 'Follow',
-                              style: const TextStyle(
-                                  fontSize: 16, color: kPrimaryColor),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    const SizedBox(height: 28),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ],
-            )),
+          backgroundColor: Colors.transparent,
+          body: ListView(
+            padding: EdgeInsets.zero,
+            controller: _scrollController,
+            children: <Widget>[
+              buildTop(),
+              const SizedBox(height: 16),
+              buildButtons(context),
+              Divider(
+                color: kAccentColor0,
+                thickness: 2.0,
+              ),
+              const SizedBox(height: 16),
+              if (_token.role == "ALUNO") buildInfoAlunoSection(info),
+              if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
+              if (_token.role == "EXTERNO") buildInfoExternoSection(info),
+              SizedBox(height: 30),
+            ],
+          ),
+        ),
       );
     }
   }
@@ -515,7 +410,19 @@ class _OtherProfileState extends State<OtherProfile> {
                       ],
                     ),
                     const SizedBox(height: 8.0),
-                    if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if ((!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv')) && post.url != '')
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -591,23 +498,19 @@ class _OtherProfileState extends State<OtherProfile> {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: bottom),
-          child: buildCover(),
+          child: Center(
+            child: buildCoverImage(),
+          ),
         ),
         Positioned(
           top: top,
-          child: buildProfileAndEditButton(),
+          child: Center(
+            child: buildProfileImage(),
+          ),
         ),
       ],
     );
   }
-
-  Widget buildCover() => Stack(
-        children: <Widget>[
-          Center(
-            child: buildCoverImage(),
-          ),
-        ],
-      );
 
   Widget buildCoverImage() {
     if (info.coverPicUrl.isEmpty) {
@@ -671,135 +574,6 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Widget buildProfileAndEditButton() => Stack(
-        children: <Widget>[
-          Center(
-            child: buildProfileImage(),
-          ),
-        ],
-      );
-
-  ElevatedButton saveButton(BuildContext context, String api) {
-    return ElevatedButton(
-      onPressed: () {
-        if (_imageData == null) {
-          // Show a dialog telling the user to select an image
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content:
-                    Text("Por favor, selecione uma imagem antes de salvar."),
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Ok'),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return FutureBuilder<int>(
-                future: BaseClient.updatePic(api, _token.tokenID,
-                    _token.username, _fileName, _imageData!),
-                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: kBorderRadius,
-                      ),
-                      content: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(width: 16),
-                          Text("Uploading..."),
-                        ],
-                      ),
-                    );
-                  } else if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData && snapshot.data == 200) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: kBorderRadius,
-                        ),
-                        backgroundColor: kAccentColor0.withOpacity(0.3),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Imagem mudada com sucesso',
-                              style: TextStyle(color: kAccentColor0),
-                            ),
-                            SizedBox(height: 15),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop();
-                                context.go(Paths.myProfile);
-                              },
-                              child: Text(
-                                'Ok',
-                                style: TextStyle(color: kAccentColor0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: kBorderRadius,
-                        ),
-                        backgroundColor: kAccentColor0.withOpacity(0.3),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Algo não correu bem!',
-                              style: TextStyle(color: kAccentColor0),
-                            ),
-                            SizedBox(height: 15),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                'Voltar',
-                                style: TextStyle(color: kAccentColor0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    setState(() {
-                      _imageData = null;
-                    });
-                  } else {
-                    return Container();
-                  }
-                },
-              );
-            },
-          );
-        }
-      },
-      child: Text(
-        'Guardar',
-        style: TextStyle(color: kAccentColor0),
-      ),
-    );
-  }
-
-  @override
   Widget buildButtons(BuildContext context) {
     return Column(
       children: [
@@ -813,6 +587,20 @@ class _OtherProfileState extends State<OtherProfile> {
         Text(
           info.role,
           style: const TextStyle(fontSize: 20, color: kAccentColor2),
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: ElevatedButton(
+            onPressed: _toggleFollow,
+            child: Text(
+              _followStatus ? 'Unfollow' : 'Follow',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kAccentColor0,
+              ),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         Row(
@@ -882,8 +670,25 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
           ],
         ),
+        SizedBox(height: 16),
       ],
     );
+  }
+
+  void _toggleFollow() {
+    if (_followStatus == true) {
+      BaseClient()
+          .unfollow("/follow", _token.username, _token.tokenID, info.username);
+      info.nFollowers--;
+    } else {
+      BaseClient()
+          .follow("/follow", _token.username, _token.tokenID, info.username);
+      info.nFollowers++;
+    }
+
+    setState(() {
+      _followStatus = !_followStatus;
+    });
   }
 
   Widget buildButton({

@@ -7,20 +7,9 @@ import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/services/fcm_services.dart';
 import 'package:responsive_login_ui/services/get_fcm_token.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
-import 'package:responsive_login_ui/views/login_view.dart';
-import 'package:responsive_login_ui/views/signUp_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'config/app_router.dart';
-import 'firebase_options.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:url_strategy/url_strategy.dart';
-
 import 'controller/simple_ui_controller.dart';
-import 'models/Token.dart';
-import 'views/my_home_page.dart';
-import 'views/news_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

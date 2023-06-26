@@ -6,8 +6,8 @@ class ProfileInfo {
   final String email;
   final String role;
   final int nFollowing;
-  final int nFollowers;
-  final int nPosts;
+  int nFollowers;
+  int nPosts;
   final String about_me;
   final String phone;
   final String city;

@@ -3,21 +3,18 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 
 import 'package:intl/intl.dart';
+import 'package:responsive_login_ui/views/video_player.dart';
 import '../constants.dart';
 import '../models/FeedData.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
-import '../services/image_up.dart';
 import '../services/load_token.dart';
-import '../services/post_actions.dart';
-import '../widgets/error_dialog.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
@@ -200,7 +197,7 @@ class _MyProfileState extends State<MyProfile> {
               if (_token.role == "ALUNO") buildInfoAlunoSection(info),
               if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
               if (_token.role == "EXTERNO") buildInfoExternoSection(info),
-              const SizedBox(height: 32),
+              SizedBox(height: 100),
             ],
           ),
         ),
@@ -432,10 +429,29 @@ class _MyProfileState extends State<MyProfile> {
                             ),
                           ],
                         ),
+                        IconButton(onPressed: () {
+                          BaseClient().deletePost("/post", post.id, _token.username, _token.tokenID);
+                          setState(() {
+                            _posts.remove(post);
+                            info.nPosts--;
+                          });
+                        }, icon: Icon(Icons.delete))
                       ],
                     ),
                     const SizedBox(height: 8.0),
-                    if (post.url.isNotEmpty)
+                      if (post.url.contains('.mp4') ||
+                          post.url.contains('.mov') ||
+                          post.url.contains('.avi') ||
+                          post.url.contains('.mkv'))
+                        Center(
+                          child: VideoPlayerWidget(
+                            videoUrl: post.url,
+                          ),
+                        ),
+                    if ((!post.url.contains('.mp4') &&
+                        !post.url.contains('.mov') &&
+                        !post.url.contains('.avi') &&
+                        !post.url.contains('.mkv')) && post.url != '')
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -857,7 +873,6 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  @override
   Widget buildButtons(BuildContext context) {
     return Column(
       children: [
@@ -940,6 +955,7 @@ class _MyProfileState extends State<MyProfile> {
             ),
           ],
         ),
+        SizedBox(height: 16),
       ],
     );
   }

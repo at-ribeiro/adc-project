@@ -291,6 +291,10 @@ class AppRouter {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
+
+     else {
+      return Container();
+
     }
    
       return Container();

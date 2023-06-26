@@ -1,10 +1,9 @@
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUp {
   
-  static Future<Map<String, dynamic>> pickImage() async {
+  Future<Map<String, dynamic>> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     
@@ -19,7 +18,7 @@ class ImageUp {
     return {};
   }
 
-  static Future<Map<String, dynamic>> takePicture() async {
+  Future<Map<String, dynamic>> takePicture() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     

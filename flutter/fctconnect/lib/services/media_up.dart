@@ -24,8 +24,7 @@ class MediaUp {
 
     if (result != null) {
       PlatformFile file = result.files.first;
-      String filePath = file.path!;
-      Uint8List fileData = await File(filePath).readAsBytes();
+      Uint8List fileData = file.bytes!;
       String fileName = file.name;
       String fileExtension = fileName.split('.').last;
 
@@ -60,3 +59,4 @@ class MediaUp {
     return {};
   }
 }
+	

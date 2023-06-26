@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_login_ui/models/Token.dart';
 
 import 'calendar/activity_provider.dart';
 import 'calendar/calendar_widget.dart';
