@@ -416,9 +416,11 @@ class BaseClient {
     );
 
     if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final commentsList =
-          jsonList.map((json) => CommentData.fromJson(json)).toList();
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<CommentData> commentsList =
+          List<CommentData>.from(data.map((json) => CommentData.fromJson(json)));
       return commentsList;
     } else {
       //throw exception
