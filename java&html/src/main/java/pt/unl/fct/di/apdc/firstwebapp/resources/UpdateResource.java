@@ -76,7 +76,7 @@ public class UpdateResource {
             }
 
 
-            Entity task = Entity.newBuilder(user)
+            Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
                     .set("user_fullname", data.getFullname())
                     .set("user_pwd", user.getString("user_pwd"))
@@ -95,6 +95,7 @@ public class UpdateResource {
                     .set("user_profile_pic", user.getString("user_profile_pic"))
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", data.getPurpose())
+                    .set("user_events", user.getList("user_events"))
                     .build();;
 
             txn.update(task);

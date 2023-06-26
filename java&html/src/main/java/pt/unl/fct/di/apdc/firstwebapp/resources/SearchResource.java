@@ -1,6 +1,10 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.util.SearchUserData;
 
@@ -19,6 +23,9 @@ public class SearchResource {
 
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
     private final Gson g = new Gson();
 
     @GET
@@ -55,11 +62,34 @@ public class SearchResource {
                 Entity user1 = greaterThanOrEqualResults.next();
                 Entity user2 = lessThanResults.next();
 
+                String imageName1 = user1.getString("user_profile_pic");
+                String imageName2 = user2.getString("user_profile_pic");
+
+                BlobId blobId;
+
+                if(imageName1 == null || imageName1.equals(""))
+                    blobId = BlobId.of(bucketName, "default_profile.jpg");
+                else
+                    blobId = BlobId.of(bucketName, imageName1);
+
+                Blob blob = storage.get(blobId);
+
+                String profilePic1 = blob.getMediaLink();
+
+                if(imageName2 == null || imageName2.equals(""))
+                    blobId = BlobId.of(bucketName, "default_profile.jpg");
+                else
+                    blobId = BlobId.of(bucketName, imageName2);
+
+                blob = storage.get(blobId);
+
+                String profilePic2 = blob.getMediaLink();
+
                 SearchUserData data1 = new SearchUserData(user1.getString("user_username"),
-                        user1.getString("user_fullname"));
+                        user1.getString("user_fullname"), profilePic1);
 
                 SearchUserData data2 = new SearchUserData(user2.getString("user_username"),
-                        user2.getString("user_fullname"));
+                        user2.getString("user_fullname"), profilePic2);
 
                 // If the username matches in both queries, add it to the result list
                 if (user1.getString("user_username").startsWith(query) && !matchedUsers.contains(data1)) {
@@ -71,6 +101,7 @@ public class SearchResource {
             }
 
             return Response.ok(matchedUsers).build();
+
         }catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());

@@ -67,6 +67,8 @@ public class RegisterResource {
                 return Response.status(Response.Status.CONFLICT).entity("Email already in use.").build();
             }
 
+            List<Value<String>> events = new ArrayList<>();
+
             user = Entity.newBuilder(userKey)
                     .set("user_username", data.getUsername())
                     .set("user_fullname", data.getFullname())
@@ -85,7 +87,8 @@ public class RegisterResource {
                     .set("user_year", "")
                     .set("user_profile_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_cover_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("external_purpose","")
+                    .set("user_purpose","")
+                    .set("user_events", ListValue.of(events))
                     .build();
 
             txn.add(user);
@@ -202,8 +205,7 @@ public class RegisterResource {
                     .set("user_profile_pic", user.getString("user_profile_pic"))
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", user.getString("user_purpose"))
-
-
+                    .set("user_events", user.getList("user_events"))
                     .build();
 
             txn.put(user);

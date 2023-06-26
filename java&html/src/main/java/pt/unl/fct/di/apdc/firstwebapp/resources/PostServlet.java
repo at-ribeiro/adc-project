@@ -98,47 +98,79 @@ public class PostServlet extends HttpServlet {
             String imageName = "";
 
             if (request.getPart("image") != null) {
-                String imageNameJPG = request.getPart("image").getSubmittedFileName();
-                imageName = imageNameJPG.substring(0, imageNameJPG.lastIndexOf("."));
+                imageName = request.getPart("image").getSubmittedFileName();
                 InputStream imageStream = request.getPart("image").getInputStream();
 
-                // Read the original image
-                BufferedImage originalImage = ImageIO.read(imageStream);
-
-                int thumbnailWidth;
-                int thumbnailHeight;
+                String contentType = request.getPart("image").getContentType();
 
 
-                //Check image size and set thumbnail size accordingly
-                if(originalImage.getWidth() > originalImage.getHeight()){
-                    thumbnailWidth = 1350;
-                    thumbnailHeight = 1080;
-                }else if(originalImage.getWidth() < originalImage.getHeight()){
-                    thumbnailWidth = 1080;
-                    thumbnailHeight = 1350;
+                if(contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType.equals("image/png")) {
+
+                    // Read the original image
+                    BufferedImage originalImage = ImageIO.read(imageStream);
+
+                    int thumbnailWidth;
+                    int thumbnailHeight;
+
+
+                    //Check image size and set thumbnail size accordingly
+                    if (originalImage.getWidth() > originalImage.getHeight()) {
+                        thumbnailWidth = 1350;
+                        thumbnailHeight = 1080;
+                    } else if (originalImage.getWidth() < originalImage.getHeight()) {
+                        thumbnailWidth = 1080;
+                        thumbnailHeight = 1350;
+                    } else {
+                        thumbnailWidth = 1080;
+                        thumbnailHeight = 1080;
+                    }
+
+                    // Create a thumbnail image using the original image
+                    BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
+                    resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+                    // Save the thumbnail image to a byte array
+                    ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(resizedImage, contentType.substring(contentType.lastIndexOf('/') +1), thumbnailOutputStream);
+                    byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
+
+
+                    // Upload the thumbnail image to your storage service (similar to the original image)
+                    BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
+
+                    if(storage.get(thumbnailBlobId)!=null){
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        return;
+                    }
+
+                    BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
+                            .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
+                            .build();
+
+                    storage.create(thumbnailBlobInfo, thumbnailBytes);
+
+                    // Close the thumbnail output stream
+                    thumbnailOutputStream.close();
+
                 }else{
-                    thumbnailWidth = 1080;
-                    thumbnailHeight = 1080;
+
+                    BlobId blobId = BlobId.of(bucketName,  username + "-" + imageName);
+
+                    if(storage.get(blobId)!=null){
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        return;
+                    }
+
+                    byte[] imageBytes = IOUtils.toByteArray(imageStream);
+
+                    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setAcl(Collections.singletonList(
+                            Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build())).build();
+
+
+                    storage.create(blobInfo, imageBytes);
+
                 }
 
-                // Create a thumbnail image using the original image
-                BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
-                resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
-
-                // Save the thumbnail image to a byte array
-                ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-                ImageIO.write(resizedImage, "jpg", thumbnailOutputStream);
-                byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
-
-                // Upload the thumbnail image to your storage service (similar to the original image)
-                BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
-                BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
-                        .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
-                        .build();
-                storage.create(thumbnailBlobInfo, thumbnailBytes);
-
-                // Close the thumbnail output stream
-                thumbnailOutputStream.close();
             }
 
             Key postKey = datastore.newKeyFactory()
@@ -262,7 +294,8 @@ public class PostServlet extends HttpServlet {
                                 post.getString("user"),
                                 url,
                                 post.getString("id").split("-")[1],
-                                likes
+                                likes,
+                                ""//null because we already have the profilePic
                         );
 
                         posts.add(feedPost);
