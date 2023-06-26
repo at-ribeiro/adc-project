@@ -4,6 +4,7 @@ class Token {
   String tokenID;
   int creationDate;
   int expirationDate;
+  String profilePic;
 
   Token({
     required this.username,
@@ -11,6 +12,7 @@ class Token {
     required this.tokenID,
     required this.creationDate,
     required this.expirationDate,
+    required this.profilePic,
   });
 
   factory Token.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Token {
       tokenID: json['tokenID'],
       creationDate: json['creationDate'],
       expirationDate: json['expirationDate'],
+      profilePic: json['profilePic'],
     );
   }
 
@@ -29,5 +32,6 @@ class Token {
     'tokenID': tokenID,
     'creationTime': creationDate,
     'expirationTime': expirationDate,
+    'profilePic': profilePic,
   };
 }

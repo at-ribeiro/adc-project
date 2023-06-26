@@ -320,6 +320,11 @@ class _LoginViewState extends State<LoginView>
     CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
     CacheDefault.cacheFactory.set('isLoggedIn', 'true');
 
+    String profiPic =
+        await BaseClient().getProfilePic('/profilePic', tokenId, username);
+
+      CacheDefault.cacheFactory.set('ProfilePic', profiPic);
+
     context.go(Paths.homePage);
 
     return response;
@@ -359,7 +364,7 @@ class _LoginViewState extends State<LoginView>
             } else {
               errorText = 'Algo não correu bem!';
             }
-            return ErrorDialog(errorText,'Tentar novamente', context);
+            return ErrorDialog(errorText, 'Tentar novamente', context);
           } else {
             context.go(Paths.homePage);
             return Container();
@@ -370,7 +375,6 @@ class _LoginViewState extends State<LoginView>
       },
     );
   }
-
 
   Widget loginButton() {
     return SizedBox(

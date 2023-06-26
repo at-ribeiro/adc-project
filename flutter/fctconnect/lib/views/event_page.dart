@@ -20,7 +20,7 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  bool isButtonPressed = false;
+  // bool isButtonPressed = false;
   late EventData _event;
   late String _buttonLabel;
   late String _eventId;
@@ -33,31 +33,31 @@ class _EventPageState extends State<EventPage> {
     super.initState();
   }
 
-  Future<void> checkIfButtonShouldBePressed() async {
-    var username = await SessionManager.get("Username");
-    var tokenID = await SessionManager.get("Token");
-    var response = await BaseClient().isInEvent("/event", username!, tokenID!);
-    setState(() {
-      isButtonPressed = response;
-      _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
-    });
-  }
+  // Future<void> checkIfButtonShouldBePressed() async {
+  //   var username = await SessionManager.get("Username");
+  //   var tokenID = await SessionManager.get("Token");
+  //   // var response = await BaseClient().isInEvent("/event", username!, tokenID!);
+  //   setState(() {
+  //     // isButtonPressed = response;
+  //     _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
+  //   });
+  // }
 
-  Future<void> handleButtonPress() async {
-    var username = await SessionManager.get("Username");
-    var tokenID = await SessionManager.get("Token");
+  // Future<void> handleButtonPress() async {
+  //   var username = await SessionManager.get("Username");
+  //   var tokenID = await SessionManager.get("Token");
 
-    if (!isButtonPressed) {
-      await BaseClient().joinEvent("/events", username!, tokenID!, _event);
-    } else {
-      await BaseClient().leaveEvent("/events", username!, tokenID!, _event);
-    }
+  //   if (!isButtonPressed) {
+  //     await BaseClient().joinEvent("/events", username!, tokenID!, _event);
+  //   } else {
+  //     await BaseClient().leaveEvent("/events", username!, tokenID!, _event);
+  //   }
 
-    setState(() {
-      isButtonPressed = !isButtonPressed;
-      _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
-    });
-  }
+  //   setState(() {
+  //     isButtonPressed = !isButtonPressed;
+  //     _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,7 @@ class _EventPageState extends State<EventPage> {
     } else if (isEventLoading) {
       return loadEvent();
     } else {
-      checkIfButtonShouldBePressed();
+      // checkIfButtonShouldBePressed();
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(
@@ -103,10 +103,9 @@ class _EventPageState extends State<EventPage> {
                       Text(
                         _event.title,
                         style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                          color: kAccentColor0
-                        ),
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            color: kAccentColor0),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -139,7 +138,7 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 16),
-                      showQrcodeOrnot(),
+                      if (_event.creator == _token.username) showQrcodeOrnot(),
                     ],
                   ),
                 ),
@@ -152,45 +151,43 @@ class _EventPageState extends State<EventPage> {
   }
 
   showQrcodeOrnot() {
-    if (_event.creator == _token.username) {
-      return Column(
-        children: [
-          SizedBox(height: 8),
-          GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return ClipRRect(
-                    borderRadius: kBorderRadius,
-                    child: Dialog(
-                      backgroundColor: Colors.transparent,
-                      child: Container(
-                        child: ClipRRect(
-                          borderRadius: kBorderRadius,
-                          child: Image.network(
-                            _event.qrcodeUrl!,
-                            fit: BoxFit.cover,
-                          ),
+    return Column(
+      children: [
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return ClipRRect(
+                  borderRadius: kBorderRadius,
+                  child: Dialog(
+                    backgroundColor: Colors.transparent,
+                    child: Container(
+                      child: ClipRRect(
+                        borderRadius: kBorderRadius,
+                        child: Image.network(
+                          _event.qrcodeUrl!,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                  );
-                },
-              );
-            },
-            child: SizedBox(
-              height: 100.0, // Replace with your desired height
-              // Adjust the fit property as needed
-              child: Image.network(
-                _event.qrcodeUrl!,
-              ),
+                  ),
+                );
+              },
+            );
+          },
+          child: SizedBox(
+            height: 100.0, // Replace with your desired height
+            // Adjust the fit property as needed
+            child: Image.network(
+              _event.qrcodeUrl!,
             ),
           ),
-          SizedBox(height: 8),
-        ],
-      );
-    }
+        ),
+        SizedBox(height: 8),
+      ],
+    );
   }
 
   Widget loadEvent() {

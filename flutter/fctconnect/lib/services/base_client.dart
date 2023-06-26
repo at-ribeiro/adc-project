@@ -91,6 +91,7 @@ class BaseClient {
         tokenID: jsonResponse['tokenID'],
         creationDate: jsonResponse['creationDate'],
         expirationDate: jsonResponse['expirationDate'],
+        profilePic: '',
       );
 
       return token;
@@ -808,14 +809,14 @@ class BaseClient {
     return response.statusCode;
   }
 
-  Future<dynamic> getProfilePic(
+  Future<String> getProfilePic(
       String api, String tokenID, String username) async {
     Map<String, String> _headers = {"Authorization": tokenID, "User": username};
 
     var url = Uri.parse(baseUrl + api + "/" + username);
     var response = await client.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      return response;
+      return response.body;
     } else {
       //throw exception
       throw extension("Something went wrong");
