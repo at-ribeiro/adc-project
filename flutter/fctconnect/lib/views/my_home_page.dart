@@ -413,7 +413,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    // You should put your function to report post here
+                    BaseClient().reportPost(
+                      "/report",
+                      _token.username,
+                      _token.tokenID,
+                      id,
+                      postUser,
+                      selectedReason,
+                      _commentController.text);
                     Navigator.of(context).pop();
                   },
                   child: Text('Submeter'),

@@ -501,10 +501,12 @@ class BaseClient {
       headers: _headers,
     );
 
-    if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final reportsList =
-          jsonList.map((json) => AlertPostData.fromJson(json)).toList();
+    if (response.statusCode == 200) {      
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<AlertPostData> reportsList =
+          List<AlertPostData>.from(data.map((json) => AlertPostData.fromJson(json)));
       return reportsList;
     } else {
       throw Exception(
