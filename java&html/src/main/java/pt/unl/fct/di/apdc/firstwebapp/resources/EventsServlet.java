@@ -94,7 +94,7 @@ public class EventsServlet extends HttpServlet {
 
             eventResults.forEachRemaining(event -> {
                 String url = "";
-                String qrCodeUrl = "";
+                String qrCodeUrl;
 
                 if (!event.getString("event_image").equals("")) {
 
@@ -116,7 +116,10 @@ public class EventsServlet extends HttpServlet {
                     participants.add(entity.getString("user_username"));
                 }
 
-                // TODO: Check with frontend
+                if(participants.isEmpty()){
+                    participants.add("");
+                }
+
                 EventGetData eventInstance = new EventGetData(
                         event.getString("event_creator"),
                         event.getString("event_title"),
@@ -126,7 +129,9 @@ public class EventsServlet extends HttpServlet {
                         event.getLong("event_end"),
                         event.getString("id"),
                         qrCodeUrl,
-                        participants);
+                        participants,
+                        event.getDouble("event_latitude"),
+                        event.getDouble("event_longitude"));
 
                 eventList.add(eventInstance);
             });
@@ -313,6 +318,8 @@ public class EventsServlet extends HttpServlet {
                     .set("event_image", StringValue.newBuilder(uniqueEventId + "-" + imageName).setExcludeFromIndexes(true).build())
                     .set("event_qr", StringValue.newBuilder(uniqueEventId + "-qrCode.png").setExcludeFromIndexes(true).build())
                     .set("event_participants", ListValue.of(participants))
+                    .set("event_latitude", DoubleValue.newBuilder(data.getLat()).setExcludeFromIndexes(true).build())
+                    .set("event_longitude", DoubleValue.newBuilder(data.getLng()).setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(entity);

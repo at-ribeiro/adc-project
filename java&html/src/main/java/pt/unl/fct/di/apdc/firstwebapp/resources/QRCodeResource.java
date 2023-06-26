@@ -150,7 +150,10 @@ public class QRCodeResource {
                     event.getLong("event_end"),
                     event.getString("id"),
                     qrCodeUrl,
-                    participants);
+                    participants,
+                    event.getDouble("event_latitude"),
+                    event.getDouble("event_longitude")
+                    );
 
             txn.commit();
             return Response.ok(eventData).build();
@@ -244,7 +247,9 @@ public class QRCodeResource {
                     event.getLong("event_end"),
                     event.getString("id"),
                     qrCodeUrl,
-                    participants);
+                    participants,
+                    event.getDouble("event_latitude"),
+                    event.getDouble("event_longitude"));
 
             return Response.ok(eventData).build();
 
