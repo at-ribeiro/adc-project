@@ -79,6 +79,23 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
+  Widget _loadProfilePic(String profilePic) {
+    if (profilePic.isEmpty) {
+      return const CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        radius: 20,
+        backgroundImage: NetworkImage(
+          profilePic,
+        ),
+      );
+    }
+  }
+
   Widget ContentBody() {
     return Column(
       children: [
@@ -107,11 +124,7 @@ class _PostPageState extends State<PostPage> {
                         child: ListTile(
                           title: Row(
                             children: [
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                                ),
-                              ),
+                              _loadProfilePic(comment.profilePic ?? ''),
                               SizedBox(width: 8.0),
                               Text(comment.user),
                             ],
