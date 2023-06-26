@@ -24,7 +24,7 @@ class TokenGetterWidget extends StatelessWidget {
                 context.go(Paths.login);
               });
               return Container(
-                decoration: kGradientDecorationUp,
+               color: Colors.transparent,
               );
             } else {
               Token token = snapshot.data;
@@ -37,21 +37,21 @@ class TokenGetterWidget extends StatelessWidget {
                   context.go(Paths.login);
                 });
                 return Container(
-                  decoration: kGradientDecorationUp,
+                  color: Colors.transparent,
                 );
               } else if (token.tokenID == null || token.tokenID == "") {
                 return Container(
-                  decoration: kGradientDecorationUp,
+                  color: Colors.transparent,
                 );
               }
 
               return Container(
-                decoration: kGradientDecorationUp,
+                color: Colors.transparent,
               );
             }
           } else {
             return Container(
-                decoration: kGradientDecorationUp,
+                color: Colors.transparent,
                 child: const Center(child: CircularProgressIndicator()));
           }
         });

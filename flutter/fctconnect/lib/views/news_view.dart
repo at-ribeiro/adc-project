@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -6,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
 
-
 import '../models/NewsData.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
+import 'news_page.dart';
 
 class NewsView extends StatefulWidget {
   const NewsView({Key? key}) : super(key: key);
@@ -39,7 +40,6 @@ class _NewsViewState extends State<NewsView> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return TokenGetterWidget(
@@ -62,127 +62,77 @@ class _NewsViewState extends State<NewsView> {
               : ListView.builder(
                   itemCount: _news.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final news = _news[index];
+                    NewsData news = _news[index];
                     return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (ctx) => NewsDetailPage(news: news),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            color: Colors.white.withOpacity(
-                                0.8), // Set opacity using the alpha value
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (ctx) => NewsDetailPage(news: news),
                           ),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0.0),
-                            ),
-                            elevation: 0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                    child: Image.network(
-                                      news.url,
-                                      fit: BoxFit.scaleDown,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 16.0),
-                                      child: Text(
-                                        news.title,
-                                        style: const TextStyle(
-                                          fontSize: 18.0,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: kBorderRadius,
+                          border: Border.all(
+                            width: 1.5,
+                            color: kAccentColor0.withOpacity(0.0),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: BackdropFilter(
+                            filter:
+                                ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: kAccentColor2.withOpacity(0.1),
+                                borderRadius: kBorderRadius,
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 100,
+                                        height: 100,
+                                        child: Image.network(
+                                          news.url,
+                                          fit: BoxFit.scaleDown,
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 8.0),
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 16.0),
+                                          child: Text(
+                                            news.title,
+                                            style: const TextStyle(
+                                              fontSize: 18.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ));
+                        ),
+                      ),
+                    );
                   },
                 ),
         ),
       );
     }
-  }
-}
-
-class NewsDetailPage extends StatelessWidget {
-  final NewsData news;
-
-  const NewsDetailPage({Key? key, required this.news}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  news.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.0,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  DateFormat('dd-MM-yyyy')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          int.parse(news.timestamp)))
-                      .toString(),
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                SizedBox(
-                  height: 400.0, // Replace with your desired height
-                  child: AspectRatio(
-                    aspectRatio: 16 /
-                        9, // Replace with the actual aspect ratio of the image
-                    child: FittedBox(
-                      fit: BoxFit.contain, // Adjust the fit property as needed
-                      child: Image.network(
-                        news.url,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Text(
-                  news.text,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
