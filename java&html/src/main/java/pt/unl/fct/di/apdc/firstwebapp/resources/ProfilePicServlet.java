@@ -87,8 +87,7 @@ public class ProfilePicServlet extends HttpServlet {
                 return;
             }
 
-            String imageNameFull = request.getPart("image").getSubmittedFileName();
-            String imageName = imageNameFull.substring(0, imageNameFull.lastIndexOf('.'));
+            String imageName= request.getPart("image").getSubmittedFileName();
             InputStream imageStream = request.getPart("image").getInputStream();
 
 
@@ -107,7 +106,7 @@ public class ProfilePicServlet extends HttpServlet {
             byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
 
             // Upload the thumbnail image to your storage service (similar to the original image)
-            BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageNameFull);
+            BlobId thumbnailBlobId = BlobId.of(bucketName, username + "-" + imageName);
             BlobInfo thumbnailBlobInfo = BlobInfo.newBuilder(thumbnailBlobId)
                     .setAcl(Collections.singletonList(Acl.newBuilder(Acl.User.ofAllUsers(), Acl.Role.READER).build()))
                     .build();
@@ -132,7 +131,7 @@ public class ProfilePicServlet extends HttpServlet {
                     .set("user_office", user.getString("user_office"))
                     .set("user_course", user.getString("user_course"))
                     .set("user_year", user.getString("user_year"))
-                    .set("user_profile_pic", StringValue.newBuilder(username+"-"+imageNameFull).setExcludeFromIndexes(true).build())
+                    .set("user_profile_pic", StringValue.newBuilder(username+"-"+imageName).setExcludeFromIndexes(true).build())
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", user.getString("user_purpose"))
                     .set("user_events", user.getList("user_events"))
@@ -142,7 +141,6 @@ public class ProfilePicServlet extends HttpServlet {
             txn.commit();
 
             response.setStatus(Response.Status.OK.getStatusCode());
-            return;
 
         }catch (Exception e){
             txn.rollback();
@@ -177,10 +175,12 @@ public class ProfilePicServlet extends HttpServlet {
 
             BlobId blobId;
 
-            if(imageName.equals(""))
+            LOG.warning("Image name: " + imageName);
+
+            if(imageName == null || imageName.equals(""))
                 blobId = BlobId.of(bucketName, "default_profile.jpg");
             else
-                blobId = BlobId.of(bucketName, username + "-" + imageName);
+                blobId = BlobId.of(bucketName, imageName);
 
             Blob blob = storage.get(blobId);
 
