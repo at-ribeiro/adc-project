@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
@@ -10,6 +11,7 @@ import '../models/CommentData.dart';
 import '../models/FeedData.dart';
 import '../models/NewsData.dart';
 import '../models/Post.dart';
+import '../models/PostReport.dart';
 import '../models/Token.dart';
 
 import 'package:http_parser/http_parser.dart';
@@ -17,6 +19,7 @@ import 'package:path/path.dart';
 
 import '../models/event_data.dart';
 import '../models/profile_info.dart';
+import '../models/update_data.dart';
 
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
 
@@ -100,7 +103,6 @@ class BaseClient {
 
   Future<int> createPost(String api, String tokenID, Post post) async {
     var _headers = {
-      "Content-Type": "multipart/form-data",
       "Authorization": tokenID,
     };
 
@@ -110,18 +112,16 @@ class BaseClient {
     request.fields['post'] = json.encode(post.toJson());
     request.fields['username'] = post.username;
 
-    if (post.imageData != null) {
+    if (post.fileData != null) {
       var multipartFile = http.MultipartFile.fromBytes(
         'image',
-        post.imageData!,
-        filename: "${post.fileName}.jpg",
-        contentType: MediaType('image', 'jpeg'),
+        post.fileData!,
+        filename: "${post.fileName}",
+        contentType: MediaType(post.type!, post.mediaType!),
       );
       request.files.add(multipartFile);
     }
-
     var response = await request.send();
-
     return response.statusCode;
   }
 
@@ -217,14 +217,16 @@ class BaseClient {
     }
   }
 
-  Future<EventData> getEvent(String api, String tokenID, String id) async {
-    var _headers = {
+  Future<EventData> getEvent(String api, id, tokenID, user) async {
+    Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": user,
     };
     var url = Uri.parse('$baseUrl$api/$id');
 
     var response = await http.get(url, headers: _headers);
+
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final event = EventData.fromJson(jsonData);
@@ -247,8 +249,9 @@ class BaseClient {
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final profileInfo = ProfileInfo.fromJson(jsonData);
+      final jsonData = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> parsedJson = json.decode(jsonData);
+      final profileInfo = ProfileInfo.fromJson(parsedJson);
       return profileInfo;
     } else {
       throw Exception(
@@ -262,12 +265,12 @@ class BaseClient {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
-      // Replace this with your actual data parsing
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final usersList =
-          jsonList.map((json) => UserQueryData.fromJson(json)).toList();
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
 
+      final List<UserQueryData> usersList = List<UserQueryData>.from(
+          data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
     } else {
       // If the server did not return a 200 OK response, throw an exception.
@@ -487,8 +490,9 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api?searcher=$username');
+    var url = Uri.parse('$baseUrl$api');
 
     var response = await http.get(
       url,
@@ -511,6 +515,7 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
 
     var url = Uri.parse('$baseUrl$api');
@@ -551,21 +556,22 @@ class BaseClient {
     }
   }
 
-  Future<void> reportPost(
-      String api, username, tokenID, id, reason, comment) async {
+  Future<dynamic> reportPost(
+      String api, username, tokenID, id, postUser, reason, comment) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
 
-    var url = Uri.parse('$baseUrl$api/$username');
+    var url = Uri.parse('$baseUrl$api/$id');
 
     var reportJson = jsonEncode({
       'creator': username,
       'postId': id,
+      'postCreator': postUser,
       'reason': reason,
       'comment': comment,
-      'timestamp': DateTime.now().toString(),
     });
 
     var response = await http.post(
@@ -581,9 +587,8 @@ class BaseClient {
     }
   }
 
-
-  Future<dynamic> createActivity(
-      String api, String username, String tokenID, ActivityData activity) async {
+  Future<dynamic> createActivity(String api, String username, String tokenID,
+      ActivityData activity) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -615,10 +620,11 @@ class BaseClient {
     }
   }
 
-  Future<void> deleteActivity(String api, String username, String tokenID, String activityID) async {
+  Future<dynamic> deleteActivity(
+      String api, String username, String tokenId, String activityID) async {
     Map<String, String>? _headers = {
-      "Content-Type": "charset=UTF-8",
-      "Authorization": tokenID,
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenId,
       "User": username,
     };
 
@@ -636,8 +642,8 @@ class BaseClient {
     }
   }
 
-  Future<dynamic> updateActivity(
-      String api, String username, String tokenID, ActivityData activity) async {
+  Future<dynamic> updateActivity(String api, String username, String tokenID,
+      ActivityData activity) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -675,8 +681,9 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api/activity');
+    var url = Uri.parse('$baseUrl$api');
 
     var response = await http.get(
       url,
@@ -691,6 +698,127 @@ class BaseClient {
     } else {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<List<PostReport>> getPostsReports(
+      String api, String username, String tokenID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<PostReport> posts =
+          List<PostReport>.from(data.map((json) => PostReport.fromJson(json)));
+      return posts;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> deletePostsReport(
+      String api, String username, String tokenID, List<String> ids) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.delete(
+      url,
+      headers: _headers,
+      body: json.encode({"ids": ids}),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> updateUser(
+      String api, UpdateData data, String tokenID, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var userJson = jsonEncode({
+      'username': data.username,
+      'fullname': data.fullname,
+      'email': data.email,
+      'phone': data.phone,
+      'about_me': data.about_me,
+      'city': data.city,
+      'department': data.department,
+      'course': data.course,
+      'year': data.year,
+      'purpose': data.purpose,
+      'office': data.office,
+      'privacy': data.privacy,
+    });
+
+    var response = await http.put(url, headers: _headers, body: userJson);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else if (response.statusCode == 409) {
+      //throw exception
+      throw '409';
+    }
+  }
+
+  static Future<int> updatePic(
+      String api, tokenID, username, filename, Uint8List image) async {
+    Map<String, String> _headers = {"Authorization": tokenID, "User": username};
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(baseUrl + api + "/" + username));
+    request.headers.addAll(_headers);
+
+    // Attach the image as a multipart file to the request
+    request.files.add(http.MultipartFile.fromBytes(
+      'image', // field name of the file
+      image,
+      filename: "$filename.jpg",
+      contentType: MediaType('image', 'jpeg'),
+    ));
+
+    // Send the request
+    var response = await request.send();
+
+    return response.statusCode;
+  }
+
+  Future<dynamic> getProfilePic(
+      String api, String tokenID, String username) async {
+    Map<String, String> _headers = {"Authorization": tokenID, "User": username};
+
+    var url = Uri.parse(baseUrl + api + "/" + username);
+    var response = await client.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw extension("Something went wrong");
     }
   }
 }

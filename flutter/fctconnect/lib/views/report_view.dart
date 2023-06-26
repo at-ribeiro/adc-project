@@ -1,4 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:responsive_login_ui/widgets/error_dialog.dart';
+import '../constants.dart';
 import '../models/AlertPostData.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
@@ -27,7 +31,6 @@ class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class ReportPage extends StatefulWidget {
-
   const ReportPage({Key? key}) : super(key: key);
 
   @override
@@ -36,7 +39,7 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   late Token _token;
-  bool  _isLoadingToken = true;
+  bool _isLoadingToken = true;
   TextEditingController nameController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController problemController = TextEditingController();
@@ -66,22 +69,13 @@ class _ReportPageState extends State<ReportPage> {
     String location = locationController.text;
     String problem = problemController.text;
 
-    if(name == '' || location == '' || problem == '') {
+    if (name == '' || location == '' || problem == '') {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erro'),
-            content: Text('Preencha todos os campos!'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('Voltar'),
-              ),
-            ],
-          );
+          String errorText = 'Por favor preencha todos os campos';
+          String buttonText = 'Ok';
+          return ErrorDialog(errorText, buttonText, context);
         },
       );
       return;
@@ -93,7 +87,7 @@ class _ReportPageState extends State<ReportPage> {
       timestamp: DateTime.now().millisecondsSinceEpoch,
     );
 
-    BaseClient().createReport("/alert",_token.username, _token.tokenID, alert);
+    BaseClient().createReport("/alert", _token.username, _token.tokenID, alert);
 
     nameController.clear();
     locationController.clear();
@@ -102,7 +96,7 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
-      if (_isLoadingToken) {
+    if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           setState(() {
@@ -111,43 +105,140 @@ class _ReportPageState extends State<ReportPage> {
           });
         });
       });
-    } else{return Scaffold(
-      appBar: _CustomAppBar(
-        onPressed: submitForm,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                hintText: 'Nome do docente',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: locationController,
-              decoration: InputDecoration(
-                hintText: 'Localização do problema',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Expanded(
-              child: TextField(
-                controller: problemController,
-                maxLines: isExpanded ? null : 10,
-                minLines: 10,
-                decoration: InputDecoration(
-                  hintText:
-                      'Seja o mais detalhado possível. Qual foi o problema que encontrou?',
-                  border: OutlineInputBorder(),
+    } else {
+      return Container(
+        decoration: kGradientDecorationUp,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: kSecondaryColor,
+            onPressed: () {
+              submitForm();
+            },
+            child: Icon(Icons.send, color: kAccentColor0),
+          ),
+          body: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: kBorderRadius,
+                    color: kAccentColor0.withOpacity(0.3),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: kBorderRadius,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: TextFormField(
+                        style: TextStyle(
+                          color: kAccentColor0,
+                        ),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.person, color: kAccentColor1),
+                          hintText: 'Nome do docente',
+                          border: InputBorder.none,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: kBorderRadius,
+                            borderSide: BorderSide(
+                              color:
+                                  kAccentColor1, // Set your desired focused color here
+                            ),
+                          ),
+                        ),
+                        controller: nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Selecione o nome do docente';
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(height: 16.0),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: kBorderRadius,
+                    color: kAccentColor0.withOpacity(0.3),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: kBorderRadius,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: TextFormField(
+                        style: TextStyle(
+                          color: kAccentColor0,
+                        ),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.person, color: kAccentColor1),
+                          hintText: 'Localização do problema',
+                          border: InputBorder.none,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: kBorderRadius,
+                            borderSide: BorderSide(
+                              color:
+                                  kAccentColor1, // Set your desired focused color here
+                            ),
+                          ),
+                        ),
+                        controller: locationController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Selecione a localização';
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: kBorderRadius,
+                    border: Border.all(
+                      color: kAccentColor1, // Set your desired border color here
+                    ),
+                    color: kAccentColor0.withOpacity(0.3),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: kBorderRadius,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: TextFormField(
+                        style: TextStyle(
+                          color: kAccentColor0,
+                        ),
+                        maxLines: null, // Allow unlimited lines
+                        decoration: InputDecoration(
+                          prefixIcon:
+                              Icon(Icons.description, color: kAccentColor1),
+                          hintText:
+                              'Seja o mais detalhado possível. Qual foi o problema que encontrou?',
+                          border: InputBorder.none,
+                        ),
+                        controller: problemController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Selecione uma descrição para o report';
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );}
+      );
+    }
   }
 }

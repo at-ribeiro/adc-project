@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../constants.dart';
 import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
+import '../models/paths.dart';
 
 class TokenGetterWidget extends StatelessWidget {
   final ValueChanged<Token> onTokenLoaded;
@@ -17,40 +19,55 @@ class TokenGetterWidget extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
-              return AlertDialog(
-                title: Text('Não estás logado!'),
-                content: Text('Volra para trás e faz login.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      context.go("/login");
-                    },
-                    child: Text('Voltar ao login.'),
-                  ),
-                ],
+              WidgetsBinding.instance!.addPostFrameCallback((_) {
+                context.go(Paths.login);
+              });
+              return Container(
+                decoration: kGradientDecorationUp,
               );
             } else {
               Token token = snapshot.data;
+              WidgetsBinding.instance!.addPostFrameCallback((_) {
+                onTokenLoaded(token);
+              });
               if (token.expirationDate <
                   DateTime.now().millisecondsSinceEpoch) {
+                String errorText = "Sessão expirada";
                 return AlertDialog(
-                  title: Text('Sessão expirada!'),
-                  content: Text('Volra para trás e faz login.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        context.go("/login");
-                      },
-                      child: Text('Voltar ao login.'),
-                    ),
-                  ],
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: kBorderRadius,
+                  ),
+                  backgroundColor: kAccentColor0.withOpacity(0.3),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        errorText,
+                        style: const TextStyle(color: kAccentColor0),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Volte ao login'),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (token.tokenID == null || token.tokenID == "") {
+                return Container(
+                  decoration: kGradientDecorationUp,
                 );
               }
-              onTokenLoaded(token); // Call the callback
-              return Container();
+              return Container(
+                decoration: kGradientDecorationUp,
+              );
             }
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return Container(
+                decoration: kGradientDecorationUp,
+                child: const Center(child: CircularProgressIndicator()));
           }
         });
   }

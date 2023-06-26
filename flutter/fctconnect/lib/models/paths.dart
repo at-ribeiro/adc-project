@@ -3,7 +3,7 @@ class Paths {
 
   static String signUp = '/signUp';
 
-  static String homePage = '/home';
+  static String homePage = '/';
 
   static String myProfile = '/profile';
 
@@ -11,7 +11,7 @@ class Paths {
 
   static String otherProfile = '/otherProfile';
 
-  static String mapas = '/maps';
+  static String mapas = '/mapas';
 
   static String post = '/post';
 
@@ -19,7 +19,18 @@ class Paths {
 
   static String report = '/report';
 
+  static String reportedPosts =  '/reportPosts';
+
   static String listReports = "${Paths.report}/list";
 
-  static String editProfile  = myProfile + '/edit';
+  static String editProfile  = '$myProfile/edit';
+
+  static String calendar = '/calendar';
+
+  static String event = '/event';
+
+  static String createEvent = '$events/newEvent';
+
+  static var splash = '/splash';
+
 }

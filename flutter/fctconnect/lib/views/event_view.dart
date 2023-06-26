@@ -1,19 +1,17 @@
-import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/events_list_data.dart';
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/views/event_creator.dart';
-import 'package:responsive_login_ui/views/search_event_view.dart';
 
+
+import '../constants.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../models/event_data.dart';
 import '../services/load_token.dart';
-import 'event_page.dart';
 
 class EventView extends StatefulWidget {
   const EventView({Key? key}) : super(key: key);
@@ -54,141 +52,116 @@ class _EventViewState extends State<EventView> {
         });
       });
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Eventos'),
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: eventController,
-                decoration: InputDecoration(
-                  labelText: 'Nome do Evento',
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchEventView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Pesquisar outros eventos'),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EventCreator(
-                          token: _token,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('Registar Evento'),
-                )
-              ],
-            ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _refreshEvents,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  itemCount: _events.length + (_loadingMore ? 1 : 0),
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index >= _events.length) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      EventData event = _events[index];
-                      return GestureDetector(
-                        onTap: () {
-                          context.go(Paths.events + '/${event.id}');
-                        },
-                        child: Card(
+      return Container(
+        decoration: kGradientDecorationUp,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _refreshEvents,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: _events.length + (_loadingMore ? 1 : 0),
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index >= _events.length) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        EventData event = _events[index];
+                        return GestureDetector(
+                          onTap: () {
+                            context.go(Paths.event + '/${event.id}');
+                          },
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (event.url != null)
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      event.url!,
-                                      width: 220,
-                                      height: 150,
-                                      fit: BoxFit.cover,
+                            padding: const EdgeInsets.all(5.0),
+                            child: ClipRRect(
+                              borderRadius: kBorderRadius,
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(
+                                    sigmaX: 50.0, sigmaY: 50.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: kAccentColor2.withOpacity(0.1),
+                                    borderRadius: kBorderRadius,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (event.url != null)
+                                          ClipRRect(
+                                            borderRadius: kBorderRadius,
+                                            child: Image.network(
+                                              event.url!,
+                                              width: 220,
+                                              height: 150,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        const SizedBox(width: 7.0),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                event.title,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: kAccentColor0,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8.0),
+                                              Text(
+                                                'Start Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    event.start,
+                                                  ),
+                                                )}',
+                                                style: const TextStyle(
+                                                  color: kAccentColor2,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8.0),
+                                              Text(
+                                                'End Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                    event.end,
+                                                  ),
+                                                )}',
+                                                style: const TextStyle(
+                                                  color: kAccentColor2,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8.0),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                const SizedBox(width: 7.0),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        event.title,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8.0),
-                                      Text(
-                                        'Start Date & Time: ' +
-                                            DateFormat('dd-MM-yyyy HH:mm:ss')
-                                                .format(
-                                              DateTime
-                                                  .fromMillisecondsSinceEpoch(
-                                                event.start,
-                                              ),
-                                            ),
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8.0),
-                                      Text(
-                                        'End Date & Time: ' +
-                                            DateFormat('dd-MM-yyyy HH:mm:ss')
-                                                .format(
-                                              DateTime
-                                                  .fromMillisecondsSinceEpoch(
-                                                event.end,
-                                              ),
-                                            ),
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8.0),
-                                    ],
-                                  ),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }
-                  },
+                        );
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
+      
     }
   }
 

@@ -6,19 +6,23 @@ import '../../services/base_client.dart';
 import 'activities.dart';
 
 class ActivityProvider extends ChangeNotifier {
+  List<Activity> activities = [];
 
-  ActivityProvider(){
-    //Future<List<ActivityData>> l =  BaseClient().getActivities("/activity", token.username, token.tokenID);
+  void initializeActivities(Token token) async {
+    List<ActivityData> activitiesData = await BaseClient()
+        .getActivities("/activity", token.username, token.tokenID);
+    for(var activity in activitiesData){
+      activities.add(
+        Activity(
+        activity.activityName,
+        DateTime.fromMillisecondsSinceEpoch(activity.from),
+        DateTime.fromMillisecondsSinceEpoch(activity.to),
+        Color(int.parse("0xFF${activity.background}")),
+        activity.creationTime,
+      )
+      );
+    }
   }
-
-  List<Activity> activities = [
-    Activity(
-        'Dentista 1',
-        DateTime.now(),
-        DateTime.now().add(Duration(hours: 2)),
-        const Color(0xFF0F8644),
-        (DateTime.now().microsecondsSinceEpoch).toString()),
-  ];
 
   void addActivity(BuildContext context, Token token) async {
     final TextEditingController nameController = TextEditingController();
@@ -36,11 +40,15 @@ class ActivityProvider extends ChangeNotifier {
               activityName: activity.activityName,
               from: activity.from.millisecondsSinceEpoch,
               to: activity.to.millisecondsSinceEpoch,
-              background: activity.background.value.toRadixString(16).substring(2).toUpperCase(),
+              background: activity.background.value
+                  .toRadixString(16)
+                  .substring(2)
+                  .toUpperCase(),
               creationTime: activity.creationTime,
             );
 
-            BaseClient().createActivity("/activity", token.username, token.tokenID, a);
+            BaseClient()
+                .createActivity("/activity", token.username, token.tokenID, a);
             notifyListeners();
             Navigator.pop(context);
           },
@@ -49,7 +57,8 @@ class ActivityProvider extends ChangeNotifier {
     );
   }
 
-  void updateActivity(BuildContext context, Activity activity, Token token) async {
+  void updateActivity(
+      BuildContext context, Activity activity, Token token) async {
     final TextEditingController nameController =
         TextEditingController(text: activity.activityName);
     Color? selectedColor;
@@ -66,13 +75,17 @@ class ActivityProvider extends ChangeNotifier {
             if (index != -1) {
               activities[index] = updatedActivity;
               ActivityData a = ActivityData(
-              activityName: updatedActivity.activityName,
-              from: updatedActivity.from.millisecondsSinceEpoch,
-              to: updatedActivity.to.millisecondsSinceEpoch,
-              background: updatedActivity.background.value.toRadixString(16).substring(2).toUpperCase(),
-              creationTime: updatedActivity.creationTime,
-            );
-              BaseClient().updateActivity("/activity", token.username, token.tokenID, a);
+                activityName: updatedActivity.activityName,
+                from: updatedActivity.from.millisecondsSinceEpoch,
+                to: updatedActivity.to.millisecondsSinceEpoch,
+                background: updatedActivity.background.value
+                    .toRadixString(16)
+                    .substring(2)
+                    .toUpperCase(),
+                creationTime: updatedActivity.creationTime,
+              );
+              BaseClient().updateActivity(
+                  "/activity", token.username, token.tokenID, a);
 
               notifyListeners();
             }
@@ -80,7 +93,8 @@ class ActivityProvider extends ChangeNotifier {
           },
           onDelete: () {
             activities.remove(activity);
-            BaseClient().deleteActivity("/activity", token.username, token.tokenID, activity.creationTime);
+            BaseClient().deleteActivity("/activity", token.username,
+                token.tokenID, activity.creationTime);
             notifyListeners();
             Navigator.pop(context);
           },
@@ -251,8 +265,8 @@ class _CreateActivityDialogState extends State<_CreateActivityDialog> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                  color: selectedColor ?? Colors.white,
-                  border: Border.all(color: Colors.black),
+                    color: selectedColor ?? Colors.white,
+                    border: Border.all(color: Colors.black),
                   ),
                 ),
               ),
@@ -481,8 +495,8 @@ class _UpdateActivityDialogState extends State<_UpdateActivityDialog> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                  color: selectedColor ?? widget.originalActivity.background,
-                  border: Border.all(color: Colors.black),
+                    color: selectedColor ?? widget.originalActivity.background,
+                    border: Border.all(color: Colors.black),
                   ),
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/views/directions_repository.dart';
 
 import '../models/directions_model.dart';
@@ -17,7 +18,7 @@ class _MapScreenState extends State<MapScreen> {
   late double lat;
   late double long;
   CameraPosition? _initialCameraPosition;
-  String showCaminhoButton = '';
+  ValueNotifier<String> showCaminhoButton = ValueNotifier<String>('');
 
   Directions? _info;
 
@@ -73,7 +74,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio3';
+          showCaminhoButton.value = 'edificio3';
         });
       },
     );
@@ -86,12 +87,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio4';
+          showCaminhoButton.value = 'edificio4';
         });
       },
     );
     _markers.add(edificio4);
-    
+
     Marker edificio5 = Marker(
       markerId: MarkerId('edificio5'),
       position: LatLng(38.663340, -9206874),
@@ -99,12 +100,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio5';
+          showCaminhoButton.value = 'edificio5';
         });
       },
     );
     _markers.add(edificio5);
-    
+
     Marker edificio11 = Marker(
       markerId: MarkerId('edificio11'),
       position: LatLng(38.662927, -9.206631),
@@ -112,12 +113,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio11';
+          showCaminhoButton.value = 'edificio11';
         });
       },
     );
     _markers.add(edificio11);
-    
+
     Marker departamental = Marker(
       markerId: MarkerId('departamental'),
       position: LatLng(38.662569, -9.207492),
@@ -125,12 +126,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'departamental';
+          showCaminhoButton.value = 'departamental';
         });
       },
     );
     _markers.add(departamental);
-    
+
     Marker edificio9 = Marker(
       markerId: MarkerId('edificio9'),
       position: LatLng(38.660202, -9.207044),
@@ -138,12 +139,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio9';
+          showCaminhoButton.value = 'edificio9';
         });
       },
     );
     _markers.add(edificio9);
-    
+
     Marker edificio8 = Marker(
       markerId: MarkerId('edificio8'),
       position: LatLng(38.660186, -9.206754),
@@ -151,12 +152,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio8';
+          showCaminhoButton.value = 'edificio8';
         });
       },
     );
     _markers.add(edificio8);
-    
+
     Marker edificio7 = Marker(
       markerId: MarkerId('edificio7'),
       position: LatLng(38.660769, -9.205788),
@@ -164,12 +165,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio7';
+          showCaminhoButton.value = 'edificio7';
         });
       },
     );
     _markers.add(edificio7);
-    
+
     Marker edificio10 = Marker(
       markerId: MarkerId('edificio10'),
       position: LatLng(38.660782, -9.204847),
@@ -177,12 +178,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio10';
+          showCaminhoButton.value = 'edificio10';
         });
       },
     );
     _markers.add(edificio10);
-    
+
     Marker edificio6 = Marker(
       markerId: MarkerId('edificio6'),
       position: LatLng(38.660672, -9.203072),
@@ -190,12 +191,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio6';
+          showCaminhoButton.value = 'edificio6';
         });
       },
     );
     _markers.add(edificio6);
-    
+
     Marker edificio2 = Marker(
       markerId: MarkerId('edificio2'),
       position: LatLng(38.660816, -9.203644),
@@ -203,12 +204,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'edificio2';
+          showCaminhoButton.value = 'edificio2';
         });
       },
     );
     _markers.add(edificio2);
-    
+
     Marker biblioteca = Marker(
       markerId: MarkerId('biblioteca'),
       position: LatLng(38.662580, -9.205425),
@@ -216,12 +217,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'biblioteca';
+          showCaminhoButton.value = 'biblioteca';
         });
       },
     );
     _markers.add(biblioteca);
-    
+
     Marker uninova1 = Marker(
       markerId: MarkerId('uninova1'),
       position: LatLng(38.660046, -9.203937),
@@ -229,12 +230,12 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'uninova1';
+          showCaminhoButton.value = 'uninova1';
         });
       },
     );
     _markers.add(uninova1);
-    
+
     Marker uninova2 = Marker(
       markerId: MarkerId('uninova2'),
       position: LatLng(38.659930, -9.203788),
@@ -242,12 +243,11 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'uninova2';
+          showCaminhoButton.value = 'uninova2';
         });
       },
     );
     _markers.add(uninova2);
-    
   }
 
   void addPublicTransportationMarkers() {
@@ -258,7 +258,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'metro';
+          showCaminhoButton.value = 'metro';
         });
       },
     );
@@ -271,7 +271,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'autocarro';
+          showCaminhoButton.value = 'autocarro';
         });
       },
     );
@@ -286,7 +286,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'barTia';
+          showCaminhoButton.value = 'barTia';
         });
       },
     );
@@ -299,7 +299,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'tantoFaz';
+          showCaminhoButton.value = 'tantoFaz';
         });
       },
     );
@@ -312,7 +312,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'cantina';
+          showCaminhoButton.value = 'cantina';
         });
       },
     );
@@ -325,7 +325,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'casaDoPessoal';
+          showCaminhoButton.value = 'casaDoPessoal';
         });
       },
     );
@@ -338,7 +338,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'mininova';
+          showCaminhoButton.value = 'mininova';
         });
       },
     );
@@ -351,7 +351,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'mySpot';
+          showCaminhoButton.value = 'mySpot';
         });
       },
     );
@@ -364,7 +364,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'espacoSolucao';
+          showCaminhoButton.value = 'espacoSolucao';
         });
       },
     );
@@ -377,7 +377,7 @@ class _MapScreenState extends State<MapScreen> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
         setState(() {
-          showCaminhoButton = 'barCampus';
+          showCaminhoButton.value = 'barCampus';
         });
       },
     );
@@ -417,20 +417,8 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Mapa'),
-          actions: [
-            if (showCaminhoButton != '')
-              IconButton(
-                icon: Icon(Icons.directions),
-                onPressed: () {
-                  _navigateToCaminho(_markers.firstWhere(
-                      (marker) => marker.mapsId.value == showCaminhoButton));
-                },
-              ),
-          ],
-        ),
         body: FutureBuilder<CameraPosition>(
           future: _initialCameraPositionFuture,
           builder: (context, snapshot) {
@@ -571,17 +559,52 @@ class _MapScreenState extends State<MapScreen> {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          onPressed: () {
-            if (_initialCameraPosition != null) {
-              _mapController?.animateCamera(
-                CameraUpdate.newCameraPosition(_initialCameraPosition!),
-              );
-            }
-          },
-          child: const Icon(Icons.center_focus_strong),
+        floatingActionButton: Align(
+          alignment: Alignment.bottomLeft,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
+                child: FloatingActionButton(
+                  backgroundColor: kPrimaryColor,
+                  foregroundColor: Colors.white,
+                  onPressed: () {
+                    if (_initialCameraPosition != null) {
+                      _mapController?.animateCamera(
+                        CameraUpdate.newCameraPosition(_initialCameraPosition!),
+                      );
+                    }
+                  },
+                  child: const Icon(Icons.center_focus_strong),
+                ),
+              ),
+              ValueListenableBuilder<String>(
+                valueListenable: showCaminhoButton,
+                builder: (context, value, child) {
+                  return Container(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: AnimatedOpacity(
+                      opacity: value.isNotEmpty ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: Container(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: FloatingActionButton(
+                          backgroundColor: kPrimaryColor,
+                          foregroundColor: Colors.white,
+                          child: Icon(Icons.directions),
+                          onPressed: () {
+                            _navigateToCaminho(_markers.firstWhere((marker) =>
+                                marker.markerId.value ==
+                                showCaminhoButton.value));
+                          },
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

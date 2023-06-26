@@ -6,11 +6,14 @@ public class SearchUserData {
 
     private String fullname;
 
+    private String profilePic;
+
     public SearchUserData(){}
 
-    public SearchUserData(String username, String fullname){
+    public SearchUserData(String username, String fullname, String profilePic){
         this.username = username;
         this.fullname = fullname;
+        this.profilePic = profilePic;
     }
 
     @Override
@@ -24,6 +27,10 @@ public class SearchUserData {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
     }
 
 }
