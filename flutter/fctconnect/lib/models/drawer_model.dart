@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Themes/theme_manager.dart';
 import '../data/cache_factory_provider.dart';
@@ -48,6 +49,8 @@ class _DrawerModelState extends State<DrawerModel> {
     ThemeManager themeManager = context.watch<ThemeManager>();
     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
     String username = _token.username;
+    String profiPic = _token.profilePic;
+
     return Drawer(
       backgroundColor: kPrimaryColor,
       shape: const RoundedRectangleBorder(
@@ -159,6 +162,9 @@ class _DrawerModelState extends State<DrawerModel> {
 
               CacheDefault.cacheFactory.logout();
               CacheDefault.cacheFactory.delete('isLoggedIn');
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              prefs.remove('ProfilePic');
 
               context.go(Paths.login);
               Navigator.pop(context);

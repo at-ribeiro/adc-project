@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
@@ -320,10 +321,12 @@ class _LoginViewState extends State<LoginView>
     CacheDefault.cacheFactory.login(tokenId, username, cD, eD, role);
     CacheDefault.cacheFactory.set('isLoggedIn', 'true');
 
-    String profiPic =
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    String picUrl =
         await BaseClient().getProfilePic('/profilePic', tokenId, username);
 
-      CacheDefault.cacheFactory.set('ProfilePic', profiPic);
+    await pref.setString('ProfilePic', picUrl);
 
     context.go(Paths.homePage);
 

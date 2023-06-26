@@ -49,7 +49,6 @@ class AppRouter {
                   return const NewsView();
                 },
               ),
-            
               GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
@@ -143,16 +142,16 @@ class AppRouter {
               );
             },
           ),
-            GoRoute(
-                path: Paths.post + "/:id/:user",
-                name: Paths.post,
-                builder: (BuildContext context, GoRouterState state) {
-                  return PostPage(
-                    postID: state.pathParameters['id']!,
-                    postUser: state.pathParameters['user']!,
-                  );
-                },
-              ),
+          GoRoute(
+            path: Paths.post + "/:id/:user",
+            name: Paths.post,
+            builder: (BuildContext context, GoRouterState state) {
+              return PostPage(
+                postID: state.pathParameters['id']!,
+                postUser: state.pathParameters['user']!,
+              );
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -239,7 +238,7 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
-    } else if(location.contains(Paths.post)){
+    } else if (location.contains(Paths.post)) {
       return 'Comentários';
     }
     // add more conditions for other routes
@@ -278,29 +277,20 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
-    }
-     else if (location == Paths.createEvent) {
+    } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location.contains(Paths.otherProfile) || location.contains(Paths.post)) {
+    } else if (location.contains(Paths.otherProfile) ||
+        location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
-
-     else {
-      return Container();
-
     }
-   
-      return Container();
-    
-    // add more conditions for other routes
-
-    // return ''; // fallback title
+    return Container();
   }
 }
