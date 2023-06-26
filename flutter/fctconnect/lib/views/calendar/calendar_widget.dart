@@ -46,6 +46,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         });
       });
     } else {
+      
       final provider = Provider.of<ActivityProvider>(context);
 
       return FutureBuilder(

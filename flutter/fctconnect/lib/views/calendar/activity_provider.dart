@@ -11,6 +11,7 @@ class ActivityProvider extends ChangeNotifier {
   Future<void> initializeActivities(Token token) async {
     List<ActivityData> activitiesData = await BaseClient()
         .getActivities("/activity", token.username, token.tokenID);
+    activities.clear();
     for(var activity in activitiesData){
       activities.add(
         Activity(
