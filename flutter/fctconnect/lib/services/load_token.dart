@@ -84,12 +84,16 @@ Future<Token> _loadToken() async {
         await CacheDefault.cacheFactory.get("Creationd") as String;
     String expirationDate =
         await CacheDefault.cacheFactory.get("Expirationd") as String;
+    String profilePic =
+        await CacheDefault.cacheFactory.get("ProfilePic") as String;
     Token token = Token(
         username: username,
         role: role,
         tokenID: tokenID,
         creationDate: int.parse(creationDate),
-        expirationDate: int.parse(expirationDate));
+        expirationDate: int.parse(expirationDate),
+         profilePic: profilePic);
+        
     return token;
   } catch (e) {
     return Future.error(e);

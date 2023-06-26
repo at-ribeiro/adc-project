@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
-import 'package:responsive_login_ui/views/loading_screen.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
@@ -17,7 +16,6 @@ import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
-import '../models/appbar_model.dart';
 import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';
@@ -51,16 +49,7 @@ class AppRouter {
                   return const NewsView();
                 },
               ),
-              GoRoute(
-                path: Paths.post + "/:id/:user",
-                name: Paths.post,
-                builder: (BuildContext context, GoRouterState state) {
-                  return PostPage(
-                    postID: state.pathParameters['id']!,
-                    postUser: state.pathParameters['user']!,
-                  );
-                },
-              ),
+            
               GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
@@ -154,6 +143,16 @@ class AppRouter {
               );
             },
           ),
+            GoRoute(
+                path: Paths.post + "/:id/:user",
+                name: Paths.post,
+                builder: (BuildContext context, GoRouterState state) {
+                  return PostPage(
+                    postID: state.pathParameters['id']!,
+                    postUser: state.pathParameters['user']!,
+                  );
+                },
+              ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -240,6 +239,8 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
+    } else if(location.contains(Paths.post)){
+      return 'Comentários';
     }
     // add more conditions for other routes
 
@@ -249,8 +250,7 @@ class AppRouter {
   Widget _getButtonsBasedOnRoute(String location, BuildContext context) {
     if (location == Paths.homePage ||
         location == '/' ||
-        location == Paths.noticias ||
-        location == Paths.events) {
+        location == Paths.noticias) {
       return IconButton(
         onPressed: () {
           showSearch(
@@ -272,21 +272,29 @@ class AppRouter {
             context.go(Paths.myProfile);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location == Paths.createEvent) {
+    } else if (location == Paths.events) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createEvent);
+          },
+          icon: Icon(Icons.add));
+    }
+     else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location.contains(Paths.otherProfile)) {
+    } else if (location.contains(Paths.otherProfile) || location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
-    } else {
-      return Container();
     }
+   
+      return Container();
+    
     // add more conditions for other routes
 
     // return ''; // fallback title

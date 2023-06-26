@@ -337,14 +337,14 @@ class _EventCreatorState extends State<EventCreator> {
                   // Do the same for the ending date...
 
                   const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  Row(
+                  Column(
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           _pickImage();
                         },
                         child: const Text(
-                            'Selecion um icon para Evento'),
+                            'Selecione um icon para Evento'),
                       ),
                       SizedBox(width: 20),
                       const Padding(

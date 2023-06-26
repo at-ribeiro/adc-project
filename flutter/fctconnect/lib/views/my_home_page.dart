@@ -246,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Text(post.likes.length.toString()),
                                     IconButton(
                                       onPressed: () {
-                                        context.push(
+                                        context.go(
                                           context.namedLocation(Paths.post,
                                               pathParameters: <String, String>{
                                                 'id': post.id,

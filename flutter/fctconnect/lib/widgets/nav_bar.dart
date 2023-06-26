@@ -45,6 +45,8 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
       _selectedIndex = 2;
     } else if (_location == Paths.myProfile) {
       _selectedIndex = 3;
+    } else {
+      _selectedIndex = 0; // or any other default value that suits your needs
     }
   }
 
@@ -64,7 +66,6 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
     } else {
       int auxIndex = _selectedIndex;
       return ClipRRect(
-        
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(15), topRight: Radius.circular(15)),
         child: NavigationBar(
@@ -79,8 +80,7 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
               context.go(Paths.noticias);
             } else if (index == 2) {
               showModalBottomSheet(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: kBorderRadius),
+                  shape: RoundedRectangleBorder(borderRadius: kBorderRadius),
                   backgroundColor: kPrimaryColor,
                   context: context,
                   builder: (BuildContext context) {
