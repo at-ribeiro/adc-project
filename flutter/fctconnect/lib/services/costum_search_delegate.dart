@@ -116,6 +116,7 @@ class CustomSearchDelegate extends SearchDelegate {
                         role: role!,
                         tokenID: tokenID!,
                         username: username!,
+                        profilePic:'',
                       );
                       switch (type) {
                         case 'msg':

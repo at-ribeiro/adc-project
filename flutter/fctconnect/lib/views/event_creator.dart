@@ -358,7 +358,10 @@ class _EventCreatorState extends State<EventCreator> {
                         onPressed: () {
                           _pickImage();
                         },
-                        child: const Text('Selecione um icon para Evento'),
+
+                        child: const Text(
+                            'Selecione um icon para Evento'),
+
                       ),
                       SizedBox(width: 20),
                       const Padding(

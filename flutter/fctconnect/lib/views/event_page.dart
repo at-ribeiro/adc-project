@@ -20,7 +20,9 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
+
   late EventGetData _event;
+
   late String _eventId;
   late Token _token;
   bool isEventLoading = true;
@@ -33,6 +35,8 @@ class _EventPageState extends State<EventPage> {
     _eventId = widget.eventId;
     super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,8 @@ class _EventPageState extends State<EventPage> {
     } else if (isEventLoading) {
       return loadEvent();
     } else {
+
+
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(
@@ -112,6 +118,7 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 16),
+
                       Container(
                         height: 300,
                         width: 500,
@@ -124,6 +131,7 @@ class _EventPageState extends State<EventPage> {
                           markers: _markers,
                         ),
                       ),
+
                       if (_event.creator == _token.username) showQrcodeOrnot(),
                     ],
                   ),
@@ -153,7 +161,9 @@ class _EventPageState extends State<EventPage> {
                       child: ClipRRect(
                         borderRadius: kBorderRadius,
                         child: Image.network(
+
                           _event.qrCodeUrl!,
+
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -167,7 +177,9 @@ class _EventPageState extends State<EventPage> {
             height: 100.0, // Replace with your desired height
             // Adjust the fit property as needed
             child: Image.network(
+
               _event.qrCodeUrl!,
+
             ),
           ),
         ),

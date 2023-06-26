@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Themes/theme_manager.dart';
 import '../data/cache_factory_provider.dart';
@@ -39,31 +40,6 @@ class _DrawerModelState extends State<DrawerModel> {
             });
         });
       });
-    } else if (_ifProfilePicLoading) {
-      return FutureBuilder(
-          future: _loadProfilePic(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-             WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  setState(() {
-                   _ifProfilePicLoading = false;
-                  });
-                });
-              if (snapshot.hasError) {
-                return Container();
-              } else {
-                String url = snapshot.data;
-                WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  setState(() {
-                    urlPic = url;
-                  });
-                });
-
-                return Container();
-              }
-            }
-            return Container();
-          });
     } else {
       return _buildDrawer();
     }
@@ -73,6 +49,8 @@ class _DrawerModelState extends State<DrawerModel> {
     ThemeManager themeManager = context.watch<ThemeManager>();
     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
     String username = _token.username;
+    String profiPic = _token.profilePic;
+
     return Drawer(
       backgroundColor: kPrimaryColor,
       shape: const RoundedRectangleBorder(
@@ -87,12 +65,10 @@ class _DrawerModelState extends State<DrawerModel> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (urlPic.isEmpty)
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(
-                          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg'),
-                    ),
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(_token.profilePic),
+                  ),
                   const SizedBox(height: 5),
                   Text(username, style: const TextStyle(fontSize: 18)),
                   Switch(
@@ -186,6 +162,9 @@ class _DrawerModelState extends State<DrawerModel> {
 
               CacheDefault.cacheFactory.logout();
               CacheDefault.cacheFactory.delete('isLoggedIn');
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+
+              prefs.remove('ProfilePic');
 
               context.go(Paths.login);
               Navigator.pop(context);
@@ -194,10 +173,5 @@ class _DrawerModelState extends State<DrawerModel> {
         ],
       ),
     );
-  }
-
-  Future<Response> _loadProfilePic() async {
-    return await BaseClient()
-        .getProfilePic('/profilePic', _token.tokenID, _token.username);
   }
 }

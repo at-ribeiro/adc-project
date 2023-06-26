@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants.dart';
 import '../data/cache_factory_provider.dart';
@@ -32,34 +33,18 @@ class TokenGetterWidget extends StatelessWidget {
               });
               if (token.expirationDate <
                   DateTime.now().millisecondsSinceEpoch) {
-                String errorText = "Sessão expirada";
-                return AlertDialog(
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: kBorderRadius,
-                  ),
-                  backgroundColor: kAccentColor0.withOpacity(0.3),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        errorText,
-                        style: const TextStyle(color: kAccentColor0),
-                      ),
-                      const SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Volte ao login'),
-                      ),
-                    ],
-                  ),
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  context.go(Paths.login);
+                });
+                return Container(
+                  decoration: kGradientDecorationUp,
                 );
               } else if (token.tokenID == null || token.tokenID == "") {
                 return Container(
                   decoration: kGradientDecorationUp,
                 );
               }
+
               return Container(
                 decoration: kGradientDecorationUp,
               );
@@ -84,12 +69,19 @@ Future<Token> _loadToken() async {
         await CacheDefault.cacheFactory.get("Creationd") as String;
     String expirationDate =
         await CacheDefault.cacheFactory.get("Expirationd") as String;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String profilePiC = await prefs.getString("ProfilePic") as String;
+
     Token token = Token(
         username: username,
         role: role,
         tokenID: tokenID,
         creationDate: int.parse(creationDate),
-        expirationDate: int.parse(expirationDate));
+        expirationDate: int.parse(expirationDate),
+        profilePic: profilePiC);
+
     return token;
   } catch (e) {
     return Future.error(e);
