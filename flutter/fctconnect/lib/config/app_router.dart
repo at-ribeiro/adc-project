@@ -277,7 +277,9 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
+
     } else if (location == Paths.createEvent) {
+
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
@@ -291,6 +293,8 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     }
+
     return Container();
+
   }
 }

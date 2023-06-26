@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/event_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
+import '../models/event_get_data.dart';
 import '../models/paths.dart';
 import '../services/load_token.dart';
 
@@ -20,44 +20,23 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-  // bool isButtonPressed = false;
-  late EventData _event;
-  late String _buttonLabel;
+
+  late EventGetData _event;
+
   late String _eventId;
   late Token _token;
   bool isEventLoading = true;
   bool _isLoadingToken = true;
+  GoogleMapController? _mapController;
+  Set<Marker> _markers = {};
+
   @override
   void initState() {
     _eventId = widget.eventId;
     super.initState();
   }
 
-  // Future<void> checkIfButtonShouldBePressed() async {
-  //   var username = await SessionManager.get("Username");
-  //   var tokenID = await SessionManager.get("Token");
-  //   // var response = await BaseClient().isInEvent("/event", username!, tokenID!);
-  //   setState(() {
-  //     // isButtonPressed = response;
-  //     _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
-  //   });
-  // }
 
-  // Future<void> handleButtonPress() async {
-  //   var username = await SessionManager.get("Username");
-  //   var tokenID = await SessionManager.get("Token");
-
-  //   if (!isButtonPressed) {
-  //     await BaseClient().joinEvent("/events", username!, tokenID!, _event);
-  //   } else {
-  //     await BaseClient().leaveEvent("/events", username!, tokenID!, _event);
-  //   }
-
-  //   setState(() {
-  //     isButtonPressed = !isButtonPressed;
-  //     _buttonLabel = isButtonPressed ? "Sair do evento" : "Entrar no evento";
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +55,8 @@ class _EventPageState extends State<EventPage> {
     } else if (isEventLoading) {
       return loadEvent();
     } else {
-      // checkIfButtonShouldBePressed();
+
+
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(
@@ -138,6 +118,20 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 16),
+
+                      Container(
+                        height: 300,
+                        width: 500,
+                        child: GoogleMap(
+                          onMapCreated: (controller) {
+                            _mapController = controller;
+                          },
+                          initialCameraPosition: CameraPosition(
+                              target: LatLng(_event.lat, _event.lng), zoom: 16),
+                          markers: _markers,
+                        ),
+                      ),
+
                       if (_event.creator == _token.username) showQrcodeOrnot(),
                     ],
                   ),
@@ -167,7 +161,9 @@ class _EventPageState extends State<EventPage> {
                       child: ClipRRect(
                         borderRadius: kBorderRadius,
                         child: Image.network(
-                          _event.qrcodeUrl!,
+
+                          _event.qrCodeUrl!,
+
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -181,7 +177,9 @@ class _EventPageState extends State<EventPage> {
             height: 100.0, // Replace with your desired height
             // Adjust the fit property as needed
             child: Image.network(
-              _event.qrcodeUrl!,
+
+              _event.qrCodeUrl!,
+
             ),
           ),
         ),
@@ -236,6 +234,10 @@ class _EventPageState extends State<EventPage> {
               setState(() {
                 _event = snapshot.data;
                 isEventLoading = false;
+                Marker eventMarker = Marker(
+                    markerId: MarkerId('Evento'),
+                    position: LatLng(_event.lat, _event.lng));
+                _markers.add(eventMarker);
               });
             });
             return Container();
@@ -247,9 +249,9 @@ class _EventPageState extends State<EventPage> {
     );
   }
 
-  Future<EventData> _loadEvent() async {
+  Future<EventGetData> _loadEvent() async {
     try {
-      EventData event = await BaseClient()
+      EventGetData event = await BaseClient()
           .getEvent("/qrcode/get", _eventId, _token.tokenID, _token.username);
       return event;
     } catch (e) {

@@ -60,6 +60,23 @@ class CustomSearchDelegate extends SearchDelegate {
     );
   }
 
+  Widget _loadProfilePic(String profilePic) {
+    if (profilePic.isEmpty) {
+      return const CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        radius: 30,
+        backgroundImage: NetworkImage(
+          profilePic,
+        ),
+      );
+    }
+  }
+
   Widget _buildSearchContent(BuildContext context) {
     if (query.isEmpty) {
       return Center(child: Text('Escreva alguma coisa para pesquisar', style: TextStyle(color: kAccentColor0),));
@@ -130,12 +147,7 @@ class CustomSearchDelegate extends SearchDelegate {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(0.2),
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundImage: NetworkImage(
-                                'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                              ),
-                            ),
+                            child: _loadProfilePic(snapshot.data![index].profilePic),
                           ),
                           Padding(
                               padding: EdgeInsets.all(
