@@ -346,7 +346,7 @@ class _MapScreenState extends State<MapScreen> {
 
     Marker mySpot = Marker(
       markerId: MarkerId('mySpot'),
-      position: LatLng(38.660128, -9205537),
+      position: LatLng(38.660128, -9.205537),
       infoWindow: InfoWindow(title: 'MySpot'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
       onTap: () {
