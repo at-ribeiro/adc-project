@@ -136,7 +136,7 @@ class _ReportPageState extends State<ReportPage> {
                         ),
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.person, color: kAccentColor1),
-                          hintText: 'Nome do docente',
+                          hintText: 'Nome completo do utilizador',
                           border: InputBorder.none,
                           focusedBorder: OutlineInputBorder(
                             borderRadius: kBorderRadius,
@@ -219,7 +219,7 @@ class _ReportPageState extends State<ReportPage> {
                           prefixIcon:
                               Icon(Icons.description, color: kAccentColor1),
                           hintText:
-                              'Seja o mais detalhado possível. Qual foi o problema que encontrou?',
+                              'Qual foi o problema que encontrou? Seja o mais detalhado possível.',
                           border: InputBorder.none,
                         ),
                         controller: problemController,

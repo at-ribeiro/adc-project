@@ -17,7 +17,8 @@ import '../models/Token.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
-import '../models/event_data.dart';
+import '../models/event_get_data.dart';
+import '../models/event_post_data.dart';
 import '../models/profile_info.dart';
 import '../models/update_data.dart';
 
@@ -91,6 +92,7 @@ class BaseClient {
         tokenID: jsonResponse['tokenID'],
         creationDate: jsonResponse['creationDate'],
         expirationDate: jsonResponse['expirationDate'],
+        profilePic: '',
       );
 
       return token;
@@ -168,7 +170,7 @@ class BaseClient {
     }
   }
 
-  Future<int> createEvent(String api, String tokenID, EventData event) async {
+  Future<int> createEvent(String api, String tokenID, EventPostData event) async {
     var _headers = {
       "Content-Type": "multipart/form-data",
       "Authorization": tokenID,
@@ -177,7 +179,7 @@ class BaseClient {
     var request = http.MultipartRequest(
         'POST', Uri.parse(baseUrl + api + '/' + event.creator));
     request.headers.addAll(_headers);
-
+    
     request.fields['event'] = json.encode(event.toJson());
 
     if (event.imageData != null) {
@@ -195,7 +197,7 @@ class BaseClient {
     return response.statusCode;
   }
 
-  Future<List<EventData>> getEvents(
+  Future<List<EventGetData>> getEvents(
       String api, String tokenID, String username, String time) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
@@ -207,17 +209,17 @@ class BaseClient {
     if (response.statusCode == 200) {
       final jsonList = json.decode(response.body) as List<dynamic>;
       final eventsList =
-          jsonList.map((json) => EventData.fromJson(json)).toList();
-
+          jsonList.map((json) => EventGetData.fromJson(json)).toList();
       return eventsList;
     } else {
       // throw exception
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+    
   }
 
-  Future<EventData> getEvent(String api, id, tokenID, user) async {
+  Future<EventGetData> getEvent(String api, id, tokenID, user) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -229,7 +231,7 @@ class BaseClient {
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      final event = EventData.fromJson(jsonData);
+      final event = EventGetData.fromJson(jsonData);
 
       return event;
     } else {
@@ -354,7 +356,7 @@ class BaseClient {
   }
 
   Future<dynamic> joinEvent(
-      String api, String username, String tokenID, EventData event) async {
+      String api, String username, String tokenID, EventPostData event) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -375,7 +377,7 @@ class BaseClient {
     }
   }
 
-  leaveEvent(String s, String t, String u, EventData event) {}
+  leaveEvent(String s, String t, String u, EventPostData event) {}
 
   Future<dynamic> likePost(String api, String username, String tokenID,
       String postID, String postUser) async {
@@ -499,10 +501,12 @@ class BaseClient {
       headers: _headers,
     );
 
-    if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final reportsList =
-          jsonList.map((json) => AlertPostData.fromJson(json)).toList();
+    if (response.statusCode == 200) {      
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<AlertPostData> reportsList =
+          List<AlertPostData>.from(data.map((json) => AlertPostData.fromJson(json)));
       return reportsList;
     } else {
       throw Exception(
@@ -808,14 +812,14 @@ class BaseClient {
     return response.statusCode;
   }
 
-  Future<dynamic> getProfilePic(
+  Future<String> getProfilePic(
       String api, String tokenID, String username) async {
     Map<String, String> _headers = {"Authorization": tokenID, "User": username};
 
     var url = Uri.parse(baseUrl + api + "/" + username);
     var response = await client.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      return response;
+      return response.body;
     } else {
       //throw exception
       throw extension("Something went wrong");

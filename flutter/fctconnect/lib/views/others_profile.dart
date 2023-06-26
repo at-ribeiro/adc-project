@@ -410,7 +410,6 @@ class _OtherProfileState extends State<OtherProfile> {
                       ],
                     ),
                     const SizedBox(height: 8.0),
-                    if (post.url.isNotEmpty)
                       if (post.url.contains('.mp4') ||
                           post.url.contains('.mov') ||
                           post.url.contains('.avi') ||
@@ -420,10 +419,10 @@ class _OtherProfileState extends State<OtherProfile> {
                             videoUrl: post.url,
                           ),
                         ),
-                    if (!post.url.contains('.mp4') &&
+                    if ((!post.url.contains('.mp4') &&
                         !post.url.contains('.mov') &&
                         !post.url.contains('.avi') &&
-                        !post.url.contains('.mkv'))
+                        !post.url.contains('.mkv')) && post.url != '')
                       Center(
                         child: GestureDetector(
                           onTap: () {

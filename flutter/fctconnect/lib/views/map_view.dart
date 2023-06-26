@@ -95,7 +95,7 @@ class _MapScreenState extends State<MapScreen> {
 
     Marker edificio5 = Marker(
       markerId: MarkerId('edificio5'),
-      position: LatLng(38.663340, -9206874),
+      position: LatLng(38.663340, -9.206874),
       infoWindow: InfoWindow(title: 'Edifício V'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       onTap: () {

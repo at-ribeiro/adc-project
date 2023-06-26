@@ -90,6 +90,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Widget _loadProfilePic(FeedData post) {
+    if (post == null || post.profilePic.isEmpty) {
+      return const CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+        ),
+      );
+    } else {
+      return CircleAvatar(
+        backgroundImage: NetworkImage(
+          post.profilePic,
+        ),
+      );
+    }
+  }
+
   Widget ContentBody() {
     return RefreshIndicator(
       onRefresh: _refreshPosts,
@@ -135,15 +151,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
-                                      ),
-                                    ),
+                                    _loadProfilePic(post),
                                     SizedBox(width: 8.0),
                                     Center(
-                                      heightFactor:
-                                          2.4, // You can adjust this to get the alignment you want
+                                      heightFactor: 2.4,
                                       child: Text(post.user),
                                     ),
                                   ],
@@ -166,16 +177,20 @@ class _MyHomePageState extends State<MyHomePage> {
                               ],
                             ),
                             const SizedBox(height: 8.0),
-                            if (post.url.isNotEmpty)
-                              if(post.url.contains('.mp4') || post.url.contains('.mov') 
-                              || post.url.contains('.avi') || post.url.contains('.mkv'))
-                                Center(
-                                  child: VideoPlayerWidget(
-                                    videoUrl: post.url,
-                                  ),
+                            if (post.url.contains('.mp4') ||
+                                post.url.contains('.mov') ||
+                                post.url.contains('.avi') ||
+                                post.url.contains('.mkv'))
+                              Center(
+                                child: VideoPlayerWidget(
+                                  videoUrl: post.url,
                                 ),
-                              if(!post.url.contains('.mp4') && !post.url.contains('.mov') 
-                              && !post.url.contains('.avi') && !post.url.contains('.mkv'))
+                              ),
+                            if ((!post.url.contains('.mp4') &&
+                                    !post.url.contains('.mov') &&
+                                    !post.url.contains('.avi') &&
+                                    !post.url.contains('.mkv')) &&
+                                post.url != '')
                               Center(
                                 child: GestureDetector(
                                   onTap: () {
@@ -254,7 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     Text(post.likes.length.toString()),
                                     IconButton(
                                       onPressed: () {
-                                        context.push(
+                                        context.go(
                                           context.namedLocation(Paths.post,
                                               pathParameters: <String, String>{
                                                 'id': post.id,
@@ -398,7 +413,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    // You should put your function to report post here
+                    BaseClient().reportPost(
+                      "/report",
+                      _token.username,
+                      _token.tokenID,
+                      id,
+                      postUser,
+                      selectedReason,
+                      _commentController.text);
                     Navigator.of(context).pop();
                   },
                   child: Text('Submeter'),

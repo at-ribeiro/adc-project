@@ -3,13 +3,14 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import '../constants.dart';
 import '../models/Token.dart';
-import '../models/event_data.dart';
+import '../models/event_post_data.dart';
 import '../models/paths.dart';
 import '../services/load_token.dart';
 
@@ -36,6 +37,9 @@ class _EventCreatorState extends State<EventCreator> {
   late DateTime _endingDate;
 
   late ScrollController _scrollController;
+  GoogleMapController? _mapController;
+
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
@@ -228,7 +232,6 @@ class _EventCreatorState extends State<EventCreator> {
                       ),
                     ),
                   ),
-
                   SizedBox(height: 20.0),
                   Container(
                     decoration: BoxDecoration(
@@ -245,7 +248,7 @@ class _EventCreatorState extends State<EventCreator> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
                                 color: kAccentColor1),
-                            hintText: 'Starting Date',
+                            hintText: 'Data de começo',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
                               borderRadius: kBorderRadius,
@@ -297,7 +300,7 @@ class _EventCreatorState extends State<EventCreator> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
                                 color: kAccentColor1),
-                            hintText: 'Ending Date',
+                            hintText: 'Data de fim',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
                               borderRadius: kBorderRadius,
@@ -334,17 +337,31 @@ class _EventCreatorState extends State<EventCreator> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Do the same for the ending date...
-
+                  Container(
+                    height: 300,
+                    width: 500,
+                    child: GoogleMap(
+                      onMapCreated: (controller) {
+                        _mapController = controller;
+                      },
+                      onTap: _onMapTap,
+                      initialCameraPosition: CameraPosition(
+                          target: LatLng(38.661022, -9.204441), zoom: 16),
+                      markers: _markers,
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  Row(
+                  Column(
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           _pickImage();
                         },
+
                         child: const Text(
-                            'Selecion um icon para Evento'),
+                            'Selecione um icon para Evento'),
+
                       ),
                       SizedBox(width: 20),
                       const Padding(
@@ -363,45 +380,56 @@ class _EventCreatorState extends State<EventCreator> {
                   ElevatedButton(
                     onPressed: () {
                       if (_validateDates()) {
-                        String uniqueId = _titleController.text +
-                            "-" +
-                            (_startingDate.millisecondsSinceEpoch +
-                                    _endingDate.millisecondsSinceEpoch)
-                                .toString();
-                        // Dates are valid, proceed with event creation
-                        EventData event = EventData(
-                          creator: _token.username,
-                          title: _titleController.text,
-                          imageData: _imageData,
-                          fileName: _fileName,
-                          description: _descriptionController.text,
-                          start: _startingDate.millisecondsSinceEpoch,
-                          end: _endingDate.millisecondsSinceEpoch,
-                        );
-                        var response = BaseClient()
-                            .createEvent("/events", _token.tokenID, event);
+                        if (_fileName.isNotEmpty) {
+                          if (_markers.isNotEmpty) {
+                            EventPostData event = EventPostData(
+                              creator: _token.username,
+                              title: _titleController.text,
+                              imageData: _imageData,
+                              fileName: _fileName,
+                              description: _descriptionController.text,
+                              start: _startingDate.millisecondsSinceEpoch,
+                              end: _endingDate.millisecondsSinceEpoch,
+                              lat: _markers.first.position.latitude,
+                              lng: _markers.first.position.longitude,
+                            );
+                            var response = BaseClient()
+                                .createEvent("/events", _token.tokenID, event);
 
-                        // TODO: Handle event creation
-                        if (response == 200 || response == 204) {
-                          context.go(Paths.events);
+                            if (response == 200 || response == 204) {
+                              context.go(Paths.events);
+                            } else {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => ErrorDialog(
+                                      'Erro ao criar evento.', 'Ok', context));
+                            }
+                          } else {
+                            showDialog(
+                                context: context,
+                                builder: (context) => ErrorDialog(
+                                    'Verifique se selecionou uma localização para o evento.',
+                                    'Ok',
+                                    context));
+                          }
                         } else {
                           showDialog(
                               context: context,
                               builder: (context) => ErrorDialog(
-                                  'Erro ao criar evento.', 'ok', context));
-                          
+                                  'Adicione uma imagem ao evento',
+                                  'Ok',
+                                  context));
                         }
                       } else {
-                        // Dates are invalid, show an error message
                         showDialog(
                             context: context,
                             builder: (context) => ErrorDialog(
                                 'Verifique se a data de início é antes da data do fim.',
-                                'ok',
+                                'Ok',
                                 context));
                       }
                     },
-                    child: Text('Create Event'),
+                    child: Text('Criar evento'),
                   ),
                 ],
               ),
@@ -410,5 +438,17 @@ class _EventCreatorState extends State<EventCreator> {
         ),
       );
     }
+  }
+
+  void _onMapTap(LatLng position) {
+    setState(() {
+      _markers = {
+        Marker(
+          markerId: MarkerId('Evento'),
+          position: position,
+          // Set other marker properties as needed
+        ),
+      };
+    });
   }
 }

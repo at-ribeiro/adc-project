@@ -429,10 +429,16 @@ class _MyProfileState extends State<MyProfile> {
                             ),
                           ],
                         ),
+                        IconButton(onPressed: () {
+                          BaseClient().deletePost("/post", post.id, _token.username, _token.tokenID);
+                          setState(() {
+                            _posts.remove(post);
+                            info.nPosts--;
+                          });
+                        }, icon: Icon(Icons.delete))
                       ],
                     ),
                     const SizedBox(height: 8.0),
-                    if (post.url.isNotEmpty)
                       if (post.url.contains('.mp4') ||
                           post.url.contains('.mov') ||
                           post.url.contains('.avi') ||
@@ -442,10 +448,10 @@ class _MyProfileState extends State<MyProfile> {
                             videoUrl: post.url,
                           ),
                         ),
-                    if (!post.url.contains('.mp4') &&
+                    if ((!post.url.contains('.mp4') &&
                         !post.url.contains('.mov') &&
                         !post.url.contains('.avi') &&
-                        !post.url.contains('.mkv'))
+                        !post.url.contains('.mkv')) && post.url != '')
                       Center(
                         child: GestureDetector(
                           onTap: () {

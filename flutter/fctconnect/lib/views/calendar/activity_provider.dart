@@ -8,7 +8,7 @@ import 'activities.dart';
 class ActivityProvider extends ChangeNotifier {
   List<Activity> activities = [];
 
-  void initializeActivities(Token token) async {
+  Future<void> initializeActivities(Token token) async {
     List<ActivityData> activitiesData = await BaseClient()
         .getActivities("/activity", token.username, token.tokenID);
     for(var activity in activitiesData){
