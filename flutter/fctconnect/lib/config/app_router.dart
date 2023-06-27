@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
+import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
@@ -20,10 +21,12 @@ import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';
 import '../views/calendar_view.dart';
+import '../views/edit_profile_options.dart';
 import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
+import '../views/routes_map.dart';
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -91,6 +94,12 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: Paths.routes,
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteMapScreen();
+            },
+          ),
+          GoRoute(
             path: '/event/:id',
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
@@ -114,6 +123,18 @@ class AppRouter {
             path: Paths.editProfile,
             builder: (BuildContext context, GoRouterState state) {
               return EditProfile();
+            },
+          ),
+          GoRoute(
+            path: Paths.optionsProfile,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfileOptions();
+            },
+          ),
+          GoRoute(
+            path: Paths.changePassword,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfilePassword();
             },
           ),
           GoRoute(
@@ -220,6 +241,8 @@ class AppRouter {
       return 'Noticias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
+    } else if (location == Paths.routes) {
+      return 'Percursos';
     } else if (location == Paths.events) {
       return 'Eventos';
     } else if (location == Paths.createEvent) {
@@ -240,6 +263,10 @@ class AppRouter {
       return 'Evento';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
+    } else if (location.contains(Paths.changePassword)) {
+      return 'Mudar Password';
+    } else if (location.contains(Paths.optionsProfile)) {
+      return 'Opções de Perfil';
     }
     // add more conditions for other routes
 
@@ -262,13 +289,19 @@ class AppRouter {
     } else if (location == Paths.myProfile) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.editProfile);
+            context.go(Paths.optionsProfile);
           },
           icon: Icon(Icons.settings));
     } else if (location == Paths.editProfile) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.myProfile);
+            context.go(Paths.optionsProfile);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location == Paths.changePassword) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.optionsProfile);
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
@@ -277,9 +310,7 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
-
     } else if (location == Paths.createEvent) {
-
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
@@ -295,6 +326,5 @@ class AppRouter {
     }
 
     return Container();
-
   }
 }

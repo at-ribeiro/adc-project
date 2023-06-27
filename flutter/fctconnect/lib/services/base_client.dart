@@ -17,6 +17,7 @@ import '../models/Token.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
+import '../models/change_pwd_data.dart';
 import '../models/event_get_data.dart';
 import '../models/event_post_data.dart';
 import '../models/profile_info.dart';
@@ -170,7 +171,8 @@ class BaseClient {
     }
   }
 
-  Future<int> createEvent(String api, String tokenID, EventPostData event) async {
+  Future<int> createEvent(
+      String api, String tokenID, EventPostData event) async {
     var _headers = {
       "Content-Type": "multipart/form-data",
       "Authorization": tokenID,
@@ -179,7 +181,7 @@ class BaseClient {
     var request = http.MultipartRequest(
         'POST', Uri.parse(baseUrl + api + '/' + event.creator));
     request.headers.addAll(_headers);
-    
+
     request.fields['event'] = json.encode(event.toJson());
 
     if (event.imageData != null) {
@@ -216,7 +218,6 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
-    
   }
 
   Future<EventGetData> getEvent(String api, id, tokenID, user) async {
@@ -419,8 +420,8 @@ class BaseClient {
       final jsonString =
           utf8.decode(response.bodyBytes); // Specify the correct encoding
       final data = jsonDecode(jsonString);
-      final List<CommentData> commentsList =
-          List<CommentData>.from(data.map((json) => CommentData.fromJson(json)));
+      final List<CommentData> commentsList = List<CommentData>.from(
+          data.map((json) => CommentData.fromJson(json)));
       return commentsList;
     } else {
       //throw exception
@@ -503,12 +504,12 @@ class BaseClient {
       headers: _headers,
     );
 
-    if (response.statusCode == 200) {      
+    if (response.statusCode == 200) {
       final jsonString =
           utf8.decode(response.bodyBytes); // Specify the correct encoding
       final data = jsonDecode(jsonString);
-      final List<AlertPostData> reportsList =
-          List<AlertPostData>.from(data.map((json) => AlertPostData.fromJson(json)));
+      final List<AlertPostData> reportsList = List<AlertPostData>.from(
+          data.map((json) => AlertPostData.fromJson(json)));
       return reportsList;
     } else {
       throw Exception(
@@ -825,6 +826,46 @@ class BaseClient {
     } else {
       //throw exception
       throw extension("Something went wrong");
+    }
+  }
+
+  Future<dynamic> changePwd(
+      String api, ChangePwdData data, String tokenID, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api');
+
+    var userJson = jsonEncode({
+      'oldPassword': data.oldPassword,
+      'newPassword': data.newPassword,
+      'passwordV': data.passwordV,
+    });
+
+    var response = await http.put(url, headers: _headers, body: userJson);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return response.statusCode;
+    }
+  }
+
+  Future<dynamic> deleteAccount(
+      String api,  String tokenID, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.delete(url, headers: _headers);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return response.statusCode;
     }
   }
 }

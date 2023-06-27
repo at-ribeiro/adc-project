@@ -98,6 +98,14 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.directions_walk, color: kAccentColor1),
+            title: const Text('Percursos'),
+            onTap: () {
+              context.go(Paths.routes);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.event, color: kAccentColor1),
             title: const Text('Eventos'),
             onTap: () {
