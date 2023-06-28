@@ -4,11 +4,14 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
+import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../models/NewsData.dart';
 import '../models/Token.dart';
+import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import 'news_page.dart';
@@ -23,21 +26,32 @@ class NewsView extends StatefulWidget {
 class _NewsViewState extends State<NewsView> {
   late Token _token;
   bool _isLoadingToken = true;
+  bool _isLoadingNews = true;
   List<NewsData> _news = [];
+  late ScrollController _scrollController;
+  int counter = 0;
+  static const int LAST = 19;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
   }
 
-  Future<void> _loadNews() async {
-    List<NewsData> news =
-        await BaseClient().fetchNews("/news", _token.tokenID, _token.username);
-    if (mounted) {
-      setState(() {
-        _news = news;
-      });
-    }
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  Future<List<NewsData>> _loadNews() async {
+    setState(() {
+      _news = [];
+    });
+    List<NewsData> news = await BaseClient().fetchNewsFCT(counter);
+
+    return news;
   }
 
   Widget build(BuildContext context) {
@@ -48,91 +62,152 @@ class _NewsViewState extends State<NewsView> {
             setState(() {
               _token = token;
               _isLoadingToken = false;
-              _loadNews();
             });
           });
         },
       );
+    } else if (_isLoadingNews) {
+      return FutureBuilder(
+          future: _loadNews(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return ErrorDialog('Algo não correu bem!', 'Voltar', context);
+              } else {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  setState(() {
+                    _news = snapshot.data;
+                    _isLoadingNews = false;
+                    counter++;
+                  });
+                });
+                return Container(
+                  color: Colors.transparent,
+                );
+              }
+            } else {
+              return Container(
+                  color: Colors.transparent,
+                  child: const Center(child: CircularProgressIndicator()));
+            }
+          });
     } else {
-      return Scaffold(
-        body: Container(
-          decoration: kGradientDecoration,
-          child: _news.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: _news.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    NewsData news = _news[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (ctx) => NewsDetailPage(news: news),
+      return Container(
+        decoration: kGradientDecoration,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: RefreshIndicator(
+            onRefresh: () {
+              setState(() {
+                _isLoadingNews = true;
+              });
+              return _loadNews();
+            },
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: _news.length,
+              itemBuilder: (BuildContext context, int index) {
+                NewsData news = _news[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (ctx) => NewsDetailPage(news: news),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: kBorderRadius,
+                      border: Border.all(
+                        width: 1.5,
+                        color: kAccentColor0.withOpacity(0.0),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: kAccentColor2.withOpacity(0.1),
+                            borderRadius: kBorderRadius,
                           ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: kBorderRadius,
-                          border: Border.all(
-                            width: 1.5,
-                            color: kAccentColor0.withOpacity(0.0),
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: BackdropFilter(
-                            filter:
-                                ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: kAccentColor2.withOpacity(0.1),
-                                borderRadius: kBorderRadius,
-                              ),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width: 100,
-                                        height: 100,
-                                        child: Image.network(
-                                          news.url,
-                                          fit: BoxFit.scaleDown,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8.0),
-                                      Expanded(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 16.0),
-                                          child: Text(
-                                            news.title,
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                            ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      news.imageUrl,
+                                      width: 400,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          news.title,
+                                          style: TextStyle(
+                                            fontSize: 24.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: kAccentColor0,
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 4.0),
+                                        Text(
+                                          news.text,
+                                          style: TextStyle(
+                                            fontSize: 18.0,
+                                            color: kAccentColor2,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       );
     }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      _loadMoreNews();
+    }
+    print(counter);
+  }
+
+  Future<void> _loadMoreNews() async {
+    if (counter == LAST) {
+      return;
+    }
+    List<NewsData> news = await BaseClient().fetchNewsFCT(counter);
+    setState(() {
+      _news.addAll(news);
+      counter++;
+    });
   }
 }

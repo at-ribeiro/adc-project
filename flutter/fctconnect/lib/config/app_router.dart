@@ -6,6 +6,7 @@ import 'package:responsive_login_ui/views/event_view.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
+import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
@@ -44,15 +45,15 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.noticias,
-                builder: (BuildContext context, GoRouterState state) {
-                  return const NewsView();
-                },
-              ),
-              GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
                   return MyHomePage();
+                },
+              ),
+              GoRoute(
+                path: Paths.noticias,
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsView();
                 },
               ),
             ],
@@ -277,9 +278,7 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
-
     } else if (location == Paths.createEvent) {
-
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
@@ -295,6 +294,5 @@ class AppRouter {
     }
 
     return Container();
-
   }
 }

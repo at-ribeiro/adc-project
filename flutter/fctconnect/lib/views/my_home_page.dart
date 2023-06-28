@@ -433,7 +433,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _loadPosts() async {
+  Future<void>  _loadPosts() async {
     List<FeedData> posts = await BaseClient().getFeedorPost(
       "/feed",
       _token.tokenID,

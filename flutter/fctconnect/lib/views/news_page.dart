@@ -52,7 +52,7 @@ class NewsDetailPage extends StatelessWidget {
                         fit:
                             BoxFit.contain, // Adjust the fit property as needed
                         child: Image.network(
-                          news.url,
+                          news.imageUrl,
                         ),
                       ),
                     ),
