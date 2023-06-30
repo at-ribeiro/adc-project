@@ -22,6 +22,10 @@ import '../models/event_post_data.dart';
 import '../models/profile_info.dart';
 import '../models/update_data.dart';
 
+import '../models/sala_get_data.dart';
+import '../models/sala_post_data.dart';
+
+
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
 
 class BaseClient {
@@ -827,4 +831,117 @@ class BaseClient {
       throw extension("Something went wrong");
     }
   }
+
+  // sala stuff
+
+    Future<int> createSala(String api, String tokenID, SalaPostData sala) async {
+    var _headers = {
+      "Content-Type": "multipart/form-data",
+      "Authorization": tokenID,
+    };
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse(baseUrl + api + '/' + sala.creator));
+    request.headers.addAll(_headers);
+    
+    request.fields['sala'] = json.encode(sala.toJson());
+
+    if (sala.imageData != null) {
+      var multipartFile = http.MultipartFile.fromBytes(
+        'image',
+        sala.imageData!,
+        filename: "${sala.fileName}.jpg",
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
+
+    return response.statusCode;
+  }
+
+  Future<List<SalaGetData>> getSalas(
+      String api, String tokenID, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      final jsonList = json.decode(response.body) as List<dynamic>;
+      final salasList =
+          jsonList.map((json) => SalaGetData.fromJson(json)).toList();
+      return salasList;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+    
+  }
+
+  Future<SalaGetData> getSala(String api, id, tokenID, user) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": user,
+    };
+    var url = Uri.parse('$baseUrl$api/$id');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final sala = SalaGetData.fromJson(jsonData);
+
+      return sala;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<bool> isInSala(String api, String username, String tokenID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<dynamic> joinSala(
+      String api, String username, String tokenID, SalaPostData sala) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+    };
+    var url = Uri.parse('$baseUrl$api/$username');
+
+    var response = await http.post(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  leaveSala(String s, String t, String u, SalaPostData sala) {}
+
 }

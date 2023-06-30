@@ -33,4 +33,10 @@ class Paths {
 
   static var splash = '/splash';
 
+  static String salas = "/salas";
+
+  static String sala = "/sala";
+
+  static String createSala = '$salas/newSala';
+
 }

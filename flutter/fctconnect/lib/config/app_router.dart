@@ -14,6 +14,7 @@ import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
+import 'package:responsive_login_ui/views/salas_view.dart';
 
 import '../constants.dart';
 import '../models/drawer_model.dart';
@@ -24,6 +25,8 @@ import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
+import '../views/sala_creator.dart';
+import '../views/sala_page.dart';
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -108,6 +111,26 @@ class AppRouter {
             path: Paths.createEvent,
             builder: (BuildContext context, GoRouterState state) {
               return EventCreator();
+            },
+          ),
+          GoRoute(
+            path: '/sala/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaPage(
+                salaId: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: Paths.salas,
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaView();
+            },
+          ),
+          GoRoute(
+            path: Paths.createSala,
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaCreator();
             },
           ),
           GoRoute(
@@ -224,6 +247,10 @@ class AppRouter {
       return 'Eventos';
     } else if (location == Paths.createEvent) {
       return 'Criar Evento';
+    } else if (location == Paths.salas) {
+      return 'Salas';
+    } else if (location == Paths.createSala) {
+      return 'Criar Sala';
     } else if (location == Paths.report) {
       return 'Reportar';
     } else if (location == Paths.calendar) {
@@ -238,6 +265,8 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
+    } else if (location.contains(Paths.sala)) {
+      return 'Sala';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
     }
@@ -285,7 +314,21 @@ class AppRouter {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location.contains(Paths.otherProfile) ||
+    } else if (location == Paths.salas) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createSala);
+          },
+          icon: Icon(Icons.add));
+
+    }else if (location == Paths.createSala) {
+
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.salas);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if (location.contains(Paths.otherProfile) ||
         location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {

@@ -12,6 +12,7 @@ import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../views/messages/messages_view.dart';
+import '../views/salas_view.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {
@@ -126,6 +127,14 @@ class _DrawerModelState extends State<DrawerModel> {
             onTap: () {
               Navigator.push(context,
                   CupertinoPageRoute(builder: (ctx) => MessagesView()));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.message, color: kAccentColor1),
+            title: const Text('Salas'),
+            onTap: () {
+              context.go(Paths.salas);
               Navigator.pop(context);
             },
           ),
