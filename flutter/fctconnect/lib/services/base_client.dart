@@ -1023,29 +1023,28 @@ class BaseClient {
     String imageUrl = imageElement?.attributes['src'] ?? "Image URL not found";
 
     final textContainer = html.querySelector('div.noticia-corpo');
-    String text = "";
+    List<String> paragraphs = []; // Create a list to store paragraphs
 
     if (textContainer != null) {
-      // Concatenating all the paragraphs in the 'noticia-corpo' div
+      // Appending each paragraph in the 'noticia-corpo' div to the list
       textContainer.querySelectorAll('p').forEach((element) {
-        text += element.text.trim() + " "; // Using .text instead of .innerHtml
+        paragraphs.add(element.text.trim()); // Using .text and adding to list
       });
-    } else {
-      text = "Text not found";
     }
 
-    final timestampElement = html.querySelector('div > p');
+    final timestampElement = html.querySelector('#node-42022 > div > p');
     String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
 
-    print(timestamp);
+    print(url);
 
     return NewsData(
       title: title,
-      text: text,
+      paragraphs: paragraphs, // Pass the list of paragraphs
       imageUrl: imageUrl,
       timestamp: timestamp,
       newsUrl: urlString,
-      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
+      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'), 
+      text: '',
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,7 +22,11 @@ class TokenGetterWidget extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasError) {
               WidgetsBinding.instance!.addPostFrameCallback((_) {
-                context.go(Paths.login);
+                if(kIsWeb){
+                    context.go(Paths.welcome);
+                  }else {
+                  context.go(Paths.login);
+                }
               });
               return Container(
                color: Colors.transparent,
@@ -34,7 +39,11 @@ class TokenGetterWidget extends StatelessWidget {
               if (token.expirationDate <
                   DateTime.now().millisecondsSinceEpoch) {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  context.go(Paths.login);
+                  if(kIsWeb){
+                    context.go(Paths.welcome);
+                  }else {
+                    context.go(Paths.login);
+                  }
                 });
                 return Container(
                   color: Colors.transparent,

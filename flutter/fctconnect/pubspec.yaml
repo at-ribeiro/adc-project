@@ -57,6 +57,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/welcome.jpg
     - assets/background.jpg
 
   # fonts:

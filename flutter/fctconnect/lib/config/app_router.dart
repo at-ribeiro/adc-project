@@ -16,6 +16,7 @@ import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
+import 'package:responsive_login_ui/views/welcome_screen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
@@ -244,6 +245,12 @@ class AppRouter {
           return const SignUpView();
         },
       ),
+       GoRoute(
+        path: Paths.welcome,
+        builder: (BuildContext context, GoRouterState state) {
+          return WelcomeScreen();
+        },
+      ),
       GoRoute(
         path: Paths.splash,
         builder: (BuildContext context, GoRouterState state) {
@@ -264,7 +271,7 @@ class AppRouter {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
-    } else if (location == Paths.noticias) {
+    } else if (location == Paths.noticias || location.contains('noticias')) {
       return 'Noticias';
     } else if (location == Paths.mapas) {
       return 'Mapa';

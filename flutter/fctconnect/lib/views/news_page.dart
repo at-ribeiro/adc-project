@@ -114,14 +114,24 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                         ),
                       ),
                       const SizedBox(height: 16.0),
-                      Text(
-                        news.text,
-                      
-                        style: const TextStyle(
-                          color: kAccentColor0,
-                          fontSize: 18.0,
+                      for (var paragraph in news.paragraphs!)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: RichText(
+                            textAlign: TextAlign.justify,
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: kAccentColor0,
+                                fontSize: 18.0,
+                              ),
+                              children: [
+                                TextSpan(
+                                    text: '    '), // 4 spaces for indentation
+                                TextSpan(text: paragraph),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 95.0),
                     ],
                   ),
