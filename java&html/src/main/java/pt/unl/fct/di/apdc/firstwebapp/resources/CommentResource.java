@@ -2,6 +2,10 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
@@ -22,6 +26,8 @@ public class CommentResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
     private final Gson g = new Gson();
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
 
 
     @POST
@@ -177,10 +183,29 @@ public class CommentResource {
             List<CommentGetData> toSend = new ArrayList<>();
 
             commentResults.forEachRemaining(comment -> {
+
+                Key authorKey = userKeyFactory.newKey(comment.getString("user"));
+
+                Entity author = txn.get(authorKey);
+
+                String imageName = author.getString("user_profile_pic");
+
+                BlobId blobId;
+
+                if(imageName == null || imageName.equals(""))
+                    blobId = BlobId.of(bucketName, "default_profile.jpg");
+                else
+                    blobId = BlobId.of(bucketName, imageName);
+
+                Blob blob = storage.get(blobId);
+
+                String profilePic = blob.getMediaLink();
+
                 toSend.add(new CommentGetData(
                         comment.getString("user"),
                         comment.getString("text"),
-                        comment.getLong("timestamp")
+                        comment.getLong("timestamp"),
+                        profilePic
                 ));
 
             });
