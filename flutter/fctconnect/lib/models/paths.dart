@@ -34,4 +34,6 @@ class Paths {
 
   static var splash = '/splash';
 
+  static String welcome = '/welcome';
+
 }
