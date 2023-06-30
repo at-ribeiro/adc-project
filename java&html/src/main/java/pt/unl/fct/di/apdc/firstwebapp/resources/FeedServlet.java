@@ -138,13 +138,9 @@ public class FeedServlet extends HttpServlet {
 
                         Key creatorKey = userKeyFactory.newKey(post.getString("user"));
 
-                        LOG.warning("creatorKey: " + creatorKey.toString());
-
                         Entity creator = txn.get(creatorKey);
 
                         String imageName = creator.getString("user_profile_pic");
-
-                        LOG.warning("imageName: " + imageName);
 
                         BlobId blobId;
 
