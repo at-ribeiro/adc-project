@@ -154,6 +154,7 @@ class _DrawerModelState extends State<DrawerModel> {
 
               CacheDefault.cacheFactory.logout();
               CacheDefault.cacheFactory.delete('isLoggedIn');
+             
               SharedPreferences prefs = await SharedPreferences.getInstance();
 
               prefs.remove('ProfilePic');

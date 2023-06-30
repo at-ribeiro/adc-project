@@ -9,6 +9,7 @@ class Paths {
 
   static String noticias = '/news';
 
+    static String noticia= '/:id';
   static String otherProfile = '/otherProfile';
 
   static String mapas = '/mapas';

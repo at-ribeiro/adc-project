@@ -7,6 +7,7 @@ import 'package:responsive_login_ui/views/event_view.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
+import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
@@ -49,15 +50,30 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.noticias,
-                builder: (BuildContext context, GoRouterState state) {
-                  return const NewsView();
-                },
-              ),
-              GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
                   return MyHomePage();
+                },
+              ),
+              GoRoute(
+                path: Paths.noticias,
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsView();
+                },
+              ),
+              GoRoute(
+                path: "/:noticias/:year/:month/:title",
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsDetailPage(
+                    newsUrl: "/" +
+                        state.pathParameters['noticias']! +
+                        "/" +
+                        state.pathParameters['year']! +
+                        "/" +
+                        state.pathParameters['month']! +
+                        "/" +
+                        state.pathParameters['title']!,
+                  );
                 },
               ),
             ],
@@ -188,9 +204,12 @@ class AppRouter {
             appBar: AppBar(
               backgroundColor: kPrimaryColor,
               elevation: 0,
-              title: Text(
-                _getTitleBasedOnRoute(state.location),
-                style: TextStyle(color: kAccentColor0),
+              title: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _getTitleBasedOnRoute(state.location),
+                  style: TextStyle(color: kAccentColor0),
+                ),
               ),
               actions: [
                 _getButtonsBasedOnRoute(state.location, context),
@@ -320,6 +339,7 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
+
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {
@@ -332,6 +352,7 @@ class AppRouter {
             context.go(Paths.routes);
           },
           icon: Icon(Icons.arrow_back));
+
     } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {

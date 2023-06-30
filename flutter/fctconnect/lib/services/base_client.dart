@@ -3,8 +3,13 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
+
 import 'package:responsive_login_ui/models/location_get_data.dart';
 import 'package:responsive_login_ui/models/route_get_data.dart';
+
+import 'package:html/dom.dart' as dom;
+import 'package:html/dom.dart' as html;
+
 
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
@@ -26,6 +31,7 @@ import '../models/profile_info.dart';
 import '../models/update_data.dart';
 
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
+const String fctUrl = 'https://www.fct.unl.pt';
 
 class BaseClient {
   var client = http.Client();
@@ -830,6 +836,7 @@ class BaseClient {
     }
   }
 
+
   Future<dynamic> changePwd(
       String api, ChangePwdData data, String tokenID, String username) async {
     var _headers = {
@@ -945,5 +952,100 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+
+  Future fetchNewsFCT(int counter) async {
+    List<NewsData> news = [];
+    final url;
+    if (counter == 0) {
+      url = Uri.parse('$fctUrl/noticias');
+    } else {
+      url = Uri.parse('$fctUrl/noticias?page=$counter');
+    }
+
+    final response = await http.get(url);
+    dom.Document html = dom.Document.html(response.body);
+    final titles = html
+        .querySelectorAll(' div.views-field-title > span > a')
+        .map((e) => e.innerHtml.trim())
+        .toList();
+
+    final imageUrl = html
+        .querySelectorAll(
+            'div.noticia-imagem.views-field-field-imagem-fid.col-tn-12.col-xs-6.col-sm-12 > span > a > img')
+        .map((e) => e.attributes['src'])
+        .toList();
+    final text = html
+        .querySelectorAll(' div.views-field-field-resumo-value > span > p')
+        .map((e) => e.innerHtml.trim())
+        .toList();
+    final timestamp = html
+        .querySelectorAll('div.views-field-created > span')
+        .map((e) => e.innerHtml.trim())
+        .toList();
+    final lastElement = html
+        .querySelectorAll(
+            ' div > div.clearfix > div > div.item-list > ul > li.pager-last.last > a')
+        .map((e) => e.innerHtml.trim())
+        .toList();
+    final newsUrls = html
+        .querySelectorAll(
+            'div.noticia-imagem.views-field-field-imagem-fid.col-tn-12.col-xs-6.col-sm-12 > span > a')
+        .map((e) => e.attributes['href'])
+        .toList();
+
+    print(newsUrls);
+
+    news = List.generate(
+        titles.length,
+        (index) => NewsData(
+              title: titles[index],
+              text: text[index],
+              imageUrl: imageUrl[index]!,
+              timestamp: timestamp[index].toString(),
+              newsUrl: newsUrls[index]!,
+              path: titles[index]
+                  .toLowerCase()
+                  .replaceAll(new RegExp(r'\s'), '-'),
+            ));
+
+    return news;
+  }
+
+  Future fetchSingularNewsFCT(String urlString) async {
+    Uri url = Uri.parse(fctUrl + urlString);
+    final response = await http.get(url);
+    dom.Document html = dom.Document.html(response.body);
+
+    final titleElement = html.querySelector('div.col-tn-12.col-sm-7 > h1');
+    String title = titleElement?.text.trim() ?? "Title not found";
+
+    final imageElement = html.querySelector('div.noticia-imagem > img');
+    String imageUrl = imageElement?.attributes['src'] ?? "Image URL not found";
+
+    final textContainer = html.querySelector('div.noticia-corpo');
+    String text = "";
+
+    if (textContainer != null) {
+      // Concatenating all the paragraphs in the 'noticia-corpo' div
+      textContainer.querySelectorAll('p').forEach((element) {
+        text += element.text.trim() + " "; // Using .text instead of .innerHtml
+      });
+    } else {
+      text = "Text not found";
+    }
+
+    final timestampElement = html.querySelector('div > p');
+    String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
+
+    print(timestamp);
+
+    return NewsData(
+      title: title,
+      text: text,
+      imageUrl: imageUrl,
+      timestamp: timestamp,
+      newsUrl: urlString,
+      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
+    );
   }
 }

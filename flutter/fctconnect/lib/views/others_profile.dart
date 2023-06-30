@@ -367,6 +367,7 @@ class _OtherProfileState extends State<OtherProfile> {
 
   Widget buildPostCard(FeedData post) {
     return Container(
+      constraints: BoxConstraints(maxWidth: 500),
       margin: EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
