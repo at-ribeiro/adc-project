@@ -4,6 +4,7 @@ class NewsData {
   final String imageUrl;
   final String timestamp;
   final String newsUrl;
+  final String path;
 
   NewsData({
     required this.title,
@@ -11,6 +12,7 @@ class NewsData {
     required this.imageUrl,
     required this.timestamp,
     required this.newsUrl,
+    required this.path,
   });
 
   factory NewsData.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class NewsData {
       imageUrl: json['url'],
       timestamp: json['timestamp'],
       newsUrl: json['newsurl'],
+      path: json['path'],
     );
   }
 

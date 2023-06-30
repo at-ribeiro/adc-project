@@ -261,8 +261,11 @@ class _MyProfileState extends State<MyProfile> {
         ),
       );
     } else {
-      return Column(
-        children: _posts.map((post) => buildPostCard(post)).toList(),
+      return Container(
+        constraints: BoxConstraints(maxWidth: 800),
+        child: Column(
+          children: _posts.map((post) => buildPostCard(post)).toList(),
+        ),
       );
     }
   }
@@ -337,8 +340,11 @@ class _MyProfileState extends State<MyProfile> {
           child: CircularProgressIndicator(),
         );
       }
-      return Column(
-        children: _posts.map((post) => buildPostCard(post)).toList(),
+      return Container(
+        constraints: BoxConstraints(maxWidth: 800),
+        child: Column(
+          children: _posts.map((post) => buildPostCard(post)).toList(),
+        ),
       );
     }
   }
@@ -381,14 +387,18 @@ class _MyProfileState extends State<MyProfile> {
         ),
       );
     } else {
-      return Column(
-        children: _posts.map((post) => buildPostCard(post)).toList(),
+      return Container(
+        constraints: BoxConstraints(maxWidth: 800),
+        child: Column(
+          children: _posts.map((post) => buildPostCard(post)).toList(),
+        ),
       );
     }
   }
 
   Widget buildPostCard(FeedData post) {
     return Container(
+      constraints: BoxConstraints(maxWidth: 500),
       margin: EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -872,14 +871,20 @@ class BaseClient {
         .map((e) => e.attributes['href'])
         .toList();
 
+    print(newsUrls);
+
     news = List.generate(
         titles.length,
         (index) => NewsData(
-            title: titles[index],
-            text: text[index],
-            imageUrl: imageUrl[index]!,
-            timestamp: timestamp[index].toString(),
-            newsUrl: newsUrls[index]!));
+              title: titles[index],
+              text: text[index],
+              imageUrl: imageUrl[index]!,
+              timestamp: timestamp[index].toString(),
+              newsUrl: newsUrls[index]!,
+              path: titles[index]
+                  .toLowerCase()
+                  .replaceAll(new RegExp(r'\s'), '-'),
+            ));
 
     return news;
   }
@@ -890,24 +895,35 @@ class BaseClient {
     dom.Document html = dom.Document.html(response.body);
 
     final titleElement = html.querySelector('div.col-tn-12.col-sm-7 > h1');
-    String title = titleElement?.innerHtml.trim() ?? "Title not found";
+    String title = titleElement?.text.trim() ?? "Title not found";
 
     final imageElement = html.querySelector('div.noticia-imagem > img');
     String imageUrl = imageElement?.attributes['src'] ?? "Image URL not found";
 
-    final textElement = html.querySelector('div.noticia-corpo > p');
-    String text = textElement?.innerHtml.trim() ?? "Text not found";
+    final textContainer = html.querySelector('div.noticia-corpo');
+    String text = "";
 
-    final timestampElement = html.querySelector('#node-42022 > div > p');
+    if (textContainer != null) {
+      // Concatenating all the paragraphs in the 'noticia-corpo' div
+      textContainer.querySelectorAll('p').forEach((element) {
+        text += element.text.trim() + " "; // Using .text instead of .innerHtml
+      });
+    } else {
+      text = "Text not found";
+    }
 
-    String timestamp = timestampElement?.innerHtml.trim() ?? "Text not found";
+    final timestampElement = html.querySelector('div > p');
+    String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
 
+    print(timestamp);
 
     return NewsData(
-        title: title,
-        text: text,
-        imageUrl: imageUrl,
-        timestamp: '',
-        newsUrl: urlString);
+      title: title,
+      text: text,
+      imageUrl: imageUrl,
+      timestamp: timestamp,
+      newsUrl: urlString,
+      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
+    );
   }
 }

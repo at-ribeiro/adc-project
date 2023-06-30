@@ -56,6 +56,21 @@ class AppRouter {
                   return NewsView();
                 },
               ),
+              GoRoute(
+                path: "/:noticias/:year/:month/:title",
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsDetailPage(
+                    newsUrl: "/" +
+                        state.pathParameters['noticias']! +
+                        "/" +
+                        state.pathParameters['year']! +
+                        "/" +
+                        state.pathParameters['month']! +
+                        "/" +
+                        state.pathParameters['title']!,
+                  );
+                },
+              ),
             ],
             builder: (context, state, child) {
               return Scaffold(
@@ -160,9 +175,12 @@ class AppRouter {
             appBar: AppBar(
               backgroundColor: kPrimaryColor,
               elevation: 0,
-              title: Text(
-                _getTitleBasedOnRoute(state.location),
-                style: TextStyle(color: kAccentColor0),
+              title: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _getTitleBasedOnRoute(state.location),
+                  style: TextStyle(color: kAccentColor0),
+                ),
               ),
               actions: [
                 _getButtonsBasedOnRoute(state.location, context),

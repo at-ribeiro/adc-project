@@ -99,92 +99,85 @@ class _NewsViewState extends State<NewsView> {
           body: RefreshIndicator(
             onRefresh: () {
               setState(() {
+                counter = 0;
                 _isLoadingNews = true;
               });
               return _loadNews();
             },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: _news.length,
-              itemBuilder: (BuildContext context, int index) {
-                NewsData news = _news[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (ctx) => NewsDetailPage(news: news),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      border: Border.all(
-                        width: 1.5,
-                        color: kAccentColor0.withOpacity(0.0),
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: kAccentColor2.withOpacity(0.1),
-                            borderRadius: kBorderRadius,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 768),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _news.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    NewsData news = _news[index];
+                    return GestureDetector(
+                      onTap: () {
+                       context.go(news.newsUrl);
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: kBorderRadius,
+                          border: Border.all(
+                            width: 1.5,
+                            color: kAccentColor0.withOpacity(0.0),
                           ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      news.imageUrl,
-                                      width: 400,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          news.title,
-                                          style: TextStyle(
-                                            fontSize: 24.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: kAccentColor0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: BackdropFilter(
+                            filter:
+                                ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: kAccentColor2.withOpacity(0.1),
+                                borderRadius: kBorderRadius,
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: AspectRatio(
+                                          aspectRatio: 16 / 9,
+                                          child: FittedBox(
+                                            fit: BoxFit.cover,
+                                            child: Image.network(
+                                              news.imageUrl,
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(height: 4.0),
-                                        Text(
-                                          news.text,
-                                          style: TextStyle(
-                                            fontSize: 18.0,
-                                            color: kAccentColor2,
-                                          ),
+                                      ),
+                                      const SizedBox(height: 8.0),
+                                      Text(
+                                        news.title,
+                                        style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: kAccentColor0,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(height: 4.0),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
