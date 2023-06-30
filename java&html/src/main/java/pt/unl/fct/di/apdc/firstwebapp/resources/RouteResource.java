@@ -2,6 +2,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.glassfish.jersey.server.monitoring.RequestEvent;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.RouteData;
 
@@ -111,6 +112,88 @@ public class RouteResource {
                 txn.rollback();
             }
         }
+    }
+
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getRoutes(@HeaderParam("Authorization") String tokenID, @HeaderParam("User") String username){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenID))) {
+                LOG.warning("Incorrect token. Please re-login");
+                Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            List<RouteData> routes = new ArrayList<>();
+
+            // Perform a query to retrieve routes with the user as a participant
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("Route")
+                    .setFilter(StructuredQuery.PropertyFilter.eq("route_creator", username))
+                    .build();
+
+            QueryResults<Entity> results = datastore.run(query);
+
+            while (results.hasNext()) {
+                Entity route = results.next();
+
+                List<String> locations = new ArrayList<>();
+
+                for(Value<?> location : route.getList("route_locations")){
+                    locations.add((String) location.get());
+                }
+
+                List<String> participants = new ArrayList<>();
+
+                for(Value<?> participant : route.getList("route_participants")){
+                    participants.add((String) participant.get());
+                }
+
+                routes.add(new RouteData(route.getString("route_creator"), route.getString("route_name"),
+                                        locations, participants));
+            }
+
+            return Response.ok(routes).build();
+
+        }  catch(Exception e){
+            LOG.severe(e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if(txn.isActive()){
+                txn.rollback();
+            }
+        }
+
     }
 
     @PUT
