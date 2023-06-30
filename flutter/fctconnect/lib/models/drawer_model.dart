@@ -114,26 +114,10 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.group, color: kAccentColor1),
-            title: const Text('Grupos'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.calendar_month, color: kAccentColor1),
             title: const Text('Calendário'),
             onTap: () {
               context.go(Paths.calendar);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.message, color: kAccentColor1),
-            title: const Text('Mensagens'),
-            onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
               Navigator.pop(context);
             },
           ),

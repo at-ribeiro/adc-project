@@ -63,6 +63,7 @@ class CustomSearchDelegate extends SearchDelegate {
   Widget _loadProfilePic(String profilePic) {
     if (profilePic.isEmpty) {
       return const CircleAvatar(
+        radius: 30,
         backgroundImage: NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
@@ -79,7 +80,11 @@ class CustomSearchDelegate extends SearchDelegate {
 
   Widget _buildSearchContent(BuildContext context) {
     if (query.isEmpty) {
-      return Center(child: Text('Escreva alguma coisa para pesquisar', style: TextStyle(color: kAccentColor0),));
+      return Center(
+          child: Text(
+        'Escreva alguma coisa para pesquisar',
+        style: TextStyle(color: kAccentColor0),
+      ));
     } else {
       return FutureBuilder<List<UserQueryData>>(
         future: BaseClient().searchUser(query, "/search"),
@@ -116,7 +121,7 @@ class CustomSearchDelegate extends SearchDelegate {
                         role: role!,
                         tokenID: tokenID!,
                         username: username!,
-                        profilePic:'',
+                        profilePic: '',
                       );
                       switch (type) {
                         case 'msg':
@@ -130,13 +135,12 @@ class CustomSearchDelegate extends SearchDelegate {
                         case "profile":
                           if (_token.username ==
                               snapshot.data![index].username) {
-                                 close(context, null) ;
+                            close(context, null);
                             context.go(Paths.myProfile);
                           } else {
-                           close(context, null) ;
+                            close(context, null);
                             context.go(Paths.otherProfile +
                                 "/${snapshot.data![index].username}");
-                                
                           }
                           break;
                       }
@@ -147,7 +151,8 @@ class CustomSearchDelegate extends SearchDelegate {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(0.2),
-                            child: _loadProfilePic(snapshot.data![index].profilePic),
+                            child: _loadProfilePic(
+                                snapshot.data![index].profilePic),
                           ),
                           Padding(
                               padding: EdgeInsets.all(
@@ -155,11 +160,15 @@ class CustomSearchDelegate extends SearchDelegate {
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(snapshot.data![index].username,
-                                    style: TextStyle(fontSize: 18, color: kAccentColor0),),
+                                Text(
+                                  snapshot.data![index].username,
+                                  style: TextStyle(
+                                      fontSize: 18, color: kAccentColor0),
+                                ),
                                 Text(
                                   snapshot.data![index].fullname,
-                                  style: TextStyle(fontSize: 12, color: kAccentColor2),
+                                  style: TextStyle(
+                                      fontSize: 12, color: kAccentColor2),
                                 ),
                               ]),
                         ],

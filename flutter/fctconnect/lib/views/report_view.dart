@@ -219,7 +219,7 @@ class _ReportPageState extends State<ReportPage> {
                           prefixIcon:
                               Icon(Icons.description, color: kAccentColor1),
                           hintText:
-                              'Qual foi o problema que encontrou? Seja o mais detalhado possível.',
+                              'Qual foi o problema que encontrou?',
                           border: InputBorder.none,
                         ),
                         controller: problemController,

@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
+import 'package:responsive_login_ui/models/location_get_data.dart';
+import 'package:responsive_login_ui/models/route_get_data.dart';
 
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
@@ -209,9 +211,10 @@ class BaseClient {
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final eventsList =
-          jsonList.map((json) => EventGetData.fromJson(json)).toList();
+      final jsonString = utf8.decode(response.bodyBytes);
+      final data = jsonDecode(jsonString);
+      final List<EventGetData> eventsList = List<EventGetData>.from(
+          data.map((json) => EventGetData.fromJson(json)));
       return eventsList;
     } else {
       // throw exception
@@ -231,9 +234,9 @@ class BaseClient {
     var response = await http.get(url, headers: _headers);
 
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
+      final jsonString = utf8.decode(response.bodyBytes);
+      final jsonData = json.decode(jsonString);
       final event = EventGetData.fromJson(jsonData);
-
       return event;
     } else {
       // throw exception
@@ -268,10 +271,8 @@ class BaseClient {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final jsonString =
-          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final jsonString = utf8.decode(response.bodyBytes);
       final data = jsonDecode(jsonString);
-
       final List<UserQueryData> usersList = List<UserQueryData>.from(
           data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
@@ -853,7 +854,7 @@ class BaseClient {
   }
 
   Future<dynamic> deleteAccount(
-      String api,  String tokenID, String username) async {
+      String api, String tokenID, String username) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -866,6 +867,83 @@ class BaseClient {
       return response.body;
     } else {
       return response.statusCode;
+    }
+  }
+
+  Future<List<LocationGetData>> getLocations(
+      String api, String tokenID, String username, String type) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api?type=$type');
+
+    var response = await http.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      final jsonString = utf8.decode(response.bodyBytes);
+      final data = jsonDecode(jsonString);
+      final List<LocationGetData> locationsList = List<LocationGetData>.from(
+          data.map((json) => LocationGetData.fromJson(json)));
+      return locationsList;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<List<RouteGetData>> getRoutes(
+      String api, String tokenID, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+    };
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      final jsonString = utf8.decode(response.bodyBytes);
+      final data = jsonDecode(jsonString);
+      final List<RouteGetData> routesList = List<RouteGetData>.from(
+          data.map((json) => RouteGetData.fromJson(json)));
+      return routesList;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> createRoute(
+      String api, String username, String tokenID, RouteGetData route) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api');
+
+    var activityJson = jsonEncode({
+      'creator': route.creator,
+      'name': route.name,
+      'participants': route.participants,
+      'locations': route.locations,
+    });
+
+    var response = await http.post(
+      url,
+      headers: _headers,
+      body: activityJson,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
   }
 }

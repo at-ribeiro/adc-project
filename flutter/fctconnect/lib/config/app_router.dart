@@ -12,6 +12,7 @@ import 'package:responsive_login_ui/views/others_profile.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
+import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
@@ -26,6 +27,7 @@ import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
+import '../views/route_creator.dart';
 import '../views/routes_map.dart';
 
 class AppRouter {
@@ -96,7 +98,7 @@ class AppRouter {
           GoRoute(
             path: Paths.routes,
             builder: (BuildContext context, GoRouterState state) {
-              return RouteMapScreen();
+              return RouteView();
             },
           ),
           GoRoute(
@@ -117,6 +119,12 @@ class AppRouter {
             path: Paths.createEvent,
             builder: (BuildContext context, GoRouterState state) {
               return EventCreator();
+            },
+          ),
+          GoRoute(
+            path: Paths.createRoute,
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteCreator();
             },
           ),
           GoRoute(
@@ -247,6 +255,8 @@ class AppRouter {
       return 'Eventos';
     } else if (location == Paths.createEvent) {
       return 'Criar Evento';
+    } else if (location == Paths.createRoute) {
+      return 'Criar Percurso';
     } else if (location == Paths.report) {
       return 'Reportar';
     } else if (location == Paths.calendar) {
@@ -310,6 +320,18 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
+    } else if (location == Paths.routes) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createRoute);
+          },
+          icon: Icon(Icons.add));
+    } else if (location == Paths.createRoute) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.routes);
+          },
+          icon: Icon(Icons.arrow_back));
     } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
