@@ -323,6 +323,20 @@ public class EventsServlet extends HttpServlet {
                     .build();
 
             txn.add(entity);
+
+            Key locationKey = datastore.newKeyFactory()
+                            .setKind("Location")
+                            .newKey(uniqueEventId);
+
+            Entity locationEntity = Entity.newBuilder(locationKey)
+                                    .set("latitude", data.getLat())
+                                    .set("longitude", data.getLng())
+                                    .set("name", uniqueEventId)
+                                    .set("type", "EVENT")
+                                    .set("event", uniqueEventId)
+                                    .build();
+
+            txn.put(locationEntity);
             txn.commit();
 
             response.setStatus(HttpServletResponse.SC_OK);
