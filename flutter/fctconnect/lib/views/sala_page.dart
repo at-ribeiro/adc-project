@@ -81,7 +81,7 @@ class _SalaPageState extends State<SalaPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _sala.title,
+                        _sala.name,
                         style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
@@ -89,12 +89,7 @@ class _SalaPageState extends State<SalaPage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Description: ${_sala.description}',
-                        style: TextStyle(fontSize: 16, color: kAccentColor2),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Creator: ${_sala.creator}',
+                        'Description: ${_sala.building}',
                         style: TextStyle(fontSize: 16, color: kAccentColor2),
                       ),
                       SizedBox(height: 8),
@@ -117,7 +112,7 @@ class _SalaPageState extends State<SalaPage> {
                         ),
                       ),
 
-                      if (_sala.creator == _token.username) showQrcodeOrnot(),
+                      // if (_sala.creator == _token.username) showQrcodeOrnot(),
                     ],
                   ),
                 ),

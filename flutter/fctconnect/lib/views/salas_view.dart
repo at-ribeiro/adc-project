@@ -114,7 +114,7 @@ class _SalaViewState extends State<SalaView> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                sala.title,
+                                                sala.name,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: kAccentColor0,

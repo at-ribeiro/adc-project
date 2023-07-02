@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 class SalaPostData {
-  final String creator;
-  final String title;
-  final String description;
+  final String name;
+  final String building;
   //final int start;
   //final int end;
   Uint8List? imageData;

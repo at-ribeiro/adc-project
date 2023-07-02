@@ -841,7 +841,7 @@ class BaseClient {
     };
 
     var request = http.MultipartRequest(
-        'POST', Uri.parse(baseUrl + api + '/' + sala.creator));
+        'POST', Uri.parse(baseUrl + api + '/' + sala.name));
     request.headers.addAll(_headers);
     
     request.fields['sala'] = json.encode(sala.toJson());

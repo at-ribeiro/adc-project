@@ -279,14 +279,13 @@ class _SalaCreatorState extends State<SalaCreator> {
                         if (_fileName.isNotEmpty) {
                           if (_markers.isNotEmpty) {
                             SalaPostData sala = SalaPostData(
-                              creator: _token.username,
-                              title: _titleController.text,
+                              name: _titleController.text,
                               imageData: _imageData,
                               fileName: _fileName,
-                              description: _descriptionController.text,
+                              building: _descriptionController.text,
                               lat: _markers.first.position.latitude,
                               lng: _markers.first.position.longitude,
-                              capacity: _capacityController.text,
+                              capacity: int.parse(_capacityController.text),
                             );
                             var response = BaseClient()
                                 .createSala("/salas", _token.tokenID, sala);
