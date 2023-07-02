@@ -38,12 +38,16 @@ class Paths {
 
   static String optionsProfile = '$myProfile/options';
 
-
   static String changePassword = '$myProfile/options/changePassword';
 
   static var splash = '/splash';
 
-
   static String welcome = '/welcome';
+
+  static String salas = "/salas";
+
+  static String sala = "/sala";
+
+  static String createSala = '$salas/newSala';
 
 }

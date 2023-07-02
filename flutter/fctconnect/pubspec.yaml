@@ -57,7 +57,7 @@ flutter:
 
   assets:
     - assets/
-    - assets/welcome.jpg
+  #  - assets/welcome.jpg                  commented for errors, remove if u need welcome
     - assets/background.jpg
 
   # fonts:
