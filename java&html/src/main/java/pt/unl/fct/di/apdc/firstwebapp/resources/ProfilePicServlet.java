@@ -38,7 +38,6 @@ public class ProfilePicServlet extends HttpServlet {
             String updater = request.getHeader("User");
             String username = request.getPathInfo().substring(1);
 
-
             Key updaterKey = userKeyFactory.newKey(updater);
 
             Entity updaterEntity = txn.get(updaterKey);
@@ -63,12 +62,12 @@ public class ProfilePicServlet extends HttpServlet {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+                response.setStatus(Response.Status.FORBIDDEN.getStatusCode());
                 return;
             }
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+                response.setStatus(Response.Status.FORBIDDEN.getStatusCode());
                 return;
             }
 
@@ -143,7 +142,6 @@ public class ProfilePicServlet extends HttpServlet {
             response.setStatus(Response.Status.OK.getStatusCode());
 
         }catch (Exception e){
-            txn.rollback();
             LOG.severe(e.getMessage());
             e.printStackTrace();
             response.setStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());

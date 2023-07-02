@@ -228,7 +228,6 @@ public class EventsServlet extends HttpServlet {
             String imageName = "";
 
             if (request.getPart("image") != null) {
-                imageName = request.getPart("image").getSubmittedFileName();
                 InputStream imageStream = request.getPart("image").getInputStream();
 
                 String contentType = request.getPart("image").getContentType();
