@@ -2,30 +2,25 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 
 import java.util.List;
 
-public class SalaGetData {
+public class RoomGetData {
 
     private String name;
     private String building;
     private String url;
     private String id;
-    //private String qrCodeUrl;
-    private List<Integer> lotation;
     private double lat;
     private double lng;
     private long capacity;
 
-    public SalaGetData(){}
+    public RoomGetData(){}
 
-    public SalaGetData(String name, String building, String url, String id,
-                        List<Integer> lotation, double lat, double lng, long capacity) {
-        this.name = name;
-        this.building = building;
-        this.url = url;
+    public RoomGetData(String id, String roomName, String roomBuilding, double roomLatitude, double roomLongitude, long roomCapacity) {
         this.id = id;
-        this.lotation = lotation;
-        this.lat = lat;
-        this.lng = lng;
-        this.capacity = capacity;
+        this.name = roomName;
+        this.building = roomBuilding;
+        this.lat = roomLatitude;
+        this.lng = roomLongitude;
+        this.capacity = roomCapacity;
     }
 
     public String getName() {
@@ -42,10 +37,6 @@ public class SalaGetData {
 
     public String getId() {
         return id;
-    }
-
-    public List<Integer> getLotation(){
-        return lotation;
     }
 
     public double getLat() {

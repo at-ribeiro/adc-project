@@ -1,6 +1,6 @@
 package pt.unl.fct.di.apdc.firstwebapp.util;
 
-public class SalaPostData {
+public class RoomPostData {
 
     private String name;
     private String building;
@@ -8,9 +8,9 @@ public class SalaPostData {
     private double lng;
     private long capacity;
 
-    public SalaPostData(){}
+    public RoomPostData(){}
 
-    public SalaPostData(String name, String building, double lat, double lng, long capacity){
+    public RoomPostData(String name, String building, double lat, double lng, long capacity){
         this.name = name;
         this.building = building;
         this.lat = lat;

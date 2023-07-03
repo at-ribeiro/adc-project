@@ -4,13 +4,16 @@ import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
+import pt.unl.fct.di.apdc.firstwebapp.util.LocationData;
 import pt.unl.fct.di.apdc.firstwebapp.util.RouteData;
+import pt.unl.fct.di.apdc.firstwebapp.util.RouteGetData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Logger;
 
 @Path("/route")
@@ -34,11 +37,11 @@ public class RouteResource {
 
             if (user == null) {
                 LOG.warning("User does not exist.");
-                Response.status(Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
             if (user.getString("user_state").equals("INACTIVE")) {
                 LOG.warning("Inactive User.");
-                Response.status(Response.Status.UNAUTHORIZED).build();
+                return  Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
             Key tokenKey = datastore.newKeyFactory()
@@ -50,12 +53,12 @@ public class RouteResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
-                Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             Key routeKey = datastore.newKeyFactory()
@@ -71,7 +74,7 @@ public class RouteResource {
             List<Value<String>> locations = new ArrayList<>();
 
             for(String location : data.getLocations()){
-                locations.add(StringValue.newBuilder(location).build());
+                locations.add(StringValue.newBuilder(location).setExcludeFromIndexes(true).build());
             }
 
             if(locations.isEmpty()){
@@ -90,11 +93,18 @@ public class RouteResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
+            List<LongValue> duration = new ArrayList<>();
+
+            for (Integer time : data.getDurations()) {
+            	duration.add(LongValue.newBuilder(time).setExcludeFromIndexes(true).build());
+            }
+
             Entity route = Entity.newBuilder(routeKey)
                     .set("route_creator", username)
                     .set("route_name", data.getName())
                     .set("route_locations", ListValue.of(locations))
                     .set("route_participants", ListValue.of(participants))
+                    .set("route_durations", ListValue.of(duration))
                     .build();
 
             txn.add(route);
@@ -128,12 +138,12 @@ public class RouteResource {
 
             if (user == null) {
                 LOG.warning("User does not exist.");
-                Response.status(Response.Status.NOT_FOUND).build();
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
 
             if (user.getString("user_state").equals("INACTIVE")) {
                 LOG.warning("Inactive User.");
-                Response.status(Response.Status.UNAUTHORIZED).build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
             Key tokenKey = datastore.newKeyFactory()
@@ -145,15 +155,15 @@ public class RouteResource {
 
             if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenID))) {
                 LOG.warning("Incorrect token. Please re-login");
-                Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             if (AuthToken.expired(token.getLong("token_expiration"))) {
                 LOG.warning("Your token has expired. Please re-login.");
-                Response.status(Response.Status.FORBIDDEN).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            List<RouteData> routes = new ArrayList<>();
+            List<RouteGetData> routes = new ArrayList<>();
 
             // Perform a query to retrieve routes with the user as a participant
             Query<Entity> query = Query.newEntityQueryBuilder()
@@ -161,15 +171,24 @@ public class RouteResource {
                     .setFilter(StructuredQuery.PropertyFilter.eq("route_creator", username))
                     .build();
 
-            QueryResults<Entity> results = datastore.run(query);
+            QueryResults<Entity> results = txn.run(query);
 
             while (results.hasNext()) {
                 Entity route = results.next();
 
-                List<String> locations = new ArrayList<>();
+                List<LocationData> locations = new ArrayList<>();
 
-                for(Value<?> location : route.getList("route_locations")){
-                    locations.add((String) location.get());
+                Query<Entity> query2 = Query.newEntityQueryBuilder()
+                        .setKind("Location")
+                        .setFilter(StructuredQuery.PropertyFilter.in("name", ListValue.of(route.getList("route_locations"))))
+                        .build();
+
+                QueryResults<Entity> results2 = txn.run(query2);
+
+                while (results2.hasNext()) {
+                	Entity location = results2.next();
+                	locations.add(new LocationData(location.getString("name"), location.getDouble("latitutde"), location.getDouble("longitude")
+                        ,location.getString("type"), location.getString("event")));
                 }
 
                 List<String> participants = new ArrayList<>();
@@ -178,8 +197,14 @@ public class RouteResource {
                     participants.add((String) participant.get());
                 }
 
-                routes.add(new RouteData(route.getString("route_creator"), route.getString("route_name"),
-                                        locations, participants));
+                List<Integer> durations = new ArrayList<>();
+
+                for (Value<?> duration : route.getList("route_durations")) {
+                	durations.add(((Long) duration.get()).intValue());
+                }
+
+                routes.add(new RouteGetData(route.getString("route_creator"), route.getString("route_name"),
+                                        locations, participants, durations));
             }
 
             return Response.ok(routes).build();
@@ -272,7 +297,9 @@ public class RouteResource {
                     .set("route_creator", routeEntity.getString("route_creator"))
                     .set("route_name", routeEntity.getString("route_name"))
                     .set("route_locations", routeEntity.getList("route_locations"))
+                    .set("route_times", routeEntity.getList("route_times"))
                     .set("route_participants", ListValue.of(participants))
+                    .set("route_durations", routeEntity.getList("route_durations"))
                     .build();
 
             txn.update(route);

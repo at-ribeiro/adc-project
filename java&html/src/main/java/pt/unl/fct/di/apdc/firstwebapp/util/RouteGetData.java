@@ -3,19 +3,19 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 
 import java.util.List;
 
-public class RouteData {
+public class RouteGetData {
 
     private String creator;
     private String name;
-    private List<String> locations;
+    private List<LocationData> locations;
     private List<String> participants;
     private List<Integer> durations;
 
-    public RouteData() {
+    public RouteGetData() {
 
     }
 
-    public RouteData(String creator, String name, List<String> locations, List<String> participants, List<Integer> durations) {
+    public RouteGetData(String creator, String name, List<LocationData> locations, List<String> participants, List<Integer> durations) {
         this.creator = creator;
         this.name = name;
         this.locations = locations;
@@ -31,7 +31,7 @@ public class RouteData {
         return name;
     }
 
-    public List<String> getLocations() {
+    public List<LocationData> getLocations() {
         return locations;
     }
 
