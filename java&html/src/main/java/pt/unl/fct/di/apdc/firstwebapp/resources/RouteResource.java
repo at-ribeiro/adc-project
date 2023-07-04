@@ -178,9 +178,11 @@ public class RouteResource {
 
                 List<LocationData> locations = new ArrayList<>();
 
+                List<StringValue> locationNames = route.getList("route_locations");
+
                 Query<Entity> query2 = Query.newEntityQueryBuilder()
                         .setKind("Location")
-                        .setFilter(StructuredQuery.PropertyFilter.in("name", ListValue.of(route.getList("route_locations"))))
+                        .setFilter(StructuredQuery.PropertyFilter.in("name", ListValue.of(locationNames)))
                         .build();
 
                 QueryResults<Entity> results2 = txn.run(query2);
@@ -210,6 +212,103 @@ public class RouteResource {
             return Response.ok(routes).build();
 
         }  catch(Exception e){
+            LOG.severe(e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if(txn.isActive()){
+                txn.rollback();
+            }
+        }
+
+    }
+
+    @GET
+    @Path("/{route}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getRoute(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                             @PathParam("route") String routeId){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key routeKey = datastore.newKeyFactory()
+                    .setKind("Route")
+                    .newKey(routeId);
+
+            Entity route = txn.get(routeKey);
+
+            if(route == null){
+                LOG.warning("Route does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if(!route.getString("route_creator").equals(username)){
+                LOG.warning("User is not the creator of the route.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            List<LocationData> locations = new ArrayList<>();
+
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("Location")
+                    .setFilter(StructuredQuery.PropertyFilter.in("name", ListValue.of(route.getList("route_locations"))))
+                    .build();
+
+            QueryResults<Entity> results = txn.run(query);
+
+            while(results.hasNext()){
+                Entity location = results.next();
+                locations.add(new LocationData(location.getString("name"), location.getDouble("latitutde"), location.getDouble("longitude")
+                        ,location.getString("type"), location.getString("event")));
+            }
+
+            List<String> participants = new ArrayList<>();
+
+            for(Value<?> participant : route.getList("route_participants")){
+                participants.add((String) participant.get());
+            }
+
+            List<Integer> durations = new ArrayList<>();
+
+            for (Value<?> duration : route.getList("route_durations")) {
+            	durations.add(((Long) duration.get()).intValue());
+            }
+
+            return Response.ok(new RouteGetData(route.getString("route_creator"), route.getString("route_name"),
+                    locations, participants, durations)).build();
+
+        }catch(Exception e){
             LOG.severe(e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
