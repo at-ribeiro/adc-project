@@ -74,7 +74,7 @@ public class RouteResource {
             List<Value<String>> locations = new ArrayList<>();
 
             for(String location : data.getLocations()){
-                locations.add(StringValue.newBuilder(location).setExcludeFromIndexes(true).build());
+                locations.add(StringValue.newBuilder(location).setExcludeFromIndexes(false).build());
             }
 
             if(locations.isEmpty()){
@@ -176,9 +176,13 @@ public class RouteResource {
             while (results.hasNext()) {
                 Entity route = results.next();
 
+                LOG.warning("DEBUG: route = " + route.getString("route_name"));
+
                 List<LocationData> locations = new ArrayList<>();
 
                 List<StringValue> locationNames = route.getList("route_locations");
+
+                LOG.warning("DEBUG: locations = " + locationNames.toString());
 
                 Query<Entity> query2 = Query.newEntityQueryBuilder()
                         .setKind("Location")
@@ -189,8 +193,13 @@ public class RouteResource {
 
                 while (results2.hasNext()) {
                 	Entity location = results2.next();
-                	locations.add(new LocationData(location.getString("name"), location.getDouble("latitutde"), location.getDouble("longitude")
-                        ,location.getString("type"), location.getString("event")));
+                    if(location.getString("type").equals("EVENT")) {
+                        locations.add(new LocationData(location.getString("name"), location.getDouble("latitude"), location.getDouble("longitude")
+                                , "EVENT", location.getString("event")));
+                    } else {
+                        locations.add(new LocationData(location.getString("name"), location.getDouble("latitude"), location.getDouble("longitude")
+                                , location.getString("type"), ""));
+                    }
                 }
 
                 List<String> participants = new ArrayList<>();
