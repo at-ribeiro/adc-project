@@ -2,13 +2,13 @@ package pt.unl.fct.di.apdc.firstwebapp.util;
 
 public class VerificationToken {
 
-    private String id;
+    private int code;
     private String username;
 
     public VerificationToken(){}
 
-    public VerificationToken(String id, String username){
-        this.id = id;
+    public VerificationToken(int code, String username){
+        this.code = code;
         this.username = username;
     }
 

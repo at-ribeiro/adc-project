@@ -11,19 +11,24 @@ public class NucleoPostData {
     private String subtitle;
     private String description;
     private String foundation;
-    private List<String> links;
+    private String facebook;
+    private String instagram;
+    private String website;
 
     public NucleoPostData() {}
 
-    public NucleoPostData(String admin, String name, String type, String email, String subtitle, String description, String foundation, List<String> links) {
+    public NucleoPostData(String admin, String name, String type, String email, String subtitle, String description, String foundation,
+                          String facebook, String instagram, String website) {
         this.admin = admin;
         this.name = name;
         this.type = type;
-    	this.email = email;
-    	this.subtitle = subtitle;
-    	this.description = description;
-    	this.foundation = foundation;
-    	this.links = links;
+        this.email = email;
+        this.subtitle = subtitle;
+        this.description = description;
+        this.foundation = foundation;
+        this.facebook = facebook;
+        this.instagram = instagram;
+        this.website = website;
     }
 
     public String getAdmin() {
@@ -51,8 +56,17 @@ public class NucleoPostData {
     	return foundation;
     }
 
-    public List<String> getLinks() {
-    	return links;
+    public String getFacebook() {
+    	return facebook;
     }
+
+    public String getInstagram() {
+    	return instagram;
+    }
+
+    public String getWebsite() {
+    	return website;
+    }
+
 
 }

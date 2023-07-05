@@ -273,6 +273,7 @@ public class RouteResource {
 
             Key routeKey = datastore.newKeyFactory()
                     .setKind("Route")
+                    .addAncestor(PathElement.of("User", username))
                     .newKey(routeId);
 
             Entity route = txn.get(routeKey);
@@ -298,8 +299,13 @@ public class RouteResource {
 
             while(results.hasNext()){
                 Entity location = results.next();
-                locations.add(new LocationData(location.getString("name"), location.getDouble("latitutde"), location.getDouble("longitude")
-                        ,location.getString("type"), location.getString("event")));
+                if(location.getString("type").equals("EVENT")) {
+                    locations.add(new LocationData(location.getString("name"), location.getDouble("latitude"), location.getDouble("longitude")
+                            , "EVENT", location.getString("event")));
+                } else {
+                    locations.add(new LocationData(location.getString("name"), location.getDouble("latitude"), location.getDouble("longitude")
+                            , location.getString("type"), ""));
+                }
             }
 
             List<String> participants = new ArrayList<>();

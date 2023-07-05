@@ -3,6 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.datastore.*;
 import com.google.cloud.storage.*;
+import com.google.cloud.storage.Blob;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -11,6 +12,7 @@ import pt.unl.fct.di.apdc.firstwebapp.util.NucleoGetData;
 import pt.unl.fct.di.apdc.firstwebapp.util.NucleoPostData;
 
 import javax.imageio.ImageIO;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+@MultipartConfig
 public class NucleosServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(EventsServlet.class.getName());
@@ -100,7 +103,10 @@ public class NucleosServlet extends HttpServlet {
             String subtitle = data.getSubtitle();
             String description = data.getDescription();
             String foundation = data.getFoundation();
-            List<String> links = data.getLinks();
+            String website = data.getWebsite();
+            String facebook = data.getFacebook();
+            String instagram = data.getInstagram();
+
 
             Key adminKey = userKeyFactory.newKey(admin);
             if(txn.get(adminKey) == null){
@@ -109,12 +115,24 @@ public class NucleosServlet extends HttpServlet {
                 return;
             }
 
+            Key nucleoKey = datastore.newKeyFactory()
+                    .setKind("Nucleo")
+                    .newKey(name);
+
+            if(txn.get(nucleoKey) != null){
+                LOG.warning("Nucleo already exists: " + name);
+                response.setStatus(Response.Status.CONFLICT.getStatusCode());
+                return;
+            }
+
+            String imageName = "";
+
             if (request.getPart("image") != null) {
                 InputStream imageStream = request.getPart("image").getInputStream();
 
                 String contentType = request.getPart("image").getContentType();
 
-                String imageName = request.getPart("image").getSubmittedFileName();
+                imageName = request.getPart("image").getSubmittedFileName();
                 BlobId blobId = BlobId.of(bucketName, name + "-" + imageName);
 
                 if (storage.get(blobId) != null) {
@@ -156,22 +174,10 @@ public class NucleosServlet extends HttpServlet {
 
             }
 
-            List<Value<String>> linksValue = new ArrayList<>();
-
-            if (links != null && !links.isEmpty()) {
-                for (String link : links) {
-                   linksValue.add(StringValue.newBuilder(link).build());
-                }
-            }
-
             List<Value<String>> admins = new ArrayList<>();
             admins.add(StringValue.newBuilder(admin).build());
 
             List<Value<String>> listOfStrings = new ArrayList<>();
-
-            Key nucleoKey = datastore.newKeyFactory()
-                    .setKind("Nucleo")
-                    .newKey(name);
 
             Entity nucleo = Entity.newBuilder(nucleoKey)
                     .set("nucleo_name", name)
@@ -180,10 +186,13 @@ public class NucleosServlet extends HttpServlet {
                     .set("nucleo_subtitle", StringValue.newBuilder(subtitle).setExcludeFromIndexes(true).build())
                     .set("nucleo_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
                     .set("nucleo_foundation", StringValue.newBuilder(foundation).setExcludeFromIndexes(true).build())
-                    .set("nucleo_links", ListValue.of(linksValue).excludeFromIndexes())
-                    .set("nucleo_members", ListValue.of(listOfStrings))
+                    .set("nucleo_facebook", StringValue.newBuilder(facebook).setExcludeFromIndexes(true).build())
+                    .set("nucleo_instagram", StringValue.newBuilder(instagram).setExcludeFromIndexes(true).build())
+                    .set("nucleo_website", StringValue.newBuilder(website).setExcludeFromIndexes(true).build())
+                    .set("nucleo_members", ListValue.of(admins))//since the admin is the one creating the nucleo, he is also a member
                     .set("nucleo_admins", ListValue.of(admins))
                     .set("nucleo_events", ListValue.of(listOfStrings))
+                    .set("nucleo_image", StringValue.newBuilder((name + "-" + imageName)).setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(nucleo);
@@ -290,16 +299,21 @@ public class NucleosServlet extends HttpServlet {
         String foundation = entity.getString("nucleo_foundation");
         String email = entity.getString("nucleo_email");
         String typeNucleo = entity.getString("nucleo_type");
-        List<String> links = new ArrayList<>();
+        String facebook = entity.getString("nucleo_facebook");
+        if(facebook == null){
+            facebook = "";
+        }
+        String instagram = entity.getString("nucleo_instagram");
+        if(instagram == null){
+            instagram = "";
+        }
+        String website = entity.getString("nucleo_website");
+        if(website == null){
+            website = "";
+        }
         List<String> members = new ArrayList<>();
         List<String> admins = new ArrayList<>();
         List<String> events = new ArrayList<>();
-
-        if (entity.getList("nucleo_links") != null) {
-            for (Value<?> link : entity.getList("nucleo_links")) {
-                links.add((String) link.get());
-            }
-        }
 
         if (entity.getList("nucleo_members") != null) {
             for (Value<?> member : entity.getList("nucleo_members")) {
@@ -319,7 +333,12 @@ public class NucleosServlet extends HttpServlet {
             }
         }
 
-        NucleoGetData nucleo = new NucleoGetData(name, subtitle, description, foundation, email, typeNucleo, links, members, admins, events);
+        BlobId blobId = BlobId.of(bucketName, entity.getString("nucleo_image"));
+        Blob blob = storage.get(blobId);
+        String url = blob.getMediaLink();
+
+       NucleoGetData nucleo = new NucleoGetData(name, typeNucleo, email, subtitle, description, foundation,
+                facebook, instagram, website, members,events , admins, url);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -349,16 +368,23 @@ public class NucleosServlet extends HttpServlet {
             String foundation = entity.getString("nucleo_foundation");
             String email = entity.getString("nucleo_email");
             String typeNucleo = entity.getString("nucleo_type");
-            List<String> links = new ArrayList<>();
+            String facebook = entity.getString("nucleo_facebook");
+            if(facebook == null){
+                facebook = "";
+            }
+            String instagram = entity.getString("nucleo_instagram");
+            if(instagram == null){
+                instagram = "";
+            }
+            String website = entity.getString("nucleo_website");
+            if(website == null){
+                website = "";
+            }
             List<String> members = new ArrayList<>();
             List<String> admins = new ArrayList<>();
             List<String> events = new ArrayList<>();
 
-            if (entity.getList("nucleo_links") != null) {
-                for (Value<?> link : entity.getList("nucleo_links")) {
-                    links.add((String) link.get());
-                }
-            }
+
 
             if (entity.getList("nucleo_members") != null) {
                 for (Value<?> member : entity.getList("nucleo_members")) {
@@ -378,7 +404,12 @@ public class NucleosServlet extends HttpServlet {
                 }
             }
 
-            nucleos.add(new NucleoGetData(name, subtitle, description, foundation, email, typeNucleo, links, members, admins, events));
+            BlobId blobId = BlobId.of(bucketName, entity.getString("nucleo_image"));
+            Blob blob = storage.get(blobId);
+            String url = blob.getMediaLink();
+
+            nucleos.add(new NucleoGetData(name, typeNucleo, email, subtitle, description, foundation,
+                    facebook, instagram, website, members,events , admins, url));
         }
 
         response.setContentType("application/json");

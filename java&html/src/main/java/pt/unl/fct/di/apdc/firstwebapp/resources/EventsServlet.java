@@ -60,6 +60,7 @@ public class EventsServlet extends HttpServlet {
 
             String tokenId = request.getHeader("Authorization");
             String username = request.getPathInfo().substring(1);
+            String cursor = request.getParameter("cursor");
 
             LOG.fine("Attempt get events");
 
@@ -85,7 +86,9 @@ public class EventsServlet extends HttpServlet {
 
             Query<Entity> eventsQuery = Query.newEntityQueryBuilder()
                     .setKind("Event")
+                    .setFilter(StructuredQuery.PropertyFilter.lt("event_start", cursor))
                     .addOrderBy(descendingTimestamp)
+                    .setLimit(10)
                     .build();
 
             QueryResults<Entity> eventResults = txn.run(eventsQuery);

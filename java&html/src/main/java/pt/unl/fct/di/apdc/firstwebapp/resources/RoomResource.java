@@ -22,16 +22,14 @@ public class RoomResource {
 
     private static final Logger LOG = Logger.getLogger(RoomResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-    private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createRoom(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username, RoomPostData data) {
 
         Transaction txn = datastore.newTransaction();
-
 
         try {
 
