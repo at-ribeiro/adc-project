@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/NewsData.dart';
 
@@ -27,6 +29,15 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
     super.initState();
     newsUrl = widget.newsUrl;
     _loadNews();
+  }
+
+  void _launchInstagramURL(String url) async {
+    Uri instagramURL = Uri.parse(url);
+    if (await canLaunchUrl(instagramURL)) {
+      await launchUrl(instagramURL);
+    } else {
+      throw 'Could not launch $instagramURL';
+    }
   }
 
   Future<NewsData> _loadNews() async {
@@ -132,6 +143,20 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                             ),
                           ),
                         ),
+                      Row(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                                onPressed: () {
+                                  _launchInstagramURL(
+                                      'https://www.fct.unl.pt$newsUrl');
+                                },
+                                icon: Icon(Icons.web,
+                                    color: kAccentColor0, size: 50.0)),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 95.0),
                     ],
                   ),

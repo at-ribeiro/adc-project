@@ -5,9 +5,14 @@ import '../models/AlertPostData.dart';
 import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
+import '../services/notify_all.dart';
+
+
 
 class ListReportsPage extends StatefulWidget {
   const ListReportsPage({Key? key}) : super(key: key);
+
+
 
   @override
   State<ListReportsPage> createState() => _ListReportPageState();
@@ -18,6 +23,10 @@ class _ListReportPageState extends State<ListReportsPage> {
   bool _isLoadingToken = true;
   List<AlertPostData> alertDataList = [];
   List<int> reportsToDelete = [];
+
+
+
+
 
   @override
   void initState() {
@@ -54,6 +63,9 @@ class _ListReportPageState extends State<ListReportsPage> {
       reportsToDelete.remove(timestamp);
     });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,43 +126,107 @@ class _ListReportPageState extends State<ListReportsPage> {
                         ),
                       ],
                     ),
-                    child: Card(
-                      color: Colors
-                          .transparent, // To make sure Card takes the glass effect
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: ListTile(
-                        title: Text(alertData.creator),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Criador: ${alertData.creator}'),
-                            Text('Localização: ${alertData.location}'),
-                            Text('Descrição:'),
-                            Text(alertData.description),
-                            Text(
-                                'Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
-                              DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(alertData.timestamp.toString()),
-                              ),
-                            )}'),
-                          ],
+                    child: Container(
+                      height: 150,
+                      child: Card(
+                        color: Colors
+                            .transparent, // To make sure Card takes the glass effect
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
                         ),
-                        trailing: IconButton(
-                          icon: Icon(
-                            isSelected
-                                ? Icons.check_box
-                                : Icons.check_box_outline_blank,
+                        child: SingleChildScrollView(
+                          child: ListTile(
+                            title: Text(alertData.creator),
+                            subtitle: Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Criador: ${alertData.creator}'),
+                                    Text('Localização: ${alertData.location}'),
+                                    Text('Descrição:'),
+                                    Text(alertData.description),
+                                    Text(
+                                        'Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                        int.parse(
+                                            alertData.timestamp.toString()),
+                                      ),
+                                    )}'),
+                                  ],
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                borderRadius: kBorderRadius,
+                                              ),
+                                              backgroundColor: kAccentColor0
+                                                  .withOpacity(0.3),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    'Tem a certeza que pretende alertar todos os utilizadores sobre esta anomalia?',
+                                                    style: const TextStyle(
+                                                        color: kAccentColor0),
+                                                  ),
+                                                  const SizedBox(height: 15),
+                                                  Row(
+                                                    children: [
+                                                       MyNotificationButton(title: alertData.description, body: alertData.location),
+                                                      SizedBox(width: 15),
+                                                      ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                                backgroundColor:
+                                                                    Colors.red),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: Text(
+                                                          'Não',
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    },
+                                    icon: Icon(Icons.notification_add)),
+                              ],
+                            ),
+                            trailing: Flexible(
+                              child: Column(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      isSelected
+                                          ? Icons.check_box
+                                          : Icons.check_box_outline_blank,
+                                    ),
+                                    onPressed: () {
+                                      if (isSelected) {
+                                        removeFromSelectedReports(
+                                            alertData.timestamp);
+                                      } else {
+                                        addToSelectedReports(
+                                            alertData.timestamp);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          onPressed: () {
-                            if (isSelected) {
-                              removeFromSelectedReports(alertData.timestamp);
-                            } else {
-                              addToSelectedReports(alertData.timestamp);
-                            }
-                          },
                         ),
                       ),
                     ),

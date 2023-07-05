@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/dom.dart' as html;
+import 'package:responsive_login_ui/models/nucleos_data.dart';
+import 'package:responsive_login_ui/models/nucleos_get.dart';
 
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
@@ -921,8 +923,90 @@ class BaseClient {
       imageUrl: imageUrl,
       timestamp: timestamp,
       newsUrl: urlString,
-      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'), 
+      path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
       text: '',
     );
+  }
+
+  Future createNucleo(String api, tokenId, username, NucleosData nucleo) async {
+    Map<String, String> _headers = {
+      "Content-Type": "multipart/form-data",
+      "Authorization": tokenId,
+      "User": username
+    };
+
+    var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api + '/'));
+
+    request.headers.addAll(_headers);
+
+    request.fields['nucleo'] = json.encode(nucleo.toJson());
+
+    if (nucleo.imageData != null) {
+      var multipartFile = http.MultipartFile.fromBytes(
+        'image',
+        nucleo.imageData!,
+        filename: "${nucleo.fileName}.jpg",
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
+
+    return response.statusCode;
+  }
+
+  Future getNucleos(String api, String tokenID, String username, tipo) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username
+    };
+    var url = Uri.parse("$baseUrl$api?type=$tipo");
+
+    var response = await http.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      print('Response Body: ${response.body}');
+      final jsonArray = json.decode(response.body) as List<dynamic>;
+
+      // Check if the JSON array is not empty
+      if (jsonArray.isNotEmpty) {
+        final jsonList = json.decode(response.body) as List<dynamic>;
+        final NucleosGetList =
+            jsonList.map((json) => NucleosGet.fromJson(json)).toList();
+        return NucleosGetList;
+      } else {
+        // Handle the case where the JSON array is empty
+        return null; // Or any appropriate handling for an empty response
+      }
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future getNucleo(String api, String nucleoId, String tokenID, String username) async {
+    
+
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api?nucleo_name=$nucleoId');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final nucleo = NucleosGet.fromJson(jsonData);
+
+      return nucleo;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
   }
 }

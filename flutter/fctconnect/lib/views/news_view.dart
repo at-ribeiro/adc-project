@@ -14,6 +14,7 @@ import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
+import '../widgets/circular_indicator.dart';
 import 'news_page.dart';
 
 class NewsView extends StatefulWidget {
@@ -88,7 +89,7 @@ class _NewsViewState extends State<NewsView> {
             } else {
               return Container(
                   color: Colors.transparent,
-                  child: const Center(child: CircularProgressIndicator()));
+                  child: const Center(child: CircularProgressIndicatorCustom()));
             }
           });
     } else {

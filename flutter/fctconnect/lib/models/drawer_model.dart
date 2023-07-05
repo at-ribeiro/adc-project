@@ -107,8 +107,9 @@ class _DrawerModelState extends State<DrawerModel> {
           ),
           ListTile(
             leading: Icon(Icons.group, color: kAccentColor1),
-            title: const Text('Grupos'),
+            title: const Text('Nucleos'),
             onTap: () {
+              context.go(Paths.nucleos);
               Navigator.pop(context);
             },
           ),
@@ -129,7 +130,23 @@ class _DrawerModelState extends State<DrawerModel> {
               Navigator.pop(context);
             },
           ),
+          ListTile(
+            leading: Icon(Icons.timer, color: kAccentColor1),
+            title: const Text('Pomodoro'),
+            onTap: () {
+              context.go(Paths.pomodoro);
+              Navigator.pop(context);
+            },
+          ),
           const Spacer(),
+          ListTile(
+            leading: Icon(Icons.group_add, color: kAccentColor1),
+            title: const Text('Criar Núcleo'),
+            onTap: () {
+              context.go(Paths.criarNucleo);
+              Navigator.pop(context);
+            },
+          ),
           ListTile(
             leading: Icon(Icons.report, color: kAccentColor1),
             title: const Text('Report'),

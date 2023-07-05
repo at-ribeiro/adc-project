@@ -36,7 +36,7 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
       _selectedIndex = 0;
     } else if (_location == Paths.noticias) {
       _selectedIndex = 1;
-    } else if (_location == Paths.post) {
+    } else if (_location == Paths.createPost) {
       _selectedIndex = 2;
     } else if (_location == Paths.myProfile) {
       _selectedIndex = 3;
@@ -74,14 +74,16 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
             } else if (index == 1) {
               context.go(Paths.noticias);
             } else if (index == 2) {
-              showModalBottomSheet(
-                  shape: RoundedRectangleBorder(borderRadius: kBorderRadius),
-                  backgroundColor: kPrimaryColor,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _buildPostModal(context);
-                  });
-              index = auxIndex;
+              context.go(Paths.createPost);
+              // showModalBottomSheet(
+              //     shape: RoundedRectangleBorder(borderRadius: kBorderRadius),
+              //     backgroundColor: kPrimaryColor,
+              //     context: context,
+              //     builder: (BuildContext context) {
+              //       context.go(Paths.createPost);
+              //       return Container();
+              //     });
+            
             } else if (index == 3) {
               context.go(Paths.myProfile);
             }

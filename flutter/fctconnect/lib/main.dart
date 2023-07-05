@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_constant.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/services/fcm_services.dart';
 import 'package:responsive_login_ui/services/get_fcm_token.dart';import 'package:responsive_login_ui/services/session_manager.dart';
@@ -111,6 +110,7 @@ class _MyAppState extends State<MyApp> {
     _initializeIsLoggedIn();
     return Consumer<ThemeManager>(builder: (context, themeManager, child) {
       return MaterialApp.router(
+        
         routerConfig: AppRouter().router,
         debugShowCheckedModeBanner: false,
         theme: darkTheme,

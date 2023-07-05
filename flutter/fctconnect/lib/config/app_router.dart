@@ -8,7 +8,11 @@ import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
 import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
+import 'package:responsive_login_ui/views/nucleo_page.dart';
+import 'package:responsive_login_ui/views/nucleos_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
+import 'package:responsive_login_ui/views/pomodoro/pomodoro_page.dart';
+import 'package:responsive_login_ui/views/post_creator.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
@@ -25,6 +29,7 @@ import '../views/calendar_view.dart';
 import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
+import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
 
 class AppRouter {
@@ -55,6 +60,12 @@ class AppRouter {
                 path: Paths.noticias,
                 builder: (BuildContext context, GoRouterState state) {
                   return NewsView();
+                },
+              ),
+              GoRoute(
+                path: Paths.createPost,
+                builder: (BuildContext context, GoRouterState state) {
+                  return PostCreator();
                 },
               ),
               GoRoute(
@@ -169,6 +180,32 @@ class AppRouter {
               );
             },
           ),
+          GoRoute(
+            path: Paths.nucleos,
+            builder: (BuildContext context, GoRouterState state) {
+              return NucleosView();
+            },
+          ),
+          GoRoute(
+            path: Paths.criarNucleo,
+            builder: (BuildContext context, GoRouterState state) {
+              return NuceloCreator();
+            },
+          ),
+          GoRoute(
+            path: Paths.nucleos + "/:id",
+            builder: (BuildContext context, GoRouterState state) {
+              return NucleoPage(
+                nucleoId: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: Paths.pomodoro,
+            builder: (BuildContext context, GoRouterState state) {
+              return PomodoroTimer();
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -216,7 +253,7 @@ class AppRouter {
           return const SignUpView();
         },
       ),
-       GoRoute(
+      GoRoute(
         path: Paths.welcome,
         builder: (BuildContext context, GoRouterState state) {
           return WelcomeScreen();
@@ -238,6 +275,7 @@ class AppRouter {
   }
 
   String _getTitleBasedOnRoute(String location) {
+    CacheDefault.cacheFactory.set('LastLocation', location);
     if (location == Paths.homePage || location == '/') {
       return 'Home';
     } else if (location == Paths.myProfile) {
@@ -266,6 +304,14 @@ class AppRouter {
       return 'Evento';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
+    } else if (location == Paths.nucleos) {
+      return 'Núcleos';
+    } else if (location == Paths.criarNucleo) {
+      return 'Criar Núcleo';
+    } else if (location == Paths.pomodoro) {
+      return 'Pomodoro';
+    } else if (location != Paths.nucleos && location.contains(Paths.nucleos))  {
+      return 'Núcleo';
     }
     // add more conditions for other routes
 
@@ -316,8 +362,13 @@ class AppRouter {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.nucleos) && location != Paths.nucleos) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.nucleos);
+          },
+          icon: Icon(Icons.arrow_back));
     }
-
     return Container();
   }
 }

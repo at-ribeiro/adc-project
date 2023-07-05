@@ -36,4 +36,12 @@ class Paths {
 
   static String welcome = '/welcome';
 
+  static String createPost = '$post/create';
+
+  static String nucleos = '/nucleos';
+
+  static String criarNucleo = '$nucleos/create';
+
+  static String pomodoro = '/pomodoro';
+
 }

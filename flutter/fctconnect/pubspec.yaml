@@ -45,6 +45,12 @@ dependencies:
   video_player: ^2.6.1
   chewie: ^1.5.0
   html: ^0.15.4
+  font_awesome_flutter: ^10.5.0
+  url_launcher: ^6.1.11
+  circular_countdown_timer: ^0.2.3
+  ndialog: ^4.3.0
+  unicons: ^2.1.1
+  cloud_functions: ^4.3.3
 
 dev_dependencies:
   flutter_test:

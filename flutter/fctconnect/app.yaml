@@ -1,12 +1,10 @@
 env: standard
 runtime: nodejs14
 
-
 handlers:
-  - url: /
+  - url: /(.*\.(html|css|js|ico|jpg|png|gif|svg|woff|woff2|ttf|map))$
+    static_files: build/web/\1
+    upload: build/web/.*\.(html|css|js|ico|jpg|png|gif|svg|woff|woff2|ttf|map)$
+  - url: /.*
     static_files: build/web/index.html
     upload: build/web/index.html
-
-  - url: /(.*)
-    static_files: build/web/\1
-    upload: build/web/(.*)

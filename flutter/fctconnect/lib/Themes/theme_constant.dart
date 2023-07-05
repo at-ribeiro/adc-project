@@ -36,7 +36,7 @@ ThemeData darkTheme = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
       padding: MaterialStateProperty.all< EdgeInsets>(
-          EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.5)),
+          EdgeInsets.symmetric(horizontal: 10.0, vertical: 10)),
           
       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
