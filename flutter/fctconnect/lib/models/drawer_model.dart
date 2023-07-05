@@ -98,6 +98,14 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.directions_walk, color: kAccentColor1),
+            title: const Text('Percursos'),
+            onTap: () {
+              context.go(Paths.routes);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.event, color: kAccentColor1),
             title: const Text('Eventos'),
             onTap: () {
@@ -106,6 +114,7 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+<<<<<<< HEAD
             leading: Icon(Icons.group, color: kAccentColor1),
             title: const Text('Nucleos'),
             onTap: () {
@@ -114,6 +123,8 @@ class _DrawerModelState extends State<DrawerModel> {
             },
           ),
           ListTile(
+=======
+>>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee
             leading: Icon(Icons.calendar_month, color: kAccentColor1),
             title: const Text('Calendário'),
             onTap: () {
@@ -121,6 +132,7 @@ class _DrawerModelState extends State<DrawerModel> {
               Navigator.pop(context);
             },
           ),
+<<<<<<< HEAD
           ListTile(
             leading: Icon(Icons.message, color: kAccentColor1),
             title: const Text('Mensagens'),
@@ -138,6 +150,8 @@ class _DrawerModelState extends State<DrawerModel> {
               Navigator.pop(context);
             },
           ),
+=======
+>>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee
           const Spacer(),
           ListTile(
             leading: Icon(Icons.group_add, color: kAccentColor1),

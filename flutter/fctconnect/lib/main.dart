@@ -76,7 +76,7 @@ ThemeManager _themeManager = ThemeManager();
 
 class MyApp extends StatefulWidget {
   final String? session;
-
+  
   MyApp({Key? key, this.session}) : super(key: key);
 
   @override

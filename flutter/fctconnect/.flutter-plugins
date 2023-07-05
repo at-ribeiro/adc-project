@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # This is a generated file; do not edit or check into version control.
 cloud_functions=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/cloud_functions-4.3.3/
 cloud_functions_web=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/cloud_functions_web-4.5.3/
@@ -60,3 +61,6 @@ video_player_web=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/video_playe
 wakelock=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/wakelock-0.6.2/
 wakelock_macos=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/wakelock_macos-0.4.0/
 wakelock_web=/Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/wakelock_web-0.4.0/
+=======
+
+>>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee

@@ -1,8 +1,11 @@
 package pt.unl.fct.di.apdc.firstwebapp.resources;
-/*
+
 import com.google.cloud.datastore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.RemoveData;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.ws.rs.*;
@@ -19,33 +22,40 @@ public class RemoveResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final KeyFactory tokenKeyFactory = datastore.newKeyFactory().setKind("Token");
+    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
+
 
 
     @DELETE
-    @Path("/")
+    @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response remove(RemoveData data) {
-        LOG.fine("Attempt to remove user: " + data.getUsername());
-
-        Key userKey = userKeyFactory.newKey(data.getUsername());
+    public Response remove(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String deleter, @PathParam("username") String username) {
+        LOG.fine("Attempt to remove user: " + username);
 
         Transaction txn = datastore.newTransaction();
+
         try {
-            Entity user = txn.get(userKey);
-            if (user == null) {
-                LOG.warning("User does not exist: " + data.getUsername());
+            Key deleterKey = userKeyFactory.newKey(deleter);
+
+            Entity deleterEntity = txn.get(deleterKey);
+            if (deleterEntity == null) {
+                LOG.warning("User does not exist: " + deleter);
                 return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if(deleterEntity.getString("user_state").equals("INACTIVE")){
+                LOG.warning("User " + deleter + " is inactive");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
-                    .addAncestor(PathElement.of("User", data.getUsername()))
+                    .addAncestor(PathElement.of("User", deleter))
                     .newKey("token");
 
             Entity token = txn.get(tokenKey);
 
-            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(data.getTokenId()))) {
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
                 LOG.warning("Incorrect token. Please re-login");
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
@@ -55,20 +65,124 @@ public class RemoveResource {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            Key removerKey = userKeyFactory.newKey(data.getTokenUsername());
-            if(txn.get(removerKey).getString("user_state").equals("INACTIVE")){
-                LOG.warning("User " + data.getTokenUsername() + " is inactive");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+            Key userKey = userKeyFactory.newKey(username);
+
+            Entity user = txn.get(userKey);
+
+            if (user == null) {
+                LOG.warning("User does not exist: " + username);
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            if (validRemove(data, user)) {
-                txn.delete(userKey);
+            if (validRemove(username, deleter)) {
+
+                Query<Entity> postQuery = Query.newEntityQueryBuilder()
+                        .setKind("Post")
+                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                        .build();
+
+                QueryResults<Entity> postResults = txn.run(postQuery);
+
+                while(postResults.hasNext()){
+                    Entity post = postResults.next();
+
+                    if (!post.getString("image").equals("")) {
+
+                        BlobId blobId = BlobId.of(bucketName,
+                                post.getString("user") + "-" + post.getString("image"));
+                        Blob blob = storage.get(blobId);
+                        if (blob != null) {
+                            storage.delete(blobId);
+                        }
+                    }
+
+                    txn.delete(post.getKey());
+                }
+
+                Query<Entity> commentQuery = Query.newEntityQueryBuilder()
+                        .setKind("Comment")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("user", username))
+                        .build();
+
+                QueryResults<Entity> commentResults = txn.run(commentQuery);
+
+                while(commentResults.hasNext()){
+                    Entity comment = commentResults.next();
+                    txn.delete(comment.getKey());
+                }
+
+                Query<Entity> eventQuery = Query.newEntityQueryBuilder()
+                        .setKind("Event")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("event_creator", username))
+                        .build();
+
+                QueryResults<Entity> eventResults = txn.run(eventQuery);
+
+                while(eventResults.hasNext()){
+                    Entity event = eventResults.next();
+
+                    if (!event.getString("event_image").equals("")) {
+
+                        BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
+                        Blob blob = storage.get(blobId);
+                        if(blob != null)
+                            storage.delete(blobId);
+                    }
+
+                    BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));
+                    Blob blob = storage.get(blobId);
+                    if(blob != null)
+                        storage.delete(blobId);
+
+                    txn.delete(event.getKey());
+
+                }
+
+                Query<Entity> verificiationQuery = Query.newEntityQueryBuilder()
+                        .setKind("Verification")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("token_user", username))
+                        .build();
+
+                QueryResults<Entity> verificationResults = txn.run(verificiationQuery);
+
+                while(verificationResults.hasNext()){
+                    Entity verification = verificationResults.next();
+                    txn.delete(verification.getKey());
+                }
+
+                Query<Entity> activityQuery = Query.newEntityQueryBuilder()
+                        .setKind("Activity")
+                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                        .build();
+
+                QueryResults<Entity> activityResults = txn.run(activityQuery);
+
+                while(activityResults.hasNext()){
+                    Entity activity = activityResults.next();
+                    txn.delete(activity.getKey());
+                }
+
+                if(!user.getString("user_profile_pic").equals("")){
+                    BlobId blobId = BlobId.of(bucketName, user.getString("user_profile_pic"));
+                    Blob blob = storage.get(blobId);
+                    if(blob != null)
+                        storage.delete(blobId);
+                }
+
+                if(!user.getString("user_cover_pic").equals("")){
+                    BlobId blobId = BlobId.of(bucketName, user.getString("user_cover_pic"));
+                    Blob blob = storage.get(blobId);
+                    if(blob != null)
+                        storage.delete(blobId);
+                }
+
+                txn.delete(userKey, tokenKey);
                 txn.commit();
                 return Response.ok(user.getString("user_username")).build();
 
             } else {
                 txn.commit();
-                LOG.warning("You don't have permissions to delete user: " + data.getUsername());
+                LOG.warning("You don't have permissions to delete user: " + username);
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
 
@@ -83,27 +197,10 @@ public class RemoveResource {
         }
     }
 
-    private boolean validRemove(RemoveData data, Entity user){
-
-        String userRole = user.getString("user_role");
-        String tokenRole = data.getRole();
-
-        if(user.getString("user_username").equals(data.getTokenUsername()))
-            return true;
-        if(tokenRole.equals("SU"))
-            return true;
-        if(tokenRole.equals("GS") && ( userRole.equals("USER") || userRole.equals("GBO") ||  userRole.equals("GA")))
-            return true;
-        if(tokenRole.equals("GBO") && userRole.equals("USER"))
-            return true;
-        if(tokenRole.equals("GA") && (userRole.equals("USER") ||  userRole.equals("GBO")))
-            return true;
-
-        return false;
-
+    private boolean validRemove(String username, String deleter) {
+        return username.equals(deleter);
     }
 
 
 }
 
- */
