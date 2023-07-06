@@ -5,11 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
 
 import 'package:responsive_login_ui/models/location_get_data.dart';
-import 'package:responsive_login_ui/models/route_get_data.dart';
+import 'package:responsive_login_ui/models/route_post_data.dart';
 
 import 'package:html/dom.dart' as dom;
 import 'package:html/dom.dart' as html;
-
 
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
@@ -28,6 +27,7 @@ import '../models/change_pwd_data.dart';
 import '../models/event_get_data.dart';
 import '../models/event_post_data.dart';
 import '../models/profile_info.dart';
+import '../models/route_get_data.dart';
 import '../models/update_data.dart';
 
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
@@ -836,7 +836,6 @@ class BaseClient {
     }
   }
 
-
   Future<dynamic> changePwd(
       String api, ChangePwdData data, String tokenID, String username) async {
     var _headers = {
@@ -905,6 +904,7 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
     var url = Uri.parse('$baseUrl$api');
 
@@ -923,7 +923,7 @@ class BaseClient {
   }
 
   Future<dynamic> createRoute(
-      String api, String username, String tokenID, RouteGetData route) async {
+      String api, String username, String tokenID, RoutePostData route) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -936,6 +936,7 @@ class BaseClient {
       'creator': route.creator,
       'name': route.name,
       'participants': route.participants,
+      'durations': route.durations,
       'locations': route.locations,
     });
 
@@ -952,6 +953,7 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+  }
 
   Future fetchNewsFCT(int counter) async {
     List<NewsData> news = [];
@@ -1026,7 +1028,6 @@ class BaseClient {
     String text = "";
 
     if (textContainer != null) {
-      // Concatenating all the paragraphs in the 'noticia-corpo' div
       textContainer.querySelectorAll('p').forEach((element) {
         text += element.text.trim() + " "; // Using .text instead of .innerHtml
       });
@@ -1037,8 +1038,6 @@ class BaseClient {
     final timestampElement = html.querySelector('div > p');
     String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
 
-    print(timestamp);
-
     return NewsData(
       title: title,
       text: text,
@@ -1047,5 +1046,26 @@ class BaseClient {
       newsUrl: urlString,
       path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
     );
+  }
+
+  Future<RouteGetData> getRoute(String api, route, tokenID, user) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": user,
+    };
+    var url = Uri.parse('$baseUrl$api/$route');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final jsonString = utf8.decode(response.bodyBytes);
+      final jsonData = json.decode(jsonString);
+      final route = RouteGetData.fromJson(jsonData);
+      return route;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
   }
 }

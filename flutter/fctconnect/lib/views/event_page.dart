@@ -55,8 +55,6 @@ class _EventPageState extends State<EventPage> {
     } else if (isEventLoading) {
       return loadEvent();
     } else {
-
-
       return Container(
         decoration: kGradientDecorationUp,
         child: Scaffold(

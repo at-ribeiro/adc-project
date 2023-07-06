@@ -23,6 +23,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   CalendarController calendarController = CalendarController();
   TextEditingController activityNameController = TextEditingController();
 
+  late Future<void> initializationFuture;
+
   @override
   void initState() {
     super.initState();
@@ -42,15 +44,17 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           setState(() {
             _token = token;
             _isLoadingToken = false;
+            final provider =
+                Provider.of<ActivityProvider>(context, listen: false);
+            initializationFuture = provider.initializeActivities(_token);
           });
         });
       });
     } else {
-      
       final provider = Provider.of<ActivityProvider>(context);
 
       return FutureBuilder(
-        future: provider.initializeActivities(_token),
+        future: initializationFuture,
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return AlertDialog(
@@ -117,7 +121,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         ),
                       ],
                     ),
-                    Expanded(
+                    Expanded( 
                       child: SfCalendar(
                         view: calendarView,
                         showNavigationArrow: true,

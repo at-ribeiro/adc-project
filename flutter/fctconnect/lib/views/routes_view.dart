@@ -14,6 +14,7 @@ import '../constants.dart';
 import '../models/Token.dart';
 import '../models/event_get_data.dart';
 import '../models/route_get_data.dart';
+import '../models/route_post_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import 'event_page.dart';
@@ -77,7 +78,8 @@ class _RouteViewState extends State<RouteView> {
                         RouteGetData route = _routes[index];
                         return GestureDetector(
                           onTap: () {
-                            //context.go(Paths.event + '/${event.id}');
+                            context.go(Paths.routes +
+                                '/${route.creator}/${route.name}');
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -103,21 +105,63 @@ class _RouteViewState extends State<RouteView> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                route.name,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Nome do Percurso: ",
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: kAccentColor0,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    route.name,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: kAccentColor0,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(height: 8.0),
-                                              Text(
-                                                route.creator,
-                                                style: const TextStyle(
-                                                  color: kAccentColor2,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Criador: ",
+                                                    style: const TextStyle(
+                                                      color: kAccentColor2,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    route.creator,
+                                                    style: const TextStyle(
+                                                      color: kAccentColor2,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(height: 8.0),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Duração Aproximada: ",
+                                                    style: const TextStyle(
+                                                      color: kAccentColor2,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    locationsDuration(
+                                                                route.durations)
+                                                            .toString() +
+                                                        " minutos",
+                                                    style: const TextStyle(
+                                                      color: kAccentColor2,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -139,6 +183,14 @@ class _RouteViewState extends State<RouteView> {
         ),
       );
     }
+  }
+
+  int locationsDuration(List<int> durations) {
+    int total = 0;
+    for (int i in durations) {
+      total += i;
+    }
+    return total;
   }
 
   void _loadRoutes() async {

@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/models/location_get_data.dart';
-import 'package:responsive_login_ui/models/route_get_data.dart';
+import 'package:responsive_login_ui/models/route_post_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import '../constants.dart';
 import '../models/Token.dart';
@@ -28,6 +28,7 @@ class _RouteCreatorState extends State<RouteCreator> {
   List<LocationGetData> locationsListEventos = [];
 
   List<String> locationsToAdd = [];
+  List<int> locationsToAddDuration = [];
   TextEditingController routeNameController = TextEditingController();
 
   bool _isFirstLoadRest = true;
@@ -50,15 +51,36 @@ class _RouteCreatorState extends State<RouteCreator> {
     super.dispose();
   }
 
-  void addToSelectedLocations(String name) {
+  int getDurationInMinutes(String duration) {
+    int durationMin = 0;
+    if (duration == "15 min") {
+      durationMin = 15;
+    } else if (duration == "30 min") {
+      durationMin = 30;
+    } else if (duration == "1 hora") {
+      durationMin = 60;
+    } else if (duration == "2 hora") {
+      durationMin = 120;
+    } else if (duration == "3 hora") {
+      durationMin = 180;
+    }
+    return durationMin;
+  }
+
+  void addToSelectedLocations(String name, String duration) {
     setState(() {
       locationsToAdd.add(name);
+      locationsToAddDuration.add(getDurationInMinutes(duration));
     });
   }
 
   void removeFromLocations(String name) {
     setState(() {
-      locationsToAdd.remove(name);
+      final index = locationsToAdd.indexOf(name);
+      if (index != -1) {
+        locationsToAdd.removeAt(index);
+        locationsToAddDuration.removeAt(index);
+      }
     });
   }
 
@@ -102,7 +124,7 @@ class _RouteCreatorState extends State<RouteCreator> {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
-            controller: _scrollController, // Use the scroll controller
+            controller: _scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -132,7 +154,6 @@ class _RouteCreatorState extends State<RouteCreator> {
                               borderRadius: kBorderRadius,
                               borderSide: BorderSide(
                                 color: kAccentColor1,
-                                // Set your desired focused color here
                               ),
                             ),
                           ),
@@ -173,14 +194,58 @@ class _RouteCreatorState extends State<RouteCreator> {
                               locationsToAdd.contains(locationData.name);
                           return ListTile(
                             title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Restauração'),
-                              ],
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             trailing: IconButton(
                               icon: Icon(
@@ -192,7 +257,11 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 if (isSelected) {
                                   removeFromLocations(locationData.name);
                                 } else {
-                                  addToSelectedLocations(locationData.name);
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                             ),
@@ -225,14 +294,58 @@ class _RouteCreatorState extends State<RouteCreator> {
                               locationsToAdd.contains(locationData.name);
                           return ListTile(
                             title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Edifício'),
-                              ],
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             trailing: IconButton(
                               icon: Icon(
@@ -244,7 +357,11 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 if (isSelected) {
                                   removeFromLocations(locationData.name);
                                 } else {
-                                  addToSelectedLocations(locationData.name);
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                             ),
@@ -277,14 +394,58 @@ class _RouteCreatorState extends State<RouteCreator> {
                               locationsToAdd.contains(locationData.name);
                           return ListTile(
                             title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Transporte'),
-                              ],
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             trailing: IconButton(
                               icon: Icon(
@@ -296,7 +457,11 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 if (isSelected) {
                                   removeFromLocations(locationData.name);
                                 } else {
-                                  addToSelectedLocations(locationData.name);
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                             ),
@@ -329,14 +494,58 @@ class _RouteCreatorState extends State<RouteCreator> {
                               locationsToAdd.contains(locationData.name);
                           return ListTile(
                             title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Evento'),
-                              ],
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             trailing: IconButton(
                               icon: Icon(
@@ -348,7 +557,11 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 if (isSelected) {
                                   removeFromLocations(locationData.name);
                                 } else {
-                                  addToSelectedLocations(locationData.name);
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                             ),
@@ -364,16 +577,21 @@ class _RouteCreatorState extends State<RouteCreator> {
                     onPressed: () {
                       if (locationsToAdd.isNotEmpty &&
                           routeNameController.text.isNotEmpty) {
-                            RouteGetData route = RouteGetData(
-                              creator: _token.username,
-                              name: routeNameController.text,
-                              locations: locationsToAdd,
-                              participants: [_token.username],
-                            );
-                          
+                        RoutePostData route = RoutePostData(
+                          creator: _token.username,
+                          name: routeNameController.text,
+                          locations: locationsToAdd.toList(),
+                          durations: locationsToAddDuration.toList(),
+                          participants: [_token.username],
+                        );
+
                         setState(() {
                           locationsToAdd.clear();
+                          locationsToAddDuration.clear();
                           routeNameController.clear();
+                          BaseClient().createRoute(
+                              "/route", _token.username, _token.tokenID, route);
+                          context.go(Paths.routes);
                         });
                       }
                     },

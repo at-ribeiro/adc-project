@@ -150,6 +150,15 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: '/routes/:user/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteMapScreen(
+                routeUser: state.pathParameters['user']!,
+                routeID: state.pathParameters['id']!,
+              );
+            },  
+          ),
+          GoRoute(
             path: Paths.optionsProfile,
             builder: (BuildContext context, GoRouterState state) {
               return EditProfileOptions();
