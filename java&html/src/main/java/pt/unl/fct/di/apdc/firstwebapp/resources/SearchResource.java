@@ -43,14 +43,22 @@ public class SearchResource {
             // Query to find users with usernames greater than or equal to the search input
             Query<Entity> queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
                     .setKind("User")
-                    .setFilter(StructuredQuery.PropertyFilter.ge("user_username", lowerBound))
+                    .setFilter(
+                            StructuredQuery.CompositeFilter.and(
+                                    StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
+                                    StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
+                            ))
                     .setLimit(5)
                     .build();
 
             // Query to find users with usernames less than the upper bound
             Query<Entity> queryLessThan = Query.newEntityQueryBuilder()
                     .setKind("User")
-                    .setFilter(StructuredQuery.PropertyFilter.lt("user_username", upperBound))
+                    .setFilter(
+                            StructuredQuery.CompositeFilter.and(
+                                    StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
+                                    StructuredQuery.PropertyFilter.lt("user_username", upperBound)
+                    ))
                     .setLimit(5)
                     .build();
 
