@@ -2,28 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
+import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
+import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
+import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
+// import 'package:responsive_login_ui/views/welcome_screen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
+import 'package:responsive_login_ui/views/salas_view.dart';
 
 import '../constants.dart';
 import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';
 import '../views/calendar_view.dart';
+import '../views/edit_profile_options.dart';
 import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
 import '../views/reported_posts_view.dart';
+import '../views/route_creator.dart';
+import '../views/routes_map.dart';
+import '../views/sala_creator.dart';
+import '../views/sala_page.dart';
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -44,15 +54,30 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.noticias,
-                builder: (BuildContext context, GoRouterState state) {
-                  return const NewsView();
-                },
-              ),
-              GoRoute(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) {
                   return MyHomePage();
+                },
+              ),
+              GoRoute(
+                path: Paths.noticias,
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsView();
+                },
+              ),
+              GoRoute(
+                path: "/:noticias/:year/:month/:title",
+                builder: (BuildContext context, GoRouterState state) {
+                  return NewsDetailPage(
+                    newsUrl: "/" +
+                        state.pathParameters['noticias']! +
+                        "/" +
+                        state.pathParameters['year']! +
+                        "/" +
+                        state.pathParameters['month']! +
+                        "/" +
+                        state.pathParameters['title']!,
+                  );
                 },
               ),
             ],
@@ -91,6 +116,12 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: Paths.routes,
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteView();
+            },
+          ),
+          GoRoute(
             path: '/event/:id',
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
@@ -111,9 +142,47 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: Paths.createRoute,
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteCreator();
+            },
+          ),
+          GoRoute(
+            path: '/sala/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaPage(
+                salaId: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: Paths.salas,
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaView();
+            },
+          ),
+          GoRoute(
+            path: Paths.createSala,
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaCreator();
+            },
+          ),
+          GoRoute(
             path: Paths.editProfile,
             builder: (BuildContext context, GoRouterState state) {
               return EditProfile();
+            },
+          ),
+          GoRoute(
+            path: Paths.optionsProfile,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfileOptions();
+            },
+          ),
+          GoRoute(
+            path: Paths.changePassword,
+            builder: (BuildContext context, GoRouterState state) {
+              return EditProfilePassword();
             },
           ),
           GoRoute(
@@ -159,9 +228,12 @@ class AppRouter {
             appBar: AppBar(
               backgroundColor: kPrimaryColor,
               elevation: 0,
-              title: Text(
-                _getTitleBasedOnRoute(state.location),
-                style: TextStyle(color: kAccentColor0),
+              title: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _getTitleBasedOnRoute(state.location),
+                  style: TextStyle(color: kAccentColor0),
+                ),
               ),
               actions: [
                 _getButtonsBasedOnRoute(state.location, context),
@@ -196,6 +268,14 @@ class AppRouter {
           return const SignUpView();
         },
       ),
+      /** 
+       GoRoute(
+        path: Paths.welcome,
+        builder: (BuildContext context, GoRouterState state) {
+          return WelcomeScreen();
+        },
+      ),
+      */
       GoRoute(
         path: Paths.splash,
         builder: (BuildContext context, GoRouterState state) {
@@ -216,14 +296,22 @@ class AppRouter {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
-    } else if (location == Paths.noticias) {
+    } else if (location == Paths.noticias || location.contains('noticias')) {
       return 'Noticias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
+    } else if (location == Paths.routes) {
+      return 'Percursos';
     } else if (location == Paths.events) {
       return 'Eventos';
     } else if (location == Paths.createEvent) {
       return 'Criar Evento';
+    } else if (location == Paths.createRoute) {
+      return 'Criar Percurso';
+    } else if (location == Paths.salas) {
+      return 'Salas';
+    } else if (location == Paths.createSala) {
+      return 'Criar Sala';
     } else if (location == Paths.report) {
       return 'Reportar';
     } else if (location == Paths.calendar) {
@@ -238,8 +326,14 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
+    } else if (location.contains(Paths.sala)) {
+      return 'Sala';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
+    } else if (location.contains(Paths.changePassword)) {
+      return 'Mudar Password';
+    } else if (location.contains(Paths.optionsProfile)) {
+      return 'Opções de Perfil';
     }
     // add more conditions for other routes
 
@@ -262,13 +356,19 @@ class AppRouter {
     } else if (location == Paths.myProfile) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.editProfile);
+            context.go(Paths.optionsProfile);
           },
           icon: Icon(Icons.settings));
     } else if (location == Paths.editProfile) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.myProfile);
+            context.go(Paths.optionsProfile);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location == Paths.changePassword) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.optionsProfile);
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
@@ -278,14 +378,40 @@ class AppRouter {
           },
           icon: Icon(Icons.add));
 
-    } else if (location == Paths.createEvent) {
+    } else if (location == Paths.routes) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createRoute);
+          },
+          icon: Icon(Icons.add));
+    } else if (location == Paths.createRoute) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.routes);
+          },
+          icon: Icon(Icons.arrow_back));
 
+    } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location.contains(Paths.otherProfile) ||
+    } else if (location == Paths.salas) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createSala);
+          },
+          icon: Icon(Icons.add));
+
+    }else if (location == Paths.createSala) {
+
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.salas);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if (location.contains(Paths.otherProfile) ||
         location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {
@@ -295,6 +421,5 @@ class AppRouter {
     }
 
     return Container();
-
   }
 }
