@@ -60,6 +60,7 @@ public class EventsServlet extends HttpServlet {
 
             String tokenId = request.getHeader("Authorization");
             String username = request.getPathInfo().substring(1);
+            String cursor = request.getParameter("cursor");
 
             LOG.fine("Attempt get events");
 
@@ -85,7 +86,9 @@ public class EventsServlet extends HttpServlet {
 
             Query<Entity> eventsQuery = Query.newEntityQueryBuilder()
                     .setKind("Event")
+                    .setFilter(StructuredQuery.PropertyFilter.lt("event_start", cursor))
                     .addOrderBy(descendingTimestamp)
+                    .setLimit(10)
                     .build();
 
             QueryResults<Entity> eventResults = txn.run(eventsQuery);
@@ -228,7 +231,6 @@ public class EventsServlet extends HttpServlet {
             String imageName = "";
 
             if (request.getPart("image") != null) {
-                imageName = request.getPart("image").getSubmittedFileName();
                 InputStream imageStream = request.getPart("image").getInputStream();
 
                 String contentType = request.getPart("image").getContentType();
@@ -337,6 +339,24 @@ public class EventsServlet extends HttpServlet {
                                     .build();
 
             txn.put(locationEntity);
+
+            long currentTime = System.currentTimeMillis();
+
+            Key activityKey = datastore.newKeyFactory()
+                    .setKind("Activity")
+                    .addAncestor(PathElement.of("User", creator))
+                    .newKey(currentTime);
+
+            Entity activityEntity = Entity.newBuilder(activityKey)
+                    .set("activity_creation_time", LongValue.of(currentTime).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_name", title)
+                    .set("activity_from", LongValue.of(start).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_to", LongValue.of(end).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_colour", "FF9800")
+                    .build();
+
+            txn.add(activityEntity);
+
             txn.commit();
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -351,4 +371,135 @@ public class EventsServlet extends HttpServlet {
             }
         }
     }
+
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+            String tokenId = request.getHeader("Authorization");
+            String username = request.getPathInfo().substring(1);
+            String eventId = request.getPathInfo().substring(1);
+
+
+            LOG.fine("Attempt add event to user: " + username);
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+
+
+            Key eventKey = datastore.newKeyFactory()
+                    .setKind("Event")
+                    .newKey(eventId);
+
+            Entity event = txn.get(eventKey);
+
+            if(event == null){
+                LOG.warning("Event does not exist");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            List<StringValue> events = user.getList("user_events");
+
+            if(events.contains(StringValue.of(eventId))){
+
+                events.remove(StringValue.of(eventId));
+
+                Entity updatedUser = Entity.newBuilder(user)
+                        .set("user_events", ListValue.of(events))
+                        .build();
+
+                txn.put(updatedUser);
+
+                Query<Entity> activityQuery = Query.newEntityQueryBuilder()
+                        .setKind("Activity")
+                        .setFilter(StructuredQuery.CompositeFilter.and(
+                                StructuredQuery.PropertyFilter.hasAncestor(userKey),
+                                StructuredQuery.PropertyFilter.eq("activity_name", event.getString("event_title"))
+                        ))
+                        .build();
+
+                QueryResults<Entity> activityResults = datastore.run(activityQuery);
+
+                if(activityResults.hasNext()){
+                    Entity activity = activityResults.next();
+                    txn.delete(activity.getKey());
+                }
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                return;
+
+            }
+
+            events.add(StringValue.of(eventId));
+
+            Entity updatedUser = Entity.newBuilder(user)
+                    .set("user_events", ListValue.of(events))
+                    .build();
+
+            txn.put(updatedUser);
+
+            long currentTime = System.currentTimeMillis();
+
+            Key activityKey = datastore.newKeyFactory()
+                    .setKind("Activity")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey(currentTime);
+
+            Entity activityEntity = Entity.newBuilder(activityKey)
+                    .set("activity_creation_time", LongValue.of(currentTime).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_name", event.getString("event_title"))
+                    .set("activity_from", LongValue.of(event.getLong("event_start")).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_to", LongValue.of(event.getLong("event_end")).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_colour", "FF9800")
+                    .build();
+
+            txn.add(activityEntity);
+            txn.commit();
+            response.setStatus(HttpServletResponse.SC_OK);
+
+        }catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+
+
+    }
+
+
 }
