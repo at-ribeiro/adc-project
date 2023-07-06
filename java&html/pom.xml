@@ -157,10 +157,17 @@
         	<artifactId>javase</artifactId>
         	<version>3.4.1</version>
     	</dependency>
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>8.0.0</version>
+		</dependency>
 
 
 
-</dependencies>
+
+
+	</dependencies>
 
 	<build>
 		<!-- To allow interaction with Gcloud client through maven-->

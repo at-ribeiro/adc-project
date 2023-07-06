@@ -35,8 +35,9 @@ public class EventsServlet extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(EventsServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-    private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
+
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
 
     public byte[] generateQRCode(String data, int width, int height) throws IOException, WriterException {
