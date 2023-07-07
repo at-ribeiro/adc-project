@@ -132,7 +132,7 @@ public class RegisterResource {
 
 
         Content content = new Content("text/plain", "Thank you for registering!\n " +
-                "To activate your account please use the following code: " + code );
+                "Para ativar a sua conta, por favor, utilize o seguinte código: " + code );
         Mail mail = new Mail(from, subject, to, content);
 
         //TODO: Substituir key por variavel de ambiente
