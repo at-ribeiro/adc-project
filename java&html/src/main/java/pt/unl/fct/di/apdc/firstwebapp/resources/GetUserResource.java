@@ -78,11 +78,6 @@ public class GetUserResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            if (user.getString("user_state").equals("INACTIVE")){
-                LOG.warning("Inactive User.");
-                return Response.status(Response.Status.UNAUTHORIZED).build();
-            }
-
             Query<Entity> followingQuery = Query.newEntityQueryBuilder()
                     .setKind("Follow")
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))

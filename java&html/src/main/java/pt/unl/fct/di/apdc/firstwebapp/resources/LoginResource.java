@@ -76,6 +76,11 @@ public class LoginResource {
 
             String hashedPWD = user.getString("user_pwd");
 
+            if(user.getString("user_state").equals("INACTIVE")) {
+            	LOG.warning("Failed login attempt for username: " + data.getUsername());
+            	return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
             if (hashedPWD.equals(DigestUtils.sha512Hex(data.getPassword()))) {
 
                 /*

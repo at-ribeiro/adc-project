@@ -114,4 +114,260 @@ public class UpdateResource {
         }
     }
 
+    @PUT
+    @Path("/activate/{user}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response changeUserState(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                                    @PathParam("user") String userToChange){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = userKeyFactory.newKey(username);
+
+            Entity user = txn.get(userKey);
+
+            if (user == null){
+                LOG.warning("User does not exist: " + username);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("SA"))){
+                LOG.warning("User does not have permission to change user state.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))){
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))){
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key userToChangeKey = userKeyFactory.newKey(userToChange);
+
+            Entity userToChangeEntity = txn.get(userToChangeKey);
+
+            if (userToChangeEntity == null){
+                LOG.warning("User does not exist: " + userToChange);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (userToChangeEntity.getString("user_state").equals("ACTIVE")){
+                LOG.warning("User is already active.");
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+
+            Entity task = Entity.newBuilder(userToChangeKey)
+                    .set("user_username", userToChangeEntity.getString("user_username"))
+                    .set("user_fullname", userToChangeEntity.getString("user_fullname"))
+                    .set("user_pwd", userToChangeEntity.getString("user_pwd"))
+                    .set("user_email", userToChangeEntity.getString("user_email"))
+                    .set("user_creation_time", userToChangeEntity.getTimestamp("user_creation_time"))
+                    .set("user_role", userToChangeEntity.getString("user_role"))
+                    .set("user_state", "ACTIVE")
+                    .set("user_privacy", userToChangeEntity.getString("user_privacy"))
+                    .set("user_phone", userToChangeEntity.getString("user_phone"))
+                    .set("user_city", userToChangeEntity.getString("user_city"))
+                    .set("user_about_me", userToChangeEntity.getString("user_about_me"))
+                    .set("user_department", userToChangeEntity.getString("user_department"))
+                    .set("user_office", userToChangeEntity.getString("user_office"))
+                    .set("user_course", userToChangeEntity.getString("user_course"))
+                    .set("user_year", userToChangeEntity.getString("user_year"))
+                    .set("user_profile_pic", userToChangeEntity.getString("user_profile_pic"))
+                    .set("user_cover_pic", userToChangeEntity.getString("user_cover_pic"))
+                    .set("user_purpose", userToChangeEntity.getString("user_purpose"))
+                    .set("user_events", userToChangeEntity.getList("user_events"))
+                    .build();
+
+            txn.update(task);
+
+            txn.commit();
+
+            return Response.ok().build();
+
+        } catch (Exception e){
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()){
+                txn.rollback();
+            }
+        }
+    }
+
+
+    @PUT
+    @Path("/deactivate/{user}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deactivateUser(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                                   @PathParam("user") String userToChange){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = userKeyFactory.newKey(username);
+
+            Entity user = txn.get(userKey);
+
+            if (user == null){
+                LOG.warning("User does not exist: " + username);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("SA"))){
+                LOG.warning("User does not have permission to change user state.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))){
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))){
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key userToChangeKey = userKeyFactory.newKey(userToChange);
+
+            Entity userToChangeEntity = txn.get(userToChangeKey);
+
+            if (userToChangeEntity == null){
+                LOG.warning("User does not exist: " + userToChange);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (userToChangeEntity.getString("user_state").equals("INACTIVE")){
+                LOG.warning("User is already inactive.");
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+
+            Entity task = Entity.newBuilder(userToChangeKey)
+                    .set("user_username", userToChangeEntity.getString("user_username"))
+                    .set("user_fullname", userToChangeEntity.getString("user_fullname"))
+                    .set("user_pwd", userToChangeEntity.getString("user_pwd"))
+                    .set("user_email", userToChangeEntity.getString("user_email"))
+                    .set("user_creation_time", userToChangeEntity.getTimestamp("user_creation_time"))
+                    .set("user_role", userToChangeEntity.getString("user_role"))
+                    .set("user_state", "INACTIVE")
+                    .set("user_privacy", userToChangeEntity.getString("user_privacy"))
+                    .set("user_phone", userToChangeEntity.getString("user_phone"))
+                    .set("user_city", userToChangeEntity.getString("user_city"))
+                    .set("user_about_me", userToChangeEntity.getString("user_about_me"))
+                    .set("user_department", userToChangeEntity.getString("user_department"))
+                    .set("user_office", userToChangeEntity.getString("user_office"))
+                    .set("user_course", userToChangeEntity.getString("user_course"))
+                    .set("user_year", userToChangeEntity.getString("user_year"))
+                    .set("user_profile_pic", userToChangeEntity.getString("user_profile_pic"))
+                    .set("user_cover_pic", userToChangeEntity.getString("user_cover_pic"))
+                    .set("user_purpose", userToChangeEntity.getString("user_purpose"))
+                    .set("user_events", userToChangeEntity.getList("user_events"))
+                    .build();
+
+            txn.update(task);
+
+            txn.commit();
+
+            return Response.ok().build();
+
+        }catch (Exception e){
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @GET
+    @Path("/state/{user}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getState(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                             @PathParam("user") String userToChange){
+
+        Transaction txn = datastore.newTransaction();
+
+        try{
+
+            Key userKey = userKeyFactory.newKey(username);
+
+            Entity user = txn.get(userKey);
+
+            if (user == null){
+                LOG.warning("User does not exist: " + username);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("SA"))){
+                LOG.warning("User does not have permission to change user state.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))){
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if (AuthToken.expired(token.getLong("token_expiration"))){
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key userToChangeKey = userKeyFactory.newKey(userToChange);
+
+            Entity userToChangeEntity = txn.get(userToChangeKey);
+
+            if(userToChangeEntity == null){
+                LOG.warning("User does not exist: " + userToChange);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if(userToChangeEntity.getString("user_state").equals("INACTIVE")){
+                return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+            } else {
+                return Response.status(Response.Status.ACCEPTED).build();
+            }
+
+        } catch (Exception e){
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()){
+                txn.rollback();
+            }
+        }
+
+    }
 }
