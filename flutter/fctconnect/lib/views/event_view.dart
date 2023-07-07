@@ -174,7 +174,7 @@ class _EventViewState extends State<EventView> {
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp.toString(),
+      _lastDisplayedEventTimestamp,
     );
     if (mounted) {
       setState(() {
@@ -192,7 +192,7 @@ class _EventViewState extends State<EventView> {
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp.toString(),
+      _lastDisplayedEventTimestamp,
     );
     setState(() {
       _events = latestEvents;

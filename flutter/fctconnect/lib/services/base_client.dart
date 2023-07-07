@@ -208,12 +208,12 @@ class BaseClient {
   }
 
   Future<List<EventGetData>> getEvents(
-      String api, String tokenID, String username, String time) async {
+      String api, String tokenID, String username, int cursor) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
     };
-    var url = Uri.parse('$baseUrl$api/$username?timestamp=$time');
+    var url = Uri.parse('$baseUrl$api/$username?cursor=$cursor');
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
@@ -271,10 +271,15 @@ class BaseClient {
     }
   }
 
-  Future<List<UserQueryData>> searchUser(String query, String api) async {
+  Future<List<UserQueryData>> searchUser(String query, String api, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "User": username,
+    };
+    print(username);
     var url = Uri.parse('$baseUrl$api/user?query=$query');
 
-    final response = await http.get(url);
+    final response = await http.get(url, headers: _headers);
 
     if (response.statusCode == 200) {
       final jsonString = utf8.decode(response.bodyBytes);
@@ -283,7 +288,6 @@ class BaseClient {
           data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
     } else {
-      // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to load data');
     }
   }
@@ -1067,5 +1071,68 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+  }
+
+  Future<dynamic> disableAccount(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> enableAccount(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<bool> isAccountEnabled(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    return response.statusCode == 202;
   }
 }

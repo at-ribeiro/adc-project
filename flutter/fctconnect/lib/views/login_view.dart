@@ -358,10 +358,10 @@ class _LoginViewState extends State<LoginView>
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             String errorText = snapshot.error.toString();
-            if (errorText.contains('401') ||
-                errorText.contains('404') ||
-                errorText.contains('403')) {
+            if (errorText.contains('404') || errorText.contains('403')) {
               errorText = 'Username ou password errados!';
+            } else if (errorText.contains('401')) {
+              errorText = 'A sua conta não está ativada!';
             } else if (errorText.contains('SocketException')) {
               errorText = 'Sem ligação à internet!';
             } else {

@@ -27,6 +27,7 @@ class _DrawerModelState extends State<DrawerModel> {
   bool _isLoadingToken = true;
   String urlPic = "";
   bool _ifProfilePicLoading = true;
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,126 +46,136 @@ class _DrawerModelState extends State<DrawerModel> {
     }
   }
 
-  Widget _buildDrawer() {
+  Drawer _buildDrawer() {
     ThemeManager themeManager = context.watch<ThemeManager>();
     bool isDarkModeOn = themeManager.themeMode == ThemeMode.dark;
     String username = _token.username;
     String profiPic = _token.profilePic;
 
     return Drawer(
-      backgroundColor: kPrimaryColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: kBorderRadius,
-      ),
-      child: Column(
-        children: [
-          IntrinsicWidth(
-            stepWidth: double.infinity,
-            child: DrawerHeader(
-              decoration: const BoxDecoration(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(_token.profilePic),
+        backgroundColor: kPrimaryColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: kBorderRadius,
+        ),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              IntrinsicWidth(
+                stepWidth: double.infinity,
+                child: DrawerHeader(
+                  decoration: const BoxDecoration(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(_token.profilePic),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(username, style: const TextStyle(fontSize: 18)),
+                      Switch(
+                        value: isDarkModeOn,
+                        onChanged: (value) {
+                          _themeManager.toggleTheme(value);
+                        },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  Text(username, style: const TextStyle(fontSize: 18)),
-                  Switch(
-                    value: isDarkModeOn,
-                    onChanged: (value) {
-                      _themeManager.toggleTheme(value);
-                    },
-                  ),
-                ],
+                ),
               ),
-            ), // Set the width of the DrawerHeader to the maximum available width
-          ),
-          ListTile(
-            leading: Icon(Icons.home, color: kAccentColor1),
-            title: const Text('Home'),
-            onTap: () {
-              context.go(Paths.homePage);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.map, color: kAccentColor1),
-            title: const Text('Mapa'),
-            onTap: () {
-              context.go(Paths.mapas);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.directions_walk, color: kAccentColor1),
-            title: const Text('Percursos'),
-            onTap: () {
-              context.go(Paths.routes);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.event, color: kAccentColor1),
-            title: const Text('Eventos'),
-            onTap: () {
-              context.go(Paths.events);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_month, color: kAccentColor1),
-            title: const Text('Calendário'),
-            onTap: () {
-              context.go(Paths.calendar);
-              Navigator.pop(context);
-            },
-          ),
-          const Spacer(),
-          ListTile(
-            leading: Icon(Icons.report, color: kAccentColor1),
-            title: const Text('Report'),
-            onTap: () {
-              context.go(Paths.report);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_problem_outlined, color: kAccentColor1),
-            title: const Text('Lista de Anomalias'),
-            onTap: () {
-              context.go(Paths.listReports);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_gmailerrorred, color: kAccentColor1),
-            title: const Text('Posts Reportados'),
-            onTap: () {
-              context.go(Paths.reportedPosts);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app, color: kAccentColor1),
-            title: const Text('Sair', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
+              ListTile(
+                leading: Icon(Icons.home, color: kAccentColor1),
+                title: const Text('Home'),
+                onTap: () {
+                  context.go(Paths.homePage);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.map, color: kAccentColor1),
+                title: const Text('Mapa'),
+                onTap: () {
+                  context.go(Paths.mapas);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.directions_walk, color: kAccentColor1),
+                title: const Text('Percursos'),
+                onTap: () {
+                  context.go(Paths.routes);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.event, color: kAccentColor1),
+                title: const Text('Eventos'),
+                onTap: () {
+                  context.go(Paths.events);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.calendar_month, color: kAccentColor1),
+                title: const Text('Calendário'),
+                onTap: () {
+                  context.go(Paths.calendar);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.report, color: kAccentColor1),
+                title: const Text('Report'),
+                onTap: () {
+                  context.go(Paths.report);
+                  Navigator.pop(context);
+                },
+              ),
+              if (_token.role == "SA" || _token.role == "SECRETARIA")
+                Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.report_problem_outlined,
+                          color: kAccentColor1),
+                      title: const Text('Lista de Anomalias'),
+                      onTap: () {
+                        context.go(Paths.listReports);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.report_gmailerrorred,
+                          color: kAccentColor1),
+                      title: const Text('Posts Reportados'),
+                      onTap: () {
+                        context.go(Paths.reportedPosts);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ListTile(
+                leading: Icon(Icons.exit_to_app, color: kAccentColor1),
+                title: const Text('Sair', style: TextStyle(color: Colors.red)),
+                onTap: () async {
+                  BaseClient()
+                      .doLogout("/logout", _token.username, _token.tokenID);
 
-              CacheDefault.cacheFactory.logout();
-              CacheDefault.cacheFactory.delete('isLoggedIn');
-             
-              SharedPreferences prefs = await SharedPreferences.getInstance();
+                  CacheDefault.cacheFactory.logout();
+                  CacheDefault.cacheFactory.delete('isLoggedIn');
 
-              prefs.remove('ProfilePic');
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
 
-              context.go(Paths.login);
-              Navigator.pop(context);
-            },
+                  prefs.remove('ProfilePic');
+
+                  context.go(Paths.login);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }
