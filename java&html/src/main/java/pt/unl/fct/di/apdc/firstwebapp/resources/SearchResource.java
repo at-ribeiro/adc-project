@@ -8,10 +8,7 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.gson.Gson;
 import pt.unl.fct.di.apdc.firstwebapp.util.SearchUserData;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -31,36 +28,68 @@ public class SearchResource {
     @GET
     @Path("/user")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response searchUser(@QueryParam("query") String query){
+    public Response searchUser(@HeaderParam("User") String username, @QueryParam("query") String query){
 
         Transaction txn = datastore.newTransaction();
 
         try{
 
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+            Entity user = txn.get(userKey);
+
+            if(user == null){
+                txn.rollback();
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
             String lowerBound = query;
-            String upperBound = query + "\ufffd"; // Next possible Unicode character
+            String upperBound = query + "\ufffd";
 
-            // Query to find users with usernames greater than or equal to the search input
-            Query<Entity> queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
-                    .setKind("User")
-                    .setFilter(
-                            StructuredQuery.CompositeFilter.and(
-                                    StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
-                                    StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
-                            ))
-                    .setLimit(5)
-                    .build();
+            Query<Entity> queryGreaterThanOrEqual = null;
 
-            // Query to find users with usernames less than the upper bound
-            Query<Entity> queryLessThan = Query.newEntityQueryBuilder()
-                    .setKind("User")
-                    .setFilter(
-                            StructuredQuery.CompositeFilter.and(
-                                    StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
-                                    StructuredQuery.PropertyFilter.lt("user_username", upperBound)
-                    ))
-                    .setLimit(5)
-                    .build();
+            Query<Entity> queryLessThan = null;
+
+            if(user.getString("user_role").equals("SA") || user.getString("user_role").equals("SECRETARIA")) {
+
+                queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(
+                                StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
+                                ))
+                        .setLimit(5)
+                        .build();
+
+                queryLessThan = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(
+                                StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.lt("user_username", upperBound)
+                                ))
+                        .setLimit(5)
+                        .build();
+
+            }else {
+                queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(
+                                StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
+                                        StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
+                                ))
+                        .setLimit(5)
+                        .build();
+
+                queryLessThan = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(
+                                StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
+                                        StructuredQuery.PropertyFilter.lt("user_username", upperBound)
+                                ))
+                        .setLimit(5)
+                        .build();
+            }
 
             QueryResults<Entity> greaterThanOrEqualResults = txn.run(queryGreaterThanOrEqual);
             QueryResults<Entity> lessThanResults = txn.run(queryLessThan);

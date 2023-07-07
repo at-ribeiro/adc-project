@@ -118,7 +118,6 @@ public class ChangePwdResource {
 
         try{
 
-
             if(email == null && username == null){
                 LOG.warning("Missing parameters.");
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -177,7 +176,7 @@ public class ChangePwdResource {
 
 
             Content content = new Content("text/plain", "Thank you for registering!\n " +
-                    "To activate your account please use the following code: " + code );
+                    "Para alterar a sua password, por favor, utilize o seguinte código: " + code );
             Mail mail = new Mail(from, subject, to, content);
 
             //TODO: Substituir key por variavel de ambiente
