@@ -12,11 +12,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.TopicManagementResponse;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.NotificationData;
 
 import java.io.FileInputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -115,6 +117,32 @@ public class NotificationResource {
                 txn.rollback();
             }
         }
+    }
+
+    @POST
+    @Path("/msgToken")
+    public Response registerToken(@HeaderParam("Token") String tokenId){
+
+        try{
+
+            List<String> registrationTokens = List.of(tokenId);
+
+            TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(
+                    registrationTokens, "all_users");
+
+            if(response.getSuccessCount() == 0){
+                LOG.severe("Error subscribing to topic");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+
+            return Response.ok().build();
+
+        }catch (Exception e){
+            LOG.warning(e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
 }
