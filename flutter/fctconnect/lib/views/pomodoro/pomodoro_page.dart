@@ -24,8 +24,8 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
   String message = "time to focus";
   String rest = "time to take a break";
 
-  Color backgroundColor = kPrimaryColor;
-  Color buttonsColor = kPrimaryColor;
+  Color backgroundColor = Style.kPrimaryColor;
+  Color buttonsColor = Style.kPrimaryColor;
 
   var timerDetails = {
     "pomodoro": 25,
@@ -220,7 +220,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: kGradientDecorationUp,
+      decoration: Style.kGradientDecorationUp,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         resizeToAvoidBottomInset: false,
@@ -280,7 +280,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                         },
                         style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(kAccentColor0),
+                              MaterialStateProperty.all(Style.kAccentColor0),
                         ),
                         child: Text(
                           mainButtonAction,
@@ -301,7 +301,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: kAccentColor0,
+                    color: Style.kAccentColor0,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
@@ -312,13 +312,13 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Expanded(
+                         Expanded(
                             flex: 1,
                             child: Text(
                               "   my tasks",
                               style: TextStyle(
                                   fontSize: 16,
-                                  color: kPrimaryColor,
+                                  color: Style.kPrimaryColor,
                                   fontWeight: FontWeight.bold),
                             )),
                         Expanded(
@@ -342,7 +342,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                                                     backgroundColor),
                                             foregroundColor:
                                                 MaterialStateProperty.all(
-                                                    kAccentColor0)),
+                                                    Style.kAccentColor0)),
                                         onPressed: () {
                                           setState(() {
                                             currentTask = tasks[index];
@@ -352,7 +352,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                                           child: Text(
                                             tasks[index],
                                             style:
-                                                TextStyle(color: kAccentColor1),
+                                                TextStyle(color: Style.kAccentColor1),
                                           ),
                                         ),
                                       ),

@@ -69,6 +69,9 @@ class _ListReportPageState extends State<ListReportsPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,9 +84,9 @@ class _ListReportPageState extends State<ListReportsPage> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+    
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+       
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               await BaseClient().deleteReports(
@@ -100,7 +103,7 @@ class _ListReportPageState extends State<ListReportsPage> {
             },
             child: Icon(
               Icons.delete,
-              color: kAccentColor0,
+              color: Style.kAccentColor0,
             ),
           ),
           body: ListView.builder(
@@ -115,7 +118,7 @@ class _ListReportPageState extends State<ListReportsPage> {
                       BorderRadius.circular(15.0), // Setting the border radius
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white
+                      color: Style.kAccentColor2
                           .withOpacity(0.3), // Glass effect by using opacity
                       borderRadius: BorderRadius.circular(15.0),
                       boxShadow: [
@@ -146,7 +149,7 @@ class _ListReportPageState extends State<ListReportsPage> {
                                     Text('Criador: ${alertData.creator}'),
                                     Text('Localização: ${alertData.location}'),
                                     Text('Descrição:'),
-                                    Text(alertData.description),
+                                    Text(alertData.description, style: textTheme.bodyText1),
                                     Text(
                                         'Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
                                       DateTime.fromMillisecondsSinceEpoch(
@@ -163,18 +166,18 @@ class _ListReportPageState extends State<ListReportsPage> {
                                           builder: (context) {
                                             return AlertDialog(
                                               shape:
-                                                  const RoundedRectangleBorder(
-                                                borderRadius: kBorderRadius,
+                                                   RoundedRectangleBorder(
+                                                borderRadius: Style.kBorderRadius,
                                               ),
-                                              backgroundColor: kAccentColor0
+                                              backgroundColor: Style.kAccentColor0
                                                   .withOpacity(0.3),
                                               content: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Text(
                                                     'Tem a certeza que pretende alertar todos os utilizadores sobre esta anomalia?',
-                                                    style: const TextStyle(
-                                                        color: kAccentColor0),
+                                                    style:  TextStyle(
+                                                        color: Style.kAccentColor0),
                                                   ),
                                                   const SizedBox(height: 15),
                                                   Row(
@@ -201,7 +204,7 @@ class _ListReportPageState extends State<ListReportsPage> {
                                             );
                                           });
                                     },
-                                    icon: Icon(Icons.notification_add)),
+                                    icon: Icon(Icons.notification_add, color: Theme.of(context).iconTheme.color,)),
                               ],
                             ),
                             trailing: Flexible(

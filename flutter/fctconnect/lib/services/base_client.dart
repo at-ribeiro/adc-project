@@ -12,7 +12,6 @@ import 'package:html/dom.dart' as html;
 import 'package:responsive_login_ui/models/nucleos_data.dart';
 import 'package:responsive_login_ui/models/nucleos_get.dart';
 
-
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
 import '../models/AlertPostData.dart';
@@ -838,7 +837,6 @@ class BaseClient {
     }
   }
 
-
   Future<dynamic> changePwd(
       String api, ChangePwdData data, String tokenID, String username) async {
     var _headers = {
@@ -954,6 +952,7 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+  }
 
   Future fetchNewsFCT(int counter) async {
     List<NewsData> news = [];
@@ -1108,9 +1107,8 @@ class BaseClient {
     }
   }
 
-  Future getNucleo(String api, String nucleoId, String tokenID, String username) async {
-    
-
+  Future getNucleo(
+      String api, String nucleoId, String tokenID, String username) async {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -1130,5 +1128,16 @@ class BaseClient {
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+  }
+
+  void sendMessageToken(msgToken) {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Token": msgToken,
+      
+    };
+
+    var url = Uri.parse('$baseUrl/notification/msgToken');
+    http.post(url, headers: _headers );
   }
 }

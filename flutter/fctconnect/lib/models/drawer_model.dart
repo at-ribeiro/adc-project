@@ -6,12 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:unicons/unicons.dart';
 
 import '../Themes/theme_manager.dart';
+import '../constants.dart';
+
 import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../views/messages/messages_view.dart';
+import '../widgets/theme_switch.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {
@@ -51,159 +55,200 @@ class _DrawerModelState extends State<DrawerModel> {
     String username = _token.username;
     String profiPic = _token.profilePic;
 
-    return Drawer(
-      backgroundColor: kPrimaryColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: kBorderRadius,
-      ),
-      child: Column(
-        children: [
-          IntrinsicWidth(
-            stepWidth: double.infinity,
-            child: DrawerHeader(
-              decoration: const BoxDecoration(),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(_token.profilePic),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(username, style: const TextStyle(fontSize: 18)),
-                  Switch(
-                    value: isDarkModeOn,
-                    onChanged: (value) {
-                      _themeManager.toggleTheme(value);
-                    },
-                  ),
-                ],
+    return Theme(
+      data: Theme.of(context).copyWith(
+        iconTheme: IconThemeData(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Style.kAccentColor0Dark
+              : Style.kAccentColor0Light,
+        ),
+        textTheme: Theme.of(context).textTheme.copyWith(
+              headline6: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Style.kAccentColor0Dark
+                    : Style.kAccentColor0Light,
+                fontSize: 18.0,
               ),
-            ), // Set the width of the DrawerHeader to the maximum available width
-          ),
-          ListTile(
-            leading: Icon(Icons.home, color: kAccentColor1),
-            title: const Text('Home'),
-            onTap: () {
-              context.go(Paths.homePage);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.map, color: kAccentColor1),
-            title: const Text('Mapa'),
-            onTap: () {
-              context.go(Paths.mapas);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.directions_walk, color: kAccentColor1),
-            title: const Text('Percursos'),
-            onTap: () {
-              context.go(Paths.routes);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.event, color: kAccentColor1),
-            title: const Text('Eventos'),
-            onTap: () {
-              context.go(Paths.events);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-<<<<<<< HEAD
-            leading: Icon(Icons.group, color: kAccentColor1),
-            title: const Text('Nucleos'),
-            onTap: () {
-              context.go(Paths.nucleos);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-=======
->>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee
-            leading: Icon(Icons.calendar_month, color: kAccentColor1),
-            title: const Text('Calendário'),
-            onTap: () {
-              context.go(Paths.calendar);
-              Navigator.pop(context);
-            },
-          ),
-<<<<<<< HEAD
-          ListTile(
-            leading: Icon(Icons.message, color: kAccentColor1),
-            title: const Text('Mensagens'),
-            onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.timer, color: kAccentColor1),
-            title: const Text('Pomodoro'),
-            onTap: () {
-              context.go(Paths.pomodoro);
-              Navigator.pop(context);
-            },
-          ),
-=======
->>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee
-          const Spacer(),
-          ListTile(
-            leading: Icon(Icons.group_add, color: kAccentColor1),
-            title: const Text('Criar Núcleo'),
-            onTap: () {
-              context.go(Paths.criarNucleo);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report, color: kAccentColor1),
-            title: const Text('Report'),
-            onTap: () {
-              context.go(Paths.report);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_problem_outlined, color: kAccentColor1),
-            title: const Text('Lista de Anomalias'),
-            onTap: () {
-              context.go(Paths.listReports);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_gmailerrorred, color: kAccentColor1),
-            title: const Text('Posts Reportados'),
-            onTap: () {
-              context.go(Paths.reportedPosts);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app, color: kAccentColor1),
-            title: const Text('Sair', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
+            ),
+        listTileTheme: ListTileThemeData(
+          iconColor: Theme.of(context).brightness == Brightness.dark
+              ? Style.kAccentColor0Dark
+              : Style.kAccentColor0Light,
+          textColor: Theme.of(context).brightness == Brightness.dark
+              ? Style.kAccentColor0Dark
+              : Style.kAccentColor0Light,
+        ),
+      ),
+      child: Drawer(
+        shape:RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+        )
+        ),
+        child: SingleChildScrollView(
+          child: IntrinsicHeight(
+            child: Column(
+              children: [
+                IntrinsicWidth(
+                  stepWidth: double.infinity,
+                  child: Container(
+                    height: 250,
+                    child: DrawerHeader(
+                      decoration: const BoxDecoration(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(_token.profilePic),
+                          ),
+                          const SizedBox(height: 15),
+                          Text(username, style: const TextStyle(fontSize: 18)),
+                          const SizedBox(height: 15),
+                          ThemeSwitch(themeManager: themeManager),
+                        ],
+                      ),
+                    ),
+                  ), // Set the width of the DrawerHeader to the maximum available width
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.home,
+                  ),
+                  title: const Text('Home'),
+                  onTap: () {
+                    context.go(Paths.homePage);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.map,
+                  ),
+                  title: const Text('Mapa'),
+                  onTap: () {
+                    context.go(Paths.mapas);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.directions_walk,
+                  ),
+                  title: const Text('Percursos'),
+                  onTap: () {
+                    context.go(Paths.routes);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.event,
+                  ),
+                  title: const Text('Eventos'),
+                  onTap: () {
+                    context.go(Paths.events);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.group,
+                  ),
+                  title: const Text('Nucleos'),
+                  onTap: () {
+                    context.go(Paths.nucleos);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.calendar_month,
+                  ),
+                  title: const Text('Calendário'),
+                  onTap: () {
+                    context.go(Paths.calendar);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.message),
+                  title: const Text('Mensagens'),
+                  onTap: () {
+                    Navigator.push(context,
+                        CupertinoPageRoute(builder: (ctx) => MessagesView()));
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.timer),
+                  title: const Text('Pomodoro'),
+                  onTap: () {
+                    context.go(Paths.pomodoro);
+                    Navigator.pop(context);
+                  },
+                ),
+                const Spacer(),
+                ListTile(
+                  leading: Icon(Icons.group_add),
+                  title: const Text('Criar Núcleo'),
+                  onTap: () {
+                    context.go(Paths.criarNucleo);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.report),
+                  title: const Text('Report'),
+                  onTap: () {
+                    context.go(Paths.report);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.report_problem_outlined),
+                  title: const Text('Lista de Anomalias'),
+                  onTap: () {
+                    context.go(Paths.listReports);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.report_gmailerrorred),
+                  title: const Text('Posts Reportados'),
+                  onTap: () {
+                    context.go(Paths.reportedPosts);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title:
+                      const Text('Sair', style: TextStyle(color: Colors.red)),
+                  onTap: () async {
+                    BaseClient()
+                        .doLogout("/logout", _token.username, _token.tokenID);
 
-              CacheDefault.cacheFactory.logout();
-              CacheDefault.cacheFactory.delete('isLoggedIn');
-             
-              SharedPreferences prefs = await SharedPreferences.getInstance();
+                    CacheDefault.cacheFactory.logout();
+                    CacheDefault.cacheFactory.delete('isLoggedIn');
 
-              prefs.remove('ProfilePic');
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
 
-              context.go(Paths.login);
-              Navigator.pop(context);
-            },
+                    prefs.remove('ProfilePic');
+
+                    context.go(Paths.login);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
 }
+
+

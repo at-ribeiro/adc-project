@@ -107,7 +107,7 @@ class _PostCreatorState extends State<PostCreator> {
           maxWidth: 500,
         ),
         child: ClipRRect(
-            borderRadius: kBorderRadius,
+            borderRadius: Style.kBorderRadius,
             child: Image.memory(_imageData!, fit: BoxFit.contain)),
       );
     } else if (_type == 'video' && _imageData != null) {
@@ -158,9 +158,7 @@ class _PostCreatorState extends State<PostCreator> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -172,25 +170,21 @@ class _PostCreatorState extends State<PostCreator> {
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       border: Border.all(
-                        color:
-                            kAccentColor1, // Set your desired border color here
+                       // Set your desired border color here
                       ),
-                      color: kAccentColor0.withOpacity(0.3),
+                     
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.description, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.description,
+                                ),
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),
@@ -244,7 +238,7 @@ class _PostCreatorState extends State<PostCreator> {
                   ElevatedButton(
                     onPressed: _isPosting ? null : doPost,
                     child: _isPosting
-                        ? CircularProgressIndicator(color: kAccentColor1)
+                        ? CircularProgressIndicator()
                         : Text('Publicar'),
                   ),
                 ],

@@ -9,7 +9,7 @@ class Paths {
 
   static String noticias = '/news';
 
-    static String noticia= '/:id';
+  static String noticia = '/:id';
   static String otherProfile = '/otherProfile';
 
   static String mapas = '/mapas';
@@ -38,15 +38,12 @@ class Paths {
 
   static String optionsProfile = '$myProfile/options';
 
-
   static String changePassword = '$myProfile/options/changePassword';
 
   static var splash = '/splash';
 
-
   static String welcome = '/welcome';
 
-<<<<<<< HEAD
   static String createPost = '$post/create';
 
   static String nucleos = '/nucleos';
@@ -54,8 +51,4 @@ class Paths {
   static String criarNucleo = '$nucleos/create';
 
   static String pomodoro = '/pomodoro';
-
 }
-=======
-}
->>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee

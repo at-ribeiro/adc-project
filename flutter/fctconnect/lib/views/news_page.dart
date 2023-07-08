@@ -47,6 +47,8 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     if (_isNewsLoading) {
       return FutureBuilder(
           future: _loadNews(),
@@ -73,9 +75,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
           });
     } else {
       return Container(
-        decoration: kGradientDecoration,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             child: Center(
               child: ConstrainedBox(
@@ -88,22 +88,15 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                     children: [
                       Text(
                         news.title,
-                        style: const TextStyle(
+                        style: textTheme.headline5!.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: kAccentColor0,
-                          fontSize: 24.0,
                         ),
                       ),
                       const SizedBox(height: 8.0),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          news.timestamp,
-                          style: const TextStyle(
-                            color: kAccentColor2,
-                            fontSize: 16.0,
-                          ),
-                        ),
+                        child:
+                            Text(news.timestamp, style: textTheme.bodyText2!),
                       ),
                       const SizedBox(height: 2.0),
                       SizedBox(
@@ -129,11 +122,9 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: RichText(
-                            textAlign: TextAlign.justify,
                             text: TextSpan(
-                              style: TextStyle(
-                                color: kAccentColor0,
-                                fontSize: 18.0,
+                              style: textTheme.bodyText1!.copyWith(
+                                fontSize: 16.0,
                               ),
                               children: [
                                 TextSpan(
@@ -143,17 +134,28 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                             ),
                           ),
                         ),
+                      SizedBox(height: 16.0),
                       Row(
                         children: [
                           Align(
                             alignment: Alignment.centerRight,
-                            child: IconButton(
+                            child: ElevatedButton(
                                 onPressed: () {
                                   _launchInstagramURL(
                                       'https://www.fct.unl.pt$newsUrl');
                                 },
-                                icon: Icon(Icons.web,
-                                    color: kAccentColor0, size: 50.0)),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.web, size: 50.0),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      'Ver no site',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                  ],
+                                )),
                           ),
                         ],
                       ),

@@ -34,9 +34,9 @@ class _NucleoPageState extends State<NucleoPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
     if (_isLoadingToken) {
       return Container(
-        decoration: kGradientDecorationUp,
         child: TokenGetterWidget(onTokenLoaded: (Token token) {
           WidgetsBinding.instance?.addPostFrameCallback((_) {
             setState(() {
@@ -50,22 +50,20 @@ class _NucleoPageState extends State<NucleoPage> {
       return loadNucleo();
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               // List of widgets common for both layouts
               var commonWidgets = [
                 SizedBox(height: 8),
                 Text(
-                  'Descrição: ${_nucleo.description}',
-                  style: TextStyle(fontSize: 30, color: kAccentColor2),
+                  ' ${_nucleo.description}',
+                  style: textTheme.headline5,
                 ),
                 SizedBox(height: 8),
                 Text(
                   'Núcleo ${_nucleo.type}',
-                  style: TextStyle(fontSize: 30, color: kAccentColor2),
+                  style: textTheme.headline5,
                 ),
                 SizedBox(height: 50),
                 Row(
@@ -74,29 +72,38 @@ class _NucleoPageState extends State<NucleoPage> {
                         _nucleo.instagram!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
+                        child: ElevatedButton(
                           onPressed: () => _launchURL(_nucleo.instagram!),
-                          icon: Icon(FontAwesomeIcons.instagram,
-                              color: kAccentColor0, size: 50.0),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Icon(FontAwesomeIcons.instagram, size: 50.0),
+                          ),
                         ),
                       ),
                     if (_nucleo.facebook != null &&
                         _nucleo.facebook!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
+                        child: ElevatedButton(
                           onPressed: () => _launchURL(_nucleo.facebook!),
-                          icon: Icon(FontAwesomeIcons.facebook,
-                              color: kAccentColor0, size: 49.0),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Icon(FontAwesomeIcons.facebook, size: 49.0),
+                          ),
                         ),
                       ),
                     if (_nucleo.website != null && _nucleo.website!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
+                        child: ElevatedButton(
                           onPressed: () => _launchURL(_nucleo.website!),
-                          icon: Icon(UniconsLine.globe,
-                              color: kAccentColor0, size: 50.0),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                            child: Icon(UniconsLine.globe, size: 50.0),
+                          ),
                         ),
                       ),
                   ],
@@ -127,10 +134,9 @@ class _NucleoPageState extends State<NucleoPage> {
                           children: [
                             Text(
                               _nucleo.name,
-                              style: TextStyle(
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  color: kAccentColor0),
+                              style: textTheme.headline2?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             ...commonWidgets,
                           ],
@@ -155,10 +161,9 @@ class _NucleoPageState extends State<NucleoPage> {
                       SizedBox(height: 16),
                       Text(
                         _nucleo.name,
-                        style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: kAccentColor0),
+                        style: textTheme.headline2?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       ...commonWidgets,
                     ],
@@ -173,8 +178,9 @@ class _NucleoPageState extends State<NucleoPage> {
   }
 
   void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
       throw 'Could not launch $url';
     }
@@ -188,18 +194,18 @@ class _NucleoPageState extends State<NucleoPage> {
           if (snapshot.hasError) {
             String errorText = snapshot.error.toString();
             return Container(
-              decoration: kGradientDecorationUp,
+              decoration: Style.kGradientDecorationUp,
               child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
+                shape: RoundedRectangleBorder(
+                  borderRadius: Style.kBorderRadius,
                 ),
-                backgroundColor: kAccentColor0.withOpacity(0.3),
+                backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       errorText,
-                      style: const TextStyle(color: kAccentColor0),
+                      style: TextStyle(color: Style.kAccentColor0),
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(

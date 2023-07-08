@@ -100,9 +100,7 @@ class _EditProfileState extends State<EditProfile> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Center(
             // Use Center here to center SingleChildScrollView
             child: SingleChildScrollView(
@@ -192,48 +190,37 @@ class _EditProfileState extends State<EditProfile> {
   Container privacyWidget() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Theme(
-            data: ThemeData(
-              canvasColor: kAccentColor0,
-              popupMenuTheme: PopupMenuThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
-                ),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              child: DropdownButtonHideUnderline(
-                child: ExpansionTile(
-                  title: privacyController.text.isEmpty
-                      ? Text(
-                          "Privacidade",
-                          style: TextStyle(color: kAccentColor0),
-                        )
-                      : Text(privacyController.text,
-                          style: TextStyle(color: kAccentColor0)),
-                  leading: Icon(Icons.work, color: kAccentColor1),
-                  children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
-                    return ListTile(
-                      title: Text(
-                        value,
-                        style: TextStyle(color: kAccentColor0),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            child: DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: privacyController.text.isEmpty
+                    ? Text(
+                        "Privacidade",
+                      )
+                    : Text(
+                        privacyController.text,
                       ),
-                      onTap: () {
-                        setState(() {
-                          privacyController.text = value;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+                leading: Icon(Icons.work),
+                children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                    ),
+                    onTap: () {
+                      setState(() {
+                        privacyController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -245,62 +232,52 @@ class _EditProfileState extends State<EditProfile> {
   Container departmentWidget() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Theme(
-            data: ThemeData(
-              canvasColor: kAccentColor0,
-              popupMenuTheme: PopupMenuThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
-                ),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              child: DropdownButtonHideUnderline(
-                child: ExpansionTile(
-                  title: departmentController.text.isEmpty
-                      ? Text(
-                          "Departamento",
-                          style: TextStyle(color: kAccentColor0),
-                        )
-                      : Text(departmentController.text,
-                          style: TextStyle(color: kAccentColor0)),
-                  leading: Icon(Icons.work, color: kAccentColor1),
-                  children: [
-                    'Ciências e Engenharia do Ambiente',
-                    'Ciência dos Materiais',
-                    'Conservação e Restauro',
-                    'Ciências Sociais Aplicadas',
-                    'Ciências da Terra',
-                    'Ciências da Vida',
-                    'Engenharia Civil',
-                    'Engenharia Eletrotécnica e de Computadores',
-                    'Engenharia Mecânica e Industrial',
-                    'Física',
-                    'Informática',
-                    'Matemática',
-                    'Química'
-                  ].map<Widget>((String value) {
-                    return ListTile(
-                      title: Text(
-                        value,
-                        style: TextStyle(color: kAccentColor0),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            child: DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: departmentController.text.isEmpty
+                    ? Text(
+                        "Departamento",
+                      )
+                    : Text(
+                        departmentController.text,
                       ),
-                      onTap: () {
-                        setState(() {
-                          departmentController.text = value;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+                leading: Icon(Icons.work),
+                children: [
+                  'Ciências e Engenharia do Ambiente',
+                  'Ciência dos Materiais',
+                  'Conservação e Restauro',
+                  'Ciências Sociais Aplicadas',
+                  'Ciências da Terra',
+                  'Ciências da Vida',
+                  'Engenharia Civil',
+                  'Engenharia Eletrotécnica e de Computadores',
+                  'Engenharia Mecânica e Industrial',
+                  'Física',
+                  'Informática',
+                  'Matemática',
+                  'Química'
+                ].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                      
+                    ),
+                    onTap: () {
+                      setState(() {
+                        departmentController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -345,49 +322,39 @@ class _EditProfileState extends State<EditProfile> {
   Container yearWidget() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Theme(
-            data: ThemeData(
-              canvasColor: kAccentColor0,
-              popupMenuTheme: PopupMenuThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
-                ),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              child: DropdownButtonHideUnderline(
-                child: ExpansionTile(
-                  title: yearController.text.isEmpty
-                      ? Text(
-                          "Ano",
-                          style: TextStyle(color: kAccentColor0),
-                        )
-                      : Text(yearController.text,
-                          style: TextStyle(color: kAccentColor0)),
-                  leading: Icon(Icons.work, color: kAccentColor1),
-                  children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
-                      .map<Widget>((String value) {
-                    return ListTile(
-                      title: Text(
-                        value,
-                        style: TextStyle(color: kAccentColor0),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            child: DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: yearController.text.isEmpty
+                    ? Text(
+                        "Ano",
+                      )
+                    : Text(
+                        yearController.text,
                       ),
-                      onTap: () {
-                        setState(() {
-                          yearController.text = value;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+                leading: Icon(Icons.work),
+                children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
+                    .map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                 
+                    ),
+                    onTap: () {
+                      setState(() {
+                        yearController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -399,68 +366,58 @@ class _EditProfileState extends State<EditProfile> {
   Container courseWidget() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Theme(
-            data: ThemeData(
-              canvasColor: kAccentColor0,
-              popupMenuTheme: PopupMenuThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
-                ),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              child: DropdownButtonHideUnderline(
-                child: ExpansionTile(
-                  title: courseController.text.isEmpty
-                      ? Text(
-                          "Curso",
-                          style: TextStyle(color: kAccentColor0),
-                        )
-                      : Text(courseController.text,
-                          style: TextStyle(color: kAccentColor0)),
-                  leading: Icon(Icons.work, color: kAccentColor1),
-                  children: [
-                    'Biologia Celular e Molecular',
-                    'Bioquímica',
-                    'Conservação-Restauro',
-                    'Engenharia do Ambiente',
-                    'Engenharia Biomédica',
-                    'Engenharia Civil',
-                    'Engenharia Eletrotécnica e de Computadores',
-                    'Engenharia Física',
-                    'Engenharia Geológica',
-                    'Engenharia e Gestão Industrial',
-                    'Engenharia Informática',
-                    'Engenharia de Materiais',
-                    'Engenharia Mecânica',
-                    'Engenharia de Micro e Nanotecnologias',
-                    'Engenharia Química e Biológica',
-                    'Matemática',
-                    'Matemática Aplicada à Gestão do Risco',
-                    'Tecnologia Agro-Industrial',
-                    'Química Aplicada'
-                  ].map<Widget>((String value) {
-                    return ListTile(
-                      title: Text(
-                        value,
-                        style: TextStyle(color: kAccentColor0),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            child: DropdownButtonHideUnderline(
+              child: ExpansionTile(
+                title: courseController.text.isEmpty
+                    ? Text(
+                        "Curso",
+                      )
+                    : Text(
+                        courseController.text,
                       ),
-                      onTap: () {
-                        setState(() {
-                          courseController.text = value;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+                leading: Icon(Icons.work),
+                children: [
+                  'Biologia Celular e Molecular',
+                  'Bioquímica',
+                  'Conservação-Restauro',
+                  'Engenharia do Ambiente',
+                  'Engenharia Biomédica',
+                  'Engenharia Civil',
+                  'Engenharia Eletrotécnica e de Computadores',
+                  'Engenharia Física',
+                  'Engenharia Geológica',
+                  'Engenharia e Gestão Industrial',
+                  'Engenharia Informática',
+                  'Engenharia de Materiais',
+                  'Engenharia Mecânica',
+                  'Engenharia de Micro e Nanotecnologias',
+                  'Engenharia Química e Biológica',
+                  'Matemática',
+                  'Matemática Aplicada à Gestão do Risco',
+                  'Tecnologia Agro-Industrial',
+                  'Química Aplicada'
+                ].map<Widget>((String value) {
+                  return ListTile(
+                    title: Text(
+                      value,
+                    
+                    ),
+                    onTap: () {
+                      setState(() {
+                        courseController.text = value;
+                      });
+                    },
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -497,20 +454,20 @@ class _EditProfileState extends State<EditProfile> {
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return AlertDialog(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: kBorderRadius,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: Style.kBorderRadius,
                       ),
-                      backgroundColor: kAccentColor0.withOpacity(0.3),
+                      backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'A carregar...',
-                            style: const TextStyle(color: kAccentColor0),
+                            style: TextStyle(color: Style.kAccentColor0),
                           ),
                           const SizedBox(height: 15),
-                          const CircularProgressIndicator(
-                            color: kAccentColor1,
+                          CircularProgressIndicator(
+                            color: Style.kAccentColor1,
                           ),
                         ],
                       ),
@@ -530,16 +487,16 @@ class _EditProfileState extends State<EditProfile> {
                       return ErrorDialog(showErrorMessage, 'ok', context);
                     } else {
                       return AlertDialog(
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: kBorderRadius,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Style.kBorderRadius,
                         ),
-                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Perfil atualizado com sucesso!',
-                              style: const TextStyle(color: kAccentColor0),
+                              style: TextStyle(color: Style.kAccentColor0),
                             ),
                             const SizedBox(height: 15),
                             ElevatedButton(
@@ -603,27 +560,17 @@ class visitWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.school, color: kAccentColor1),
+              prefixIcon: Icon(Icons.school),
               hintText: 'Propósito da visita',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: purposeController,
           ),
@@ -645,28 +592,20 @@ class officeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
+            style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon:
-                  Icon(Icons.local_post_office_outlined, color: kAccentColor1),
-              hintText: 'Escritório',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
+              prefixIcon: Icon(
+                Icons.local_post_office_outlined,
               ),
+              hintText: 'Escritório',
             ),
             controller: officeController,
           ),
@@ -688,27 +627,18 @@ class aboutMeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
+            style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.person, color: kAccentColor1),
+              prefixIcon: Icon(Icons.person),
               hintText: 'Sobre Mim',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: aboutMeController,
             validator: (value) {
@@ -736,27 +666,18 @@ class cityWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
+            style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.location_city, color: kAccentColor1),
+              prefixIcon: Icon(Icons.location_city),
               hintText: 'Cidade',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: homeTownController,
             validator: (value) {
@@ -785,27 +706,18 @@ class phoneNumberWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
+            style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.phone, color: kAccentColor1),
+              prefixIcon: Icon(Icons.phone),
               hintText: 'Número de telemóvel',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: phoneNumberController,
           ),
@@ -827,27 +739,18 @@ class emailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
+            style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.email, color: kAccentColor1),
+              prefixIcon: Icon(Icons.email),
               hintText: 'Email',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: emailController,
           ),
@@ -869,27 +772,17 @@ class fullNameWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.person, color: kAccentColor1),
+              prefixIcon: Icon(Icons.person),
               hintText: 'Nome Completo',
-              border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1, // Set your desired focused color here
-                ),
-              ),
             ),
             controller: fullNameController,
           ),

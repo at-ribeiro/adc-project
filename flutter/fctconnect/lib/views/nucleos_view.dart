@@ -57,9 +57,7 @@ class _NucleosViewState extends State<NucleosView> {
       );
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Column(
             children: [
               SizedBox(height: 20),
@@ -70,8 +68,10 @@ class _NucleosViewState extends State<NucleosView> {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           _currentNucleoType == 'Academico'
-                              ? kPrimaryColor
-                              : kAccentColor1),
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context)
+                                  .navigationBarTheme
+                                  .indicatorColor!),
                     ),
                     onPressed: () => _onNucleoTypeButtonPressed('Academico'),
                     child: Text(
@@ -79,16 +79,19 @@ class _NucleosViewState extends State<NucleosView> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _currentNucleoType == 'Academico'
-                              ? kAccentColor0
-                              : kPrimaryColor),
+                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
+                              : Theme.of(context)
+                                  .primaryColor),
                     ),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           _currentNucleoType == 'Cultural'
-                              ? kPrimaryColor
-                              : kAccentColor1),
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context)
+                                  .navigationBarTheme
+                                  .indicatorColor!),
                     ),
                     onPressed: () => _onNucleoTypeButtonPressed('Cultural'),
                     child: Text(
@@ -96,40 +99,51 @@ class _NucleosViewState extends State<NucleosView> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _currentNucleoType == 'Cultural'
-                              ? kAccentColor0
-                              : kPrimaryColor),
+                               ? Theme.of(context).appBarTheme.titleTextStyle!.color
+                              : Theme.of(context)
+                                  .primaryColor),
                     ),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           _currentNucleoType == 'Recreativo'
-                              ? kPrimaryColor
-                              : kAccentColor1),
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context)
+                                  .navigationBarTheme
+                                  .indicatorColor!),
                     ),
                     onPressed: () => _onNucleoTypeButtonPressed('Recreativo'),
-                    child: Text('Recreativo' ,
+                    child: Text(
+                      'Recreativo',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _currentNucleoType == 'Recreativo'
-                              ? kAccentColor0
-                              : kPrimaryColor),),
+                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
+                              : Theme.of(context)
+                                  .primaryColor),
+                    ),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
                           _currentNucleoType == 'Associação-Parceira'
-                              ? kPrimaryColor
-                              : kAccentColor1),
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context)
+                                  .navigationBarTheme
+                                  .indicatorColor!),
                     ),
                     onPressed: () =>
                         _onNucleoTypeButtonPressed('Associação-Parceira'),
-                    child: Text('Associação-Parceira' ,
+                    child: Text(
+                      'Associação-Parceira',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _currentNucleoType == 'Associação-Parceira'
-                              ? kAccentColor0
-                              : kPrimaryColor),),
+                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
+                              : Theme.of(context)
+                                  .primaryColor),
+                    ),
                   ),
                 ],
               ),
@@ -137,7 +151,7 @@ class _NucleosViewState extends State<NucleosView> {
                 child: _isLoadingNucleos
                     ? Center(child: CircularProgressIndicatorCustom())
                     : _currentNucleoType == null
-                        ? Center(child: Text("Select a category"))
+                        ? Center(child: Text("Selecione uma categoria"))
                         : buildNucleoTab(context,
                             nucleoType: _currentNucleoType!),
               ),
@@ -149,6 +163,8 @@ class _NucleosViewState extends State<NucleosView> {
   }
 
   Widget buildNucleoTab(BuildContext context, {required String nucleoType}) {
+TextTheme textTheme = Theme.of(context).textTheme;
+
     var filteredNucleos =
         _nucleos.where((nucleo) => nucleo.type == nucleoType).toList();
     var screenWidth = MediaQuery.of(context).size.width;
@@ -179,10 +195,10 @@ class _NucleosViewState extends State<NucleosView> {
             child: Container(
               margin: EdgeInsets.all(5),
               decoration: BoxDecoration(
-                borderRadius: kBorderRadius,
+                borderRadius: Style.kBorderRadius,
                 border: Border.all(
                   width: 1.5,
-                  color: kAccentColor0.withOpacity(0.0),
+                  color: Style.kAccentColor0.withOpacity(0.0),
                 ),
               ),
               child: ClipRRect(
@@ -191,8 +207,8 @@ class _NucleosViewState extends State<NucleosView> {
                   filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: kAccentColor2.withOpacity(0.1),
-                      borderRadius: kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.1),
+                      borderRadius: Style.kBorderRadius,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -202,7 +218,7 @@ class _NucleosViewState extends State<NucleosView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ClipRRect(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               child: AspectRatio(
                                 aspectRatio: 1.2,
                                 child: FittedBox(
@@ -217,11 +233,7 @@ class _NucleosViewState extends State<NucleosView> {
                             Center(
                               child: Text(
                                 filteredNucleos[index].name,
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: kAccentColor0,
-                                ),
+                                style: textTheme.headline6,
                               ),
                             ),
                             const SizedBox(height: 4.0),

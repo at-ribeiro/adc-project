@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -89,7 +88,7 @@ class _NuceloCreatorState extends State<NuceloCreator> {
         width: 440, // Adj ust the width as needed
         height: 300, // Adjust the height as needed
         child: ClipRRect(
-            borderRadius: kBorderRadius,
+            borderRadius: Style.kBorderRadius,
             child: Image.memory(_imageData!, fit: BoxFit.fill)),
       );
     } else if (_isImageLoading) {
@@ -112,20 +111,19 @@ class _NuceloCreatorState extends State<NuceloCreator> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
-            backgroundColor: kAccentColor1,
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
             child: _isLoading
-                ? CircularProgressIndicator(
-                    color: kPrimaryColor,
-                  ) // Show the loading circle
+                ? CircularProgressIndicator() // Show the loading circle
                 : Icon(
                     Icons.add,
-                    color: kPrimaryColor,
                   ),
             onPressed: () async {
-              if(_token == null){
+              if (_token == null) {
                 setState(() {
                   _isLoadingToken = true;
                 });
@@ -155,27 +153,6 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                   fileName: _fileName,
                 );
 
-                print(nucleo.admin +
-                    " " +
-                    nucleo.name +
-                    " " +
-                    nucleo.type +
-                    " " +
-                    nucleo.email +
-                    " " +
-                    nucleo.subtitle +
-                    " " +
-                    nucleo.description +
-                    " " +
-                    nucleo.foundation +
-                    " " +
-                    nucleo.facebook +
-                    " " +
-                    nucleo.instagram +
-                    " " +
-                    nucleo.website +
-                    " ");
-
                 var response = await BaseClient().createNucleo(
                     '/nucleos', _token!.tokenID, _token!.username, nucleo);
 
@@ -196,7 +173,6 @@ class _NuceloCreatorState extends State<NuceloCreator> {
               });
             },
           ),
-          backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -209,29 +185,21 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.group, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.group,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Nome do Núcleo',
-                                  border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: nameController,
                                 validator: (value) {
@@ -247,29 +215,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.person, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.person,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Nome do Presidente',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: adminController,
                                 validator: (value) {
@@ -285,29 +246,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.email, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.email,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Email do núcleo',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: emailController,
                                 validator: (value) {
@@ -323,29 +277,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.title, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.title,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Subtitulo do núcleo',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: subtitleController,
                                 validator: (value) {
@@ -362,25 +309,21 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         Container(
                           height: 200,
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            border: Border.all(
-                              color:
-                                  kAccentColor1, // Set your desired border color here
-                            ),
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 maxLines: null, // Allow unlimited lines
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.description,
-                                      color: kAccentColor1),
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Descrição',
                                   border: InputBorder.none,
                                 ),
@@ -399,29 +342,23 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.title, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.title,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Data de Criação',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
+                                  focusedBorder: OutlineInputBorder(),
                                 ),
                                 controller: foundationController,
                                 validator: (value) {
@@ -437,19 +374,19 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: Theme(
                                 data: ThemeData(
-                                  canvasColor: kAccentColor0,
+                                  canvasColor: Style.kAccentColor2,
                                   popupMenuTheme: PopupMenuThemeData(
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: kBorderRadius,
+                                      borderRadius: Style.kBorderRadius,
                                     ),
                                   ),
                                 ),
@@ -462,21 +399,20 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                                       title: typeController.text.isEmpty
                                           ? Text(
                                               "Tipo de Núcleo",
-                                              style: TextStyle(
-                                                  color: kAccentColor0),
                                             )
-                                          : Text(typeController.text,
-                                              style: TextStyle(
-                                                  color: kAccentColor0)),
+                                          : Text(
+                                              typeController.text,
+                                            ),
                                       leading: Icon(Icons.style,
-                                          color: kAccentColor1),
+                                          color: Theme.of(context)
+                                              .inputDecorationTheme
+                                              .prefixStyle!
+                                              .color),
                                       children:
                                           types.map<Widget>((String value) {
                                         return ListTile(
                                           title: Text(
                                             value,
-                                            style:
-                                                TextStyle(color: kAccentColor0),
                                           ),
                                           onTap: () {
                                             setState(() {
@@ -496,29 +432,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(FontAwesomeIcons.instagram,
-                                      color: kAccentColor1),
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Instagram',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: instagramController,
                                 validator: (value) {
@@ -534,29 +463,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(FontAwesomeIcons.facebook,
-                                      color: kAccentColor1),
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'Facebook',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: facebookController,
                                 validator: (value) {
@@ -572,29 +494,22 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                         SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                            borderRadius: Style.kBorderRadius,
+                            color: Style.kAccentColor2.withOpacity(0.3),
                           ),
                           child: ClipRRect(
-                            borderRadius: kBorderRadius,
+                            borderRadius: Style.kBorderRadius,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: TextFormField(
-                                style: TextStyle(
-                                  color: kAccentColor0,
-                                ),
                                 decoration: InputDecoration(
-                                  prefixIcon:
-                                      Icon(Icons.web, color: kAccentColor1),
+                                  prefixIcon: Icon(Icons.web,
+                                      color: Theme.of(context)
+                                          .inputDecorationTheme
+                                          .prefixStyle!
+                                          .color),
                                   hintText: 'WebSite',
                                   border: InputBorder.none,
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
                                 controller: websiteController,
                                 validator: (value) {

@@ -42,7 +42,7 @@ class _EventPageState extends State<EventPage> {
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return Container(
-        decoration: kGradientDecorationUp,
+        decoration: Style.kGradientDecorationUp,
         child: TokenGetterWidget(onTokenLoaded: (Token token) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             setState(() {
@@ -58,7 +58,7 @@ class _EventPageState extends State<EventPage> {
 
 
       return Container(
-        decoration: kGradientDecorationUp,
+        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
@@ -85,17 +85,17 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
-                            color: kAccentColor0),
+                            color: Style.kAccentColor0),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Description: ${_event.description}',
-                        style: TextStyle(fontSize: 16, color: kAccentColor2),
+                        style: TextStyle(fontSize: 16, color: Style.kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Creator: ${_event.creator}',
-                        style: TextStyle(fontSize: 16, color: kAccentColor2),
+                        style: TextStyle(fontSize: 16, color: Style.kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -105,7 +105,7 @@ class _EventPageState extends State<EventPage> {
                                 _event.start,
                               ),
                             ),
-                        style: TextStyle(fontSize: 16, color: kAccentColor2),
+                        style: TextStyle(fontSize: 16, color: Style.kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -115,7 +115,7 @@ class _EventPageState extends State<EventPage> {
                                 _event.end,
                               ),
                             ),
-                        style: TextStyle(fontSize: 16, color: kAccentColor2),
+                        style: TextStyle(fontSize: 16, color:Style. kAccentColor2),
                       ),
                       SizedBox(height: 16),
 
@@ -154,12 +154,12 @@ class _EventPageState extends State<EventPage> {
               context: context,
               builder: (BuildContext context) {
                 return ClipRRect(
-                  borderRadius: kBorderRadius,
+                  borderRadius: Style.kBorderRadius,
                   child: Dialog(
                     backgroundColor: Colors.transparent,
                     child: Container(
                       child: ClipRRect(
-                        borderRadius: kBorderRadius,
+                        borderRadius: Style.kBorderRadius,
                         child: Image.network(
 
                           _event.qrCodeUrl!,
@@ -205,18 +205,18 @@ class _EventPageState extends State<EventPage> {
               errorText = 'Algo não correu bem';
 
             return Container(
-              decoration: kGradientDecorationUp,
+              decoration: Style.kGradientDecorationUp,
               child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
+                shape: RoundedRectangleBorder(
+                  borderRadius: Style.kBorderRadius,
                 ),
-                backgroundColor: kAccentColor0.withOpacity(0.3),
+                backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       errorText,
-                      style: const TextStyle(color: kAccentColor0),
+                      style:  TextStyle(color: Style.kAccentColor0),
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(

@@ -138,8 +138,10 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
             Container(
               padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
               child: FloatingActionButton(
-                backgroundColor: kPrimaryColor,
-                foregroundColor: Colors.white,
+                backgroundColor:
+                    Theme.of(context).floatingActionButtonTheme.backgroundColor,
+                foregroundColor:
+                    Theme.of(context).floatingActionButtonTheme.foregroundColor,
                 onPressed: drawRoute,
                 child: Icon(Icons.directions),
               ),

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "configVersion": 2,
   "packages": [
@@ -963,9 +962,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-07-05T15:43:52.272171Z",
+  "generated": "2023-07-08T16:58:25.681565Z",
   "generator": "pub",
   "generatorVersion": "3.0.5"
 }
-=======
->>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee

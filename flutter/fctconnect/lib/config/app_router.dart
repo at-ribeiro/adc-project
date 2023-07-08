@@ -240,13 +240,11 @@ class AppRouter {
           return Scaffold(
             drawer: drawerModel,
             appBar: AppBar(
-              backgroundColor: kPrimaryColor,
               elevation: 0,
               title: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _getTitleBasedOnRoute(state.location),
-                  style: TextStyle(color: kAccentColor0),
                 ),
               ),
               actions: [
@@ -255,9 +253,8 @@ class AppRouter {
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.menu,
-                      color: kAccentColor0,
                     ),
                     onPressed: () {
                       Scaffold.of(context).openDrawer();
@@ -310,7 +307,7 @@ class AppRouter {
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
     } else if (location == Paths.noticias || location.contains('noticias')) {
-      return 'Noticias';
+      return 'Notícias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
     } else if (location == Paths.routes) {
@@ -337,21 +334,18 @@ class AppRouter {
       return 'Evento';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
-<<<<<<< HEAD
     } else if (location == Paths.nucleos) {
       return 'Núcleos';
     } else if (location == Paths.criarNucleo) {
       return 'Criar Núcleo';
     } else if (location == Paths.pomodoro) {
       return 'Pomodoro';
-    } else if (location != Paths.nucleos && location.contains(Paths.nucleos))  {
+    } else if (location != Paths.nucleos && location.contains(Paths.nucleos)) {
       return 'Núcleo';
-=======
     } else if (location.contains(Paths.changePassword)) {
       return 'Mudar Password';
     } else if (location.contains(Paths.optionsProfile)) {
       return 'Opções de Perfil';
->>>>>>> 0f04151bf6abe45acbd6800f4abcb8940b3eedee
     }
     // add more conditions for other routes
 
@@ -395,7 +389,6 @@ class AppRouter {
             context.go(Paths.createEvent);
           },
           icon: Icon(Icons.add));
-
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {
@@ -408,7 +401,6 @@ class AppRouter {
             context.go(Paths.routes);
           },
           icon: Icon(Icons.arrow_back));
-
     } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
@@ -426,6 +418,18 @@ class AppRouter {
       return IconButton(
           onPressed: () {
             context.go(Paths.nucleos);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if(location.contains('noticias')){
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.noticias);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if (location.contains(Paths.optionsProfile)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.myProfile);
           },
           icon: Icon(Icons.arrow_back));
     }

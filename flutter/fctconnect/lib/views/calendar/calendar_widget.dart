@@ -54,16 +54,16 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                borderRadius: kBorderRadius,
+              shape:  RoundedRectangleBorder(
+                borderRadius: Style.kBorderRadius,
               ),
-              backgroundColor: kAccentColor0.withOpacity(0.3),
-              content: const Row(
+              backgroundColor: Style.kAccentColor2.withOpacity(0.3),
+              content:  Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
-                    color: kAccentColor1,
+                    color: Style.kAccentColor1,
                   ),
                 ],
               ),
@@ -72,15 +72,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             return Text('Error initializing activities: ${snapshot.error}');
           } else {
             return Container(
-              decoration: kGradientDecorationDown,
+              decoration: Style.kGradientDecorationDown,
               child: Scaffold(
                 backgroundColor: Colors.transparent,
                 floatingActionButton: FloatingActionButton(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor: Style.kPrimaryColor,
                   onPressed: () {
                     provider.addActivity(context, _token);
                   },
-                  child: const Icon(Icons.add, color: kAccentColor0),
+                  child: Icon(Icons.add, color: Style.kAccentColor0),
                 ),
                 body: Column(
                   children: [
@@ -125,31 +125,31 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         controller: calendarController,
                         dataSource: ActivityDataSource(provider.activities),
                         selectionDecoration: BoxDecoration(
-                          color: kAccentColor2.withOpacity(0.1),
-                          border: Border.all(color: kSecondaryColor, width: 3),
+                          color: Style.kAccentColor2.withOpacity(0.1),
+                          border: Border.all(color: Style.kSecondaryColor, width: 3),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(7)),
                           shape: BoxShape.rectangle,
                         ),
-                        monthViewSettings: const MonthViewSettings(
+                        monthViewSettings:  MonthViewSettings(
                           appointmentDisplayMode:
                               MonthAppointmentDisplayMode.indicator,
                           showAgenda: true,
                           monthCellStyle: MonthCellStyle(
                             textStyle: TextStyle(
-                              color: kAccentColor0,
+                              color: Style.kAccentColor0,
                               fontSize: 16,
                             ),
                             trailingDatesTextStyle: TextStyle(
-                              color: kAccentColor0,
+                              color: Style.kAccentColor0,
                               fontSize: 16,
                             ),
                             leadingDatesTextStyle: TextStyle(
-                              color: kAccentColor0,
+                              color: Style.kAccentColor0,
                               fontSize: 16,
                             ),
                             todayTextStyle: TextStyle(
-                              color: kAccentColor0,
+                              color: Style.kAccentColor0,
                               fontSize: 16,
                             ),
                           ),

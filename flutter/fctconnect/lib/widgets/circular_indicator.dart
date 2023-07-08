@@ -9,6 +9,6 @@ class CircularProgressIndicatorCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator(color: kAccentColor1,);
+    return CircularProgressIndicator(color: Style.kAccentColor1,);
   }
 }

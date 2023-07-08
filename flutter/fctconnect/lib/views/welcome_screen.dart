@@ -4,13 +4,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/NewsData.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Themes/theme_manager.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../widgets/error_dialog.dart';
+import '../widgets/theme_switch.dart';
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -37,6 +40,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeManager themeManager = context.watch<ThemeManager>();
+
     if (_isLoadingNews) {
       return FutureBuilder(
           future: _loadNews(),
@@ -63,7 +68,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: CustomScrollView(
@@ -80,8 +85,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                backgroundColor:
-                    kPrimaryColor, // Set the background color of the SliverAppBar
+                backgroundColor: Style
+                    .kPrimaryColor, // Set the background color of the SliverAppBar
                 title: Text('Bem vindo à FCTConnect'),
                 leading: Container(
                   width: 30.0,
@@ -95,6 +100,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 actions: [
                   Row(
                     children: [
+                     ThemeSwitch(themeManager: themeManager),
+                      SizedBox(width: 16.0),
                       Container(
                         width: 80.0,
                         height: 40.0,
@@ -109,12 +116,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                             ), // Set the desired radius value
 
-                            primary: kAccentColor0,
+                            primary: Style.kAccentColor0,
                           ),
                           child: Text(
                             'Registar',
                             style: TextStyle(
-                              color: kSecondaryColor,
+                              color: Style.kSecondaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -137,7 +144,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           child: Text(
                             'Entrar',
                             style: TextStyle(
-                              color: kAccentColor0,
+                              color: Style.kAccentColor0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -157,11 +164,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       SizedBox(height: 40.0),
                       GestureDetector(
                         onTap: () {
-                          _launchInstagramURL('https://www.fct.unl.pt/' + _news[currentNewsIndex].newsUrl);
+                          _launchInstagramURL('https://www.fct.unl.pt/' +
+                              _news[currentNewsIndex].newsUrl);
                         },
                         child: Card(
-                          
-                          color: kPrimaryColor.withOpacity(0.8),
+                          color: Style.kPrimaryColor.withOpacity(0.8),
                           child: Container(
                             height: 500.0,
                             child: PageView.builder(
@@ -174,7 +181,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               itemBuilder: (context, index) {
                                 final newsItem = _news[index];
                                 return Container(
-                                  color: kPrimaryColor.withOpacity(0.5),
+                                  color: Style.kPrimaryColor.withOpacity(0.5),
                                   child: Stack(
                                     children: [
                                       Row(
@@ -198,13 +205,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                 width: 850,
                                                 child: Flexible(
                                                   child: Align(
-                                                    alignment: Alignment.topLeft,
+                                                    alignment:
+                                                        Alignment.topLeft,
                                                     child: Text(
                                                       "       " +
                                                           _news[index].text,
                                                       style: TextStyle(
                                                         fontSize: 24.0,
-                                                        color: kAccentColor0,
+                                                        color:
+                                                            Style.kAccentColor0,
                                                       ),
                                                       maxLines:
                                                           null, // Remove the limitation of 2 lines
@@ -239,7 +248,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                             newsItem.title,
                                             style: TextStyle(
                                               fontSize: 28.0,
-                                              color: kAccentColor0,
+                                              color: Style.kAccentColor0,
                                             ),
                                           ),
                                         ),
@@ -276,7 +285,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         height: 500.0, // Set height for the map container
                         width: 800.0, // Set width for the map container
                         child: ClipRRect(
-                          borderRadius: kBorderRadius,
+                          borderRadius: Style.kBorderRadius,
                           child: GoogleMap(
                               initialCameraPosition: CameraPosition(
                                 target: _initialPosition,
@@ -314,7 +323,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                             'https://www.instagram.com/estudasses.fct/');
                                       },
                                       icon: Icon(FontAwesomeIcons.instagram,
-                                          color: kAccentColor0, size: 50.0)),
+                                          color: Style.kAccentColor0,
+                                          size: 50.0)),
                                 )
                               ],
                             ),

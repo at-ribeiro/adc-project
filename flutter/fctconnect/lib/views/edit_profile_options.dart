@@ -59,204 +59,196 @@ class _EditProfileOptionsState extends State<EditProfileOptions> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-            backgroundColor: Colors.transparent,
             body: Container(
-              padding: EdgeInsets.only(left: 16, top: 25, right: 16),
-              child: ListView(
+          padding: EdgeInsets.only(left: 16, top: 25, right: 16),
+          child: ListView(
+            children: [
+              SizedBox(
+                height: 15,
+              ),
+              Row(
                 children: [
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person,
-                        color: kAccentColor1,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text(
-                        "Conta",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                  Divider(
-                    height: 15,
-                    thickness: 2,
+                  Icon(
+                    Icons.person,
+                    color: Style.kAccentColor1,
                   ),
                   SizedBox(
-                    height: 10,
+                    width: 8,
                   ),
-                  buildEditProfileGesture(context, "Editar Perfil"),
-                  buildEditProfileGesture(context, "Mudar Password"),
-                  deleteAccountGesture(context),
+                  Text(
+                    "Conta",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  )
                 ],
               ),
-            )),
+              Divider(
+                height: 15,
+                thickness: 2,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              ListTile(
+                onTap: () {
+                  context.go(Paths.editProfile);
+                },
+                title: Text(
+                  "Editar Perfil",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                leading: Icon(
+                  Icons.edit,
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  context.go(Paths.changePassword);
+                },
+                title: Text(
+                  "Mudar Password",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                leading: Icon(
+                  Icons.lock,
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  "Apagar Conta",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                leading: Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Style.kBorderRadius,
+                        ),
+                        backgroundColor: Style.kAccentColor2.withOpacity(0.3),
+                        title: Text(
+                            "Tem a certeza que deseja apagar a sua conta?"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Cancelar"),
+                            style: ElevatedButton.styleFrom(),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return FutureBuilder(
+                                    future: BaseClient().deleteAccount(
+                                        "/remove",
+                                        _token.tokenID,
+                                        _token.username),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: Style.kBorderRadius,
+                                          ),
+                                          backgroundColor: Style.kAccentColor2
+                                              .withOpacity(0.3),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'A apagar...',
+                                                style: TextStyle(
+                                                    color: Style.kAccentColor0),
+                                              ),
+                                              SizedBox(height: 15),
+                                              CircularProgressIndicator(
+                                                color: Style.kAccentColor1,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } else {
+                                        if (snapshot.hasError) {
+                                          return ErrorDialog(
+                                              "Erro ao apagar a conta.",
+                                              'OK',
+                                              context);
+                                        } else {
+                                          return AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: Style.kBorderRadius,
+                                            ),
+                                            backgroundColor: Style.kAccentColor2
+                                                .withOpacity(0.3),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  'Conta apagada com sucesso!',
+                                                  style: TextStyle(
+                                                      color:
+                                                          Style.kAccentColor0),
+                                                ),
+                                                SizedBox(height: 15),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    Navigator.of(context).pop();
+                                                    CacheDefault.cacheFactory
+                                                        .logout();
+                                                    CacheDefault.cacheFactory
+                                                        .delete('isLoggedIn');
+                                                    SharedPreferences prefs =
+                                                        await SharedPreferences
+                                                            .getInstance();
+                                                    prefs.remove('ProfilePic');
+                                                    context.go(Paths.login);
+                                                  },
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            child: Text("Apagar"),
+                            style: ElevatedButton.styleFrom(
+                              primary:Colors.red,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        )),
       );
     }
-  }
-
-  GestureDetector deleteAccountGesture(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: kBorderRadius,
-              ),
-              backgroundColor: kAccentColor0.withOpacity(0.3),
-              title: Text("Tem a certeza que deseja apagar a sua conta?"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancelar"),
-                  style: ElevatedButton.styleFrom(),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return FutureBuilder(
-                          future: BaseClient().deleteAccount(
-                              "/remove", _token.tokenID, _token.username),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: kBorderRadius,
-                                ),
-                                backgroundColor: kAccentColor0.withOpacity(0.3),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'A apagar...',
-                                      style: TextStyle(color: kAccentColor0),
-                                    ),
-                                    SizedBox(height: 15),
-                                    CircularProgressIndicator(
-                                      color: kAccentColor1,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } else {
-                              if (snapshot.hasError) {
-                                return ErrorDialog(
-                                    "Erro ao apagar a conta.", 'OK', context);
-                              } else {
-                                return AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: kBorderRadius,
-                                  ),
-                                  backgroundColor:
-                                      kAccentColor0.withOpacity(0.3),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Conta apagada com sucesso!',
-                                        style: TextStyle(color: kAccentColor0),
-                                      ),
-                                      SizedBox(height: 15),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          CacheDefault.cacheFactory.logout();
-                                          CacheDefault.cacheFactory
-                                              .delete('isLoggedIn');
-                                          SharedPreferences prefs =
-                                              await SharedPreferences
-                                                  .getInstance();
-                                          prefs.remove('ProfilePic');
-                                          context.go(Paths.login);
-                                        },
-                                        child: Text('Ok'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                        );
-                      },
-                    );
-                  },
-                  child: Text("Apagar"),
-                  style: ElevatedButton.styleFrom(),
-                ),
-              ],
-            );
-          },
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Apagar Conta",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.red,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  GestureDetector buildEditProfileGesture(BuildContext context, String title) {
-    return GestureDetector(
-      onTap: () {
-        if (title == "Editar Perfil") {
-          context.go(Paths.editProfile);
-        } else {
-          context.go(Paths.changePassword);
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-            )
-          ],
-        ),
-      ),
-    );
   }
 }

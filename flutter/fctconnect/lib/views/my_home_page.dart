@@ -33,6 +33,8 @@ class _MyHomePageState extends State<MyHomePage> {
       DateTime.now().millisecondsSinceEpoch.toString();
   late ScrollController _scrollController;
 
+  bool _isDarKThem = true;
+
   late DropzoneViewController dropControler;
 
   @override
@@ -66,17 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Stack(
           children: [
             // Here's where you add the gradient
-            Positioned.fill(
-              child: DecoratedBox(decoration: kGradientDecoration),
-            ),
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: Colors.transparent,
-                ),
-              ),
-            ),
+            // Positioned.fill(
+            //   child: DecoratedBox(decoration: Style.kGradientDecoration),
+            // ),
+            // Positioned.fill(
+            //   child: BackdropFilter(
+            //     filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            //     child: Container(
+            //       color: Colors.transparent,
+            //     ),
+            //   ),
+            // ),
             Center(
               // Center the ContentBody widget
               child: Container(
@@ -125,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.circular(10.0),
                 border: Border.all(
                   width: 1.5,
-                  color: kAccentColor0.withOpacity(0.0),
+                  color: Style.kAccentColor0.withOpacity(0.0),
                 ),
               ),
               child: ClipRRect(
@@ -134,8 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: kAccentColor2.withOpacity(0.1),
-                      borderRadius: kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -198,11 +200,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return ClipRRect(
-                                          borderRadius: kBorderRadius,
+                                          borderRadius: Style.kBorderRadius,
                                           child: Dialog(
                                             child: Container(
                                               child: ClipRRect(
-                                                borderRadius: kBorderRadius,
+                                                borderRadius:
+                                                    Style.kBorderRadius,
                                                 child: Image.network(
                                                   post.url,
                                                   fit: BoxFit.cover,
@@ -414,13 +417,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 TextButton(
                   onPressed: () async {
                     BaseClient().reportPost(
-                      "/report",
-                      _token.username,
-                      _token.tokenID,
-                      id,
-                      postUser,
-                      selectedReason,
-                      _commentController.text);
+                        "/report",
+                        _token.username,
+                        _token.tokenID,
+                        id,
+                        postUser,
+                        selectedReason,
+                        _commentController.text);
                     Navigator.of(context).pop();
                   },
                   child: Text('Submeter'),
@@ -433,7 +436,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void>  _loadPosts() async {
+  Future<void> _loadPosts() async {
     List<FeedData> posts = await BaseClient().getFeedorPost(
       "/feed",
       _token.tokenID,

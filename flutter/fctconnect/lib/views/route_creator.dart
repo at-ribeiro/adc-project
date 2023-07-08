@@ -98,9 +98,7 @@ class _RouteCreatorState extends State<RouteCreator> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             controller: _scrollController, // Use the scroll controller
             child: Column(
@@ -113,28 +111,18 @@ class _RouteCreatorState extends State<RouteCreator> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
+                          style: TextStyle(),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.title),
                             hintText: 'Título do Percurso',
-                            border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color: kAccentColor1,
-                                // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: routeNameController,
                           validator: (value) {
@@ -150,212 +138,311 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                ExpansionTile(
-                  title: Text('RESTAURAÇÃO'),
-                  onExpansionChanged: (expanded) {
-                    if (expanded && _isFirstLoadRest) {
-                      _isFirstLoadRest = false;
-                      _loadLocations("RESTAURACAO");
-                    }
-                  },
-                  children: [
-                    if (_isFirstLoadRest)
-                      CircularProgressIndicator()
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: locationsListRestauracao.length,
-                        itemBuilder: (context, index) {
-                          LocationGetData locationData =
-                              locationsListRestauracao[index];
-                          bool isSelected =
-                              locationsToAdd.contains(locationData.name);
-                          return ListTile(
-                            title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Restauração'),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isSelected
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
-                              ),
-                              onPressed: () {
-                                if (isSelected) {
-                                  removeFromLocations(locationData.name);
-                                } else {
-                                  addToSelectedLocations(locationData.name);
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: Style.kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          child: DropdownButtonHideUnderline(
+                            child: ExpansionTile(
+                              title: Text('RESTAURAÇÃO'),
+                              onExpansionChanged: (expanded) {
+                                if (expanded && _isFirstLoadRest) {
+                                  _isFirstLoadRest = false;
+                                  _loadLocations("RESTAURACAO");
                                 }
                               },
+                              children: [
+                                if (_isFirstLoadRest)
+                                  CircularProgressIndicator()
+                                else
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: locationsListRestauracao.length,
+                                    itemBuilder: (context, index) {
+                                      LocationGetData locationData =
+                                          locationsListRestauracao[index];
+                                      bool isSelected = locationsToAdd
+                                          .contains(locationData.name);
+                                      return ListTile(
+                                        title: Text(locationData.name),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                            ),
+                                            Text(
+                                                'Tipo de localização: Restauração'),
+                                          ],
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(
+                                            isSelected
+                                                ? Icons.check_box
+                                                : Icons.check_box_outline_blank,
+                                          ),
+                                          onPressed: () {
+                                            if (isSelected) {
+                                              removeFromLocations(
+                                                  locationData.name);
+                                            } else {
+                                              addToSelectedLocations(
+                                                  locationData.name);
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                  ],
+                    ),
+                  ),
                 ),
                 SizedBox(height: 10.0),
-                ExpansionTile(
-                  title: Text('EDIFÍCIOS'),
-                  onExpansionChanged: (expanded) {
-                    if (expanded && _isFirstLoadEd) {
-                      _isFirstLoadEd = false;
-                      _loadLocations("EDIFICIO");
-                    }
-                  },
-                  children: [
-                    if (_isFirstLoadEd)
-                      CircularProgressIndicator()
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: locationsListEdificios.length,
-                        itemBuilder: (context, index) {
-                          LocationGetData locationData =
-                              locationsListEdificios[index];
-                          bool isSelected =
-                              locationsToAdd.contains(locationData.name);
-                          return ListTile(
-                            title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Edifício'),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isSelected
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
-                              ),
-                              onPressed: () {
-                                if (isSelected) {
-                                  removeFromLocations(locationData.name);
-                                } else {
-                                  addToSelectedLocations(locationData.name);
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: Style.kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          child: DropdownButtonHideUnderline(
+                            child: ExpansionTile(
+                              title: Text('EDIFÍCIOS'),
+                              onExpansionChanged: (expanded) {
+                                if (expanded && _isFirstLoadEd) {
+                                  _isFirstLoadEd = false;
+                                  _loadLocations("EDIFICIO");
                                 }
                               },
+                              children: [
+                                if (_isFirstLoadEd)
+                                  CircularProgressIndicator()
+                                else
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: locationsListEdificios.length,
+                                    itemBuilder: (context, index) {
+                                      LocationGetData locationData =
+                                          locationsListEdificios[index];
+                                      bool isSelected = locationsToAdd
+                                          .contains(locationData.name);
+                                      return ListTile(
+                                        title: Text(locationData.name),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                            ),
+                                            Text(
+                                                'Tipo de localização: Edifício'),
+                                          ],
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(
+                                            isSelected
+                                                ? Icons.check_box
+                                                : Icons.check_box_outline_blank,
+                                          ),
+                                          onPressed: () {
+                                            if (isSelected) {
+                                              removeFromLocations(
+                                                  locationData.name);
+                                            } else {
+                                              addToSelectedLocations(
+                                                  locationData.name);
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                  ],
+                    ),
+                  ),
                 ),
                 SizedBox(height: 10.0),
-                ExpansionTile(
-                  title: Text('TRANSPORTES'),
-                  onExpansionChanged: (expanded) {
-                    if (expanded && _isFirstLoadTrans) {
-                      _isFirstLoadTrans = false;
-                      _loadLocations("TRANSPORTE");
-                    }
-                  },
-                  children: [
-                    if (_isFirstLoadTrans)
-                      CircularProgressIndicator()
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: locationsListTransporte.length,
-                        itemBuilder: (context, index) {
-                          LocationGetData locationData =
-                              locationsListTransporte[index];
-                          bool isSelected =
-                              locationsToAdd.contains(locationData.name);
-                          return ListTile(
-                            title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Transporte'),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isSelected
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
-                              ),
-                              onPressed: () {
-                                if (isSelected) {
-                                  removeFromLocations(locationData.name);
-                                } else {
-                                  addToSelectedLocations(locationData.name);
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: Style.kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          child: DropdownButtonHideUnderline(
+                            child: ExpansionTile(
+                              title: Text('TRANSPORTES'),
+                              onExpansionChanged: (expanded) {
+                                if (expanded && _isFirstLoadTrans) {
+                                  _isFirstLoadTrans = false;
+                                  _loadLocations("TRANSPORTE");
                                 }
                               },
+                              children: [
+                                if (_isFirstLoadTrans)
+                                  CircularProgressIndicator()
+                                else
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: locationsListTransporte.length,
+                                    itemBuilder: (context, index) {
+                                      LocationGetData locationData =
+                                          locationsListTransporte[index];
+                                      bool isSelected = locationsToAdd
+                                          .contains(locationData.name);
+                                      return ListTile(
+                                        title: Text(locationData.name),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                            ),
+                                            Text(
+                                                'Tipo de localização: Transporte'),
+                                          ],
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(
+                                            isSelected
+                                                ? Icons.check_box
+                                                : Icons.check_box_outline_blank,
+                                          ),
+                                          onPressed: () {
+                                            if (isSelected) {
+                                              removeFromLocations(
+                                                  locationData.name);
+                                            } else {
+                                              addToSelectedLocations(
+                                                  locationData.name);
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                  ],
+                    ),
+                  ),
                 ),
                 SizedBox(height: 10.0),
-                ExpansionTile(
-                  title: Text('EVENTOS'),
-                  onExpansionChanged: (expanded) {
-                    if (expanded && _isFirstLoadEv) {
-                      _isFirstLoadEv = false;
-                      _loadLocations("EVENTO");
-                    }
-                  },
-                  children: [
-                    if (_isFirstLoadEv)
-                      CircularProgressIndicator()
-                    else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: locationsListEventos.length,
-                        itemBuilder: (context, index) {
-                          LocationGetData locationData =
-                              locationsListEventos[index];
-                          bool isSelected =
-                              locationsToAdd.contains(locationData.name);
-                          return ListTile(
-                            title: Text(locationData.name),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                ),
-                                Text('Tipo de localização: Evento'),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                isSelected
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
-                              ),
-                              onPressed: () {
-                                if (isSelected) {
-                                  removeFromLocations(locationData.name);
-                                } else {
-                                  addToSelectedLocations(locationData.name);
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: Style.kBorderRadius,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          child: DropdownButtonHideUnderline(
+                            child: ExpansionTile(
+                              title: Text('EVENTOS'),
+                              onExpansionChanged: (expanded) {
+                                if (expanded && _isFirstLoadEv) {
+                                  _isFirstLoadEv = false;
+                                  _loadLocations("EVENTO");
                                 }
                               },
+                              children: [
+                                if (_isFirstLoadEv)
+                                  CircularProgressIndicator()
+                                else
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: locationsListEventos.length,
+                                    itemBuilder: (context, index) {
+                                      LocationGetData locationData =
+                                          locationsListEventos[index];
+                                      bool isSelected = locationsToAdd
+                                          .contains(locationData.name);
+                                      return ListTile(
+                                        title: Text(locationData.name),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                            ),
+                                            Text('Tipo de localização: Evento'),
+                                          ],
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(
+                                            isSelected
+                                                ? Icons.check_box
+                                                : Icons.check_box_outline_blank,
+                                          ),
+                                          onPressed: () {
+                                            if (isSelected) {
+                                              removeFromLocations(
+                                                  locationData.name);
+                                            } else {
+                                              addToSelectedLocations(
+                                                  locationData.name);
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                  ],
+                    ),
+                  ),
                 ),
                 SizedBox(height: 20.0),
                 Padding(
@@ -364,18 +451,19 @@ class _RouteCreatorState extends State<RouteCreator> {
                     onPressed: () {
                       if (locationsToAdd.isNotEmpty &&
                           routeNameController.text.isNotEmpty) {
-                            RouteGetData route = RouteGetData(
-                              creator: _token.username,
-                              name: routeNameController.text,
-                              locations: locationsToAdd,
-                              participants: [_token.username],
-                            );
-                          
+                        RouteGetData route = RouteGetData(
+                          creator: _token.username,
+                          name: routeNameController.text,
+                          locations: locationsToAdd,
+                          participants: [_token.username],
+                        );
+
                         setState(() {
                           locationsToAdd.clear();
                           routeNameController.clear();
                         });
                       }
+                      context.go(Paths.routes);
                     },
                     child: Text('Criar Percurso'),
                   ),

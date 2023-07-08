@@ -107,15 +107,16 @@ class _ReportPageState extends State<ReportPage> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           floatingActionButton: FloatingActionButton(
-            backgroundColor: kSecondaryColor,
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
             onPressed: () {
               submitForm();
             },
-            child: Icon(Icons.send, color: kAccentColor0),
+            child: Icon(Icons.send),
           ),
           body: Padding(
             padding: EdgeInsets.all(16.0),
@@ -123,28 +124,19 @@ class _ReportPageState extends State<ReportPage> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: kBorderRadius,
-                    color: kAccentColor0.withOpacity(0.3),
+                    borderRadius: Style.kBorderRadius,
+                    color: Style.kAccentColor2.withOpacity(0.3),
                   ),
                   child: ClipRRect(
-                    borderRadius: kBorderRadius,
+                    borderRadius: Style.kBorderRadius,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                        style: TextStyle(
-                          color: kAccentColor0,
-                        ),
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person, color: kAccentColor1),
+                          prefixIcon: Icon(Icons.person,
+                              color: Theme.of(context).iconTheme.color),
                           hintText: 'Nome completo do utilizador',
                           border: InputBorder.none,
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: kBorderRadius,
-                            borderSide: BorderSide(
-                              color:
-                                  kAccentColor1, // Set your desired focused color here
-                            ),
-                          ),
                         ),
                         controller: nameController,
                         validator: (value) {
@@ -161,28 +153,21 @@ class _ReportPageState extends State<ReportPage> {
                 SizedBox(height: 16.0),
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: kBorderRadius,
-                    color: kAccentColor0.withOpacity(0.3),
+                    borderRadius: Style.kBorderRadius,
+                    color: Style.kAccentColor2.withOpacity(0.3),
                   ),
                   child: ClipRRect(
-                    borderRadius: kBorderRadius,
+                    borderRadius: Style.kBorderRadius,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                        style: TextStyle(
-                          color: kAccentColor0,
-                        ),
+                        
                         decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.person, color: kAccentColor1),
+                          prefixIcon:
+                              Icon(Icons.person, color: Theme.of(context).iconTheme.color),
                           hintText: 'Localização do problema',
                           border: InputBorder.none,
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: kBorderRadius,
-                            borderSide: BorderSide(
-                              color:
-                                  kAccentColor1, // Set your desired focused color here
-                            ),
-                          ),
+                         
                         ),
                         controller: locationController,
                         validator: (value) {
@@ -200,26 +185,24 @@ class _ReportPageState extends State<ReportPage> {
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    borderRadius: kBorderRadius,
+                    borderRadius: Style.kBorderRadius,
                     border: Border.all(
-                      color: kAccentColor1, // Set your desired border color here
+                      color: Style
+                          .kAccentColor1, // Set your desired border color here
                     ),
-                    color: kAccentColor0.withOpacity(0.3),
+                    color: Style.kAccentColor2.withOpacity(0.3),
                   ),
                   child: ClipRRect(
-                    borderRadius: kBorderRadius,
+                    borderRadius: Style.kBorderRadius,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                        style: TextStyle(
-                          color: kAccentColor0,
-                        ),
+                      
                         maxLines: null, // Allow unlimited lines
                         decoration: InputDecoration(
-                          prefixIcon:
-                              Icon(Icons.description, color: kAccentColor1),
-                          hintText:
-                              'Qual foi o problema que encontrou?',
+                          prefixIcon: Icon(Icons.description,
+                              color:  Theme.of(context).iconTheme.color),
+                          hintText: 'Qual foi o problema que encontrou?',
                           border: InputBorder.none,
                         ),
                         controller: problemController,

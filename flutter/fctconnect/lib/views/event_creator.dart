@@ -79,7 +79,7 @@ class _EventCreatorState extends State<EventCreator> {
         width: 440, // Adj ust the width as needed
         height: 300, // Adjust the height as needed
         child: ClipRRect(
-            borderRadius: kBorderRadius,
+            borderRadius: Style.kBorderRadius,
             child: Image.memory(_imageData!, fit: BoxFit.fill)),
       );
     } else if (_isImageLoading) {
@@ -149,7 +149,7 @@ class _EventCreatorState extends State<EventCreator> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Center(
@@ -160,26 +160,26 @@ class _EventCreatorState extends State<EventCreator> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius:Style. kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius:Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
                           style: TextStyle(
-                            color: kAccentColor0,
+                            color: Style.kAccentColor0,
                           ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.title, color: Style.kAccentColor1),
                             hintText: 'Título do evento',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               borderSide: BorderSide(
                                 color:
-                                    kAccentColor1, // Set your desired focused color here
+                                    Style.kAccentColor1, // Set your desired focused color here
                               ),
                             ),
                           ),
@@ -199,25 +199,25 @@ class _EventCreatorState extends State<EventCreator> {
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
+                      borderRadius:Style. kBorderRadius,
                       border: Border.all(
                         color:
-                            kAccentColor1, // Set your desired border color here
+                            Style.kAccentColor1, // Set your desired border color here
                       ),
-                      color: kAccentColor0.withOpacity(0.3),
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
                           style: TextStyle(
-                            color: kAccentColor0,
+                            color: Style.kAccentColor0,
                           ),
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
                             prefixIcon:
-                                Icon(Icons.description, color: kAccentColor1),
+                                Icon(Icons.description, color: Style.kAccentColor1),
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),
@@ -236,11 +236,11 @@ class _EventCreatorState extends State<EventCreator> {
                   SizedBox(height: 20.0),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius:Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextField(
@@ -248,12 +248,12 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _startingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color: kAccentColor1),
+                                color:Style.kAccentColor1),
                             hintText: 'Data de começo',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(color: kAccentColor1),
+                              borderRadius: Style.kBorderRadius,
+                              borderSide: BorderSide(color: Style.kAccentColor1),
                             ),
                           ),
                           onTap: () async {
@@ -288,11 +288,11 @@ class _EventCreatorState extends State<EventCreator> {
                   SizedBox(height: 20),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextField(
@@ -300,12 +300,12 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _endingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color: kAccentColor1),
+                                color: Style.kAccentColor1),
                             hintText: 'Data de fim',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(color: kAccentColor1),
+                              borderRadius: Style.kBorderRadius,
+                              borderSide: BorderSide(color: Style.kAccentColor1),
                             ),
                           ),
                           onTap: () async {
@@ -446,7 +446,7 @@ class _EventCreatorState extends State<EventCreator> {
     }
   },
   child: _isLoading
-      ? CircularProgressIndicator(color: kAccentColor1,) // Show the loading circle
+      ? CircularProgressIndicator(color: Style.kAccentColor1,) // Show the loading circle
       : Text('Criar evento'),
 ),
 

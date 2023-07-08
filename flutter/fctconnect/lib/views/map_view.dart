@@ -566,8 +566,12 @@ class _MapScreenState extends State<MapScreen> {
               Container(
                 padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
                 child: FloatingActionButton(
-                  backgroundColor: kPrimaryColor,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .backgroundColor,
+                  foregroundColor: Theme.of(context)
+                      .floatingActionButtonTheme
+                      .foregroundColor,
                   onPressed: () {
                     if (_initialCameraPosition != null) {
                       _mapController?.animateCamera(
@@ -589,8 +593,12 @@ class _MapScreenState extends State<MapScreen> {
                       child: Container(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: FloatingActionButton(
-                          backgroundColor: kPrimaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .backgroundColor,
+                          foregroundColor: Theme.of(context)
+                              .floatingActionButtonTheme
+                              .foregroundColor,
                           child: Icon(Icons.directions),
                           onPressed: () {
                             _navigateToCaminho(_markers.firstWhere((marker) =>
