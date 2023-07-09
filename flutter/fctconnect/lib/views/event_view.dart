@@ -54,9 +54,9 @@ class _EventViewState extends State<EventView> {
       });
     } else {
       return Container(
-        decoration: Style.kGradientDecorationUp,
+   
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+
           body: Column(
             children: [
               Expanded(
@@ -114,7 +114,7 @@ class _EventViewState extends State<EventView> {
                                                 event.title,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: Style.kAccentColor0,
+                                             
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -126,7 +126,7 @@ class _EventViewState extends State<EventView> {
                                                   ),
                                                 )}',
                                                 style: TextStyle(
-                                                  color: Style.kAccentColor2,
+                                               
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -138,7 +138,7 @@ class _EventViewState extends State<EventView> {
                                                   ),
                                                 )}',
                                                 style: TextStyle(
-                                                  color: Style.kAccentColor2,
+                                                  
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),

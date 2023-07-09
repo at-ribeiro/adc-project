@@ -40,6 +40,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
     ThemeManager themeManager = context.watch<ThemeManager>();
 
     if (_isLoadingNews) {
@@ -56,21 +57,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     _isLoadingNews = false;
                   });
                 });
-                return Container(
-                  color: Colors.transparent,
-                );
+                return Container();
               }
             } else {
               return Container(
-                  color: Colors.transparent,
                   child: const Center(child: CircularProgressIndicator()));
             }
           });
     } else {
       return Container(
-        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: CustomScrollView(
             slivers: <Widget>[
               // SliverAppBar
@@ -85,9 +81,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                backgroundColor: Style
-                    .kPrimaryColor, // Set the background color of the SliverAppBar
-                title: Text('Bem vindo à FCTConnect'),
+                // Set the background color of the SliverAppBar
+                title: Text(
+                  'Bem vindo à FCTConnect',
+                  style: textTheme.headline6!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 leading: Container(
                   width: 30.0,
                   height: 30.0,
@@ -100,7 +100,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 actions: [
                   Row(
                     children: [
-                     ThemeSwitch(themeManager: themeManager),
+                      ThemeSwitch(themeManager: themeManager),
                       SizedBox(width: 16.0),
                       Container(
                         width: 80.0,
@@ -116,12 +116,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                             ), // Set the desired radius value
 
-                            primary: Style.kAccentColor0,
+                            primary: Theme.of(context).indicatorColor,
                           ),
                           child: Text(
                             'Registar',
                             style: TextStyle(
-                              color: Style.kSecondaryColor,
+                              color: Theme.of(context).primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

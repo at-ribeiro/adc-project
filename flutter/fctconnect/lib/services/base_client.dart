@@ -1134,10 +1134,26 @@ class BaseClient {
     Map<String, String>? _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Token": msgToken,
-      
     };
 
     var url = Uri.parse('$baseUrl/notification/msgToken');
-    http.post(url, headers: _headers );
+    http.post(url, headers: _headers);
+  }
+
+  static void sendNotificationToAll(
+      String token, username, String title, String body) {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": token,
+      "User": username,
+    };
+
+    dynamic _body = {
+      "title": title,
+      "message": body,
+    };
+
+    var url = Uri.parse('$baseUrl/notification/anomaly');
+    http.post(url, headers: _headers, body: json.encode(_body));
   }
 }

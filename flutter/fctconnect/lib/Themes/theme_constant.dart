@@ -13,6 +13,10 @@ ThemeData lightTheme = ThemeData(
     headline6: TextStyle(color: Style.kAccentColor0Light),
     subtitle1: TextStyle(color: Style.kAccentColor2Light),
   ),
+  buttonTheme: ButtonThemeData(
+    buttonColor: Style.kAccentColor0Light,
+    textTheme: ButtonTextTheme.primary,
+  ),
   brightness: Brightness.light,
   primaryColor: Style.kPrimaryColorLight,
   scaffoldBackgroundColor: Style.kPrimaryColorLight,
@@ -113,6 +117,10 @@ ThemeData darkTheme = ThemeData(
     headline5: TextStyle(color: Style.kAccentColor0Dark),
     headline6: TextStyle(color: Style.kAccentColor0Dark),
     subtitle1: TextStyle(color: Style.kAccentColor2Dark),
+  ),
+  buttonTheme: ButtonThemeData(
+    buttonColor: Style.kAccentColor0Dark,
+    textTheme: ButtonTextTheme.primary,
   ),
   brightness: Brightness.dark,
   primaryColor: Style.kPrimaryColorDark,

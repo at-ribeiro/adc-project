@@ -281,8 +281,9 @@ class _SignUpViewState extends State<SignUpView> {
                                           ? Text(
                                               "Role",
                                             )
-                                          : Text(roleController.text,
-                                              ),
+                                          : Text(
+                                              roleController.text,
+                                            ),
                                       leading: Icon(Icons.work,
                                           color: Theme.of(context)
                                               .iconTheme
@@ -295,7 +296,6 @@ class _SignUpViewState extends State<SignUpView> {
                                         return ListTile(
                                           title: Text(
                                             value,
-                                            
                                           ),
                                           onTap: () {
                                             setState(() {
@@ -431,7 +431,7 @@ class _SignUpViewState extends State<SignUpView> {
                     child: RichText(
                       text: TextSpan(
                         text: 'Já tens uma conta?',
-                        style: TextStyle(color: Style.kAccentColor0),
+                        style: textTheme.bodyText1!,
                         children: [
                           TextSpan(
                             text: " Log In",

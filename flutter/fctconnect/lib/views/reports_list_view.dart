@@ -7,12 +7,8 @@ import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../services/notify_all.dart';
 
-
-
 class ListReportsPage extends StatefulWidget {
   const ListReportsPage({Key? key}) : super(key: key);
-
-
 
   @override
   State<ListReportsPage> createState() => _ListReportPageState();
@@ -23,10 +19,6 @@ class _ListReportPageState extends State<ListReportsPage> {
   bool _isLoadingToken = true;
   List<AlertPostData> alertDataList = [];
   List<int> reportsToDelete = [];
-
-
-
-
 
   @override
   void initState() {
@@ -64,12 +56,8 @@ class _ListReportPageState extends State<ListReportsPage> {
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-
     TextTheme textTheme = Theme.of(context).textTheme;
 
     if (_isLoadingToken) {
@@ -84,9 +72,7 @@ class _ListReportPageState extends State<ListReportsPage> {
       });
     } else {
       return Container(
-    
         child: Scaffold(
-       
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               await BaseClient().deleteReports(
@@ -103,7 +89,6 @@ class _ListReportPageState extends State<ListReportsPage> {
             },
             child: Icon(
               Icons.delete,
-              color: Style.kAccentColor0,
             ),
           ),
           body: ListView.builder(
@@ -149,7 +134,8 @@ class _ListReportPageState extends State<ListReportsPage> {
                                     Text('Criador: ${alertData.creator}'),
                                     Text('Localização: ${alertData.location}'),
                                     Text('Descrição:'),
-                                    Text(alertData.description, style: textTheme.bodyText1),
+                                    Text(alertData.description,
+                                        style: textTheme.bodyText1),
                                     Text(
                                         'Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
                                       DateTime.fromMillisecondsSinceEpoch(
@@ -165,24 +151,34 @@ class _ListReportPageState extends State<ListReportsPage> {
                                           context: context,
                                           builder: (context) {
                                             return AlertDialog(
-                                              shape:
-                                                   RoundedRectangleBorder(
-                                                borderRadius: Style.kBorderRadius,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    Style.kBorderRadius,
                                               ),
-                                              backgroundColor: Style.kAccentColor0
+                                              backgroundColor: Style
+                                                  .kAccentColor0
                                                   .withOpacity(0.3),
                                               content: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Text(
                                                     'Tem a certeza que pretende alertar todos os utilizadores sobre esta anomalia?',
-                                                    style:  TextStyle(
-                                                        color: Style.kAccentColor0),
+                                                    style: TextStyle(
+                                                        color: Style
+                                                            .kAccentColor0),
                                                   ),
                                                   const SizedBox(height: 15),
                                                   Row(
                                                     children: [
-                                                       MyNotificationButton(title: alertData.description, body: alertData.location),
+                                                      MyNotificationButton(
+                                                          username:
+                                                              _token.username,
+                                                          tokenId:
+                                                              _token.tokenID,
+                                                          title: alertData
+                                                              .description,
+                                                          body: alertData
+                                                              .location),
                                                       SizedBox(width: 15),
                                                       ElevatedButton(
                                                         style: ElevatedButton
@@ -193,9 +189,10 @@ class _ListReportPageState extends State<ListReportsPage> {
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
-                                                        child: Text(
-                                                          'Não',
-                                                        ),
+                                                        child: Text('Não',
+                                                            style: textTheme
+                                                                .button!
+                                                                ),
                                                       ),
                                                     ],
                                                   ),
@@ -204,7 +201,10 @@ class _ListReportPageState extends State<ListReportsPage> {
                                             );
                                           });
                                     },
-                                    icon: Icon(Icons.notification_add, color: Theme.of(context).iconTheme.color,)),
+                                    icon: Icon(
+                                      Icons.notification_add,
+                                      color: Theme.of(context).iconTheme.color,
+                                    )),
                               ],
                             ),
                             trailing: Flexible(
