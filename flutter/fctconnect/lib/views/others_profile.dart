@@ -172,13 +172,8 @@ class _OtherProfileState extends State<OtherProfile> {
 
                     if (_token.role == "SECRETARIA" || _token.role == "SA") {
                       _disableStatus = snapshot.data![1];
-                      print("sec");
-                      print(_disableStatus);
                     } else {
                       _followStatus = snapshot.data![1];
-                      print("else");
-                      print(_followStatus);
-                      print(_token.role);
                     }
                     _infoIsLoading = false;
                   });

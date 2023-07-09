@@ -1135,4 +1135,51 @@ class BaseClient {
 
     return response.statusCode == 202;
   }
+
+  Future<bool> isUserInterestedInEvent(
+      String api, String username, String tokenID, String eventID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username?event=$eventID');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+    if (response.statusCode == 202) {
+      return true;
+    } else if (response.statusCode == 406) {
+      return false;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> interestedInEvent(String api, String username, String tokenID, String eventID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url =
+        Uri.parse('$baseUrl$api/$username/$eventID');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
 }
