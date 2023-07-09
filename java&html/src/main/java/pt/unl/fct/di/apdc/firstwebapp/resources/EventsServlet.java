@@ -379,9 +379,20 @@ public class EventsServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
-            String username = request.getPathInfo().substring(1);
-            String eventId = request.getPathInfo().substring(1);
+            String pathInfo = request.getPathInfo(); // Assuming request is an instance of HttpServletRequest
+            String[] pathParams = pathInfo.substring(1).split("/");
+            String username = pathParams[0];
 
+            String eventId = null;
+
+            if (pathParams.length >= 2) {
+                eventId = pathParams[1];
+            }
+
+            if(eventId ==null){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
 
             LOG.fine("Attempt add event to user: " + username);
 
@@ -429,7 +440,7 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            List<StringValue> events = user.getList("user_events");
+            List<Value<?>> events = user.getList("user_events");
 
             if(events.contains(StringValue.of(eventId))){
 
@@ -491,6 +502,7 @@ public class EventsServlet extends HttpServlet {
         }catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             if (txn.isActive()) {

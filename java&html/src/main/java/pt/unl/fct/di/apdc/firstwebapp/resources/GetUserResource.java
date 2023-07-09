@@ -169,7 +169,7 @@ public class GetUserResource {
     }
 
     @GET
-    @Path("/events/{username}")
+    @Path("/hasEvent/{username}")
     public Response interestedInEvent(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
                                       @PathParam("username") String usernamePath, @QueryParam("event") String event) {
 
