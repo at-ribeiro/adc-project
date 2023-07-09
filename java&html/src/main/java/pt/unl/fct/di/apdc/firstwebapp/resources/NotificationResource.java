@@ -18,6 +18,9 @@ import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
 import pt.unl.fct.di.apdc.firstwebapp.util.NotificationData;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -74,7 +77,7 @@ public class NotificationResource {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
-            if(!user.getString("user_role").equals("SECRETARIA") || !user.getString("user_role").equals("SA")){
+            if(!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("SA"))){
                 LOG.warning("User does not have sufficient role");
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
@@ -85,14 +88,18 @@ public class NotificationResource {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            FileInputStream serviceAccount =
-                    new FileInputStream("/firebase.json");
+            if(FirebaseApp.getApps().isEmpty()) {
 
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
+                URL url = new URL("https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/firebase.json");
+                URLConnection connection = url.openConnection();
+                InputStream serviceAccount = connection.getInputStream();
 
-            FirebaseApp.initializeApp(options);
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                FirebaseApp.initializeApp(options);
+            }
 
             Message message = Message.builder()
                     .setNotification(Notification.builder().setTitle(data.getTitle()).setBody(data.getMessage()).build())
@@ -126,6 +133,19 @@ public class NotificationResource {
         try{
 
             List<String> registrationTokens = List.of(tokenId);
+
+            if(FirebaseApp.getApps().isEmpty()) {
+
+                URL url = new URL("https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/firebase.json");
+                URLConnection connection = url.openConnection();
+                InputStream serviceAccount = connection.getInputStream();
+
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+
+                FirebaseApp.initializeApp(options);
+            }
 
             TopicManagementResponse response = FirebaseMessaging.getInstance().subscribeToTopic(
                     registrationTokens, "all_users");

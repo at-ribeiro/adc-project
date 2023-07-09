@@ -42,9 +42,6 @@ public class RegisterData {
     public String getPrivacy() {return privacy;}
 
     public boolean validRegistration() {
-        if(username != null && password != null && passwordV!=null && password.equals(passwordV) && email!=null)
-            return true;
-
-        return false;
+        return username != null && password != null && passwordV != null && password.equals(passwordV) && email != null;
     }
 }

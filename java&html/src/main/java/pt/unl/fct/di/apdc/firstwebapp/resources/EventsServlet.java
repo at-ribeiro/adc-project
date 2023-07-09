@@ -441,14 +441,19 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            List<Value<?>> events = user.getList("user_events");
+            List<Value<?>> eventValues = new ArrayList<>(user.getList("user_events"));
+            List<String> events = new ArrayList<>();
 
-            if(events.contains(StringValue.of(eventId))){
+            for(Value<?> value : eventValues){
+                events.add(value.get().toString());
+            }
 
-                events.remove(StringValue.of(eventId));
+            if(events.contains(eventId)){
+
+                eventValues.remove(StringValue.of(eventId));
 
                 Entity updatedUser = Entity.newBuilder(user)
-                        .set("user_events", ListValue.of(events))
+                        .set("user_events", ListValue.of(eventValues))
                         .build();
 
                 txn.put(updatedUser);
@@ -468,20 +473,22 @@ public class EventsServlet extends HttpServlet {
                     txn.delete(activity.getKey());
                 }
 
+                txn.commit();
+
                 response.setStatus(HttpServletResponse.SC_OK);
                 return;
 
             }
 
-            events.add(StringValue.of(eventId));
+            eventValues.add(StringValue.of(eventId));
 
             Entity updatedUser = Entity.newBuilder(user)
-                    .set("user_events", ListValue.of(events))
+                    .set("user_events", ListValue.of(eventValues))
                     .build();
 
             txn.put(updatedUser);
 
-            long currentTime = System.currentTimeMillis();
+            String currentTime = String.valueOf(System.currentTimeMillis());
 
             Key activityKey = datastore.newKeyFactory()
                     .setKind("Activity")
@@ -489,7 +496,7 @@ public class EventsServlet extends HttpServlet {
                     .newKey(currentTime);
 
             Entity activityEntity = Entity.newBuilder(activityKey)
-                    .set("activity_creation_time", LongValue.of(currentTime).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_creation_time", StringValue.of(currentTime).toBuilder().setExcludeFromIndexes(true).build())
                     .set("activity_name", event.getString("event_title"))
                     .set("activity_from", LongValue.of(event.getLong("event_start")).toBuilder().setExcludeFromIndexes(true).build())
                     .set("activity_to", LongValue.of(event.getLong("event_end")).toBuilder().setExcludeFromIndexes(true).build())
