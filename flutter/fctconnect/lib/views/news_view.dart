@@ -195,7 +195,6 @@ class _NewsViewState extends State<NewsView> {
         _scrollController.position.maxScrollExtent) {
       _loadMoreNews();
     }
-    print(counter);
   }
 
   Future<void> _loadMoreNews() async {

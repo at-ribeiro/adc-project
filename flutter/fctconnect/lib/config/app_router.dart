@@ -162,6 +162,15 @@ class AppRouter {
             },
           ),
           GoRoute(
+            path: '/routes/:user/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return RouteMapScreen(
+                routeUser: state.pathParameters['user']!,
+                routeID: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
             path: Paths.optionsProfile,
             builder: (BuildContext context, GoRouterState state) {
               return EditProfileOptions();
@@ -300,13 +309,21 @@ class AppRouter {
     return false;
   }
 
+  Future<bool> hasRoleTo() async {
+    String? role = await CacheDefault.cacheFactory.get('Role');
+    if (role == "AE" || role == "SECRETARIA" || role == "SA") return true;
+    return false;
+  }
+
   String _getTitleBasedOnRoute(String location) {
     CacheDefault.cacheFactory.set('LastLocation', location);
     if (location == Paths.homePage || location == '/') {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
+
     } else if (location == Paths.noticias || location.contains('noticias')) {
+
       return 'Notícias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
@@ -384,11 +401,24 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
-      return IconButton(
-          onPressed: () {
-            context.go(Paths.createEvent);
-          },
-          icon: Icon(Icons.add));
+
+      return FutureBuilder<bool>(
+        future: hasRoleTo(),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.data == true) {
+            return IconButton(
+              onPressed: () {
+                context.go(Paths.createEvent);
+              },
+              icon: Icon(Icons.add),
+            );
+          } else {
+            return Container();
+          }
+        },
+      );
+
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {

@@ -20,7 +20,6 @@ class EventPage extends StatefulWidget {
 }
 
 class _EventPageState extends State<EventPage> {
-
   late EventGetData _event;
 
   late String _eventId;
@@ -30,13 +29,13 @@ class _EventPageState extends State<EventPage> {
   GoogleMapController? _mapController;
   Set<Marker> _markers = {};
 
+  late bool _isInterestedStatus;
+
   @override
   void initState() {
     _eventId = widget.eventId;
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +54,6 @@ class _EventPageState extends State<EventPage> {
     } else if (isEventLoading) {
       return loadEvent();
     } else {
-
-
       return Container(
         decoration: Style.kGradientDecorationUp,
         child: Scaffold(
@@ -88,18 +85,27 @@ class _EventPageState extends State<EventPage> {
                             color: Style.kAccentColor0),
                       ),
                       SizedBox(height: 8),
+                      if (_event.creator != _token.username)
+                        Column(
+                          children: [
+                            buildInterestedInButton(),
+                            SizedBox(height: 8),
+                          ],
+                        ),
                       Text(
-                        'Description: ${_event.description}',
+
+                        'Descrição: ${_event.description}',
                         style: TextStyle(fontSize: 16, color: Style.kAccentColor2),
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Creator: ${_event.creator}',
+                        'Criador: ${_event.creator}',
                         style: TextStyle(fontSize: 16, color: Style.kAccentColor2),
+
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Start Date & Time: ' +
+                        'Data de Inicio: ' +
                             DateFormat('dd-MM-yyyy HH:mm:ss').format(
                               DateTime.fromMillisecondsSinceEpoch(
                                 _event.start,
@@ -109,7 +115,7 @@ class _EventPageState extends State<EventPage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'End Date & Time: ' +
+                        'Data de Fim: ' +
                             DateFormat('dd-MM-yyyy HH:mm:ss').format(
                               DateTime.fromMillisecondsSinceEpoch(
                                 _event.end,
@@ -118,7 +124,6 @@ class _EventPageState extends State<EventPage> {
                         style: TextStyle(fontSize: 16, color:Style. kAccentColor2),
                       ),
                       SizedBox(height: 16),
-
                       Container(
                         height: 300,
                         width: 500,
@@ -131,8 +136,8 @@ class _EventPageState extends State<EventPage> {
                           markers: _markers,
                         ),
                       ),
-
                       if (_event.creator == _token.username) showQrcodeOrnot(),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -142,6 +147,34 @@ class _EventPageState extends State<EventPage> {
         ),
       );
     }
+  }
+
+  buildInterestedInButton() {
+    return ElevatedButton(
+      onPressed: _toggleInterestedIn,
+      child: Text(
+        _isInterestedStatus ? 'Remover Interesse' : 'Tenho Interesse',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Style.kAccentColor0,
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _isInterested() async {
+    bool _isInterestedAux = await BaseClient().isUserInterestedInEvent(
+        "/hasEvent", _token.username, _token.tokenID, _eventId);
+    return _isInterestedAux;
+  }
+
+  void _toggleInterestedIn() {
+    BaseClient().interestedInEvent(
+        '/events', _token.username, _token.tokenID, _eventId);
+    setState(() {
+      _isInterestedStatus = !_isInterestedStatus;
+    });
   }
 
   showQrcodeOrnot() {
@@ -161,9 +194,7 @@ class _EventPageState extends State<EventPage> {
                       child: ClipRRect(
                         borderRadius: Style.kBorderRadius,
                         child: Image.network(
-
                           _event.qrCodeUrl!,
-
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -177,21 +208,18 @@ class _EventPageState extends State<EventPage> {
             height: 100.0, // Replace with your desired height
             // Adjust the fit property as needed
             child: Image.network(
-
               _event.qrCodeUrl!,
-
             ),
           ),
         ),
-        SizedBox(height: 8),
       ],
     );
   }
 
   Widget loadEvent() {
     return FutureBuilder(
-      future: _loadEvent(),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+      future: Future.wait([_loadEvent(), _isInterested()]),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             String errorText = snapshot.error.toString();
@@ -232,7 +260,8 @@ class _EventPageState extends State<EventPage> {
           } else {
             WidgetsBinding.instance!.addPostFrameCallback((_) {
               setState(() {
-                _event = snapshot.data;
+                _event = snapshot.data![0];
+                _isInterestedStatus = snapshot.data![1];
                 isEventLoading = false;
                 Marker eventMarker = Marker(
                     markerId: MarkerId('Evento'),

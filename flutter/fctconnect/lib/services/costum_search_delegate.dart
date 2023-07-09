@@ -13,6 +13,7 @@ import '../models/Token.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   final String type;
+  String? username;
 
   CustomSearchDelegate(this.type);
 
@@ -72,7 +73,11 @@ class CustomSearchDelegate extends SearchDelegate {
       ));
     } else {
       return FutureBuilder<List<UserQueryData>>(
-        future: BaseClient().searchUser(query, "/search"),
+        future: BaseClient().searchUser(
+          query,
+          "/search",
+          username!,
+        ),
         builder: (BuildContext context,
             AsyncSnapshot<List<UserQueryData>> snapshot) {
           if (snapshot.hasError) {
@@ -173,11 +178,16 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    fetchUsername();
     return Container(
       // Setting the gradient background
       decoration:
           BoxDecoration(color: Theme.of(context).appBarTheme.backgroundColor),
       child: _buildSearchContent(context), // The actual search content
     );
+  }
+
+  Future<void> fetchUsername() async {
+    username = await CacheDefault.cacheFactory.get('Username');
   }
 }

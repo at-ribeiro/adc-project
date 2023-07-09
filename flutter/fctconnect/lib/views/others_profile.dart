@@ -40,6 +40,7 @@ class _OtherProfileState extends State<OtherProfile> {
   late ScrollController _scrollController;
   late ProfileInfo info;
   late bool _followStatus;
+  late bool _disableStatus;
   String followButton = '';
 
   @override
@@ -99,6 +100,12 @@ class _OtherProfileState extends State<OtherProfile> {
     return _followStatuAux;
   }
 
+  Future<bool> _isActivated() async {
+    bool _activatedStatus = await BaseClient().isAccountEnabled(
+        "/update/state", _token.username, _token.tokenID, widget.name);
+    return _activatedStatus;
+  }
+
   Widget _loadProfilePic() {
     if (info == null || info.profilePicUrl.isEmpty) {
       return const CircleAvatar(
@@ -113,6 +120,27 @@ class _OtherProfileState extends State<OtherProfile> {
         ),
       );
     }
+  }
+
+  Future<bool> _buttonStatusType() {
+    if (_token.role == "SECRETARIA" || _token.role == "SA") {
+      return _isActivated();
+    } else {
+      return _isFollowing();
+    }
+  }
+
+  void _toggleDisableAccount() {
+    if (_disableStatus == true) {
+      BaseClient().disableAccount(
+          "/update/deactivate", _token.username, _token.tokenID, info.username);
+    } else {
+      BaseClient().enableAccount(
+          "/update/activate", _token.username, _token.tokenID, info.username);
+    }
+    setState(() {
+      _disableStatus = !_disableStatus;
+    });
   }
 
   @override
@@ -130,7 +158,7 @@ class _OtherProfileState extends State<OtherProfile> {
       });
     } else if (_infoIsLoading) {
       return FutureBuilder(
-          future: Future.wait([_loadInfo(), _isFollowing()]),
+          future: Future.wait([_loadInfo(), _buttonStatusType()]),
           builder:
               (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
@@ -143,7 +171,12 @@ class _OtherProfileState extends State<OtherProfile> {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
                   setState(() {
                     info = snapshot.data![0];
-                    _followStatus = snapshot.data![1];
+
+                    if (_token.role == "SECRETARIA" || _token.role == "SA") {
+                      _disableStatus = snapshot.data![1];
+                    } else {
+                      _followStatus = snapshot.data![1];
+                    }
                     _infoIsLoading = false;
                   });
                 });
@@ -169,12 +202,11 @@ class _OtherProfileState extends State<OtherProfile> {
                 thickness: 2.0,
               ),
               const SizedBox(height: 16),
-              if (_token.role == "ALUNO")
-                buildInfoAlunoSection(info, textTheme),
-              if (_token.role == "PROFESSOR")
-                buildInfoProfessorSection(info, textTheme),
-              if (_token.role == "EXTERNO")
-                buildInfoExternoSection(info, textTheme),
+
+              if (info.role == "ALUNO") buildInfoAlunoSection(info, textTheme),
+              if (info.role == "PROFESSOR") buildInfoProfessorSection(info, textTheme),
+              if (info.role == "EXTERNO") buildInfoExternoSection(info, textTheme),
+
               SizedBox(height: 30),
             ],
           ),
@@ -619,19 +651,35 @@ class _OtherProfileState extends State<OtherProfile> {
           style: TextStyle(fontSize: 20, color: Style.kAccentColor2),
         ),
         const SizedBox(height: 16),
-        Center(
-          child: ElevatedButton(
-            onPressed: _toggleFollow,
-            child: Text(
-              _followStatus ? 'Unfollow' : 'Follow',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Style.kAccentColor0,
+
+        if (_token.role != "SECRETARIA" && _token.role != "SA")
+          Center(
+            child: ElevatedButton(
+              onPressed: _toggleFollow,
+              child: Text(
+                _followStatus ? 'Unfollow' : 'Follow',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Style.kAccentColor0,
+                ),
               ),
             ),
           ),
-        ),
+        if (_token.role == "SECRETARIA" || _token.role == "SA")
+          Center(
+            child: ElevatedButton(
+              onPressed: _toggleDisableAccount,
+              child: Text(
+                _disableStatus ? 'Desativar Conta' : 'Ativar Conta',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

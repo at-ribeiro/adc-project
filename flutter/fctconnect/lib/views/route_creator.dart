@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/models/location_get_data.dart';
-import 'package:responsive_login_ui/models/route_get_data.dart';
+import 'package:responsive_login_ui/models/route_post_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import '../constants.dart';
 import '../models/Token.dart';
@@ -28,6 +28,7 @@ class _RouteCreatorState extends State<RouteCreator> {
   List<LocationGetData> locationsListEventos = [];
 
   List<String> locationsToAdd = [];
+  List<int> locationsToAddDuration = [];
   TextEditingController routeNameController = TextEditingController();
 
   bool _isFirstLoadRest = true;
@@ -50,15 +51,36 @@ class _RouteCreatorState extends State<RouteCreator> {
     super.dispose();
   }
 
-  void addToSelectedLocations(String name) {
+  int getDurationInMinutes(String duration) {
+    int durationMin = 0;
+    if (duration == "15 min") {
+      durationMin = 15;
+    } else if (duration == "30 min") {
+      durationMin = 30;
+    } else if (duration == "1 hora") {
+      durationMin = 60;
+    } else if (duration == "2 hora") {
+      durationMin = 120;
+    } else if (duration == "3 hora") {
+      durationMin = 180;
+    }
+    return durationMin;
+  }
+
+  void addToSelectedLocations(String name, String duration) {
     setState(() {
       locationsToAdd.add(name);
+      locationsToAddDuration.add(getDurationInMinutes(duration));
     });
   }
 
   void removeFromLocations(String name) {
     setState(() {
-      locationsToAdd.remove(name);
+      final index = locationsToAdd.indexOf(name);
+      if (index != -1) {
+        locationsToAdd.removeAt(index);
+        locationsToAddDuration.removeAt(index);
+      }
     });
   }
 
@@ -100,7 +122,7 @@ class _RouteCreatorState extends State<RouteCreator> {
       return Container(
         child: Scaffold(
           body: SingleChildScrollView(
-            controller: _scrollController, // Use the scroll controller
+            controller: _scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -123,6 +145,7 @@ class _RouteCreatorState extends State<RouteCreator> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.title),
                             hintText: 'Título do Percurso',
+
                           ),
                           controller: routeNameController,
                           validator: (value) {
@@ -138,27 +161,98 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                          child: DropdownButtonHideUnderline(
-                            child: ExpansionTile(
-                              title: Text('RESTAURAÇÃO'),
-                              onExpansionChanged: (expanded) {
-                                if (expanded && _isFirstLoadRest) {
-                                  _isFirstLoadRest = false;
-                                  _loadLocations("RESTAURACAO");
+
+                ExpansionTile(
+                  title: Text('RESTAURAÇÃO'),
+                  onExpansionChanged: (expanded) {
+                    if (expanded && _isFirstLoadRest) {
+                      _isFirstLoadRest = false;
+                      _loadLocations("RESTAURACAO");
+                    }
+                  },
+                  children: [
+                    if (_isFirstLoadRest)
+                      CircularProgressIndicator()
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: locationsListRestauracao.length,
+                        itemBuilder: (context, index) {
+                          LocationGetData locationData =
+                              locationsListRestauracao[index];
+                          bool isSelected =
+                              locationsToAdd.contains(locationData.name);
+                          return ListTile(
+                            title: Text(locationData.name),
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isSelected
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                              ),
+                              onPressed: () {
+                                if (isSelected) {
+                                  removeFromLocations(locationData.name);
+                                } else {
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                               children: [
@@ -215,27 +309,97 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 10.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                          child: DropdownButtonHideUnderline(
-                            child: ExpansionTile(
-                              title: Text('EDIFÍCIOS'),
-                              onExpansionChanged: (expanded) {
-                                if (expanded && _isFirstLoadEd) {
-                                  _isFirstLoadEd = false;
-                                  _loadLocations("EDIFICIO");
+                ExpansionTile(
+                  title: Text('EDIFÍCIOS'),
+                  onExpansionChanged: (expanded) {
+                    if (expanded && _isFirstLoadEd) {
+                      _isFirstLoadEd = false;
+                      _loadLocations("EDIFICIO");
+                    }
+                  },
+                  children: [
+                    if (_isFirstLoadEd)
+                      CircularProgressIndicator()
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: locationsListEdificios.length,
+                        itemBuilder: (context, index) {
+                          LocationGetData locationData =
+                              locationsListEdificios[index];
+                          bool isSelected =
+                              locationsToAdd.contains(locationData.name);
+                          return ListTile(
+                            title: Text(locationData.name),
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isSelected
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                              ),
+                              onPressed: () {
+                                if (isSelected) {
+                                  removeFromLocations(locationData.name);
+                                } else {
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                               children: [
@@ -292,27 +456,97 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 10.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                          child: DropdownButtonHideUnderline(
-                            child: ExpansionTile(
-                              title: Text('TRANSPORTES'),
-                              onExpansionChanged: (expanded) {
-                                if (expanded && _isFirstLoadTrans) {
-                                  _isFirstLoadTrans = false;
-                                  _loadLocations("TRANSPORTE");
+                ExpansionTile(
+                  title: Text('TRANSPORTES'),
+                  onExpansionChanged: (expanded) {
+                    if (expanded && _isFirstLoadTrans) {
+                      _isFirstLoadTrans = false;
+                      _loadLocations("TRANSPORTE");
+                    }
+                  },
+                  children: [
+                    if (_isFirstLoadTrans)
+                      CircularProgressIndicator()
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: locationsListTransporte.length,
+                        itemBuilder: (context, index) {
+                          LocationGetData locationData =
+                              locationsListTransporte[index];
+                          bool isSelected =
+                              locationsToAdd.contains(locationData.name);
+                          return ListTile(
+                            title: Text(locationData.name),
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isSelected
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                              ),
+                              onPressed: () {
+                                if (isSelected) {
+                                  removeFromLocations(locationData.name);
+                                } else {
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                               children: [
@@ -369,27 +603,97 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 10.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                          child: DropdownButtonHideUnderline(
-                            child: ExpansionTile(
-                              title: Text('EVENTOS'),
-                              onExpansionChanged: (expanded) {
-                                if (expanded && _isFirstLoadEv) {
-                                  _isFirstLoadEv = false;
-                                  _loadLocations("EVENTO");
+                ExpansionTile(
+                  title: Text('EVENTOS'),
+                  onExpansionChanged: (expanded) {
+                    if (expanded && _isFirstLoadEv) {
+                      _isFirstLoadEv = false;
+                      _loadLocations("EVENTO");
+                    }
+                  },
+                  children: [
+                    if (_isFirstLoadEv)
+                      CircularProgressIndicator()
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: locationsListEventos.length,
+                        itemBuilder: (context, index) {
+                          LocationGetData locationData =
+                              locationsListEventos[index];
+                          bool isSelected =
+                              locationsToAdd.contains(locationData.name);
+                          return ListTile(
+                            title: Text(locationData.name),
+                            subtitle: Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Localização: ${locationData.latitude}, ${locationData.longitude}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Tipo de localização: ${locationData.type}',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('Duração:',
+                                          style: TextStyle(fontSize: 16)),
+                                      DropdownButton<String>(
+                                        value: locationData.duration,
+                                        items: <String>[
+                                          '0 min',
+                                          '15 min',
+                                          '30 min',
+                                          '1 hora',
+                                          '2 hora',
+                                          '3 hora'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            locationData.duration = newValue!;
+                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
+                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isSelected
+                                    ? Icons.check_box
+                                    : Icons.check_box_outline_blank,
+                              ),
+                              onPressed: () {
+                                if (isSelected) {
+                                  removeFromLocations(locationData.name);
+                                } else {
+                                  addToSelectedLocations(
+                                    locationData.name,
+                                    locationData
+                                        .duration, 
+                                  );
                                 }
                               },
                               children: [
@@ -451,16 +755,21 @@ class _RouteCreatorState extends State<RouteCreator> {
                     onPressed: () {
                       if (locationsToAdd.isNotEmpty &&
                           routeNameController.text.isNotEmpty) {
-                        RouteGetData route = RouteGetData(
+                        RoutePostData route = RoutePostData(
                           creator: _token.username,
                           name: routeNameController.text,
-                          locations: locationsToAdd,
+                          locations: locationsToAdd.toList(),
+                          durations: locationsToAddDuration.toList(),
                           participants: [_token.username],
                         );
 
                         setState(() {
                           locationsToAdd.clear();
+                          locationsToAddDuration.clear();
                           routeNameController.clear();
+                          BaseClient().createRoute(
+                              "/route", _token.username, _token.tokenID, route);
+                          context.go(Paths.routes);
                         });
                       }
                       context.go(Paths.routes);

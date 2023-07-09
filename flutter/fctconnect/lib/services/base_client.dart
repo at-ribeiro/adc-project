@@ -5,10 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:responsive_login_ui/models/ActivityData.dart';
 
 import 'package:responsive_login_ui/models/location_get_data.dart';
-import 'package:responsive_login_ui/models/route_get_data.dart';
+import 'package:responsive_login_ui/models/route_post_data.dart';
 
 import 'package:html/dom.dart' as dom;
 import 'package:html/dom.dart' as html;
+
 import 'package:responsive_login_ui/models/nucleos_data.dart';
 import 'package:responsive_login_ui/models/nucleos_get.dart';
 
@@ -29,6 +30,7 @@ import '../models/change_pwd_data.dart';
 import '../models/event_get_data.dart';
 import '../models/event_post_data.dart';
 import '../models/profile_info.dart';
+import '../models/route_get_data.dart';
 import '../models/update_data.dart';
 
 const String baseUrl = 'https://fct-connect-estudasses.oa.r.appspot.com/rest';
@@ -209,12 +211,12 @@ class BaseClient {
   }
 
   Future<List<EventGetData>> getEvents(
-      String api, String tokenID, String username, String time) async {
+      String api, String tokenID, String username, int cursor) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
     };
-    var url = Uri.parse('$baseUrl$api/$username?timestamp=$time');
+    var url = Uri.parse('$baseUrl$api/$username?cursor=$cursor');
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
@@ -272,10 +274,16 @@ class BaseClient {
     }
   }
 
-  Future<List<UserQueryData>> searchUser(String query, String api) async {
+  Future<List<UserQueryData>> searchUser(
+      String query, String api, String username) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "User": username,
+    };
+    print(username);
     var url = Uri.parse('$baseUrl$api/user?query=$query');
 
-    final response = await http.get(url);
+    final response = await http.get(url, headers: _headers);
 
     if (response.statusCode == 200) {
       final jsonString = utf8.decode(response.bodyBytes);
@@ -284,7 +292,6 @@ class BaseClient {
           data.map((json) => UserQueryData.fromJson(json)));
       return usersList;
     } else {
-      // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to load data');
     }
   }
@@ -905,6 +912,7 @@ class BaseClient {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
     var url = Uri.parse('$baseUrl$api');
 
@@ -923,7 +931,7 @@ class BaseClient {
   }
 
   Future<dynamic> createRoute(
-      String api, String username, String tokenID, RouteGetData route) async {
+      String api, String username, String tokenID, RoutePostData route) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
@@ -936,6 +944,7 @@ class BaseClient {
       'creator': route.creator,
       'name': route.name,
       'participants': route.participants,
+      'durations': route.durations,
       'locations': route.locations,
     });
 
@@ -1027,7 +1036,6 @@ class BaseClient {
     List<String> paragraphs = []; // Create a list to store paragraphs
 
     if (textContainer != null) {
-      // Appending each paragraph in the 'noticia-corpo' div to the list
       textContainer.querySelectorAll('p').forEach((element) {
         paragraphs.add(element.text.trim()); // Using .text and adding to list
       });
@@ -1035,8 +1043,6 @@ class BaseClient {
 
     final timestampElement = html.querySelector('#node-42022 > div > p');
     String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
-
-    print(url);
 
     return NewsData(
       title: title,
@@ -1101,7 +1107,52 @@ class BaseClient {
         return null; // Or any appropriate handling for an empty response
       }
     } else {
-      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+  // throw exception
+
+  Future<RouteGetData> getRoute(String api, route, tokenID, user) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": user,
+    };
+    var url = Uri.parse('$baseUrl$api/$route');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final jsonString = utf8.decode(response.bodyBytes);
+      final jsonData = json.decode(jsonString);
+      final route = RouteGetData.fromJson(jsonData);
+      return route;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> disableAccount(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
@@ -1114,6 +1165,7 @@ class BaseClient {
       "Authorization": tokenID,
       "User": username,
     };
+
     var url = Uri.parse('$baseUrl$api?nucleo_name=$nucleoId');
 
     var response = await http.get(url, headers: _headers);
@@ -1124,7 +1176,33 @@ class BaseClient {
 
       return nucleo;
     } else {
-      // throw exception
+      //throw exception
+
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+  // throw exception
+
+  Future<dynamic> enableAccount(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
@@ -1155,5 +1233,69 @@ class BaseClient {
 
     var url = Uri.parse('$baseUrl/notification/anomaly');
     http.post(url, headers: _headers, body: json.encode(_body));
+  }
+
+  Future<bool> isAccountEnabled(
+      String api, String username, String tokenID, String user) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$user');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    return response.statusCode == 202;
+  }
+
+  Future<bool> isUserInterestedInEvent(
+      String api, String username, String tokenID, String eventID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username?event=$eventID');
+
+    var response = await http.get(
+      url,
+      headers: _headers,
+    );
+    if (response.statusCode == 202) {
+      return true;
+    } else if (response.statusCode == 406) {
+      return false;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> interestedInEvent(
+      String api, String username, String tokenID, String eventID) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$username/$eventID');
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
   }
 }

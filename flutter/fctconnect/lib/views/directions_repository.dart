@@ -20,7 +20,35 @@ class DirectionsRepository {
       queryParameters: {
         'origin': '${origin.latitude},${origin.longitude}',
         'destination': '${destination.latitude},${destination.longitude}',
-        'mode' : 'walking',
+        'mode': 'walking',
+        'key': 'AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return Directions.fromMap(response.data);
+    } else {
+      throw Exception(
+          'Failed to get directions. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<Directions> getOptimizedDirections({
+    required LatLng origin,
+    required LatLng destination,
+    required List<LatLng> waypoints,
+  }) async {
+    final waypointString = waypoints
+        .map((waypoint) => '${waypoint.latitude},${waypoint.longitude}')
+        .join('|');
+
+    final response = await _dio.get(
+      _baseURL,
+      queryParameters: {
+        'origin': '${origin.latitude},${origin.longitude}',
+        'destination': '${destination.latitude},${destination.longitude}',
+        'waypoints': 'optimize:true|$waypointString',
+        'mode': 'walking',
         'key': 'AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E',
       },
     );
