@@ -11,6 +11,7 @@ class PostActions {
       String? type,
       String username,
       String tokenId) async {
+
     Post post = Post(
         post: postContent,
         fileData: fileData,
@@ -18,6 +19,7 @@ class PostActions {
         type: type,
         username: username,
         mediaType: mediaType);
+        
     int response = await BaseClient().createPost("/post", tokenId, post);
 
     return response;

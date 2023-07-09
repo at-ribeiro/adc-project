@@ -24,8 +24,8 @@ class CustomSearchDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        color: kAccentColor0,
-        icon: Icon(Icons.clear),
+        icon: Icon(Icons.clear,
+            color: Theme.of(context).appBarTheme.iconTheme!.color),
       ),
     ];
   }
@@ -36,8 +36,8 @@ class CustomSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      color: kAccentColor0,
-      icon: Icon(Icons.arrow_back_ios),
+      icon: Icon(Icons.arrow_back_ios,
+          color: Theme.of(context).appBarTheme.iconTheme!.color),
     );
   }
 
@@ -45,20 +45,6 @@ class CustomSearchDelegate extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     // Typically you would navigate to another page or show the selected result
     return Container();
-  }
-
-  @override
-  ThemeData appBarTheme(BuildContext context) {
-    return Theme.of(context).copyWith(
-      appBarTheme: AppBarTheme(
-        color: kPrimaryColor, // Set AppBar color here
-        iconTheme: IconThemeData(
-            color: kAccentColor0), // Set AppBar icon colors if needed
-      ),
-      textTheme: TextTheme(
-        headline6: TextStyle(color: kAccentColor0, fontSize: 18.0),
-      ),
-    );
   }
 
   Widget _loadProfilePic(String profilePic) {
@@ -84,7 +70,6 @@ class CustomSearchDelegate extends SearchDelegate {
       return Center(
           child: Text(
         'Escreva alguma coisa para pesquisar',
-        style: TextStyle(color: kAccentColor0),
       ));
     } else {
       return FutureBuilder<List<UserQueryData>>(
@@ -108,7 +93,7 @@ class CustomSearchDelegate extends SearchDelegate {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15), // Rounded corners
                   ),
-                  color: kAccentColor2.withOpacity(0.1), // Translucent effect
+                  // Translucent effect
                   child: InkWell(
                     onTap: () async {
                       var cd = await CacheDefault.cacheFactory.get('Creationd');
@@ -168,12 +153,14 @@ class CustomSearchDelegate extends SearchDelegate {
                                 Text(
                                   snapshot.data![index].username,
                                   style: TextStyle(
-                                      fontSize: 18, color: kAccentColor0),
+                                    fontSize: 18,
+                                  ),
                                 ),
                                 Text(
                                   snapshot.data![index].fullname,
                                   style: TextStyle(
-                                      fontSize: 12, color: kAccentColor2),
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ]),
                         ],
@@ -194,7 +181,8 @@ class CustomSearchDelegate extends SearchDelegate {
     fetchUsername();
     return Container(
       // Setting the gradient background
-      decoration: kGradientDecorationUp,
+      decoration:
+          BoxDecoration(color: Theme.of(context).appBarTheme.backgroundColor),
       child: _buildSearchContent(context), // The actual search content
     );
   }

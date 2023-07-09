@@ -1,18 +1,19 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_constant.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
+import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/services/fcm_services.dart';
-import 'package:responsive_login_ui/services/get_fcm_token.dart';import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/services/get_fcm_token.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import 'config/app_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'controller/simple_ui_controller.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   setPathUrlStrategy();
@@ -30,6 +31,38 @@ void main() async {
   String? session = await CacheDefault.cacheFactory.get('Session');
 
   getKey();
+
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  
+  Future<void> requestNotificationPermissions() async {
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    await requestNotificationPermissions();
+
+    Future<void> sendTokenToBackend() async {
+      String? msgToken = await _firebaseMessaging.getToken();
+
+      if (msgToken != null) {
+        BaseClient().sendMessageToken(msgToken);
+      }
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      String? firebaseToken = await messaging.getToken();
+      print('Firebase Token: $firebaseToken');
+    }
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // User granted permissions. Now we can get the token and send it to the backend
+      sendTokenToBackend();
+    }
+  }
 
   runApp(
     ChangeNotifierProvider(
@@ -77,7 +110,7 @@ ThemeManager _themeManager = ThemeManager();
 
 class MyApp extends StatefulWidget {
   final String? session;
-  
+
   MyApp({Key? key, this.session}) : super(key: key);
 
   @override
@@ -109,13 +142,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     _initializeIsLoggedIn();
+    final themeManager = Provider.of<ThemeManager>(context);
     return Consumer<ThemeManager>(builder: (context, themeManager, child) {
       return MaterialApp.router(
         routerConfig: AppRouter().router,
         debugShowCheckedModeBanner: false,
-        theme: darkTheme,
+        theme: lightTheme,
         darkTheme: darkTheme,
-        themeMode: _themeManager.themeMode,
+        themeMode: themeManager.themeMode,
       );
     });
   }

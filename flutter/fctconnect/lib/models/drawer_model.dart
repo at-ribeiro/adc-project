@@ -6,12 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:unicons/unicons.dart';
 
 import '../Themes/theme_manager.dart';
+import '../constants.dart';
+
 import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../views/messages/messages_view.dart';
+import '../widgets/theme_switch.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {

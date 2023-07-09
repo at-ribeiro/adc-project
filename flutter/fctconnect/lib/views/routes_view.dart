@@ -58,9 +58,7 @@ class _RouteViewState extends State<RouteView> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Column(
             children: [
               Expanded(
@@ -84,14 +82,14 @@ class _RouteViewState extends State<RouteView> {
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: ClipRRect(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(
                                     sigmaX: 50.0, sigmaY: 50.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: kAccentColor2.withOpacity(0.1),
-                                    borderRadius: kBorderRadius,
+                                    color: Style.kAccentColor2.withOpacity(0.1),
+                                    borderRadius: Style.kBorderRadius,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -109,19 +107,11 @@ class _RouteViewState extends State<RouteView> {
                                                 children: [
                                                   Text(
                                                     "Nome do Percurso: ",
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: kAccentColor0,
-                                                    ),
+                                                    
                                                   ),
                                                   Text(
                                                     route.name,
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: kAccentColor0,
-                                                    ),
+                                                   
                                                   ),
                                                 ],
                                               ),
@@ -130,15 +120,11 @@ class _RouteViewState extends State<RouteView> {
                                                 children: [
                                                   Text(
                                                     "Criador: ",
-                                                    style: const TextStyle(
-                                                      color: kAccentColor2,
-                                                    ),
+                                                   
                                                   ),
                                                   Text(
                                                     route.creator,
-                                                    style: const TextStyle(
-                                                      color: kAccentColor2,
-                                                    ),
+                                                  
                                                   ),
                                                 ],
                                               ),
@@ -147,18 +133,14 @@ class _RouteViewState extends State<RouteView> {
                                                 children: [
                                                   Text(
                                                     "Duração Aproximada: ",
-                                                    style: const TextStyle(
-                                                      color: kAccentColor2,
-                                                    ),
+                                                    
                                                   ),
                                                   Text(
                                                     locationsDuration(
                                                                 route.durations)
                                                             .toString() +
                                                         " minutos",
-                                                    style: const TextStyle(
-                                                      color: kAccentColor2,
-                                                    ),
+                                                 
                                                   ),
                                                 ],
                                               ),

@@ -9,13 +9,18 @@ import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
 import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
+import 'package:responsive_login_ui/views/nucleo_page.dart';
+import 'package:responsive_login_ui/views/nucleos_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
+import 'package:responsive_login_ui/views/pomodoro/pomodoro_page.dart';
+import 'package:responsive_login_ui/views/post_creator.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
+import 'package:responsive_login_ui/views/welcome_screen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 
 import '../constants.dart';
@@ -27,6 +32,7 @@ import '../views/edit_profile_options.dart';
 import '../views/event_creator.dart';
 import '../views/event_page.dart';
 import '../views/map_view.dart';
+import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
 import '../views/route_creator.dart';
 import '../views/routes_map.dart';
@@ -59,6 +65,12 @@ class AppRouter {
                 path: Paths.noticias,
                 builder: (BuildContext context, GoRouterState state) {
                   return NewsView();
+                },
+              ),
+              GoRoute(
+                path: Paths.createPost,
+                builder: (BuildContext context, GoRouterState state) {
+                  return PostCreator();
                 },
               ),
               GoRoute(
@@ -206,18 +218,42 @@ class AppRouter {
               );
             },
           ),
+          GoRoute(
+            path: Paths.nucleos,
+            builder: (BuildContext context, GoRouterState state) {
+              return NucleosView();
+            },
+          ),
+          GoRoute(
+            path: Paths.criarNucleo,
+            builder: (BuildContext context, GoRouterState state) {
+              return NuceloCreator();
+            },
+          ),
+          GoRoute(
+            path: Paths.nucleos + "/:id",
+            builder: (BuildContext context, GoRouterState state) {
+              return NucleoPage(
+                nucleoId: state.pathParameters['id']!,
+              );
+            },
+          ),
+          GoRoute(
+            path: Paths.pomodoro,
+            builder: (BuildContext context, GoRouterState state) {
+              return PomodoroTimer();
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
             drawer: drawerModel,
             appBar: AppBar(
-              backgroundColor: kPrimaryColor,
               elevation: 0,
               title: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   _getTitleBasedOnRoute(state.location),
-                  style: TextStyle(color: kAccentColor0),
                 ),
               ),
               actions: [
@@ -226,9 +262,8 @@ class AppRouter {
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.menu,
-                      color: kAccentColor0,
                     ),
                     onPressed: () {
                       Scaffold.of(context).openDrawer();
@@ -254,6 +289,12 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: Paths.welcome,
+        builder: (BuildContext context, GoRouterState state) {
+          return WelcomeScreen();
+        },
+      ),
+      GoRoute(
         path: Paths.splash,
         builder: (BuildContext context, GoRouterState state) {
           return Splash();
@@ -275,11 +316,14 @@ class AppRouter {
   }
 
   String _getTitleBasedOnRoute(String location) {
+    CacheDefault.cacheFactory.set('LastLocation', location);
     if (location == Paths.homePage || location == '/') {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
-    } else if (location == Paths.noticias) {
+
+    } else if (location == Paths.noticias || location.contains('noticias')) {
+
       return 'Notícias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
@@ -307,6 +351,14 @@ class AppRouter {
       return 'Evento';
     } else if (location.contains(Paths.post)) {
       return 'Comentários';
+    } else if (location == Paths.nucleos) {
+      return 'Núcleos';
+    } else if (location == Paths.criarNucleo) {
+      return 'Criar Núcleo';
+    } else if (location == Paths.pomodoro) {
+      return 'Pomodoro';
+    } else if (location != Paths.nucleos && location.contains(Paths.nucleos)) {
+      return 'Núcleo';
     } else if (location.contains(Paths.changePassword)) {
       return 'Mudar Password';
     } else if (location.contains(Paths.optionsProfile)) {
@@ -349,6 +401,7 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
+
       return FutureBuilder<bool>(
         future: hasRoleTo(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -365,6 +418,7 @@ class AppRouter {
           }
         },
       );
+
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {
@@ -390,8 +444,25 @@ class AppRouter {
             context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.nucleos) && location != Paths.nucleos) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.nucleos);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if(location.contains('noticias')){
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.noticias);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if (location.contains(Paths.optionsProfile)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.myProfile);
+          },
+          icon: Icon(Icons.arrow_back));
     }
-
     return Container();
   }
 }

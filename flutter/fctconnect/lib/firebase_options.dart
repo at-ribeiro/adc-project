@@ -44,40 +44,39 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAydaTKvYtp76TCnBceWiRx-yt5Ggxgkhk',
-    appId: '1:305889307562:web:c5478808b791f2ce6699d3',
-    messagingSenderId: '305889307562',
-    projectId: 'fct-connect-estudasses',
-    authDomain: 'fct-connect-estudasses.firebaseapp.com',
-    storageBucket: 'fct-connect-estudasses.appspot.com',
-    measurementId: 'G-4Q9RZ187TD',
+    apiKey: 'AIzaSyDqJdRjuqeuTWBoiSPHk3jr9wFCUF9ksOg',
+    appId: '1:223517067321:web:be1a93ee777f2337eea5e8',
+    messagingSenderId: '223517067321',
+    projectId: 'fctconnect-flutter',
+    authDomain: 'fctconnect-flutter.firebaseapp.com',
+    storageBucket: 'fctconnect-flutter.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB1kEN-9K8yLRgCcM5T59lZ0l92NXs9q38',
-    appId: '1:305889307562:android:a027a4f29368e8106699d3',
-    messagingSenderId: '305889307562',
-    projectId: 'fct-connect-estudasses',
-    storageBucket: 'fct-connect-estudasses.appspot.com',
+    apiKey: 'AIzaSyBTxOcft3F07H2zE7DbrKH3Wm-hsAkyYdk',
+    appId: '1:223517067321:android:04a71052bb51541aeea5e8',
+    messagingSenderId: '223517067321',
+    projectId: 'fctconnect-flutter',
+    storageBucket: 'fctconnect-flutter.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD0sbbG7ukalw39d3vW9vbBFtr8Kj3k-V4',
-    appId: '1:305889307562:ios:c28bf2450e313ee46699d3',
-    messagingSenderId: '305889307562',
-    projectId: 'fct-connect-estudasses',
-    storageBucket: 'fct-connect-estudasses.appspot.com',
-    iosClientId: '305889307562-ksu3kiilfmbftnunptsf7hj4gl0lctv4.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fctconnect',
+    apiKey: 'AIzaSyA69jR-iVBVobPWovVetKuubP13ASrFpTg',
+    appId: '1:223517067321:ios:dead1e642b3c8220eea5e8',
+    messagingSenderId: '223517067321',
+    projectId: 'fctconnect-flutter',
+    storageBucket: 'fctconnect-flutter.appspot.com',
+    iosClientId: '223517067321-eqtgkk2c6lq5ar6n0urhdgur1ltas3ls.apps.googleusercontent.com',
+    iosBundleId: 'com.estudasses.RunnerTest',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyD0sbbG7ukalw39d3vW9vbBFtr8Kj3k-V4',
-    appId: '1:305889307562:ios:c28bf2450e313ee46699d3',
-    messagingSenderId: '305889307562',
-    projectId: 'fct-connect-estudasses',
-    storageBucket: 'fct-connect-estudasses.appspot.com',
-    iosClientId: '305889307562-ksu3kiilfmbftnunptsf7hj4gl0lctv4.apps.googleusercontent.com',
+    apiKey: 'AIzaSyA69jR-iVBVobPWovVetKuubP13ASrFpTg',
+    appId: '1:223517067321:ios:d0bf10480846c9c6eea5e8',
+    messagingSenderId: '223517067321',
+    projectId: 'fctconnect-flutter',
+    storageBucket: 'fctconnect-flutter.appspot.com',
+    iosClientId: '223517067321-h979cgc3d9shm7702h91mmop7i9h8mte.apps.googleusercontent.com',
     iosBundleId: 'com.example.fctconnect',
   );
 }

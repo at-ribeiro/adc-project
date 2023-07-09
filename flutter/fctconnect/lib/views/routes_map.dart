@@ -119,7 +119,7 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
               Container(
                 padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
                 child: FloatingActionButton(
-                  backgroundColor: kPrimaryColor,
+                  backgroundColor: Style.kPrimaryColor,
                   foregroundColor: Colors.white,
                   onPressed: setOptimizedRoute,
                   child: Icon(Icons.directions),
@@ -149,12 +149,12 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
               errorText = 'Algo não correu bem';
 
             return Container(
-              decoration: kGradientDecorationUp,
+              
               child: AlertDialog(
                 shape: const RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
+                  borderRadius: Style.kBorderRadius,
                 ),
-                backgroundColor: kAccentColor0.withOpacity(0.3),
+                backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

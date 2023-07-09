@@ -145,6 +145,8 @@ class _OtherProfileState extends State<OtherProfile> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -163,7 +165,7 @@ class _OtherProfileState extends State<OtherProfile> {
               if (snapshot.hasError) {
                 const Text('Algo correu mal.');
                 return Container(
-                  decoration: kGradientDecoration,
+                  decoration: Style.kGradientDecoration,
                 );
               } else {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
@@ -178,21 +180,16 @@ class _OtherProfileState extends State<OtherProfile> {
                     _infoIsLoading = false;
                   });
                 });
-                return Container(
-                  decoration: kGradientDecorationUp,
-                );
+                return Container();
               }
             } else {
               return Container(
-                  decoration: kGradientDecorationUp,
                   child: const Center(child: CircularProgressIndicator()));
             }
           });
     } else {
       return Container(
-        decoration: kGradientDecoration,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: ListView(
             padding: EdgeInsets.zero,
             controller: _scrollController,
@@ -201,13 +198,15 @@ class _OtherProfileState extends State<OtherProfile> {
               const SizedBox(height: 16),
               buildButtons(context),
               Divider(
-                color: kAccentColor0,
+                color: Style.kAccentColor0,
                 thickness: 2.0,
               ),
               const SizedBox(height: 16),
-              if (info.role == "ALUNO") buildInfoAlunoSection(info),
-              if (info.role == "PROFESSOR") buildInfoProfessorSection(info),
-              if (info.role == "EXTERNO") buildInfoExternoSection(info),
+
+              if (info.role == "ALUNO") buildInfoAlunoSection(info, textTheme),
+              if (info.role == "PROFESSOR") buildInfoProfessorSection(info, textTheme),
+              if (info.role == "EXTERNO") buildInfoExternoSection(info, textTheme),
+
               SizedBox(height: 30),
             ],
           ),
@@ -216,7 +215,7 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Widget buildInfoProfessorSection(ProfileInfo info) {
+  Widget buildInfoProfessorSection(ProfileInfo info, TextTheme textTheme) {
     if (onButtonSelected == 'Info') {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -225,47 +224,57 @@ class _OtherProfileState extends State<OtherProfile> {
           children: [
             Text(
               'Sobre mim',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.about_me,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Departamento',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.department,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Gabinente',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.office,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Contacto',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.email,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Cidade',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.city,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
           ],
@@ -278,7 +287,7 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Widget buildInfoAlunoSection(ProfileInfo info) {
+  Widget buildInfoAlunoSection(ProfileInfo info, TextTheme textTheme) {
     if (onButtonSelected == 'Info') {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -287,57 +296,67 @@ class _OtherProfileState extends State<OtherProfile> {
           children: [
             Text(
               'Sobre mim',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.about_me,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Departamento',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.department,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Curso',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.course,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Ano',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.year,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Cidade',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.city,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               "Grupos: ${info.nGroups}",
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             SizedBox(height: 16),
             Text(
               "Núcleos: ${info.nNucleos}",
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
           ],
         ),
@@ -354,7 +373,7 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
-  Widget buildInfoExternoSection(ProfileInfo info) {
+  Widget buildInfoExternoSection(ProfileInfo info, TextTheme textTheme) {
     if (onButtonSelected == 'Info') {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -363,29 +382,35 @@ class _OtherProfileState extends State<OtherProfile> {
           children: [
             Text(
               'Sobre mim',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.about_me,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Cidade',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.city,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
             Text(
               'Propósito',
-              style: TextStyle(fontSize: 20),
+              style: textTheme.headline6,
             ),
             Text(
               info.purpose,
-              style: TextStyle(fontSize: 16),
+              style: TextTheme().bodyText1!.copyWith(
+                    fontSize: 16,
+                  ),
             ),
             SizedBox(height: 16),
           ],
@@ -406,7 +431,7 @@ class _OtherProfileState extends State<OtherProfile> {
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
           width: 1.5,
-          color: kAccentColor0.withOpacity(0.0),
+          color: Style.kAccentColor0.withOpacity(0.0),
         ),
       ),
       child: ClipRRect(
@@ -415,8 +440,8 @@ class _OtherProfileState extends State<OtherProfile> {
           filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
           child: Container(
             decoration: BoxDecoration(
-              color: kAccentColor2.withOpacity(0.1),
-              borderRadius: kBorderRadius,
+              color: Style.kAccentColor2.withOpacity(0.1),
+              borderRadius: Style.kBorderRadius,
             ),
             child: Material(
               color: Colors.transparent,
@@ -465,11 +490,11 @@ class _OtherProfileState extends State<OtherProfile> {
                               context: context,
                               builder: (BuildContext context) {
                                 return ClipRRect(
-                                  borderRadius: kBorderRadius,
+                                  borderRadius: Style.kBorderRadius,
                                   child: Dialog(
                                     child: Container(
                                       child: ClipRRect(
-                                        borderRadius: kBorderRadius,
+                                        borderRadius: Style.kBorderRadius,
                                         child: Image.network(
                                           post.url,
                                           fit: BoxFit.cover,
@@ -550,7 +575,7 @@ class _OtherProfileState extends State<OtherProfile> {
   Widget buildCoverImage() {
     if (info.coverPicUrl.isEmpty) {
       return Container(
-        color: kAccentColor0,
+        color: Style.kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
@@ -560,7 +585,7 @@ class _OtherProfileState extends State<OtherProfile> {
       );
     } else {
       return Container(
-        color: kAccentColor0,
+        color: Style.kAccentColor0,
         child: Image.network(
           info.coverPicUrl,
           width: double.infinity,
@@ -575,7 +600,7 @@ class _OtherProfileState extends State<OtherProfile> {
     if (info.profilePicUrl.isEmpty) {
       return CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: kAccentColor0,
+        backgroundColor: Style.kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
@@ -583,7 +608,7 @@ class _OtherProfileState extends State<OtherProfile> {
     } else {
       return CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: kAccentColor0,
+        backgroundColor: Style.kAccentColor0,
         backgroundImage: NetworkImage(
           info.profilePicUrl,
         ),
@@ -601,7 +626,7 @@ class _OtherProfileState extends State<OtherProfile> {
         width: 400,
         height: 400,
         child: ClipRRect(
-            borderRadius: kBorderRadius,
+            borderRadius: Style.kBorderRadius,
             child: Image.memory(_imageData!, fit: BoxFit.fill)),
       );
     } else {
@@ -615,15 +640,18 @@ class _OtherProfileState extends State<OtherProfile> {
         const SizedBox(height: 8),
         Text(
           info.username,
-          style: const TextStyle(
-              fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
+          style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Style.kAccentColor0),
         ),
         const SizedBox(height: 8),
         Text(
           info.role,
-          style: const TextStyle(fontSize: 20, color: kAccentColor2),
+          style: TextStyle(fontSize: 20, color: Style.kAccentColor2),
         ),
         const SizedBox(height: 16),
+
         if (_token.role != "SECRETARIA" && _token.role != "SA")
           Center(
             child: ElevatedButton(
@@ -633,7 +661,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kAccentColor0,
+                  color: Style.kAccentColor0,
                 ),
               ),
             ),
@@ -658,7 +686,7 @@ class _OtherProfileState extends State<OtherProfile> {
           children: [
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
+              color: Style.kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
@@ -666,7 +694,7 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
+              color: Style.kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0, left: 8.0),
@@ -674,7 +702,7 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
+              color: Style.kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -697,7 +725,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kAccentColor0,
+                  color: Style.kAccentColor0,
                 ),
               ),
             ),
@@ -714,7 +742,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kAccentColor0,
+                  color: Style.kAccentColor0,
                 ),
               ),
             ),

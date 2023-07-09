@@ -10,6 +10,9 @@ import 'package:responsive_login_ui/models/route_post_data.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/dom.dart' as html;
 
+import 'package:responsive_login_ui/models/nucleos_data.dart';
+import 'package:responsive_login_ui/models/nucleos_get.dart';
+
 import 'package:responsive_login_ui/models/user_query_data.dart';
 
 import '../models/AlertPostData.dart';
@@ -271,7 +274,8 @@ class BaseClient {
     }
   }
 
-  Future<List<UserQueryData>> searchUser(String query, String api, String username) async {
+  Future<List<UserQueryData>> searchUser(
+      String query, String api, String username) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "User": username,
@@ -1029,28 +1033,85 @@ class BaseClient {
     String imageUrl = imageElement?.attributes['src'] ?? "Image URL not found";
 
     final textContainer = html.querySelector('div.noticia-corpo');
-    String text = "";
+    List<String> paragraphs = []; // Create a list to store paragraphs
 
     if (textContainer != null) {
       textContainer.querySelectorAll('p').forEach((element) {
-        text += element.text.trim() + " "; // Using .text instead of .innerHtml
+        paragraphs.add(element.text.trim()); // Using .text and adding to list
       });
-    } else {
-      text = "Text not found";
     }
 
-    final timestampElement = html.querySelector('div > p');
+    final timestampElement = html.querySelector('#node-42022 > div > p');
     String timestamp = timestampElement?.text.trim() ?? "Timestamp not found";
 
     return NewsData(
       title: title,
-      text: text,
+      paragraphs: paragraphs, // Pass the list of paragraphs
       imageUrl: imageUrl,
       timestamp: timestamp,
       newsUrl: urlString,
       path: title.toLowerCase().replaceAll(new RegExp(r'\s'), '-'),
+      text: '',
     );
   }
+
+  Future createNucleo(String api, tokenId, username, NucleosData nucleo) async {
+    Map<String, String> _headers = {
+      "Content-Type": "multipart/form-data",
+      "Authorization": tokenId,
+      "User": username
+    };
+
+    var request = http.MultipartRequest('POST', Uri.parse(baseUrl + api + '/'));
+
+    request.headers.addAll(_headers);
+
+    request.fields['nucleo'] = json.encode(nucleo.toJson());
+
+    if (nucleo.imageData != null) {
+      var multipartFile = http.MultipartFile.fromBytes(
+        'image',
+        nucleo.imageData!,
+        filename: "${nucleo.fileName}.jpg",
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
+
+    return response.statusCode;
+  }
+
+  Future getNucleos(String api, String tokenID, String username, tipo) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username
+    };
+    var url = Uri.parse("$baseUrl$api?type=$tipo");
+
+    var response = await http.get(url, headers: _headers);
+    if (response.statusCode == 200) {
+      print('Response Body: ${response.body}');
+      final jsonArray = json.decode(response.body) as List<dynamic>;
+
+      // Check if the JSON array is not empty
+      if (jsonArray.isNotEmpty) {
+        final jsonList = json.decode(response.body) as List<dynamic>;
+        final NucleosGetList =
+            jsonList.map((json) => NucleosGet.fromJson(json)).toList();
+        return NucleosGetList;
+      } else {
+        // Handle the case where the JSON array is empty
+        return null; // Or any appropriate handling for an empty response
+      }
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+  // throw exception
 
   Future<RouteGetData> getRoute(String api, route, tokenID, user) async {
     Map<String, String>? _headers = {
@@ -1091,10 +1152,37 @@ class BaseClient {
       return response;
     } else {
       //throw exception
+
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
   }
+
+  Future getNucleo(
+      String api, String nucleoId, String tokenID, String username) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api?nucleo_name=$nucleoId');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final nucleo = NucleosGet.fromJson(jsonData);
+
+      return nucleo;
+    } else {
+      //throw exception
+
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+  // throw exception
 
   Future<dynamic> enableAccount(
       String api, String username, String tokenID, String user) async {
@@ -1114,9 +1202,37 @@ class BaseClient {
       return response;
     } else {
       //throw exception
+
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
+  }
+
+  void sendMessageToken(msgToken) {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Token": msgToken,
+    };
+
+    var url = Uri.parse('$baseUrl/notification/msgToken');
+    http.post(url, headers: _headers);
+  }
+
+  static void sendNotificationToAll(
+      String token, username, String title, String body) {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": token,
+      "User": username,
+    };
+
+    dynamic _body = {
+      "title": title,
+      "message": body,
+    };
+
+    var url = Uri.parse('$baseUrl/notification/anomaly');
+    http.post(url, headers: _headers, body: json.encode(_body));
   }
 
   Future<bool> isAccountEnabled(
@@ -1160,14 +1276,14 @@ class BaseClient {
     }
   }
 
-  Future<dynamic> interestedInEvent(String api, String username, String tokenID, String eventID) async {
+  Future<dynamic> interestedInEvent(
+      String api, String username, String tokenID, String eventID) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
       "User": username,
     };
-    var url =
-        Uri.parse('$baseUrl$api/$username/$eventID');
+    var url = Uri.parse('$baseUrl$api/$username/$eventID');
 
     var response = await http.put(
       url,

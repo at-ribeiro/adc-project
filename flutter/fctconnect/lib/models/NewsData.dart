@@ -5,7 +5,7 @@ class NewsData {
   final String timestamp;
   final String newsUrl;
   final String path;
-
+  final List<String>? paragraphs;
   NewsData({
     required this.title,
     required this.text,
@@ -13,6 +13,7 @@ class NewsData {
     required this.timestamp,
     required this.newsUrl,
     required this.path,
+    this.paragraphs,
   });
 
   factory NewsData.fromJson(Map<String, dynamic> json) {

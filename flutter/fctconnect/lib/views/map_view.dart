@@ -147,7 +147,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return Container(
-        decoration: kGradientDecorationUp,
         child: TokenGetterWidget(onTokenLoaded: (Token token) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             setState(() {
@@ -273,6 +272,7 @@ class _MapScreenState extends State<MapScreen> {
                               // Add more rows as needed
                             ],
                           ),
+
                         ),
                       ),
                     if (_info != null)
@@ -311,7 +311,7 @@ class _MapScreenState extends State<MapScreen> {
                 Container(
                   padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
                   child: FloatingActionButton(
-                    backgroundColor: kPrimaryColor,
+                    backgroundColor: Style.kPrimaryColor,
                     foregroundColor: Colors.white,
                     onPressed: () {
                       if (_initialCameraPosition != null) {
@@ -335,7 +335,7 @@ class _MapScreenState extends State<MapScreen> {
                         child: Container(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: FloatingActionButton(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: Style.kPrimaryColor,
                             foregroundColor: Colors.white,
                             child: Icon(Icons.directions),
                             onPressed: () {

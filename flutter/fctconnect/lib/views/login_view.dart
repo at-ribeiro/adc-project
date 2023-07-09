@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Themes/theme_manager.dart';
 import '../constants.dart';
 import '../controller/simple_ui_controller.dart';
 import '../data/cache_factory_provider.dart';
@@ -15,6 +17,7 @@ import '../data/cache_factory_provider.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../widgets/error_dialog.dart';
+import '../widgets/theme_switch.dart';
 
 class LoginView extends StatefulWidget {
   final String? session;
@@ -55,11 +58,9 @@ class _LoginViewState extends State<LoginView>
     var size = MediaQuery.of(context).size;
 
     return Container(
-      decoration: kGradientDecoration,
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           resizeToAvoidBottomInset: false,
           body: LayoutBuilder(
             builder: (context, constraints) {
@@ -112,193 +113,191 @@ class _LoginViewState extends State<LoginView>
     Size size,
     SimpleUIController simpleUIController,
   ) {
+    ThemeManager themeManager = context.watch<ThemeManager>();
+
     TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: size.width > 600
-                ? MainAxisAlignment.center
-                : MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: size.height * 0.03,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text(
-                  'Login',
-                  style: textTheme.headline2!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: kAccentColor0,
+      body: Column(
+        children: [
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: size.width > 600
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ThemeSwitch(
+                        themeManager: themeManager,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text(
-                  'Bem vindo de volta!',
-                  style: textTheme.headline5!.copyWith(
-                    color: kAccentColor0,
+                  SizedBox(
+                    height: size.height * 0.03,
                   ),
-                ),
-              ),
-              SizedBox(
-                height: size.height * 0.03,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: kBorderRadius,
-                          color: kAccentColor0.withOpacity(0.3),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: kBorderRadius,
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: TextFormField(
-                              style: const TextStyle(
-                                color: kAccentColor0,
-                              ),
-                              decoration: const InputDecoration(
-                                prefixIcon: Icon(
-                                  Icons.person,
-                                  color: kAccentColor1,
-                                ),
-                                hintText: 'Username',
-                                border: InputBorder.none,
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: kBorderRadius,
-                                  borderSide: BorderSide(
-                                    color:
-                                        kAccentColor1, // Set your desired focused color here
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      'Login',
+                      style: textTheme.headline2!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      'Bem vindo de volta!',
+                      style: textTheme.headline5!.copyWith(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: size.height * 0.03,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0, right: 20),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: Style.kBorderRadius,
+                              color: Style.kAccentColor2.withOpacity(0.3),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: Style.kBorderRadius,
+                              child: BackdropFilter(
+                                filter:
+                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.person,
+                                        color:
+                                            Theme.of(context).iconTheme.color),
+                                    hintText: 'Username',
+                                    border: InputBorder.none,
                                   ),
+                                  controller: nameController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter username';
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ),
-                              controller: nameController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter username';
-                                }
-                                return null;
-                              },
                             ),
                           ),
-                        ),
-                      ),
-                      // ),
-                      SizedBox(
-                        height: size.height * 0.01,
-                      ),
-
-                      /// password
-                      Obx(
-                        () => Container(
-                          decoration: BoxDecoration(
-                            borderRadius: kBorderRadius,
-                            color: kAccentColor0.withOpacity(0.3),
+                          // ),
+                          SizedBox(
+                            height: size.height * 0.01,
                           ),
-                          child: ClipRRect(
-                            borderRadius: kBorderRadius,
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: TextFormField(
-                                controller: passwordController,
-                                obscureText: simpleUIController.isObscure.value,
-                                decoration: InputDecoration(
-                                  prefixIcon: const Icon(
-                                    Icons.lock_open,
-                                    color: kAccentColor1,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      simpleUIController.isObscure.value
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: kAccentColor1,
+
+                          /// password
+                          Obx(
+                            () => Container(
+                              decoration: BoxDecoration(
+                                borderRadius: Style.kBorderRadius,
+                                color: Style.kAccentColor2.withOpacity(0.3),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: Style.kBorderRadius,
+                                child: BackdropFilter(
+                                  filter:
+                                      ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                  child: TextFormField(
+                                    controller: passwordController,
+                                    obscureText:
+                                        simpleUIController.isObscure.value,
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.lock_open,
+                                          color: Theme.of(context)
+                                              .iconTheme
+                                              .color),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          simpleUIController.isObscure.value
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Theme.of(context)
+                                              .iconTheme
+                                              .color,
+                                        ),
+                                        onPressed: () {
+                                          simpleUIController.isObscureActive();
+                                        },
+                                      ),
+                                      hintText: 'Password',
+                                      border: InputBorder.none,
                                     ),
-                                    onPressed: () {
-                                      simpleUIController.isObscureActive();
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Insira a password?';
+                                      }
+                                      return null;
                                     },
                                   ),
-                                  hintText: 'Password',
-                                  border: InputBorder.none,
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderRadius: kBorderRadius,
-                                    borderSide: BorderSide(
-                                      color:
-                                          kAccentColor1, // Set your desired focused color here
-                                    ),
-                                  ),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Insira a password?';
-                                  }
-                                  return null;
-                                },
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.01,
-                      ),
-
-                      SizedBox(
-                        height: size.height * 0.02,
-                      ),
-
-                      /// Login Button
-                      loginButton(),
-                      SizedBox(
-                        height: size.height * 0.03,
-                      ),
-
-                      /// Navigate To Login Screen
-                      GestureDetector(
-                        onTap: () {
-                          context.go(Paths.signUp);
-                          nameController.clear();
-                          emailController.clear();
-                          passwordController.clear();
-                          _formKey.currentState?.reset();
-                          simpleUIController.isObscure.value = true;
-                        },
-                        child: RichText(
-                          text: const TextSpan(
-                            text: 'Não tens uma conta?',
-                            style: TextStyle(
-                              color: kAccentColor0,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: " Sign up",
-                                style: TextStyle(color: kAccentColor1),
-                              ),
-                            ],
+                          SizedBox(
+                            height: size.height * 0.01,
                           ),
-                        ),
+
+                          SizedBox(
+                            height: size.height * 0.02,
+                          ),
+
+                          /// Login Button
+                          loginButton(),
+                          SizedBox(
+                            height: size.height * 0.03,
+                          ),
+
+                          /// Navigate To Login Screen
+                          GestureDetector(
+                            onTap: () {
+                              context.go(Paths.signUp);
+                              nameController.clear();
+                              emailController.clear();
+                              passwordController.clear();
+                              _formKey.currentState?.reset();
+                              simpleUIController.isObscure.value = true;
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                text: 'Não tens uma conta?',
+                                style: textTheme.bodyText1!,
+                                children: [
+                                  TextSpan(
+                                    text: " Sign up",
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).iconTheme.color),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -339,19 +338,20 @@ class _LoginViewState extends State<LoginView>
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: kBorderRadius,
+            shape: RoundedRectangleBorder(
+              borderRadius: Style.kBorderRadius,
             ),
-            backgroundColor: kAccentColor0.withOpacity(0.3),
-            content: const Row(
+            backgroundColor: Style.kAccentColor2.withOpacity(0.3),
+            content: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CircularProgressIndicator(
-                  color: kAccentColor1,
+                  color: Style.kAccentColor1,
                 ),
                 SizedBox(width: 10),
-                Text('Loading...', style: TextStyle(color: kAccentColor0)),
+                Text('Loading...',
+                    style: TextStyle(color: Style.kAccentColor0)),
               ],
             ),
           );
@@ -394,7 +394,7 @@ class _LoginViewState extends State<LoginView>
               });
           // Call the login funct
         },
-        child: const Text('Login', style: TextStyle(color: kAccentColor0)),
+        child: Text('Login', style: TextStyle(color: Style.kAccentColor0)),
       ),
     );
   }
