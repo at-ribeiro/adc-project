@@ -141,11 +141,10 @@ class _RouteCreatorState extends State<RouteCreator> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(),
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.title),
                             hintText: 'Título do Percurso',
-
+                            border: InputBorder.none,
                           ),
                           controller: routeNameController,
                           validator: (value) {
@@ -161,7 +160,6 @@ class _RouteCreatorState extends State<RouteCreator> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-
                 ExpansionTile(
                   title: Text('RESTAURAÇÃO'),
                   onExpansionChanged: (expanded) {
@@ -227,8 +225,14 @@ class _RouteCreatorState extends State<RouteCreator> {
                                         onChanged: (String? newValue) {
                                           setState(() {
                                             locationData.duration = newValue!;
-                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
-                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            if (locationsToAdd.indexOf(
+                                                    locationData.name) !=
+                                                -1) {
+                                              locationsToAddDuration[
+                                                      locationsToAdd.indexOf(
+                                                          locationData.name)] =
+                                                  getDurationInMinutes(
+                                                      locationData.duration);
                                             }
                                           });
                                         },
@@ -250,63 +254,15 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 } else {
                                   addToSelectedLocations(
                                     locationData.name,
-                                    locationData
-                                        .duration, 
+                                    locationData.duration,
                                   );
                                 }
                               },
-                              children: [
-                                if (_isFirstLoadRest)
-                                  CircularProgressIndicator()
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: locationsListRestauracao.length,
-                                    itemBuilder: (context, index) {
-                                      LocationGetData locationData =
-                                          locationsListRestauracao[index];
-                                      bool isSelected = locationsToAdd
-                                          .contains(locationData.name);
-                                      return ListTile(
-                                        title: Text(locationData.name),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                            ),
-                                            Text(
-                                                'Tipo de localização: Restauração'),
-                                          ],
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(
-                                            isSelected
-                                                ? Icons.check_box
-                                                : Icons.check_box_outline_blank,
-                                          ),
-                                          onPressed: () {
-                                            if (isSelected) {
-                                              removeFromLocations(
-                                                  locationData.name);
-                                            } else {
-                                              addToSelectedLocations(
-                                                  locationData.name);
-                                            }
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 10.0),
                 ExpansionTile(
@@ -374,8 +330,14 @@ class _RouteCreatorState extends State<RouteCreator> {
                                         onChanged: (String? newValue) {
                                           setState(() {
                                             locationData.duration = newValue!;
-                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
-                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            if (locationsToAdd.indexOf(
+                                                    locationData.name) !=
+                                                -1) {
+                                              locationsToAddDuration[
+                                                      locationsToAdd.indexOf(
+                                                          locationData.name)] =
+                                                  getDurationInMinutes(
+                                                      locationData.duration);
                                             }
                                           });
                                         },
@@ -397,63 +359,15 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 } else {
                                   addToSelectedLocations(
                                     locationData.name,
-                                    locationData
-                                        .duration, 
+                                    locationData.duration,
                                   );
                                 }
                               },
-                              children: [
-                                if (_isFirstLoadEd)
-                                  CircularProgressIndicator()
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: locationsListEdificios.length,
-                                    itemBuilder: (context, index) {
-                                      LocationGetData locationData =
-                                          locationsListEdificios[index];
-                                      bool isSelected = locationsToAdd
-                                          .contains(locationData.name);
-                                      return ListTile(
-                                        title: Text(locationData.name),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                            ),
-                                            Text(
-                                                'Tipo de localização: Edifício'),
-                                          ],
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(
-                                            isSelected
-                                                ? Icons.check_box
-                                                : Icons.check_box_outline_blank,
-                                          ),
-                                          onPressed: () {
-                                            if (isSelected) {
-                                              removeFromLocations(
-                                                  locationData.name);
-                                            } else {
-                                              addToSelectedLocations(
-                                                  locationData.name);
-                                            }
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 10.0),
                 ExpansionTile(
@@ -521,8 +435,14 @@ class _RouteCreatorState extends State<RouteCreator> {
                                         onChanged: (String? newValue) {
                                           setState(() {
                                             locationData.duration = newValue!;
-                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
-                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            if (locationsToAdd.indexOf(
+                                                    locationData.name) !=
+                                                -1) {
+                                              locationsToAddDuration[
+                                                      locationsToAdd.indexOf(
+                                                          locationData.name)] =
+                                                  getDurationInMinutes(
+                                                      locationData.duration);
                                             }
                                           });
                                         },
@@ -544,63 +464,15 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 } else {
                                   addToSelectedLocations(
                                     locationData.name,
-                                    locationData
-                                        .duration, 
+                                    locationData.duration,
                                   );
                                 }
                               },
-                              children: [
-                                if (_isFirstLoadTrans)
-                                  CircularProgressIndicator()
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: locationsListTransporte.length,
-                                    itemBuilder: (context, index) {
-                                      LocationGetData locationData =
-                                          locationsListTransporte[index];
-                                      bool isSelected = locationsToAdd
-                                          .contains(locationData.name);
-                                      return ListTile(
-                                        title: Text(locationData.name),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                            ),
-                                            Text(
-                                                'Tipo de localização: Transporte'),
-                                          ],
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(
-                                            isSelected
-                                                ? Icons.check_box
-                                                : Icons.check_box_outline_blank,
-                                          ),
-                                          onPressed: () {
-                                            if (isSelected) {
-                                              removeFromLocations(
-                                                  locationData.name);
-                                            } else {
-                                              addToSelectedLocations(
-                                                  locationData.name);
-                                            }
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 10.0),
                 ExpansionTile(
@@ -668,8 +540,14 @@ class _RouteCreatorState extends State<RouteCreator> {
                                         onChanged: (String? newValue) {
                                           setState(() {
                                             locationData.duration = newValue!;
-                                            if (locationsToAdd.indexOf(locationData.name) != -1) {
-                                              locationsToAddDuration[locationsToAdd.indexOf(locationData.name)] = getDurationInMinutes(locationData.duration);
+                                            if (locationsToAdd.indexOf(
+                                                    locationData.name) !=
+                                                -1) {
+                                              locationsToAddDuration[
+                                                      locationsToAdd.indexOf(
+                                                          locationData.name)] =
+                                                  getDurationInMinutes(
+                                                      locationData.duration);
                                             }
                                           });
                                         },
@@ -691,62 +569,15 @@ class _RouteCreatorState extends State<RouteCreator> {
                                 } else {
                                   addToSelectedLocations(
                                     locationData.name,
-                                    locationData
-                                        .duration, 
+                                    locationData.duration,
                                   );
                                 }
                               },
-                              children: [
-                                if (_isFirstLoadEv)
-                                  CircularProgressIndicator()
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: locationsListEventos.length,
-                                    itemBuilder: (context, index) {
-                                      LocationGetData locationData =
-                                          locationsListEventos[index];
-                                      bool isSelected = locationsToAdd
-                                          .contains(locationData.name);
-                                      return ListTile(
-                                        title: Text(locationData.name),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Localização: ${locationData.latitude}, ${locationData.longitude}',
-                                            ),
-                                            Text('Tipo de localização: Evento'),
-                                          ],
-                                        ),
-                                        trailing: IconButton(
-                                          icon: Icon(
-                                            isSelected
-                                                ? Icons.check_box
-                                                : Icons.check_box_outline_blank,
-                                          ),
-                                          onPressed: () {
-                                            if (isSelected) {
-                                              removeFromLocations(
-                                                  locationData.name);
-                                            } else {
-                                              addToSelectedLocations(
-                                                  locationData.name);
-                                            }
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 20.0),
                 Padding(
@@ -772,7 +603,6 @@ class _RouteCreatorState extends State<RouteCreator> {
                           context.go(Paths.routes);
                         });
                       }
-                      context.go(Paths.routes);
                     },
                     child: Text('Criar Percurso'),
                   ),

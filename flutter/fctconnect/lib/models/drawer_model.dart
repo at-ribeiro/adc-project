@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:unicons/unicons.dart';
 
 import '../Themes/theme_manager.dart';
 import '../constants.dart';
@@ -57,10 +56,10 @@ class _DrawerModelState extends State<DrawerModel> {
     String profiPic = _token.profilePic;
 
     return Drawer(
-        backgroundColor: kPrimaryColor,
         shape: const RoundedRectangleBorder(
-          borderRadius: kBorderRadius,
-        ),
+            borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(30),
+                topRight: Radius.circular(30))),
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
@@ -78,18 +77,13 @@ class _DrawerModelState extends State<DrawerModel> {
                       ),
                       const SizedBox(height: 5),
                       Text(username, style: const TextStyle(fontSize: 18)),
-                      Switch(
-                        value: isDarkModeOn,
-                        onChanged: (value) {
-                          _themeManager.toggleTheme(value);
-                        },
-                      ),
+                      ThemeSwitch(themeManager: themeManager),
                     ],
                   ),
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.home, color: kAccentColor1),
+                leading: Icon(Icons.home),
                 title: const Text('Home'),
                 onTap: () {
                   context.go(Paths.homePage);
@@ -97,7 +91,7 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.map, color: kAccentColor1),
+                leading: Icon(Icons.map),
                 title: const Text('Mapa'),
                 onTap: () {
                   context.go(Paths.mapas);
@@ -105,7 +99,7 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.directions_walk, color: kAccentColor1),
+                leading: Icon(Icons.directions_walk),
                 title: const Text('Percursos'),
                 onTap: () {
                   context.go(Paths.routes);
@@ -113,7 +107,7 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.event, color: kAccentColor1),
+                leading: Icon(Icons.event),
                 title: const Text('Eventos'),
                 onTap: () {
                   context.go(Paths.events);
@@ -121,7 +115,7 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.calendar_month, color: kAccentColor1),
+                leading: Icon(Icons.calendar_month),
                 title: const Text('Calendário'),
                 onTap: () {
                   context.go(Paths.calendar);
@@ -129,7 +123,7 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.report, color: kAccentColor1),
+                leading: Icon(Icons.report,),
                 title: const Text('Report'),
                 onTap: () {
                   context.go(Paths.report);
@@ -141,7 +135,7 @@ class _DrawerModelState extends State<DrawerModel> {
                   children: [
                     ListTile(
                       leading: Icon(Icons.report_problem_outlined,
-                          color: kAccentColor1),
+                      ),
                       title: const Text('Lista de Anomalias'),
                       onTap: () {
                         context.go(Paths.listReports);
@@ -150,7 +144,7 @@ class _DrawerModelState extends State<DrawerModel> {
                     ),
                     ListTile(
                       leading: Icon(Icons.report_gmailerrorred,
-                          color: kAccentColor1),
+                         ),
                       title: const Text('Posts Reportados'),
                       onTap: () {
                         context.go(Paths.reportedPosts);
@@ -160,7 +154,7 @@ class _DrawerModelState extends State<DrawerModel> {
                   ],
                 ),
               ListTile(
-                leading: Icon(Icons.exit_to_app, color: kAccentColor1),
+                leading: Icon(Icons.exit_to_app,),
                 title: const Text('Sair', style: TextStyle(color: Colors.red)),
                 onTap: () async {
                   BaseClient()

@@ -46,7 +46,7 @@ dependencies:
   chewie: ^1.5.0
   html: ^0.15.4
   font_awesome_flutter: ^10.5.0
-  url_launcher: ^6.1.11
+  url_launcher: ^6.1.12
   circular_countdown_timer: ^0.2.3
   ndialog: ^4.3.0
   unicons: ^2.1.1

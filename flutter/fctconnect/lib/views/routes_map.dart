@@ -112,22 +112,24 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
           markers: Set<Marker>.from(markers),
           polylines: polylines,
         ),
-        floatingActionButton: kIsWeb ? null : Align(
-          alignment: Alignment.bottomLeft,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
-                child: FloatingActionButton(
-                  backgroundColor: Style.kPrimaryColor,
-                  foregroundColor: Colors.white,
-                  onPressed: setOptimizedRoute,
-                  child: Icon(Icons.directions),
+        floatingActionButton: kIsWeb
+            ? null
+            : Align(
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
+                      child: FloatingActionButton(
+                        backgroundColor: Style.kPrimaryColor,
+                        foregroundColor: Colors.white,
+                        onPressed: setOptimizedRoute,
+                        child: Icon(Icons.directions),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       );
     }
   }
@@ -149,10 +151,9 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
               errorText = 'Algo não correu bem';
 
             return Container(
-              
               child: AlertDialog(
                 shape: const RoundedRectangleBorder(
-                  borderRadius: Style.kBorderRadius,
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 ),
                 backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                 content: Column(
@@ -160,7 +161,6 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
                   children: [
                     Text(
                       errorText,
-                      style: const TextStyle(color: kAccentColor0),
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(

@@ -35,7 +35,7 @@ void main() async {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  
+
   Future<void> requestNotificationPermissions() async {
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
