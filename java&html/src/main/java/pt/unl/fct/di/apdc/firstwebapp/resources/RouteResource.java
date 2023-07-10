@@ -3,10 +3,7 @@ package pt.unl.fct.di.apdc.firstwebapp.resources;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
-import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.LocationData;
-import pt.unl.fct.di.apdc.firstwebapp.util.RouteData;
-import pt.unl.fct.di.apdc.firstwebapp.util.RouteGetData;
+import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -434,9 +431,10 @@ public class RouteResource {
     }
 
     @DELETE
-    @Path("/{route}")
+    @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteRoute(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
-                                @PathParam("route") String routeId){
+                                RouteDeleteData data){
 
             Transaction txn = datastore.newTransaction();
 
@@ -472,24 +470,27 @@ public class RouteResource {
                     return Response.status(Response.Status.FORBIDDEN).build();
                 }
 
-                Key routeKey = datastore.newKeyFactory()
-                        .setKind("Route")
-                        .addAncestor(PathElement.of("User", username))
-                        .newKey(routeId);
+                for (String id : data.getRoutes()){
+                    Key routeKey = datastore.newKeyFactory()
+                            .setKind("Route")
+                            .addAncestor(PathElement.of("User", username))
+                            .newKey(id);
 
-                Entity routeEntity = txn.get(routeKey);
+                    Entity routeEntity = txn.get(routeKey);
 
-                if(routeEntity == null){
-                    LOG.warning("Route does not exist.");
-                    return Response.status(Response.Status.NOT_FOUND).build();
+                    if(routeEntity == null){
+                        LOG.warning("Route does not exist.");
+                        return Response.status(Response.Status.NOT_FOUND).build();
+                    }
+
+                    if(!routeEntity.getString("route_creator").equals(username)){
+                        LOG.warning("User is not the creator of the route.");
+                        return Response.status(Response.Status.PRECONDITION_FAILED).build();
+                    }
+
+                    txn.delete(routeKey);
                 }
 
-                if(!routeEntity.getString("route_creator").equals(username)){
-                    LOG.warning("User is not the creator of the route.");
-                    return Response.status(Response.Status.PRECONDITION_FAILED).build();
-                }
-
-                txn.delete(routeKey);
                 txn.commit();
 
                 return Response.ok().build();
