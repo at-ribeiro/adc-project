@@ -14,7 +14,6 @@ import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../views/messages/messages_view.dart';
-import '../widgets/theme_switch.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {
@@ -77,7 +76,6 @@ class _DrawerModelState extends State<DrawerModel> {
                       ),
                       const SizedBox(height: 5),
                       Text(username, style: const TextStyle(fontSize: 18)),
-                      ThemeSwitch(themeManager: themeManager),
                     ],
                   ),
                 ),

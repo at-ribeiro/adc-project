@@ -24,8 +24,7 @@ class CustomSearchDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        icon: Icon(Icons.clear,
-            color: Theme.of(context).appBarTheme.iconTheme!.color),
+        icon: Icon(Icons.clear),
       ),
     ];
   }
@@ -36,8 +35,7 @@ class CustomSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      icon: Icon(Icons.arrow_back_ios,
-          color: Theme.of(context).appBarTheme.iconTheme!.color),
+      icon: Icon(Icons.arrow_back_ios),
     );
   }
 
@@ -46,6 +44,7 @@ class CustomSearchDelegate extends SearchDelegate {
     // Typically you would navigate to another page or show the selected result
     return Container();
   }
+
 
   Widget _loadProfilePic(String profilePic) {
     if (profilePic.isEmpty) {
@@ -93,7 +92,6 @@ class CustomSearchDelegate extends SearchDelegate {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15), // Rounded corners
                   ),
-                  // Translucent effect
                   child: InkWell(
                     onTap: () async {
                       var cd = await CacheDefault.cacheFactory.get('Creationd');
@@ -153,14 +151,12 @@ class CustomSearchDelegate extends SearchDelegate {
                                 Text(
                                   snapshot.data![index].username,
                                   style: TextStyle(
-                                    fontSize: 18,
-                                  ),
+                                      fontSize: 18,),
                                 ),
                                 Text(
                                   snapshot.data![index].fullname,
                                   style: TextStyle(
-                                    fontSize: 12,
-                                  ),
+                                      fontSize: 12,),
                                 ),
                               ]),
                         ],
@@ -181,8 +177,6 @@ class CustomSearchDelegate extends SearchDelegate {
     fetchUsername();
     return Container(
       // Setting the gradient background
-      decoration:
-          BoxDecoration(color: Theme.of(context).appBarTheme.backgroundColor),
       child: _buildSearchContent(context), // The actual search content
     );
   }
