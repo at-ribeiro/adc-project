@@ -36,6 +36,7 @@ import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
 import '../views/route_creator.dart';
 import '../views/routes_map.dart';
+import '../views/verify_account_view.dart';
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -289,6 +290,14 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: "${Paths.verifyAccount}/:username",
+        builder: (BuildContext context, GoRouterState state) {
+          return VerifyAccountView(
+            username: state.pathParameters['username']!,
+          );
+        },
+      ),
+      GoRoute(
         path: Paths.welcome,
         builder: (BuildContext context, GoRouterState state) {
           return WelcomeScreen();
@@ -321,9 +330,7 @@ class AppRouter {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
-
     } else if (location == Paths.noticias || location.contains('noticias')) {
-
       return 'Notícias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
@@ -401,7 +408,6 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
-
       return FutureBuilder<bool>(
         future: hasRoleTo(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -418,7 +424,6 @@ class AppRouter {
           }
         },
       );
-
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {
@@ -450,13 +455,13 @@ class AppRouter {
             context.go(Paths.nucleos);
           },
           icon: Icon(Icons.arrow_back));
-    }else if(location.contains('noticias')){
+    } else if (location.contains('noticias')) {
       return IconButton(
           onPressed: () {
             context.go(Paths.noticias);
           },
           icon: Icon(Icons.arrow_back));
-    }else if (location.contains(Paths.optionsProfile)) {
+    } else if (location.contains(Paths.optionsProfile)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.myProfile);

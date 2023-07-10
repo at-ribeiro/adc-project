@@ -280,7 +280,6 @@ class BaseClient {
       "Content-Type": "application/json; charset=UTF-8",
       "User": username,
     };
-    print(username);
     var url = Uri.parse('$baseUrl$api/user?query=$query');
 
     final response = await http.get(url, headers: _headers);
@@ -1003,8 +1002,6 @@ class BaseClient {
         .map((e) => e.attributes['href'])
         .toList();
 
-    print(newsUrls);
-
     news = List.generate(
         titles.length,
         (index) => NewsData(
@@ -1093,7 +1090,6 @@ class BaseClient {
 
     var response = await http.get(url, headers: _headers);
     if (response.statusCode == 200) {
-      print('Response Body: ${response.body}');
       final jsonArray = json.decode(response.body) as List<dynamic>;
 
       // Check if the JSON array is not empty
@@ -1294,6 +1290,42 @@ class BaseClient {
       return response;
     } else {
       //throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> verifyAccount(String api, username, code) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+    };
+    var url = Uri.parse('$baseUrl$api/$username?code=$code');
+
+    var response = await http.get(url, headers: _headers);
+
+    return response.statusCode;
+  }
+
+  Future<dynamic> deleteRoutes(
+      String api, String username, String tokenID, List<String> routes) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl$api');
+
+    var response = await http.delete(
+      url,
+      headers: _headers,
+      body: json.encode({"routes": routes}),
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
       throw Exception(
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }

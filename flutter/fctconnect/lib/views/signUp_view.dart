@@ -511,7 +511,9 @@ class _SignUpViewState extends State<SignUpView> {
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();
-                          context.go(Paths.login);
+                          context.go(Paths.verifyAccount);
+                          context.go(
+                              '${Paths.verifyAccount}/${nameController.text}');
 
                           nameController.clear();
                           emailController.clear();

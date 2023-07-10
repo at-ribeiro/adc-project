@@ -123,7 +123,25 @@ class _DrawerModelState extends State<DrawerModel> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.report,),
+                leading: Icon(Icons.group),
+                title: const Text('Núcleos'),
+                onTap: () {
+                  context.go(Paths.nucleos);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.timer),
+                title: const Text('Pomodoro'),
+                onTap: () {
+                  context.go(Paths.pomodoro);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.report,
+                ),
                 title: const Text('Report'),
                 onTap: () {
                   context.go(Paths.report);
@@ -134,7 +152,8 @@ class _DrawerModelState extends State<DrawerModel> {
                 Column(
                   children: [
                     ListTile(
-                      leading: Icon(Icons.report_problem_outlined,
+                      leading: Icon(
+                        Icons.report_problem_outlined,
                       ),
                       title: const Text('Lista de Anomalias'),
                       onTap: () {
@@ -143,8 +162,9 @@ class _DrawerModelState extends State<DrawerModel> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.report_gmailerrorred,
-                         ),
+                      leading: Icon(
+                        Icons.report_gmailerrorred,
+                      ),
                       title: const Text('Posts Reportados'),
                       onTap: () {
                         context.go(Paths.reportedPosts);
@@ -154,7 +174,9 @@ class _DrawerModelState extends State<DrawerModel> {
                   ],
                 ),
               ListTile(
-                leading: Icon(Icons.exit_to_app,),
+                leading: Icon(
+                  Icons.exit_to_app,
+                ),
                 title: const Text('Sair', style: TextStyle(color: Colors.red)),
                 onTap: () async {
                   BaseClient()
