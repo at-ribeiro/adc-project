@@ -98,7 +98,6 @@ public class RegisterResource {
             Random rand = new Random();
 
             int code = rand.nextInt(900000) + 100000;
-            VerificationToken tokenData = new VerificationToken(code, data.getUsername());
 
             Key verKey = datastore.newKeyFactory()
                     .setKind("Verification")
@@ -116,7 +115,7 @@ public class RegisterResource {
 
             sendEmailVerification(code, data.getEmail());
 
-            return Response.ok(tokenData).header("Access-Control-Allow_Origin", "*").build();
+            return Response.ok().build();
 
         }finally {
             if(txn.isActive()){

@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 @MultipartConfig
 public class NucleosServlet extends HttpServlet {
 
-    private static final Logger LOG = Logger.getLogger(EventsServlet.class.getName());
+    private static final Logger LOG = Logger.getLogger(NucleosServlet.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");

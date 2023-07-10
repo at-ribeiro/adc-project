@@ -77,10 +77,10 @@ public class RoomResource {
             Entity entity = Entity.newBuilder(roomKey)
                     .set("id", uniqueRoomId)
                     .set("room_name", data.getName())
-                    .set("room_building", StringValue.newBuilder(data.getBuilding()).setExcludeFromIndexes(true).build())
+                    .set("room_building", data.getBuilding())
                     .set("room_latitude", DoubleValue.newBuilder(data.getLat()).setExcludeFromIndexes(true).build())
                     .set("room_longitude", DoubleValue.newBuilder(data.getLng()).setExcludeFromIndexes(true).build())
-                    .set("room_capacity", data.getCapacity())
+                    .set("room_capacity", LongValue.newBuilder(data.getCapacity()).setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(entity);
