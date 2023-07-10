@@ -29,11 +29,10 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
   }
 
   void _launchInstagramURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
+    Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
       throw 'Could not launch $url';
-    }
   }
 
   Future<NewsData> _loadNews() async {

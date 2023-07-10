@@ -9,6 +9,7 @@ import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
 import 'package:responsive_login_ui/views/news_page.dart';
 import 'package:responsive_login_ui/views/news_view.dart';
+import 'package:responsive_login_ui/views/notification_screen.dart';
 import 'package:responsive_login_ui/views/nucleo_page.dart';
 import 'package:responsive_login_ui/views/nucleos_view.dart';
 import 'package:responsive_login_ui/views/others_profile.dart';
@@ -244,6 +245,12 @@ class AppRouter {
               return PomodoroTimer();
             },
           ),
+          GoRoute(
+            path: Paths.notification + '/:messageBody',
+            builder: (BuildContext context, GoRouterState state) {
+              return NotificationScreen();
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -321,9 +328,7 @@ class AppRouter {
       return 'Home';
     } else if (location == Paths.myProfile) {
       return 'Meu Perfil';
-
     } else if (location == Paths.noticias || location.contains('noticias')) {
-
       return 'Notícias';
     } else if (location == Paths.mapas) {
       return 'Mapa';
@@ -363,6 +368,8 @@ class AppRouter {
       return 'Mudar Password';
     } else if (location.contains(Paths.optionsProfile)) {
       return 'Opções de Perfil';
+    } else if (location.contains(Paths.notification)) {
+      return 'Notificação';
     }
     // add more conditions for other routes
 
@@ -401,7 +408,6 @@ class AppRouter {
           },
           icon: Icon(Icons.arrow_back));
     } else if (location == Paths.events) {
-
       return FutureBuilder<bool>(
         future: hasRoleTo(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -418,7 +424,6 @@ class AppRouter {
           }
         },
       );
-
     } else if (location == Paths.routes) {
       return IconButton(
           onPressed: () {
@@ -450,18 +455,24 @@ class AppRouter {
             context.go(Paths.nucleos);
           },
           icon: Icon(Icons.arrow_back));
-    }else if(location.contains('noticias')){
+    } else if (location.contains('noticias')) {
       return IconButton(
           onPressed: () {
             context.go(Paths.noticias);
           },
           icon: Icon(Icons.arrow_back));
-    }else if (location.contains(Paths.optionsProfile)) {
+    } else if (location.contains(Paths.optionsProfile)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.myProfile);
           },
           icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.notification)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.homePage);
+          },
+          icon: Icon(Icons.home));
     }
     return Container();
   }

@@ -57,19 +57,21 @@ class _LoginViewState extends State<LoginView>
 
     var size = MediaQuery.of(context).size;
 
-    return Container(
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 600) {
-                return _buildLargeScreen(size, simpleUIController);
-              } else {
-                return _buildSmallScreen(size, simpleUIController);
-              }
-            },
+    return Center(
+      child: Container(
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  return _buildLargeScreen(size, simpleUIController);
+                } else {
+                  return _buildSmallScreen(size, simpleUIController);
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -81,17 +83,20 @@ class _LoginViewState extends State<LoginView>
     Size size,
     SimpleUIController simpleUIController,
   ) {
-    return Row(
-      children: [
-        SizedBox(width: size.width * 0.06),
-        Expanded(
-          flex: 5,
-          child: _buildMainBody(
-            size,
-            simpleUIController,
+    return Center(
+      child: Row(
+        
+        children: [
+          SizedBox(width: size.width * 0.06),
+          Expanded(
+            flex: 5,
+            child: _buildMainBody(
+              size,
+              simpleUIController,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -119,6 +124,7 @@ class _LoginViewState extends State<LoginView>
 
     return Scaffold(
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
             child: SingleChildScrollView(

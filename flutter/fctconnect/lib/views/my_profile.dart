@@ -711,7 +711,7 @@ class _MyProfileState extends State<MyProfile> {
                             style: TextStyle(color: Style.kAccentColor0),
                           ),
                           const SizedBox(height: 15),
-                          Row(
+                          Column(
                             children: [
                               ElevatedButton(
                                   onPressed: () {
@@ -722,7 +722,8 @@ class _MyProfileState extends State<MyProfile> {
                                     style:
                                         TextStyle(color: Style.kAccentColor0),
                                   )),
-                              if (!kIsWeb) SizedBox(width: 16),
+                              if (!kIsWeb) 
+                              SizedBox(width: 16),
                               if (!kIsWeb)
                                 ElevatedButton(
                                     onPressed: () {
@@ -738,24 +739,27 @@ class _MyProfileState extends State<MyProfile> {
                           SizedBox(height: 16),
                           _buildImagePreview(),
                           SizedBox(height: 16),
-                          Center(
-                            child: Row(
-                              children: [
-                                saveButton(context, '/profilePic'),
-                                SizedBox(
-                                  width: 16,
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    'Cancelar',
-                                    style:
-                                        TextStyle(color: Style.kAccentColor0),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Center(
+                              child: Row(
+                                children: [
+                                  saveButton(context, '/profilePic'),
+                                  SizedBox(
+                                    width: 16,
                                   ),
-                                ),
-                              ],
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text(
+                                      'Cancelar',
+                                      style:
+                                          TextStyle(color: Style.kAccentColor0),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

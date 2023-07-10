@@ -219,7 +219,7 @@
     },
     {
       "name": "firebase_messaging",
-      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/firebase_messaging-14.6.3",
+      "rootUri": "file:///Users/joaohenriquegarcia/.pub-cache/hosted/pub.dev/firebase_messaging-14.6.4",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
@@ -962,7 +962,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-07-09T12:38:03.331359Z",
+  "generated": "2023-07-10T09:47:45.749763Z",
   "generator": "pub",
   "generatorVersion": "3.0.5"
 }
