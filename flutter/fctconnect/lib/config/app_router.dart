@@ -37,6 +37,7 @@ import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
 import '../views/route_creator.dart';
 import '../views/routes_map.dart';
+import '../views/verify_account_view.dart';
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -293,6 +294,14 @@ class AppRouter {
         path: Paths.signUp,
         builder: (BuildContext context, GoRouterState state) {
           return const SignUpView();
+        },
+      ),
+      GoRoute(
+        path: "${Paths.verifyAccount}/:username",
+        builder: (BuildContext context, GoRouterState state) {
+          return VerifyAccountView(
+            username: state.pathParameters['username']!,
+          );
         },
       ),
       GoRoute(

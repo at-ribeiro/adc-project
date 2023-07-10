@@ -58,6 +58,16 @@ class _NucleosViewState extends State<NucleosView> {
     } else {
       return Container(
         child: Scaffold(
+          floatingActionButton: _token.role == "SA" || _token.role == "SECRETARIA" ? FloatingActionButton(
+            backgroundColor:
+                Theme.of(context).floatingActionButtonTheme.backgroundColor,
+            foregroundColor:
+                Theme.of(context).floatingActionButtonTheme.foregroundColor,
+            onPressed: () {
+              context.go(Paths.criarNucleo);
+            },
+            child: Icon(Icons.add),
+          ) : null,
           body: Column(
             children: [
               SizedBox(height: 20),
@@ -155,6 +165,7 @@ class _NucleosViewState extends State<NucleosView> {
                         : buildNucleoTab(context,
                             nucleoType: _currentNucleoType!),
               ),
+              
             ],
           ),
         ),

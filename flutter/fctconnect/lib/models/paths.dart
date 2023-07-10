@@ -13,6 +13,8 @@ class Paths {
 
   static String otherProfile = '/otherProfile';
 
+  static String verifyAccount = '/verifyAccount';
+
   static String mapas = '/mapas';
 
   static String post = '/post';

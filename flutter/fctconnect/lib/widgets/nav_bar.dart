@@ -90,7 +90,7 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
               _selectedIndex = index;
             });
           },
-          destinations: _navBarItems,
+          destinations: (_token.role == "SECRETARIA" || _token.role == "SA") ? _navBarItemsBackOffice : _navBarItems,
         ),
       );
     }
@@ -115,5 +115,17 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
       selectedIcon: Icon(Icons.person_rounded),
       label: 'Profile',
     ),
+  ];
+
+  static final _navBarItemsBackOffice = [
+    NavigationDestination(
+      icon: Icon(Icons.home_outlined),
+      label: 'Home',
+      selectedIcon: Icon(Icons.home_rounded),
+    ),
+    NavigationDestination(
+        icon: Icon(Icons.newspaper_outlined),
+        label: 'Noticias',
+        selectedIcon: Icon(Icons.newspaper_rounded)),
   ];
 }
