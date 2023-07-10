@@ -4,6 +4,8 @@ import 'package:responsive_login_ui/data/cache_factory_provider.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
+import 'package:responsive_login_ui/views/forgot_pwd.dart';
+import 'package:responsive_login_ui/views/forgot_pwd_code.dart';
 import 'package:responsive_login_ui/views/login_view.dart';
 import 'package:responsive_login_ui/views/my_home_page.dart';
 import 'package:responsive_login_ui/views/my_profile.dart';
@@ -297,10 +299,24 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: Paths.forgotPwd,
+        builder: (BuildContext context, GoRouterState state) {
+          return const ForgotPasswordView();
+        },
+      ),
+      GoRoute(
         path: "${Paths.verifyAccount}/:username",
         builder: (BuildContext context, GoRouterState state) {
           return VerifyAccountView(
             username: state.pathParameters['username']!,
+          );
+        },
+      ),
+      GoRoute(
+        path: "${Paths.forgotPwdCode}/:query",
+        builder: (BuildContext context, GoRouterState state) {
+          return ForgotPwdCodeView(
+            query: state.pathParameters['query']!,
           );
         },
       ),

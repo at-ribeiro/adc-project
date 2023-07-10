@@ -1330,4 +1330,27 @@ class BaseClient {
           "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
   }
+
+  Future<dynamic> forgotPWD(String api, query) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+    };
+    var url = Uri.parse('$baseUrl$api/?query=$query');
+    var response =
+        await http.post(url, headers: _headers);
+    return response.statusCode;
+  }
+
+  Future<dynamic> forgotPWDCode(String api, query, code, password) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "newpwd": password,
+      "code": code,
+    };
+    var url = Uri.parse('$baseUrl$api/?query=$query');
+    var response =
+        await http.put(url, headers: _headers);
+    return response.statusCode;
+  }
+
 }

@@ -85,7 +85,6 @@ class _LoginViewState extends State<LoginView>
   ) {
     return Center(
       child: Row(
-        
         children: [
           SizedBox(width: size.width * 0.06),
           Expanded(
@@ -234,9 +233,8 @@ class _LoginViewState extends State<LoginView>
                                           simpleUIController.isObscure.value
                                               ? Icons.visibility
                                               : Icons.visibility_off,
-                                          color: Theme.of(context)
-                                              .iconTheme
-                                              .color,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
                                         ),
                                         onPressed: () {
                                           simpleUIController.isObscureActive();
@@ -292,6 +290,23 @@ class _LoginViewState extends State<LoginView>
                                             Theme.of(context).iconTheme.color),
                                   ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.01),
+                          GestureDetector(
+                            onTap: () {
+                              context.go(Paths.forgotPwd);
+                              nameController.clear();
+                              emailController.clear();
+                              passwordController.clear();
+                              _formKey.currentState?.reset();
+                              simpleUIController.isObscure.value = true;
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                text: 'Esqueceste-te da password?',
+                                style: textTheme.bodyText1!,
                               ),
                             ),
                           ),
