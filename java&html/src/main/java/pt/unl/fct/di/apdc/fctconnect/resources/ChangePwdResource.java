@@ -112,18 +112,41 @@ public class ChangePwdResource {
     @POST
     @Path("/forgotpwd")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response forgotPwdEmail(@QueryParam("username") String username, @QueryParam("email") String email){
+    public Response forgotPwdEmail(@QueryParam("query") String query){
 
         Transaction txn = datastore.newTransaction();
 
         try{
 
-            if(email == null && username == null){
+            if(query == null){
                 LOG.warning("Missing parameters.");
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            if(email == null) {
+            String username;
+            String email = null;
+
+            if(query.contains("@")){ //if it's email
+
+                email = query;
+
+                Query<Entity> emailQuery = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("user_email", email))
+                        .build();
+
+                QueryResults<Entity> results = datastore.run(emailQuery);
+
+                if(!results.hasNext()){
+                    LOG.warning("Email not associated with any user.");
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+
+                username = results.next().getString("user_username");
+
+            } else{
+                username = query;
+            }
                 Key userKey = userKeyFactory.newKey(username);
 
                 Entity user = txn.get(userKey);
@@ -133,32 +156,14 @@ public class ChangePwdResource {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
 
+            if(email == null) {
                 email = user.getString("user_email");
-
-            }
-            else{
-
-                Query<Entity> query = Query.newEntityQueryBuilder()
-                        .setKind("User")
-                        .setFilter(StructuredQuery.PropertyFilter.eq("user_email", email))
-                        .build();
-
-
-                QueryResults<Entity> results = datastore.run(query);
-
-                if(!results.hasNext()){
-                    LOG.warning("Email not associated with any user.");
-                    return Response.status(Response.Status.NOT_FOUND).build();
-                }
-
-               username = results.next().getString("user_username");
-
             }
 
             Key pwdKey = datastore.newKeyFactory()
                     .setKind("ChangePwd")
                     .addAncestor(PathElement.of("User", username))
-                    .newKey("pwd");
+                    .newKey("changepwd");
 
             Random rand = new Random();
 
@@ -175,7 +180,7 @@ public class ChangePwdResource {
             Email to = new Email(email);
 
 
-            Content content = new Content("text/plain", "Thank you for registering!\n " +
+            Content content = new Content("text/plain",
                     "Para alterar a sua password, por favor, utilize o seguinte código: " + code );
             Mail mail = new Mail(from, subject, to, content);
 
@@ -209,28 +214,32 @@ public class ChangePwdResource {
     @PUT
     @Path("/forgotpwd")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response forgotPwd(@HeaderParam("Authorization") String tokenId, @QueryParam("username") String username,
-                              @QueryParam("email") String email, @QueryParam("code") String code,
-                              @QueryParam("newpwd") String newpwd){
+    public Response forgotPwd(@HeaderParam("Authorization") String tokenId, @QueryParam("query") String query,
+                              @HeaderParam("code") String code,
+                              @HeaderParam("newpwd") String newpwd){
 
         Transaction txn = datastore.newTransaction();
 
         try{
 
-            if(email == null && username == null || code == null || newpwd == null){
+            if(query == null || code == null || newpwd == null){
                 LOG.warning("Missing parameters.");
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            if(username == null){
+            String username;
+            String email = null;
 
+            if(query.contains("@")){ //if it's email
 
-                    Query<Entity> query = Query.newEntityQueryBuilder()
-                            .setKind("User")
-                            .setFilter(StructuredQuery.PropertyFilter.eq("user_email", email))
-                            .build();
+                email = query;
 
-                    QueryResults<Entity> results = datastore.run(query);
+                Query<Entity> queryEmail = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("user_email", email))
+                        .build();
+
+                    QueryResults<Entity> results = datastore.run(queryEmail);
 
                     if(!results.hasNext()){
                         LOG.warning("Email not associated with any user.");
@@ -238,6 +247,8 @@ public class ChangePwdResource {
                     }
 
                     username = results.next().getString("user_username");
+            }else{
+                username = query;
             }
 
             Key userKey = userKeyFactory.newKey(username);
@@ -252,7 +263,7 @@ public class ChangePwdResource {
             Key pwdKey = datastore.newKeyFactory()
                     .setKind("ChangePwd")
                     .addAncestor(PathElement.of("User", username))
-                    .newKey("pwd");
+                    .newKey("changepwd");
 
             Entity token = txn.get(pwdKey);
 
@@ -268,8 +279,8 @@ public class ChangePwdResource {
 
 
             Entity task = Entity.newBuilder(user)
-                    .set("user_pwd", StringValue.newBuilder(newpwd).setExcludeFromIndexes(true).build())
-                    .build();;
+                    .set("user_pwd", StringValue.newBuilder(DigestUtils.sha512Hex(newpwd)).setExcludeFromIndexes(true).build())
+                    .build();
 
             txn.update(task);
             txn.commit();

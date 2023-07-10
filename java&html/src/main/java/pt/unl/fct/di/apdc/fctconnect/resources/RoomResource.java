@@ -265,9 +265,9 @@ public class RoomResource {
     }
 
     @GET
-    @Path("/{roomId}")
+    @Path("/{roomId}/reservations")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getRoom(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+    public Response getRoomReservations(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
                             @PathParam("roomId") String roomId) {
 
         Transaction txn = datastore.newTransaction();
@@ -327,7 +327,7 @@ public class RoomResource {
                         entity.getString("reservation_room"), entity.getLong("reservation_day"), entity.getLong("reservation_hour")));
             }
 
-            return Response.ok(results).build();
+            return Response.ok(reservations).build();
 
         }catch (Exception e) {
             txn.rollback();
@@ -338,8 +338,71 @@ public class RoomResource {
                 txn.rollback();
             }
         }
-
-
     }
+
+    @GET
+    @Path("/{roomId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRoom(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                            @PathParam("roomId") String roomId) {
+
+        Transaction txn = datastore.newTransaction();
+
+        try {
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key roomKey = datastore.newKeyFactory()
+                    .setKind("Room")
+                    .newKey(roomId);
+
+            Entity room = txn.get(roomKey);
+
+            if (room == null) {
+                LOG.warning("Room does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            RoomGetData roomResult = new RoomGetData(room.getString("id"), room.getString("room_name"), room.getString("room_building"),
+                    room.getDouble("room_latitude"), room.getDouble("room_longitude"), room.getLong("room_capacity"));
+
+            return Response.ok(roomResult).build();
+
+        } catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
 
 }
