@@ -18,12 +18,11 @@ import java.util.logging.Logger;
 @Path("/search")
 public class SearchResource {
 
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(SearchResource.class.getName());
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
-    private final Gson g = new Gson();
 
     @GET
     @Path("/user")
@@ -49,12 +48,18 @@ public class SearchResource {
 
             Query<Entity> queryLessThan = null;
 
+            List<StringValue> types = new ArrayList<>();
+            types.add(StringValue.newBuilder("ALUNO").build());
+            types.add(StringValue.newBuilder("PROFESSOR").build());
+            types.add(StringValue.newBuilder("EXTERNO").build());
+
             if(user.getString("user_role").equals("SA") || user.getString("user_role").equals("SECRETARIA")) {
 
                 queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
                         .setKind("User")
                         .setFilter(
                                 StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.in("user_role", ListValue.of(types)),
                                         StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
                                 ))
                         .setLimit(5)
@@ -64,16 +69,21 @@ public class SearchResource {
                         .setKind("User")
                         .setFilter(
                                 StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.in("user_role", ListValue.of(types)),
                                         StructuredQuery.PropertyFilter.lt("user_username", upperBound)
                                 ))
                         .setLimit(5)
                         .build();
 
             }else {
+
+
+
                 queryGreaterThanOrEqual = Query.newEntityQueryBuilder()
                         .setKind("User")
                         .setFilter(
                                 StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.in("user_role", ListValue.of(types)),
                                         StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
                                         StructuredQuery.PropertyFilter.ge("user_username", lowerBound)
                                 ))
@@ -84,6 +94,7 @@ public class SearchResource {
                         .setKind("User")
                         .setFilter(
                                 StructuredQuery.CompositeFilter.and(
+                                        StructuredQuery.PropertyFilter.in("user_role", ListValue.of(types)),
                                         StructuredQuery.PropertyFilter.eq("user_state", "ACTIVE"),
                                         StructuredQuery.PropertyFilter.lt("user_username", upperBound)
                                 ))

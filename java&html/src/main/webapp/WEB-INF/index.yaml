@@ -19,5 +19,11 @@ indexes:
 
   - kind: User
     properties:
+      - name: user_role
       - name: user_state
+      - name: user_username
+
+  - kind: User
+    properties:
+      - name: user_role
       - name: user_username

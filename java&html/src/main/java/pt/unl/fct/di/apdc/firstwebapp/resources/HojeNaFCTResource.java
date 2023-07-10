@@ -7,7 +7,6 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.AuthToken;
-import pt.unl.fct.di.apdc.firstwebapp.util.Email;
 import pt.unl.fct.di.apdc.firstwebapp.util.HojeNaFCT.*;
 
 import javax.mail.*;
