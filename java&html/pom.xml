@@ -2,14 +2,14 @@
   
   <modelVersion>4.0.0</modelVersion>
   
-  <groupId>Firstwebapp</groupId>
-  <artifactId>Firstwebapp</artifactId>
+  <groupId>FCTConnect</groupId>
+  <artifactId>FCTConnect</artifactId>
   <version>0.0.1</version>
   
   <packaging>war</packaging>
   
-  <name>FirstWebApplication</name>
-  <description>ADC 2023 Example Application</description>
+  <name>FCT Connect</name>
+  <description>APDC 2023 Application</description>
     <properties>
 		<appengine.maven.plugin.version>2.4.0</appengine.maven.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
