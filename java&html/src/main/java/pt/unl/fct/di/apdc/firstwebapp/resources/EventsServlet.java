@@ -9,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import pt.unl.fct.di.apdc.firstwebapp.util.*;
 
 import javax.imageio.ImageIO;
-import javax.servlet.*;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 import java.awt.image.BufferedImage;
@@ -146,11 +145,9 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            // Convert the list of posts to JSON
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(eventList);
 
-            // Set the response content type and write the JSON string to the output stream
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(json);
@@ -180,7 +177,6 @@ public class EventsServlet extends HttpServlet {
 
             if (jsonPart.startsWith("\"") && jsonPart.endsWith("\"")) {
                 jsonPart = jsonPart.substring(1, jsonPart.length() - 1);
-                // Replace escaped inner quotes
                 jsonPart = jsonPart.replace("\\\"", "\"");
             }
 
@@ -195,7 +191,6 @@ public class EventsServlet extends HttpServlet {
 
             LOG.fine("Attempt to create event with user " + creator);
 
-            // verifications
             Key userKey = userKeyFactory.newKey(creator);
             Entity user = txn.get(userKey);
             if (user == null) {
@@ -209,7 +204,11 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            // TODO:Check user's role
+            if(!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("AE"))){
+                LOG.warning("Not enough role.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
 
             Key tokenKey = datastore.newKeyFactory()
                     .setKind("Token")
@@ -250,7 +249,6 @@ public class EventsServlet extends HttpServlet {
                 int thumbnailHeight;
 
 
-                //Check image size and set thumbnail size accordingly
                 if (originalImage.getWidth() > originalImage.getHeight()) {
                     thumbnailWidth = 1350;
                     thumbnailHeight = 1080;
@@ -262,17 +260,14 @@ public class EventsServlet extends HttpServlet {
                     thumbnailHeight = 1080;
                 }
 
-                // Create a thumbnail image using the original image
                 BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
                 resizedImage.getGraphics().drawImage(originalImage.getScaledInstance(thumbnailWidth, thumbnailHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
 
-                // Save the thumbnail image to a byte array
                 ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
                 ImageIO.write(resizedImage, contentType.substring(contentType.lastIndexOf('/') +1), thumbnailOutputStream);
                 byte[] thumbnailBytes = thumbnailOutputStream.toByteArray();
 
 
-                // Upload the thumbnail image to your storage service (similar to the original image)
                 BlobId thumbnailBlobId = BlobId.of(bucketName, uniqueEventId + "-" + imageName);
 
                 if(storage.get(thumbnailBlobId)!=null){
@@ -312,7 +307,7 @@ public class EventsServlet extends HttpServlet {
                     .newKey(uniqueEventId);
 
             Entity entity = Entity.newBuilder(eventKey)
-                    .set("id", uniqueEventId)
+                    .set("id", StringValue.newBuilder(uniqueEventId).setExcludeFromIndexes(true).build())
                     .set("event_title", title)
                     .set("event_creator", creator)
                     .set("event_description", StringValue.newBuilder(description).setExcludeFromIndexes(true).build())
@@ -332,8 +327,8 @@ public class EventsServlet extends HttpServlet {
                             .newKey(uniqueEventId);
 
             Entity locationEntity = Entity.newBuilder(locationKey)
-                                    .set("latitude", data.getLat())
-                                    .set("longitude", data.getLng())
+                                    .set("latitude", DoubleValue.newBuilder(data.getLat()).setExcludeFromIndexes(true).build())
+                                    .set("longitude",  DoubleValue.newBuilder(data.getLng()).setExcludeFromIndexes(true).build())
                                     .set("name", uniqueEventId)
                                     .set("type", "EVENT")
                                     .set("event", uniqueEventId)
@@ -346,14 +341,14 @@ public class EventsServlet extends HttpServlet {
             Key activityKey = datastore.newKeyFactory()
                     .setKind("Activity")
                     .addAncestor(PathElement.of("User", creator))
-                    .newKey(currentTime);
+                    .newKey(String.valueOf(currentTime));
 
             Entity activityEntity = Entity.newBuilder(activityKey)
-                    .set("activity_creation_time", LongValue.of(currentTime).toBuilder().setExcludeFromIndexes(true).build())
+                    .set("activity_creation_time", StringValue.newBuilder(String.valueOf(currentTime)).setExcludeFromIndexes(true).build())
                     .set("activity_name", title)
                     .set("activity_from", LongValue.of(start).toBuilder().setExcludeFromIndexes(true).build())
                     .set("activity_to", LongValue.of(end).toBuilder().setExcludeFromIndexes(true).build())
-                    .set("activity_colour", "FF9800")
+                    .set("activity_colour", StringValue.newBuilder("FF9800").setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(activityEntity);
@@ -380,7 +375,7 @@ public class EventsServlet extends HttpServlet {
 
         try{
             String tokenId = request.getHeader("Authorization");
-            String pathInfo = request.getPathInfo(); // Assuming request is an instance of HttpServletRequest
+            String pathInfo = request.getPathInfo();
             String[] pathParams = pathInfo.substring(1).split("/");
             String username = pathParams[0];
 
@@ -500,7 +495,7 @@ public class EventsServlet extends HttpServlet {
                     .set("activity_name", event.getString("event_title"))
                     .set("activity_from", LongValue.of(event.getLong("event_start")).toBuilder().setExcludeFromIndexes(true).build())
                     .set("activity_to", LongValue.of(event.getLong("event_end")).toBuilder().setExcludeFromIndexes(true).build())
-                    .set("activity_colour", "FF9800")
+                    .set("activity_colour", StringValue.newBuilder("FF9800").setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(activityEntity);
