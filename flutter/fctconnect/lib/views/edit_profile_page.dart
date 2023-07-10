@@ -201,6 +201,8 @@ class _EditProfileState extends State<EditProfile> {
             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             child: DropdownButtonHideUnderline(
               child: ExpansionTile(
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
                 title: privacyController.text.isEmpty
                     ? Text(
                         "Privacidade",
@@ -208,7 +210,7 @@ class _EditProfileState extends State<EditProfile> {
                     : Text(
                         privacyController.text,
                       ),
-                leading: Icon(Icons.work),
+                leading: Icon(Icons.privacy_tip),
                 children: ['PUBLIC', 'PRIVATE'].map<Widget>((String value) {
                   return ListTile(
                     title: Text(
@@ -243,6 +245,8 @@ class _EditProfileState extends State<EditProfile> {
             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             child: DropdownButtonHideUnderline(
               child: ExpansionTile(
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
                 title: departmentController.text.isEmpty
                     ? Text(
                         "Departamento",
@@ -250,7 +254,7 @@ class _EditProfileState extends State<EditProfile> {
                     : Text(
                         departmentController.text,
                       ),
-                leading: Icon(Icons.work),
+                leading: Icon(Icons.school),
                 children: [
                   'Ciências e Engenharia do Ambiente',
                   'Ciência dos Materiais',
@@ -269,7 +273,6 @@ class _EditProfileState extends State<EditProfile> {
                   return ListTile(
                     title: Text(
                       value,
-                      
                     ),
                     onTap: () {
                       setState(() {
@@ -333,6 +336,8 @@ class _EditProfileState extends State<EditProfile> {
             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             child: DropdownButtonHideUnderline(
               child: ExpansionTile(
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
                 title: yearController.text.isEmpty
                     ? Text(
                         "Ano",
@@ -340,13 +345,12 @@ class _EditProfileState extends State<EditProfile> {
                     : Text(
                         yearController.text,
                       ),
-                leading: Icon(Icons.work),
+                leading: Icon(Icons.numbers),
                 children: ['1º Ano', '2º Ano', '3º Ano', '4º Ano', '5º Ano']
                     .map<Widget>((String value) {
                   return ListTile(
                     title: Text(
                       value,
-                 
                     ),
                     onTap: () {
                       setState(() {
@@ -377,6 +381,8 @@ class _EditProfileState extends State<EditProfile> {
             padding: EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             child: DropdownButtonHideUnderline(
               child: ExpansionTile(
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
                 title: courseController.text.isEmpty
                     ? Text(
                         "Curso",
@@ -409,7 +415,6 @@ class _EditProfileState extends State<EditProfile> {
                   return ListTile(
                     title: Text(
                       value,
-                    
                     ),
                     onTap: () {
                       setState(() {
@@ -637,7 +642,10 @@ class aboutMeWidget extends StatelessWidget {
           child: TextFormField(
             style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.person),
+              prefixIcon: Icon(
+                Icons.person,
+                color: Theme.of(context).iconTheme.color,
+              ),
               hintText: 'Sobre Mim',
             ),
             controller: aboutMeController,
@@ -676,7 +684,10 @@ class cityWidget extends StatelessWidget {
           child: TextFormField(
             style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.location_city),
+              prefixIcon: Icon(
+                Icons.location_city,
+                color: Theme.of(context).iconTheme.color,
+              ),
               hintText: 'Cidade',
             ),
             controller: homeTownController,
@@ -716,7 +727,10 @@ class phoneNumberWidget extends StatelessWidget {
           child: TextFormField(
             style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.phone),
+              prefixIcon: Icon(
+                Icons.phone,
+                color: Theme.of(context).iconTheme.color,
+              ),
               hintText: 'Número de telemóvel',
             ),
             controller: phoneNumberController,
@@ -749,7 +763,10 @@ class emailWidget extends StatelessWidget {
           child: TextFormField(
             style: TextStyle(),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.email),
+              prefixIcon: Icon(
+                Icons.email,
+                color: Theme.of(context).iconTheme.color,
+              ),
               hintText: 'Email',
             ),
             controller: emailController,
@@ -781,7 +798,10 @@ class fullNameWidget extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.person),
+              prefixIcon: Icon(
+                Icons.person,
+                color: Theme.of(context).iconTheme.color,
+              ),
               hintText: 'Nome Completo',
             ),
             controller: fullNameController,

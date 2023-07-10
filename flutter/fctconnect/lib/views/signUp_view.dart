@@ -246,7 +246,6 @@ class _SignUpViewState extends State<SignUpView> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: Style.kBorderRadius,
@@ -254,7 +253,6 @@ class _SignUpViewState extends State<SignUpView> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Theme(
                           data: ThemeData(
-                            canvasColor: Style.kAccentColor0,
                             popupMenuTheme: PopupMenuThemeData(
                               shape: RoundedRectangleBorder(
                                 borderRadius: Style.kBorderRadius,
@@ -276,11 +274,12 @@ class _SignUpViewState extends State<SignUpView> {
                                       horizontal: 9, vertical: 4),
                                   child: DropdownButtonHideUnderline(
                                     child: ExpansionTile(
+                              
                                       initiallyExpanded: isExpandedRole,
                                       title: roleController.text.isEmpty
                                           ? Text(
                                               "Role",
-                                            )
+                                            style: TextStyle(color: Theme.of(context).appBarTheme.iconTheme?.color),)
                                           : Text(
                                               roleController.text,
                                             ),
@@ -296,6 +295,7 @@ class _SignUpViewState extends State<SignUpView> {
                                         return ListTile(
                                           title: Text(
                                             value,
+                                            style: textTheme.bodyText1,
                                           ),
                                           onTap: () {
                                             setState(() {

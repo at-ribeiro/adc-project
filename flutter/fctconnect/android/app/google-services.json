@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:223517067321:android:04a71052bb51541aeea5e8",
+        "mobilesdk_app_id": "1:223517067321:android:9866275d39a82a84eea5e8",
         "android_client_info": {
           "package_name": "com.example.fctconnect"
         }
@@ -29,6 +29,13 @@
             {
               "client_id": "223517067321-di11r5nroupogk0veh8uim1jm0gvvvof.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "223517067321-eqtgkk2c6lq5ar6n0urhdgur1ltas3ls.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.estudasses.RunnerTest"
+              }
             }
           ]
         }

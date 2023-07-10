@@ -21,11 +21,20 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return android;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for android - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -45,38 +54,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyDqJdRjuqeuTWBoiSPHk3jr9wFCUF9ksOg',
-    appId: '1:223517067321:web:be1a93ee777f2337eea5e8',
+    appId: '1:223517067321:web:87d0b6fa3e43e345eea5e8',
     messagingSenderId: '223517067321',
     projectId: 'fctconnect-flutter',
     authDomain: 'fctconnect-flutter.firebaseapp.com',
     storageBucket: 'fctconnect-flutter.appspot.com',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBTxOcft3F07H2zE7DbrKH3Wm-hsAkyYdk',
-    appId: '1:223517067321:android:04a71052bb51541aeea5e8',
-    messagingSenderId: '223517067321',
-    projectId: 'fctconnect-flutter',
-    storageBucket: 'fctconnect-flutter.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA69jR-iVBVobPWovVetKuubP13ASrFpTg',
-    appId: '1:223517067321:ios:dead1e642b3c8220eea5e8',
-    messagingSenderId: '223517067321',
-    projectId: 'fctconnect-flutter',
-    storageBucket: 'fctconnect-flutter.appspot.com',
-    iosClientId: '223517067321-eqtgkk2c6lq5ar6n0urhdgur1ltas3ls.apps.googleusercontent.com',
-    iosBundleId: 'com.estudasses.RunnerTest',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA69jR-iVBVobPWovVetKuubP13ASrFpTg',
-    appId: '1:223517067321:ios:d0bf10480846c9c6eea5e8',
-    messagingSenderId: '223517067321',
-    projectId: 'fctconnect-flutter',
-    storageBucket: 'fctconnect-flutter.appspot.com',
-    iosClientId: '223517067321-h979cgc3d9shm7702h91mmop7i9h8mte.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fctconnect',
   );
 }

@@ -171,10 +171,7 @@ class _PostCreatorState extends State<PostCreator> {
                     height: 200,
                     decoration: BoxDecoration(
                       borderRadius: Style.kBorderRadius,
-                      border: Border.all(
-                       // Set your desired border color here
-                      ),
-                     
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: Style.kBorderRadius,
@@ -183,8 +180,9 @@ class _PostCreatorState extends State<PostCreator> {
                         child: TextFormField(
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.description,
-                                ),
+                            prefixIcon: Icon(
+                              Icons.description,
+                            ),
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),

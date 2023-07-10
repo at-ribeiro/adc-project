@@ -161,13 +161,11 @@ class _ReportPageState extends State<ReportPage> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                        
                         decoration: InputDecoration(
-                          prefixIcon:
-                              Icon(Icons.person, color: Theme.of(context).iconTheme.color),
+                          prefixIcon: Icon(Icons.person,
+                              color: Theme.of(context).iconTheme.color),
                           hintText: 'Localização do problema',
                           border: InputBorder.none,
-                         
                         ),
                         controller: locationController,
                         validator: (value) {
@@ -186,10 +184,6 @@ class _ReportPageState extends State<ReportPage> {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: Style.kBorderRadius,
-                    border: Border.all(
-                      color: Style
-                          .kAccentColor1, // Set your desired border color here
-                    ),
                     color: Style.kAccentColor2.withOpacity(0.3),
                   ),
                   child: ClipRRect(
@@ -197,11 +191,10 @@ class _ReportPageState extends State<ReportPage> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                      
                         maxLines: null, // Allow unlimited lines
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.description,
-                              color:  Theme.of(context).iconTheme.color),
+                              color: Theme.of(context).iconTheme.color),
                           hintText: 'Qual foi o problema que encontrou?',
                           border: InputBorder.none,
                         ),

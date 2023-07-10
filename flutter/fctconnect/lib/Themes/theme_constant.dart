@@ -11,7 +11,7 @@ ThemeData lightTheme = ThemeData(
     headline4: TextStyle(color: Style.kAccentColor0Light),
     headline5: TextStyle(color: Style.kAccentColor0Light),
     headline6: TextStyle(color: Style.kAccentColor0Light),
-    subtitle1: TextStyle(color: Style.kAccentColor2Light),
+    subtitle1: TextStyle(color: Style.kAccentColor0Light),
   ),
   buttonTheme: ButtonThemeData(
     buttonColor: Style.kAccentColor0Light,
@@ -74,6 +74,7 @@ ThemeData lightTheme = ThemeData(
     backgroundColor: MaterialStateProperty.all<Color>(Style.kPrimaryColorLight),
   ),
   inputDecorationTheme: InputDecorationTheme(
+     
       hintStyle: TextStyle(
         color: Style.kAccentColor0Light,
       ),

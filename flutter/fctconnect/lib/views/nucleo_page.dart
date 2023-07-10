@@ -177,14 +177,14 @@ class _NucleoPageState extends State<NucleoPage> {
     }
   }
 
+
   void _launchURL(String url) async {
     Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
       throw 'Could not launch $url';
-    }
   }
+
 
   Widget loadNucleo() {
     return FutureBuilder(

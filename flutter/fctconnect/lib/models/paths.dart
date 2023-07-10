@@ -54,4 +54,6 @@ class Paths {
   static String criarNucleo = '$nucleos/create';
 
   static String pomodoro = '/pomodoro';
+
+  static String notification = '/notification';
 }
