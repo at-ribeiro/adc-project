@@ -10,6 +10,8 @@ import pt.unl.fct.di.apdc.fctconnect.util.Rooms.RoomPostData;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -404,5 +406,186 @@ public class RoomResource {
         }
     }
 
+    @DELETE
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteAllReservations(@HeaderParam("Authorization") String password) {
+        Transaction txn = datastore.newTransaction();
+
+        try {
+
+            //TODO: descobrir maneira de fazer password mudar todas as vezes
+            if(!password.equals("very secret password")) {
+                LOG.warning("Incorrect password.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            LocalDate currentDate = LocalDate.now();
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+            int weekdayNumber = dayOfWeek.getValue();
+
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("Reservation")
+                    .setFilter(StructuredQuery.PropertyFilter.eq("reservation_day", weekdayNumber-1))
+                    .build();
+
+            QueryResults<Entity> results = txn.run(query);
+
+            while(results.hasNext()) {
+                Entity entity = results.next();
+                txn.delete(entity.getKey());
+            }
+
+            txn.commit();
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @DELETE
+    @Path("/reservation/{reservationId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteReservation(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                                      @PathParam("reservationId") String reservationId) {
+
+        Transaction txn = datastore.newTransaction();
+
+        try {
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key reservationKey = datastore.newKeyFactory()
+                    .setKind("Reservation")
+                    .newKey(reservationId);
+
+            Entity reservation = txn.get(reservationKey);
+
+            if (reservation == null) {
+                LOG.warning("Reservation does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            txn.delete(reservationKey);
+            txn.commit();
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @DELETE
+    @Path("/{roomId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteRoom(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
+                               @PathParam("roomId") String roomId) {
+        Transaction txn = datastore.newTransaction();
+
+        try {
+
+            Key userKey = userKeyFactory.newKey(username);
+            Entity user = txn.get(userKey);
+            if (user == null) {
+                LOG.warning("User does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (user.getString("user_state").equals("INACTIVE")) {
+                LOG.warning("Inactive User.");
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+
+            Key tokenKey = datastore.newKeyFactory()
+                    .setKind("Token")
+                    .addAncestor(PathElement.of("User", username))
+                    .newKey("token");
+
+            Entity token = txn.get(tokenKey);
+
+            if (token == null || !token.getString("token_hashed_id").equals(DigestUtils.sha512Hex(tokenId))) {
+                LOG.warning("Incorrect token. Please re-login");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+            if (AuthToken.expired(token.getLong("token_expiration"))) {
+                LOG.warning("Your token has expired. Please re-login.");
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            Key roomKey = datastore.newKeyFactory()
+                    .setKind("Room")
+                    .newKey(roomId);
+
+            Entity room = txn.get(roomKey);
+
+            if (room == null) {
+                LOG.warning("Room does not exist.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("Reservation")
+                    .setFilter(StructuredQuery.PropertyFilter.eq("reservation_room_id", roomId))
+                    .build();
+
+            QueryResults<Entity> results = txn.run(query);
+
+            while(results.hasNext()) {
+                Entity entity = results.next();
+                txn.delete(entity.getKey());
+            }
+
+            txn.delete(roomKey);
+
+            txn.commit();
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            txn.rollback();
+            LOG.severe(e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
 
 }
