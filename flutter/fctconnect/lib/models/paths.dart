@@ -9,6 +9,10 @@ class Paths {
 
   static String noticias = '/news';
 
+  static String forgotPwd = '/forgotPassword';
+
+  static String forgotPwdCode = '/forgotPasswordCode';
+
   static String noticia = '/:id';
 
   static String otherProfile = '/otherProfile';

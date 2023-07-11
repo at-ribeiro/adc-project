@@ -34,7 +34,6 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController roleController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
@@ -52,7 +51,6 @@ class _SignUpViewState extends State<SignUpView> {
     nameController.dispose();
     fullNameController.dispose();
     emailController.dispose();
-    roleController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
     privacyController.dispose();
@@ -236,83 +234,6 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Theme(
-                          data: ThemeData(
-                            popupMenuTheme: PopupMenuThemeData(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: Style.kBorderRadius,
-                              ),
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: Style.kBorderRadius,
-                              color: Style.kAccentColor2.withOpacity(0.3),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: Style.kBorderRadius,
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 9, vertical: 4),
-                                  child: DropdownButtonHideUnderline(
-                                    child: ExpansionTile(
-                                      initiallyExpanded: isExpandedRole,
-                                      title: roleController.text.isEmpty
-                                          ? Text(
-                                              "Role",
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .appBarTheme
-                                                      .iconTheme
-                                                      ?.color),
-                                            )
-                                          : Text(
-                                              roleController.text,
-                                            ),
-                                      leading: Icon(Icons.work,
-                                          color: Theme.of(context)
-                                              .iconTheme
-                                              .color),
-                                      children: [
-                                        'Aluno',
-                                        'Professor',
-                                        'Externo'
-                                      ].map<Widget>((String value) {
-                                        return ListTile(
-                                          title: Text(
-                                            value,
-                                            style: textTheme.bodyText1,
-                                          ),
-                                          onTap: () {
-                                            setState(() {
-                                              roleController.text = value;
-                                              isExpandedRole = false;
-                                            });
-                                          },
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.02),
                   Obx(
                     () => Container(
                       decoration: BoxDecoration(
@@ -419,7 +340,6 @@ class _SignUpViewState extends State<SignUpView> {
                     onTap: () {
                       nameController.clear();
                       emailController.clear();
-                      roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
                       simpleUIController.isObscure.value = true;
@@ -460,7 +380,6 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": roleController.text.toUpperCase(),
               "state": "INACTIVE",
               "privacy": "PRIVATE",
             };
@@ -508,13 +427,11 @@ class _SignUpViewState extends State<SignUpView> {
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();
-                          context.go(Paths.verifyAccount);
                           context.go(
                               '${Paths.verifyAccount}/${nameController.text}');
 
                           nameController.clear();
                           emailController.clear();
-                          roleController.clear();
                           passwordController.clear();
                           _formKey.currentState?.reset();
                         });

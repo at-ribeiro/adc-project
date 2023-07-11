@@ -85,7 +85,9 @@ class _LoginViewState extends State<LoginView>
   ) {
     return Center(
       child: Row(
+
         mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
           SizedBox(width: size.width * 0.06),
           Expanded(
@@ -282,6 +284,23 @@ class _LoginViewState extends State<LoginView>
                                             Theme.of(context).iconTheme.color),
                                   ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.01),
+                          GestureDetector(
+                            onTap: () {
+                              context.go(Paths.forgotPwd);
+                              nameController.clear();
+                              emailController.clear();
+                              passwordController.clear();
+                              _formKey.currentState?.reset();
+                              simpleUIController.isObscure.value = true;
+                            },
+                            child: RichText(
+                              text: TextSpan(
+                                text: 'Esqueceste-te da password?',
+                                style: textTheme.bodyText1!,
                               ),
                             ),
                           ),

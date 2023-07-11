@@ -37,6 +37,9 @@ class _EventCreatorState extends State<EventCreator> {
   late DateTime _startingDate;
   late DateTime _endingDate;
 
+  late int startTimeFinal;
+  late int endTimeFinal;
+
   late ScrollController _scrollController;
   GoogleMapController? _mapController;
 
@@ -131,7 +134,6 @@ class _EventCreatorState extends State<EventCreator> {
     DateTime startDate = format.parse(_startingDateController.text);
     DateTime endDate = format.parse(_endingDateController.text);
 
-    // This will check if the end date is later than or equal to the start date
     return endDate.isAfter(startDate) || endDate.isAtSameMomentAs(startDate);
   }
 
@@ -167,10 +169,19 @@ class _EventCreatorState extends State<EventCreator> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title,
-                                color: Theme.of(context).iconTheme.color),
+
+                            prefixIcon:
+                                Icon(Icons.title, color: Theme.of(context).iconTheme.color),
                             hintText: 'Título do evento',
                             border: InputBorder.none,
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: Style.kBorderRadius,
+                              borderSide: BorderSide(
+                                color: Style
+                                    .kAccentColor1, // Set your desired focused color here
+                              ),
+                            ),
+
                           ),
                           controller: _titleController,
                           validator: (value) {
@@ -189,6 +200,7 @@ class _EventCreatorState extends State<EventCreator> {
                     height: 200,
                     decoration: BoxDecoration(
                       borderRadius: Style.kBorderRadius,
+
                       color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
@@ -199,7 +211,9 @@ class _EventCreatorState extends State<EventCreator> {
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.description,
+
                                 color: Theme.of(context).iconTheme.color),
+
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),
@@ -230,9 +244,11 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _startingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
+
                                 color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de começo',
                             border: InputBorder.none,
+
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -253,9 +269,11 @@ class _EventCreatorState extends State<EventCreator> {
                                     date.day,
                                     time.hour,
                                     time.minute);
+                                startTimeFinal =
+                                    selectedDateTime.millisecondsSinceEpoch;
                                 _startingDateController.text =
-                                    DateFormat('yyyy-MM-dd – kk:mm').format(
-                                        selectedDateTime); // You can use any date format you want
+                                    DateFormat('yyyy-MM-dd – kk:mm')
+                                        .format(selectedDateTime);
                               }
                             }
                           },
@@ -281,6 +299,7 @@ class _EventCreatorState extends State<EventCreator> {
                                 color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de fim',
                             border: InputBorder.none,
+
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -301,9 +320,12 @@ class _EventCreatorState extends State<EventCreator> {
                                     date.day,
                                     time.hour,
                                     time.minute);
+                                endTimeFinal =
+                                    selectedDateTime.millisecondsSinceEpoch;
+
                                 _endingDateController.text =
-                                    DateFormat('yyyy-MM-dd – kk:mm').format(
-                                        selectedDateTime); // You can use any date format you want
+                                    DateFormat('yyyy-MM-dd – kk:mm')
+                                        .format(selectedDateTime);
                               }
                             }
                           },
@@ -364,8 +386,11 @@ class _EventCreatorState extends State<EventCreator> {
                               imageData: _imageData,
                               fileName: _fileName,
                               description: _descriptionController.text,
-                              start: _startingDate.millisecondsSinceEpoch,
-                              end: _endingDate.millisecondsSinceEpoch,
+
+ 
+                              start: startTimeFinal,
+                              end: endTimeFinal,
+
                               lat: _markers.first.position.latitude,
                               lng: _markers.first.position.longitude,
                             );
