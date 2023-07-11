@@ -1,40 +1,40 @@
 {
   "project_info": {
-    "project_number": "305889307562",
-    "project_id": "fct-connect-estudasses",
-    "storage_bucket": "fct-connect-estudasses.appspot.com"
+    "project_number": "223517067321",
+    "project_id": "fctconnect-flutter",
+    "storage_bucket": "fctconnect-flutter.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:305889307562:android:a027a4f29368e8106699d3",
+        "mobilesdk_app_id": "1:223517067321:android:9866275d39a82a84eea5e8",
         "android_client_info": {
           "package_name": "com.example.fctconnect"
         }
       },
       "oauth_client": [
         {
-          "client_id": "305889307562-n0jhvija14gqqcfcm0gacfd5h3bvketn.apps.googleusercontent.com",
+          "client_id": "223517067321-di11r5nroupogk0veh8uim1jm0gvvvof.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB1kEN-9K8yLRgCcM5T59lZ0l92NXs9q38"
+          "current_key": "AIzaSyBTxOcft3F07H2zE7DbrKH3Wm-hsAkyYdk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "305889307562-n0jhvija14gqqcfcm0gacfd5h3bvketn.apps.googleusercontent.com",
+              "client_id": "223517067321-di11r5nroupogk0veh8uim1jm0gvvvof.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "305889307562-ksu3kiilfmbftnunptsf7hj4gl0lctv4.apps.googleusercontent.com",
+              "client_id": "223517067321-eqtgkk2c6lq5ar6n0urhdgur1ltas3ls.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.fctconnect"
+                "bundle_id": "com.estudasses.RunnerTest"
               }
             }
           ]

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
-
 import '../models/NewsData.dart';
 
 class NewsDetailPage extends StatefulWidget {
@@ -18,15 +18,21 @@ class NewsDetailPage extends StatefulWidget {
 
 class _NewsDetailPageState extends State<NewsDetailPage> {
   late String newsUrl;
-  late NewsData news;
+  late Future<NewsData> newsFuture;
   bool _isNewsLoading = true;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     newsUrl = widget.newsUrl;
-    _loadNews();
+    newsFuture = _loadNews();
+  }
+
+  void _launchInstagramURL(String url) async {
+    Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
+      throw 'Could not launch $url';
   }
 
   Future<NewsData> _loadNews() async {
@@ -36,111 +42,114 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isNewsLoading) {
-      return FutureBuilder(
-          future: _loadNews(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return ErrorDialog('Algo correu mal', 'Ok', context);
-              } else {
-                WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  setState(() {
-                    news = snapshot.data;
-                    _isNewsLoading = false;
-                  });
-                });
-              }
-              return Container(
-                  color: Colors.transparent,
-                  child: const Center(child: CircularProgressIndicator()));
-            } else {
-              return Container(
-                  color: Colors.transparent,
-                  child: const Center(child: CircularProgressIndicator()));
-            }
-          });
-    } else {
-      return Container(
-        decoration: kGradientDecoration,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
-            child: Center(
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints(maxWidth: 768), // set max-width here
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        news.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: kAccentColor0,
-                          fontSize: 24.0,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          news.timestamp,
-                          style: const TextStyle(
-                            color: kAccentColor2,
-                            fontSize: 16.0,
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    return FutureBuilder<NewsData>(
+      future: newsFuture,
+      builder: (BuildContext context, AsyncSnapshot<NewsData> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: ErrorDialog('Algo correu mal', 'Ok', context),
+          );
+        } else {
+          NewsData news = snapshot.data!;
+          return Scaffold(
+            body: SingleChildScrollView(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 768),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          news.title,
+                          style: textTheme.headline5!.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 2.0),
-                      SizedBox(
-                        // You can adjust this height
-                        width: double.infinity,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: AspectRatio(
-                            aspectRatio: 16 /
-                                9, // Replace with the actual aspect ratio of the image
-                            child: FittedBox(
-                              fit: BoxFit
-                                  .cover, // Adjust the fit property as needed
-                              child: Image.network(
-                                news.imageUrl,
+                        const SizedBox(height: 8.0),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child:
+                              Text(news.timestamp, style: textTheme.bodyText2!),
+                        ),
+                        const SizedBox(height: 2.0),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: FittedBox(
+                                fit: BoxFit.cover,
+                                child: Image.network(
+                                  news.imageUrl,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      for (var paragraph in news.paragraphs!)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: RichText(
-                            textAlign: TextAlign.justify,
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: kAccentColor0,
-                                fontSize: 18.0,
+                        const SizedBox(height: 16.0),
+                        for (var paragraph in news.paragraphs!)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: RichText(
+                              text: TextSpan(
+                                style: textTheme.bodyText1!.copyWith(
+                                  fontSize: 16.0,
+                                ),
+                                children: [
+                                  TextSpan(
+                                      text: '    '), // 4 spaces for indentation
+                                  TextSpan(text: paragraph),
+                                ],
                               ),
-                              children: [
-                                TextSpan(
-                                    text: '    '), // 4 spaces for indentation
-                                TextSpan(text: paragraph),
-                              ],
                             ),
                           ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _launchInstagramURL(
+                                      'https://www.fct.unl.pt$newsUrl');
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.web, size: 50.0),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      'Ver no site',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      const SizedBox(height: 95.0),
-                    ],
+                        const SizedBox(height: 95.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      );
-    }
+          );
+        }
+      },
+    );
   }
 }

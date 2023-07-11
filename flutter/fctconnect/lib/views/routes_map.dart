@@ -1,18 +1,37 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:responsive_login_ui/models/route_get_data.dart';
 
 import '../constants.dart';
+import '../models/Token.dart';
 import '../models/directions_model.dart';
+import '../models/location_get_data.dart';
+import '../models/paths.dart';
+import '../models/route_post_data.dart';
+import '../services/base_client.dart';
+import '../services/load_token.dart';
 import 'directions_repository.dart';
 
 class RouteMapScreen extends StatefulWidget {
+  final String routeUser;
+  final String routeID;
+
+  const RouteMapScreen({required this.routeID, required this.routeUser});
+
   @override
   _RouteMapScreenState createState() => _RouteMapScreenState();
 }
 
 class _RouteMapScreenState extends State<RouteMapScreen> {
   late GoogleMapController mapController;
+  late Token _token;
+  bool _isLoadingToken = true;
+  bool isRouteLoading = true;
+  late RouteGetData _route;
+
   List<Marker> markers = [];
   Set<Polyline> polylines = {};
   DirectionsRepository directionsRepository = DirectionsRepository();
@@ -20,28 +39,12 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize markers
-    markers.add(
-      Marker(
-        markerId: MarkerId('marker1'),
-        position: LatLng(38.659804, -9.205121),
-        infoWindow: InfoWindow(title: 'Marker 1'),
-      ),
-    );
-    markers.add(
-      Marker(
-        markerId: MarkerId('marker2'),
-        position: LatLng(38.660980, -9.206393),
-        infoWindow: InfoWindow(title: 'Marker 2'),
-      ),
-    );
-    markers.add(
-      Marker(
-        markerId: MarkerId('marker3'),
-        position: LatLng(38.660785, -9.207470),
-        infoWindow: InfoWindow(title: 'Marker 3'),
-      ),
-    );
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -49,104 +52,165 @@ class _RouteMapScreenState extends State<RouteMapScreen> {
     setState(() {});
   }
 
-  Future<void> drawRoute() async {
-    if (markers.length >= 2) {
-      // Clear existing polylines
-      polylines.clear();
+  Future<void> setOptimizedRoute() async {
+    if (markers.length < 2) return;
 
-      // Calculate the minimum route
-      List<LatLng> minimumRoute = await getMinimumRoute(markers);
+    final origin = markers.first.position;
+    final destination = markers.last.position;
+    final waypoints = markers
+        .sublist(1, markers.length - 1)
+        .map((marker) => marker.position)
+        .toList();
 
-      // Create polyline options
-      Polyline polyline = Polyline(
-        polylineId: PolylineId('route'),
+    try {
+      final directions = await directionsRepository.getOptimizedDirections(
+        origin: origin,
+        destination: destination,
+        waypoints: waypoints,
+      );
+
+      final polyline = Polyline(
+        polylineId: PolylineId('optimized_route'),
         color: Colors.blue,
+        points: directions.polylinePoints
+            .map((point) => LatLng(point.latitude, point.longitude))
+            .toList(),
         width: 5,
-        points: minimumRoute,
       );
 
       setState(() {
+        polylines.clear();
         polylines.add(polyline);
       });
-    }
-  }
-
-  Future<List<LatLng>> getMinimumRoute(List<Marker> markers) async {
-    List<LatLng> minimumRoute = [];
-    List<LatLng> remainingMarkers =
-        List.from(markers.map((marker) => marker.position));
-
-    LatLng origin = remainingMarkers.removeAt(0);
-    minimumRoute.add(origin);
-
-    while (remainingMarkers.isNotEmpty) {
-      LatLng currentMarker = minimumRoute.last;
-      LatLng nearestMarker =
-          await findNearestMarker(currentMarker, remainingMarkers);
-      minimumRoute.add(nearestMarker);
-      remainingMarkers.remove(nearestMarker);
-    }
-
-    return minimumRoute;
-  }
-
-  Future<LatLng> findNearestMarker(LatLng origin, List<LatLng> markers) async {
-    double minDistance = double.infinity;
-    LatLng nearestMarker = markers[0];
-
-    for (LatLng marker in markers) {
-      Directions directions = await directionsRepository.getDirections(
-          origin: origin, destination: marker);
-
-      double distance = parseDistance(directions.totalDistance);
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestMarker = marker;
-      }
-    }
-
-    return nearestMarker;
-  }
-
-  double parseDistance(String distance) {
-    // Assuming the distance is in the format "x km" or "x m"
-    List<String> parts = distance.split(" ");
-    double value = double.parse(parts[0]);
-    if (parts[1] == 'km') {
-      return value;
-    } else {
-      return value / 1000; // Convert meters to kilometers
+    } catch (e) {
+      print('Error getting optimized directions: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GoogleMap(
-        onMapCreated: onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(38.661029, -9.204454),
-          zoom: 17,
+    if (_isLoadingToken) {
+      return TokenGetterWidget(onTokenLoaded: (Token token) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _token = token;
+            _isLoadingToken = false;
+          });
+        });
+      });
+    } else if (isRouteLoading) {
+      return loadRoute();
+    } else {
+      return Scaffold(
+        body: GoogleMap(
+          myLocationEnabled: true,
+          onMapCreated: onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: LatLng(38.661029, -9.204454),
+            zoom: 17,
+          ),
+          markers: Set<Marker>.from(markers),
+          polylines: polylines,
         ),
-        markers: Set<Marker>.from(markers),
-        polylines: polylines,
-      ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomLeft,
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
-              child: FloatingActionButton(
-                backgroundColor: kPrimaryColor,
-                foregroundColor: Colors.white,
-                onPressed: drawRoute,
-                child: Icon(Icons.directions),
+        floatingActionButton: kIsWeb
+            ? null
+            : Align(
+                alignment: Alignment.bottomLeft,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(left: 25.0, bottom: 16.0),
+                      child: FloatingActionButton(
+                        backgroundColor: Style.kPrimaryColor,
+                        foregroundColor: Colors.white,
+                        onPressed: setOptimizedRoute,
+                        child: Icon(Icons.directions),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+      );
+    }
+  }
+
+  Widget loadRoute() {
+    return FutureBuilder(
+      future: _loadRoute(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            String errorText = snapshot.error.toString();
+            if (errorText.contains('404'))
+              errorText = 'Percurso não encontrado';
+            else if (errorText.contains('401'))
+              errorText = 'Não tem permissões para aceder a este percurso';
+            else if (errorText.contains('500'))
+              errorText = 'Erro interno do servidor';
+            else
+              errorText = 'Algo não correu bem';
+
+            return Container(
+              child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                backgroundColor: Style.kAccentColor2.withOpacity(0.3),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      errorText,
+                    ),
+                    const SizedBox(height: 15),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.go(Paths.routes);
+                      },
+                      child: const Text('Voltar'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              setState(() {
+                _route = snapshot.data;
+                isRouteLoading = false;
+                int i = 1;
+                for (LocationGetData location in _route.locations) {
+                  markers.add(Marker(
+                    markerId: MarkerId(location.name),
+                    position: LatLng(location.latitude, location.longitude),
+                    infoWindow: InfoWindow(
+                      title: location.name,
+                      snippet: i.toString() + "º Ponto",
+                    ),
+                  ));
+                  i++;
+                }
+              });
+            });
+            return Container();
+          }
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
     );
+  }
+
+  Future<RouteGetData> _loadRoute() async {
+    try {
+      RouteGetData route = await BaseClient().getRoute(
+          "/route",
+          widget.routeUser + "-" + widget.routeID,
+          _token.tokenID,
+          _token.username);
+      return route;
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 }

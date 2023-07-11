@@ -3,10 +3,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
+import 'package:responsive_login_ui/widgets/theme_switch.dart';
 
+import '../Themes/theme_manager.dart';
 import '../models/paths.dart';
 
 import '../constants.dart';
@@ -30,7 +34,6 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController nameController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  TextEditingController roleController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordVerController = TextEditingController();
   TextEditingController privacyController = TextEditingController();
@@ -48,7 +51,6 @@ class _SignUpViewState extends State<SignUpView> {
     nameController.dispose();
     fullNameController.dispose();
     emailController.dispose();
-    roleController.dispose();
     passwordController.dispose();
     passwordVerController.dispose();
     privacyController.dispose();
@@ -63,11 +65,9 @@ class _SignUpViewState extends State<SignUpView> {
     var theme = Theme.of(context);
 
     return Container(
-      decoration: kGradientDecoration,
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           resizeToAvoidBottomInset: false,
           body: Center(
             child: LayoutBuilder(
@@ -110,6 +110,7 @@ class _SignUpViewState extends State<SignUpView> {
   Widget _buildMainBody(
       Size size, SimpleUIController simpleUIController, ThemeData theme) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    ThemeManager themeManager = context.watch<ThemeManager>();
 
     return SingleChildScrollView(
       child: Column(
@@ -129,12 +130,8 @@ class _SignUpViewState extends State<SignUpView> {
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
-            child: Text(
-              'Conecta-te aos teus colegas!',
-              style: textTheme.headline5!.copyWith(
-                color: kAccentColor0,
-              ),
-            ),
+            child: Text('Conecta-te aos teus colegas!',
+                style: textTheme.headline5!),
           ),
           SizedBox(height: size.height * 0.03),
           Padding(
@@ -145,29 +142,19 @@ class _SignUpViewState extends State<SignUpView> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
-                          decoration: const InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.person, color: kAccentColor1),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Username',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: nameController,
                           validator: (value) {
@@ -188,29 +175,19 @@ class _SignUpViewState extends State<SignUpView> {
                   SizedBox(height: size.height * 0.02),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.person, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.person,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Nome Completo',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: fullNameController,
                           validator: (value) {
@@ -229,29 +206,19 @@ class _SignUpViewState extends State<SignUpView> {
                   /// Email
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.person, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.person,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Email',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: emailController,
                           validator: (value) {
@@ -267,84 +234,28 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Theme(
-                          data: ThemeData(
-                            canvasColor: kAccentColor0,
-                            popupMenuTheme: PopupMenuThemeData(
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    kBorderRadius,
-                              ),
-                            ),
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 9, vertical: 4),
-                            child: DropdownButtonHideUnderline(
-                              child: ExpansionTile(
-                                initiallyExpanded: isExpandedRole,
-                                title: roleController.text.isEmpty
-                                    ? Text(
-                                        "Role",
-                                        style: TextStyle(color: kAccentColor0),
-                                      )
-                                    : Text(roleController.text,
-                                        style: TextStyle(color: kAccentColor0)),
-                                leading: Icon(Icons.work, color: kAccentColor1),
-                                children: ['Aluno', 'Professor', 'Externo']
-                                    .map<Widget>((String value) {
-                                  return ListTile(
-                                    title: Text(
-                                      value,
-                                      style: TextStyle(color: kAccentColor0),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        roleController.text = value;
-                                        isExpandedRole = false;
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.02),
                   Obx(
                     () => Container(
                       decoration: BoxDecoration(
-                        borderRadius: kBorderRadius,
-                        color: kAccentColor0.withOpacity(0.2),
+                        borderRadius: Style.kBorderRadius,
+                        color: Style.kAccentColor2.withOpacity(0.2),
                       ),
                       child: ClipRRect(
-                        borderRadius: kBorderRadius,
+                        borderRadius: Style.kBorderRadius,
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: TextFormField(
                             controller: passwordController,
                             obscureText: simpleUIController.isObscure.value,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_open,
-                                  color: kAccentColor1),
+                              prefixIcon: Icon(Icons.lock_open,
+                                  color: Theme.of(context).iconTheme.color),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   simpleUIController.isObscure.value
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: kAccentColor1,
+                                  color: Theme.of(context).iconTheme.color,
                                 ),
                                 onPressed: () {
                                   simpleUIController.isObscureActive();
@@ -352,13 +263,6 @@ class _SignUpViewState extends State<SignUpView> {
                               ),
                               hintText: 'Password',
                               border: InputBorder.none,
-                              focusedBorder: const OutlineInputBorder(
-                                borderRadius: kBorderRadius,
-                                borderSide: BorderSide(
-                                  color:
-                                      kAccentColor1, // Set your desired focused color here
-                                ),
-                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -380,27 +284,27 @@ class _SignUpViewState extends State<SignUpView> {
                   Obx(
                     () => Container(
                       decoration: BoxDecoration(
-                        borderRadius: kBorderRadius,
-                        color: kAccentColor0.withOpacity(0.2),
+                        borderRadius: Style.kBorderRadius,
+                        color: Style.kAccentColor2.withOpacity(0.2),
                       ),
                       child: ClipRRect(
-                        borderRadius: kBorderRadius,
+                        borderRadius: Style.kBorderRadius,
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: TextFormField(
                             controller: passwordVerController,
                             obscureText: simpleUIController.isObscure.value,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(
+                              prefixIcon: Icon(
                                 Icons.lock_open,
-                                color: kAccentColor1,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   simpleUIController.isObscure.value
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: kAccentColor1,
+                                  color: Theme.of(context).iconTheme.color,
                                 ),
                                 onPressed: () {
                                   simpleUIController.isObscureActive();
@@ -408,13 +312,6 @@ class _SignUpViewState extends State<SignUpView> {
                               ),
                               hintText: 'Verificação da Password',
                               border: InputBorder.none,
-                              focusedBorder: const OutlineInputBorder(
-                                borderRadius: kBorderRadius,
-                                borderSide: BorderSide(
-                                  color:
-                                      kAccentColor1, // Set your desired focused color here
-                                ),
-                              ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -443,7 +340,6 @@ class _SignUpViewState extends State<SignUpView> {
                     onTap: () {
                       nameController.clear();
                       emailController.clear();
-                      roleController.clear();
                       passwordController.clear();
                       _formKey.currentState?.reset();
                       simpleUIController.isObscure.value = true;
@@ -452,11 +348,11 @@ class _SignUpViewState extends State<SignUpView> {
                     child: RichText(
                       text: TextSpan(
                         text: 'Já tens uma conta?',
-                        style: TextStyle(color: kAccentColor0),
+                        style: textTheme.bodyText1!,
                         children: [
                           TextSpan(
                             text: " Log In",
-                            style: TextStyle(color: kAccentColor1),
+                            style: TextStyle(color: Style.kAccentColor1),
                           ),
                         ],
                       ),
@@ -484,7 +380,6 @@ class _SignUpViewState extends State<SignUpView> {
               "password": passwordController.text,
               "passwordV": passwordVerController.text,
               "email": emailController.text,
-              "role": roleController.text.toUpperCase(),
               "state": "INACTIVE",
               "privacy": "PRIVATE",
             };
@@ -498,20 +393,20 @@ class _SignUpViewState extends State<SignUpView> {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return AlertDialog(
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: kBorderRadius,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Style.kBorderRadius,
                         ),
-                        backgroundColor: kAccentColor0.withOpacity(0.3),
-                        content: const Row(
+                        backgroundColor: Style.kAccentColor2.withOpacity(0.3),
+                        content: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(
-                              color: kAccentColor1,
+                              color: Style.kAccentColor1,
                             ),
                             SizedBox(width: 10),
                             Text('Loading...',
-                                style: TextStyle(color: kAccentColor0)),
+                                style: TextStyle(color: Style.kAccentColor0)),
                           ],
                         ),
                       );
@@ -527,15 +422,16 @@ class _SignUpViewState extends State<SignUpView> {
                             break;
                         }
 
-                        return ErrorDialog(errorText, 'Voltar a tentar', context);
+                        return ErrorDialog(
+                            errorText, 'Voltar a tentar', context);
                       } else {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           Navigator.of(context).pop();
-                          context.go(Paths.login);
+                          context.go(
+                              '${Paths.verifyAccount}/${nameController.text}');
 
                           nameController.clear();
                           emailController.clear();
-                          roleController.clear();
                           passwordController.clear();
                           _formKey.currentState?.reset();
                         });

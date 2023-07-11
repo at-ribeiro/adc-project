@@ -69,16 +69,16 @@
 //   //     backgroundColor: Colors.white,
 //   //     body: Center(
 //   //       child: _showError
-//   //           ? CircularProgressIndicator()
+//   //           ? CircularProgressIndicatorCustom()
 //   //           : FutureBuilder<Token>(
 //   //               future: widget.token,
 //   //               builder: (BuildContext context, AsyncSnapshot<Token> snapshot) {
 //   //                 if (snapshot.connectionState == ConnectionState.waiting) {
 //   //                   // While waiting for the future to complete, show a loading indicator
-//   //                   return CircularProgressIndicator();
+//   //                   return CircularProgressIndicatorCustom();
 //   //                 } else if (snapshot.hasError) {
 //   //                   // If an error occurred while fetching the token, show the loading indicator and handle the error with showDialog
-//   //                   return CircularProgressIndicator();
+//   //                   return CircularProgressIndicatorCustom();
 //   //                 } else {
 //   //                   // When the future completes successfully, navigate to the home page
 //   //                   final token = snapshot.data;

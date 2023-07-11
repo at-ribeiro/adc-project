@@ -14,9 +14,9 @@ import '../constants.dart';
 import '../models/Token.dart';
 import '../models/event_get_data.dart';
 import '../models/route_get_data.dart';
+import '../models/route_post_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'event_page.dart';
 
 class RouteView extends StatefulWidget {
   const RouteView({Key? key}) : super(key: key);
@@ -36,6 +36,8 @@ class _RouteViewState extends State<RouteView> {
   TextEditingController eventController = TextEditingController();
   TextEditingController searchController = TextEditingController();
 
+  List<String> routesToDelete = [];
+
   @override
   void initState() {
     super.initState();
@@ -43,11 +45,23 @@ class _RouteViewState extends State<RouteView> {
     _scrollController.addListener(_onScroll);
   }
 
+  void addToSelectedRoutes(String creator, String routeName) {
+    setState(() {
+      routesToDelete.add("$creator-$routeName");
+    });
+  }
+
+  void removeFromSelectedRoutes(String creator, String routeName) {
+    setState(() {
+      routesToDelete.remove("$creator-$routeName");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
           setState(() {
             _token = token;
             _isLoadingToken = false;
@@ -57,79 +71,136 @@ class _RouteViewState extends State<RouteView> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              await BaseClient().deleteRoutes(
+                  "/route", _token.username, _token.tokenID, routesToDelete);
+              setState(() {
+                routesToDelete.clear();
+              });
+              _loadRoutes();
+            },
+            child: Icon(
+              Icons.delete,
+            ),
+          ),
           body: Column(
             children: [
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _refreshRoutes,
                   child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount: _routes.length + (_loadingMore ? 1 : 0),
-                    itemBuilder: (BuildContext context, int index) {
-                      if (index >= _routes.length) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else {
-                        RouteGetData route = _routes[index];
-                        return GestureDetector(
-                          onTap: () {
-                            //context.go(Paths.event + '/${event.id}');
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: ClipRRect(
-                              borderRadius: kBorderRadius,
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                    sigmaX: 50.0, sigmaY: 50.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: kAccentColor2.withOpacity(0.1),
-                                    borderRadius: kBorderRadius,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //adicionar cenas
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                    itemCount: _routes.length,
+                    itemBuilder: (context, index) {
+                      RouteGetData route = _routes[index];
+                      bool isSelected = routesToDelete
+                          .contains("${route.creator}-${route.name}");
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Style.kAccentColor2.withOpacity(
+                                  0.3), // Glass effect by using opacity
+                              borderRadius: BorderRadius.circular(15.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 10.0,
+                                  spreadRadius: 2.0,
+                                ),
+                              ],
+                            ),
+                            child: Container(
+                              child: Card(
+                                color: Colors
+                                    .transparent, // To make sure Card takes the glass effect
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context.go(Paths.routes +
+                                          '/${route.creator}/${route.name}');
+                                    },
+                                    child: ListTile(
+                                      title: Text(route.creator),
+                                      subtitle: Column(
+                                        children: [
+                                          Row(
                                             children: [
                                               Text(
-                                                route.name,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
-                                                ),
+                                                "Nome do Percurso: ",
                                               ),
-                                              const SizedBox(height: 8.0),
                                               Text(
-                                                route.creator,
-                                                style: const TextStyle(
-                                                  color: kAccentColor2,
-                                                ),
+                                                route.name,
                                               ),
-                                              const SizedBox(height: 8.0),
                                             ],
                                           ),
+                                          const SizedBox(height: 8.0),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Criador: ",
+                                              ),
+                                              Text(
+                                                route.creator,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8.0),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Duração Aproximada: ",
+                                              ),
+                                              Text(
+                                                locationsDuration(
+                                                            route.durations)
+                                                        .toString() +
+                                                    " minutos",
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      trailing: Flexible(
+                                        child: Column(
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(
+                                                isSelected
+                                                    ? Icons.check_box
+                                                    : Icons
+                                                        .check_box_outline_blank,
+                                              ),
+                                              onPressed: () {
+                                                if (isSelected) {
+                                                  removeFromSelectedRoutes(
+                                                      route.creator,
+                                                      route.name);
+                                                } else {
+                                                  addToSelectedRoutes(
+                                                      route.creator,
+                                                      route.name);
+                                                }
+                                              },
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      }
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -139,6 +210,14 @@ class _RouteViewState extends State<RouteView> {
         ),
       );
     }
+  }
+
+  int locationsDuration(List<int> durations) {
+    int total = 0;
+    for (int i in durations) {
+      total += i;
+    }
+    return total;
   }
 
   void _loadRoutes() async {

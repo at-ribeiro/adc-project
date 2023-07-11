@@ -14,6 +14,7 @@ import '../models/Token.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
+import '../widgets/circular_indicator.dart';
 import 'news_page.dart';
 
 class NewsView extends StatefulWidget {
@@ -24,6 +25,8 @@ class NewsView extends StatefulWidget {
 }
 
 class _NewsViewState extends State<NewsView> {
+
+  
   late Token _token;
   bool _isLoadingToken = true;
   bool _isLoadingNews = true;
@@ -55,6 +58,9 @@ class _NewsViewState extends State<NewsView> {
   }
 
   Widget build(BuildContext context) {
+
+    TextTheme textTheme = Theme.of(context).textTheme;
+
     if (_isLoadingToken) {
       return TokenGetterWidget(
         onTokenLoaded: (Token token) {
@@ -88,12 +94,13 @@ class _NewsViewState extends State<NewsView> {
             } else {
               return Container(
                   color: Colors.transparent,
-                  child: const Center(child: CircularProgressIndicator()));
+                  child:
+                      const Center(child: CircularProgressIndicatorCustom()));
             }
           });
     } else {
       return Container(
-        decoration: kGradientDecoration,
+     
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: RefreshIndicator(
@@ -114,15 +121,15 @@ class _NewsViewState extends State<NewsView> {
                     NewsData news = _news[index];
                     return GestureDetector(
                       onTap: () {
-                       context.go(news.newsUrl);
+                        context.go(news.newsUrl);
                       },
                       child: Container(
                         margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          borderRadius: kBorderRadius,
+                          borderRadius: Style.kBorderRadius,
                           border: Border.all(
                             width: 1.5,
-                            color: kAccentColor0.withOpacity(0.0),
+                            color: Style.kAccentColor0.withOpacity(0.0),
                           ),
                         ),
                         child: ClipRRect(
@@ -132,8 +139,8 @@ class _NewsViewState extends State<NewsView> {
                                 ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: kAccentColor2.withOpacity(0.1),
-                                borderRadius: kBorderRadius,
+                                color: Style.kAccentColor2.withOpacity(0.1),
+                                borderRadius: Style.kBorderRadius,
                               ),
                               child: Material(
                                 color: Colors.transparent,
@@ -159,10 +166,8 @@ class _NewsViewState extends State<NewsView> {
                                       const SizedBox(height: 8.0),
                                       Text(
                                         news.title,
-                                        style: TextStyle(
-                                          fontSize: 20.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: kAccentColor0,
+                                        style: textTheme.headline6!.copyWith(
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       const SizedBox(height: 4.0),
@@ -190,7 +195,6 @@ class _NewsViewState extends State<NewsView> {
         _scrollController.position.maxScrollExtent) {
       _loadMoreNews();
     }
-    print(counter);
   }
 
   Future<void> _loadMoreNews() async {
