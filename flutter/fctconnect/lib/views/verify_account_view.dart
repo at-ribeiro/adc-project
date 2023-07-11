@@ -19,7 +19,7 @@ import '../services/base_client.dart';
 class VerifyAccountView extends StatefulWidget {
   final String username;
 
-  const VerifyAccountView({Key? key , required this.username}) : super(key: key);
+  const VerifyAccountView({Key? key, required this.username}) : super(key: key);
 
   @override
   State<VerifyAccountView> createState() => _VerifyAccountViewState();
@@ -102,13 +102,6 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ThemeSwitch(themeManager: themeManager),
-            ),
-          ),
           SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
@@ -178,8 +171,8 @@ class _VerifyAccountViewState extends State<VerifyAccountView> {
               barrierDismissible: false,
               builder: (BuildContext context) {
                 return FutureBuilder(
-                  future: BaseClient()
-                      .verifyAccount("/register/verification", widget.username, codeController.text),
+                  future: BaseClient().verifyAccount("/register/verification",
+                      widget.username, codeController.text),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return AlertDialog(

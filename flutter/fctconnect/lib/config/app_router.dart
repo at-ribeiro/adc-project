@@ -24,7 +24,7 @@ import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
 import 'package:responsive_login_ui/views/welcome_screen.dart';
-// import 'package:responsive_login_ui/views/welcome_screen.dart';
+
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 import 'package:responsive_login_ui/views/salas_view.dart';
 import 'package:responsive_login_ui/views/buildings_view.dart';
@@ -502,7 +502,7 @@ class AppRouter {
           }
         },
       );
-    } else if (location == Paths.routes) {
+    } else if (location.contains(Paths.routes)) {
       return IconButton(
           onPressed: () {
             context.go(Paths.createRoute);
@@ -554,7 +554,7 @@ class AppRouter {
     } else if (location.contains(Paths.optionsProfile)) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.myProfile);
+            context.go(Paths.homePage);
           },
           icon: Icon(Icons.arrow_back));
     } else if (location.contains(Paths.notification)) {

@@ -498,6 +498,19 @@ class _MyProfileState extends State<MyProfile> {
                       style: TextStyle(fontSize: 16.0),
                     ),
                     const SizedBox(height: 8.0),
+                    IconButton(
+                      onPressed: () {
+                        context.go(
+                          context.namedLocation(Paths.post,
+                              pathParameters: <String, String>{
+                                'id': post.id,
+                                'user': post.user,
+                              }),
+                        );
+                      },
+                      icon: Icon(Icons.comment_outlined),
+                    ),
+                    const SizedBox(height: 8.0),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(

@@ -115,7 +115,6 @@ class _ListReportPageState extends State<ListReportsPage> {
                       ],
                     ),
                     child: Container(
-                      height: 150,
                       child: Card(
                         color: Colors
                             .transparent, // To make sure Card takes the glass effect

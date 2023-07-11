@@ -4,15 +4,18 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_login_ui/views/video_player.dart';
 import 'package:video_player/video_player.dart';
 import '../constants.dart';
 import '../models/Token.dart';
+import '../models/paths.dart';
 import '../services/load_token.dart';
 import '../services/media_up.dart';
 import '../services/post_actions.dart';
+import '../widgets/error_dialog.dart';
 
 class PostCreator extends StatefulWidget {
   const PostCreator({Key? key}) : super(key: key);
@@ -243,49 +246,49 @@ class _PostCreatorState extends State<PostCreator> {
     );
   }
 
-  void doPost() async {
-    print('doPost called...');
-    setState(() {
-      _isPosting = true;
-    });
+  // void doPost() async {
+  //   print('doPost called...');
+  //   setState(() {
+  //     _isPosting = true;
+  //   });
 
-    try {
-      int result = await _post();
-      print('doPost result: $result');
-      // rest of your code...
-    } catch (e) {
-      print('doPost error: $e');
-      // rest of your code...
-    } finally {
-      setState(() {
-        _isPosting = false;
-      });
-    }
-  }
-
-  // FutureBuilder doPost() {
-  //   return FutureBuilder<int>(
-  //     future: _post(), // this will hold the future returned by doPost
-  //     builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-  //       if (snapshot.connectionState == ConnectionState.waiting) {
-  //         // return a button that indicates loading while the future is not completed
-  //         return ElevatedButton(
-  //           onPressed: null,
-  //           child: CircularProgressIndicator(),
-  //         );
-  //       } else if (snapshot.hasError) {
-  //         return ErrorDialog('Erro ao publicar evento', 'Ok', context);
-  //       } else {
-  //         if (snapshot.data == 200) {
-  //           context.go(Paths.homePage);
-  //           return Container();
-  //         } else {
-  //           return ErrorDialog('Erro ao publicar evento', 'Ok', context);
-  //         }
-  //       }
-  //     },
-  //   );
+  //   try {
+  //     int result = await _post();
+  //     print('doPost result: $result');
+  //     // rest of your code...
+  //   } catch (e) {
+  //     print('doPost error: $e');
+  //     // rest of your code...
+  //   } finally {
+  //     setState(() {
+  //       _isPosting = false;
+  //     });
+  //   }
   // }
+
+  FutureBuilder doPost() {
+    return FutureBuilder<int>(
+      future: _post(), // this will hold the future returned by doPost
+      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // return a button that indicates loading while the future is not completed
+          return ElevatedButton(
+            onPressed: null,
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return ErrorDialog('Erro ao publicar evento', 'Ok', context);
+        } else {
+          if (snapshot.data == 200) {
+            context.go(Paths.homePage);
+            return Container();
+          } else {
+            return ErrorDialog('Erro ao publicar evento', 'Ok', context);
+          }
+        }
+      },
+    );
+  }
 
   Future<int> _post() async {
     print('Starting post...');
