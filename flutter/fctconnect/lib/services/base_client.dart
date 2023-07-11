@@ -1336,8 +1336,7 @@ class BaseClient {
       "Content-Type": "application/json; charset=UTF-8",
     };
     var url = Uri.parse('$baseUrl$api/?query=$query');
-    var response =
-        await http.post(url, headers: _headers);
+    var response = await http.post(url, headers: _headers);
     return response.statusCode;
   }
 
@@ -1348,9 +1347,20 @@ class BaseClient {
       "code": code,
     };
     var url = Uri.parse('$baseUrl$api/?query=$query');
-    var response =
-        await http.put(url, headers: _headers);
+    var response = await http.put(url, headers: _headers);
     return response.statusCode;
   }
 
+  static registerInEvent(
+      String api, String tokenID, String username, enventId) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+
+    var url = Uri.parse('$baseUrl/$api/$enventId');
+    var response = await http.get(url, headers: _headers);
+    return response.statusCode;
+  }
 }

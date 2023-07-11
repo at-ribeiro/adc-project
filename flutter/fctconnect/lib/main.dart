@@ -21,7 +21,7 @@ import 'controller/simple_ui_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  setPathUrlStrategy();
+
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
