@@ -104,6 +104,7 @@ ThemeData lightTheme = ThemeData(
     collapsedIconColor: Style.kAccentColor1Light,
   ),
   focusColor: Style.kAccentColor1Light,
+  
 );
 
 //Dark theme

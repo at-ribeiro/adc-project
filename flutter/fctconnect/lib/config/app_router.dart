@@ -72,12 +72,6 @@ class AppRouter {
                 },
               ),
               GoRoute(
-                path: Paths.createPost,
-                builder: (BuildContext context, GoRouterState state) {
-                  return PostCreator();
-                },
-              ),
-              GoRoute(
                 path: "/:noticias/:year/:month/:title",
                 builder: (BuildContext context, GoRouterState state) {
                   return NewsDetailPage(
@@ -101,6 +95,12 @@ class AppRouter {
                 ),
                 body: child,
               );
+            },
+          ),
+          GoRoute(
+            path: Paths.createPost,
+            builder: (BuildContext context, GoRouterState state) {
+              return PostCreator();
             },
           ),
           GoRoute(
@@ -379,7 +379,7 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
-    } else if (location.contains(Paths.post)) {
+    } else if (location == Paths.post) {
       return 'Comentários';
     } else if (location == Paths.nucleos) {
       return 'Núcleos';
@@ -395,6 +395,8 @@ class AppRouter {
       return 'Opções de Perfil';
     } else if (location.contains(Paths.notification)) {
       return 'Notificação';
+    } else if (location.contains(Paths.post) && location != Paths.post) {
+      return 'Criar Post';
     }
     // add more conditions for other routes
 
@@ -496,6 +498,12 @@ class AppRouter {
       return IconButton(
           onPressed: () {
             context.go(Paths.homePage);
+          },
+          icon: Icon(Icons.arrow_back));
+    } else if (location.contains(Paths.event)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.events);
           },
           icon: Icon(Icons.home));
     }

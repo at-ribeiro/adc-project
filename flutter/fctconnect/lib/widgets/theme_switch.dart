@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../Themes/theme_manager.dart';
-import '../constants.dart';
 
-class ThemeSwitch extends StatelessWidget {
+import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
+
+class ThemeSwitch extends StatefulWidget {
   const ThemeSwitch({
-    super.key,
+    Key? key,
     required this.themeManager,
-  });
+  }) : super(key: key);
 
   final ThemeManager themeManager;
 
   @override
+  _ThemeSwitchState createState() => _ThemeSwitchState();
+}
+
+class _ThemeSwitchState extends State<ThemeSwitch> {
+  bool _isDarkTheme = false;
+
+  @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        // Update the theme mode here
-        // You can use Provider, GetX, or any other state management approach
-        if (themeManager.getThemeMode() == ThemeMode.light) {
-          themeManager.toggleTheme('dark');
-        } else if (themeManager.getThemeMode() == ThemeMode.dark) {
-          themeManager.toggleTheme('system');
-        } else {
-          themeManager.toggleTheme('light');
-        }
+    _isDarkTheme = widget.themeManager.getThemeMode() == ThemeMode.dark;
+
+    return Switch(
+      value: _isDarkTheme,
+      onChanged: (value) {
+        setState(() {
+          _isDarkTheme = value;
+          // Toggle theme
+          widget.themeManager.toggleTheme(_isDarkTheme ? 'dark' : 'light');
+        });
       },
-      child: themeManager.getThemeMode() == ThemeMode.light
-          ? Icon(Icons.light_mode, color: Style.kPrimaryColorDark)
-          : themeManager.getThemeMode() == ThemeMode.dark
-              ? Icon(Icons.dark_mode, color: Style.kPrimaryColorLight)
-              : Text(
-                  'System Theme',
-                  style: TextStyle(fontSize: 18),
-                ),
+      activeTrackColor: Theme.of(context).primaryColor,
     );
   }
 }

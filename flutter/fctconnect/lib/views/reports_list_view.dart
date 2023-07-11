@@ -191,8 +191,7 @@ class _ListReportPageState extends State<ListReportsPage> {
                                                         },
                                                         child: Text('Não',
                                                             style: textTheme
-                                                                .button!
-                                                                ),
+                                                                .button!),
                                                       ),
                                                     ],
                                                   ),

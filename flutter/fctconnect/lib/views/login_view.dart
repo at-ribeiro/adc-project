@@ -85,6 +85,9 @@ class _LoginViewState extends State<LoginView>
   ) {
     return Center(
       child: Row(
+
+        mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
           SizedBox(width: size.width * 0.06),
           Expanded(
@@ -133,15 +136,6 @@ class _LoginViewState extends State<LoginView>
                     ? MainAxisAlignment.center
                     : MainAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ThemeSwitch(
-                        themeManager: themeManager,
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     height: size.height * 0.03,
                   ),

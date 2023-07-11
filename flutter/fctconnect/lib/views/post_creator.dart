@@ -101,32 +101,39 @@ class _PostCreatorState extends State<PostCreator> {
 
   Widget _buildMediaPreview() {
     if (_type == 'image' && _imageData != null) {
-      return Container(
-        constraints: BoxConstraints(
-          maxHeight: 500,
-          maxWidth: 500,
-        ),
-        child: ClipRRect(
+      return Center(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: 500,
+            maxWidth: 500,
+          ),
+          child: ClipRRect(
             borderRadius: Style.kBorderRadius,
-            child: Image.memory(_imageData!, fit: BoxFit.contain)),
+            child: Image.memory(_imageData!, fit: BoxFit.contain),
+          ),
+        ),
       );
     } else if (_type == 'video' && _imageData != null) {
       if (kIsWeb) {
         String base64String = base64Encode(_videoFile!.bytes!);
-        return Container(
-          constraints: BoxConstraints(maxHeight: 350),
-          child: VideoPlayerWidget(
-            videoUrl: 'data:video/mp4;base64,$base64String',
+        return Center(
+          child: Container(
+            constraints: BoxConstraints(maxHeight: 350),
+            child: VideoPlayerWidget(
+              videoUrl: 'data:video/mp4;base64,$base64String',
+            ),
           ),
         );
       } else {
-        return Container(
-          constraints: BoxConstraints(maxHeight: 350),
-          child: VideoPlayerWidget(file: File(_videoFile!.path!)),
+        return Center(
+          child: Container(
+            constraints: BoxConstraints(maxHeight: 350),
+            child: VideoPlayerWidget(file: File(_videoFile!.path!)),
+          ),
         );
       }
     } else if (_isImageLoading) {
-      return CircularProgressIndicator();
+      return Center(child: CircularProgressIndicator());
     } else {
       return SizedBox.shrink();
     }
@@ -157,95 +164,90 @@ class _PostCreatorState extends State<PostCreator> {
         });
       });
     } else {
-      return Container(
-        child: Scaffold(
-          body: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildMediaPreview(),
-                  SizedBox(height: 20.0),
-                  Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: Style.kBorderRadius,
-                      color: Style.kAccentColor2.withOpacity(0.3),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: Style.kBorderRadius,
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: TextFormField(
-                          maxLines: null, // Allow unlimited lines
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.description,
-                            ),
-                            hintText: 'Descrição',
-                            border: InputBorder.none,
-                          ),
-                          controller: _postTextController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Selecione uma descrição para o evento';
-                            } else {
-                              return null;
-                            }
-                          },
+      return Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      TextField(
+                        maxLines: 6,
+                        decoration: InputDecoration(
+                          hintText: "O que se passa no campus?",
                         ),
+                        controller: _postTextController,
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 20.0),
-                  SizedBox(height: 20),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          _pickFile('image');
-                        },
-                        child: const Text('Selecione a Imagem'),
+                      SizedBox(height: 10),
+                      FractionallySizedBox(
+                        widthFactor: 1,
+                        child: Center(child: _buildMediaPreview()),
                       ),
-                      SizedBox(height: 15.0), // Separator
-                      ElevatedButton(
-                        onPressed: () async {
-                          _pickFile('video');
-                        },
-                        child: const Text('Selecione o Video'),
-                      ),
-                      SizedBox(height: 15.0), // Separator
-                      if (!kIsWeb)
-                        ElevatedButton(
-                          onPressed: () async {
-                            var imageDataMap = await _mediaUp.takePicture();
-                            if (imageDataMap.isNotEmpty) {
-                              _imageData = imageDataMap['fileData'];
-                              _fileName = imageDataMap['fileName'];
-                              _mediaType = imageDataMap['mediaType'];
-                              _type = imageDataMap['type'];
-                            }
-                          },
-                          child: const Text('Tire uma Foto'),
-                        ),
+                      if (_isPosting) CircularProgressIndicator()
                     ],
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _isPosting ? null : doPost,
-                    child: _isPosting
-                        ? CircularProgressIndicator()
-                        : Text('Publicar'),
-                  ),
-                ],
+                ),
               ),
-            ),
+              _buildButtons(),
+            ],
           ),
         ),
       );
     }
+  }
+
+  Widget _buildButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FloatingActionButton(
+            onPressed: () async {
+              _pickFile('image');
+            },
+            child: Icon(Icons.image),
+            tooltip: 'Escolher uma imagem',
+            // You can replace this with your own text
+          ),
+          SizedBox(width: 30), // Gives some space between the buttons
+          FloatingActionButton(
+            onPressed: () async {
+              _pickFile('video');
+            },
+            child: Icon(Icons.videocam),
+            tooltip: 'Escolher um video',
+            // You can replace this with your own text
+          ),
+          if (!kIsWeb)
+            Padding(
+              padding: const EdgeInsets.only(left: 30.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  var imageDataMap = await _mediaUp.takePicture();
+                  if (imageDataMap.isNotEmpty) {
+                    _imageData = imageDataMap['fileData'];
+                    _fileName = imageDataMap['fileName'];
+                    _mediaType = imageDataMap['mediaType'];
+                    _type = imageDataMap['type'];
+                  }
+                },
+                child: Icon(Icons.camera_alt),
+                tooltip: 'Tirar uma foto',
+                // You can replace this with your own text
+              ),
+            ),
+          SizedBox(width: 30),
+          FloatingActionButton(
+            onPressed: _isPosting ? null : doPost,
+            child: Icon(Icons.publish),
+            tooltip: 'Publicar',
+          ),
+        ],
+      ),
+    );
   }
 
   void doPost() async {

@@ -58,104 +58,150 @@ class _NucleosViewState extends State<NucleosView> {
     } else {
       return Container(
         child: Scaffold(
-          floatingActionButton: _token.role == "SA" || _token.role == "SECRETARIA" ? FloatingActionButton(
-            backgroundColor:
-                Theme.of(context).floatingActionButtonTheme.backgroundColor,
-            foregroundColor:
-                Theme.of(context).floatingActionButtonTheme.foregroundColor,
-            onPressed: () {
-              context.go(Paths.criarNucleo);
-            },
-            child: Icon(Icons.add),
-          ) : null,
+          floatingActionButton:
+              _token.role == "SA" || _token.role == "SECRETARIA"
+                  ? FloatingActionButton(
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      foregroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .foregroundColor,
+                      onPressed: () {
+                        context.go(Paths.criarNucleo);
+                      },
+                      child: Icon(Icons.add),
+                    )
+                  : null,
           body: Column(
             children: [
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          _currentNucleoType == 'Academico'
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context)
-                                  .navigationBarTheme
-                                  .indicatorColor!),
-                    ),
-                    onPressed: () => _onNucleoTypeButtonPressed('Academico'),
-                    child: Text(
-                      'Academico',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _currentNucleoType == 'Academico'
-                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
-                              : Theme.of(context)
-                                  .primaryColor),
-                    ),
+              Container(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Wrap(
+                        alignment: WrapAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  _currentNucleoType == 'Academico'
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context)
+                                          .navigationBarTheme
+                                          .indicatorColor!),
+                            ),
+                            onPressed: () =>
+                                _onNucleoTypeButtonPressed('Academico'),
+                            child: Text(
+                              'Academico',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _currentNucleoType == 'Academico'
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .titleTextStyle!
+                                          .color
+                                      : Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Wrap(
+                        alignment: WrapAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  _currentNucleoType == 'Cultural'
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context)
+                                          .navigationBarTheme
+                                          .indicatorColor!),
+                            ),
+                            onPressed: () =>
+                                _onNucleoTypeButtonPressed('Cultural'),
+                            child: Text(
+                              'Cultural',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _currentNucleoType == 'Cultural'
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .titleTextStyle!
+                                          .color
+                                      : Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Wrap(
+                        alignment: WrapAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  _currentNucleoType == 'Recreativo'
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context)
+                                          .navigationBarTheme
+                                          .indicatorColor!),
+                            ),
+                            onPressed: () =>
+                                _onNucleoTypeButtonPressed('Recreativo'),
+                            child: Text(
+                              'Recreativo',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _currentNucleoType == 'Recreativo'
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .titleTextStyle!
+                                          .color
+                                      : Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+
+                      Wrap(
+                        alignment: WrapAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  _currentNucleoType == 'Associação-Parceira'
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context)
+                                          .navigationBarTheme
+                                          .indicatorColor!),
+                            ),
+                            onPressed: () => _onNucleoTypeButtonPressed(
+                                'Associação-Parceira'),
+                            child: Text(
+                              'Associação-Parceira',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _currentNucleoType ==
+                                          'Associação-Parceira'
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .titleTextStyle!
+                                          .color
+                                      : Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          _currentNucleoType == 'Cultural'
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context)
-                                  .navigationBarTheme
-                                  .indicatorColor!),
-                    ),
-                    onPressed: () => _onNucleoTypeButtonPressed('Cultural'),
-                    child: Text(
-                      'Cultural',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _currentNucleoType == 'Cultural'
-                               ? Theme.of(context).appBarTheme.titleTextStyle!.color
-                              : Theme.of(context)
-                                  .primaryColor),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          _currentNucleoType == 'Recreativo'
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context)
-                                  .navigationBarTheme
-                                  .indicatorColor!),
-                    ),
-                    onPressed: () => _onNucleoTypeButtonPressed('Recreativo'),
-                    child: Text(
-                      'Recreativo',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _currentNucleoType == 'Recreativo'
-                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
-                              : Theme.of(context)
-                                  .primaryColor),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          _currentNucleoType == 'Associação-Parceira'
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context)
-                                  .navigationBarTheme
-                                  .indicatorColor!),
-                    ),
-                    onPressed: () =>
-                        _onNucleoTypeButtonPressed('Associação-Parceira'),
-                    child: Text(
-                      'Associação-Parceira',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _currentNucleoType == 'Associação-Parceira'
-                              ? Theme.of(context).appBarTheme.titleTextStyle!.color
-                              : Theme.of(context)
-                                  .primaryColor),
-                    ),
-                  ),
-                ],
+                ),
               ),
               Expanded(
                 child: _isLoadingNucleos
@@ -165,7 +211,6 @@ class _NucleosViewState extends State<NucleosView> {
                         : buildNucleoTab(context,
                             nucleoType: _currentNucleoType!),
               ),
-              
             ],
           ),
         ),
@@ -174,7 +219,7 @@ class _NucleosViewState extends State<NucleosView> {
   }
 
   Widget buildNucleoTab(BuildContext context, {required String nucleoType}) {
-TextTheme textTheme = Theme.of(context).textTheme;
+    TextTheme textTheme = Theme.of(context).textTheme;
 
     var filteredNucleos =
         _nucleos.where((nucleo) => nucleo.type == nucleoType).toList();
@@ -231,7 +276,7 @@ TextTheme textTheme = Theme.of(context).textTheme;
                             ClipRRect(
                               borderRadius: Style.kBorderRadius,
                               child: AspectRatio(
-                                aspectRatio: 1.2,
+                                aspectRatio: 1.3,
                                 child: FittedBox(
                                   fit: BoxFit.fitHeight,
                                   child: Image.network(

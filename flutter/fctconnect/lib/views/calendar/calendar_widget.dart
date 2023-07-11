@@ -58,11 +58,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return AlertDialog(
-              shape:  RoundedRectangleBorder(
+              shape: RoundedRectangleBorder(
                 borderRadius: Style.kBorderRadius,
               ),
               backgroundColor: Style.kAccentColor2.withOpacity(0.3),
-              content:  Row(
+              content: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -76,15 +76,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             return Text('Error initializing activities: ${snapshot.error}');
           } else {
             return Container(
-              decoration: Style.kGradientDecorationDown,
               child: Scaffold(
-                backgroundColor: Colors.transparent,
                 floatingActionButton: FloatingActionButton(
-                  backgroundColor: Style.kPrimaryColor,
                   onPressed: () {
                     provider.addActivity(context, _token);
                   },
-                  child: Icon(Icons.add, color: Style.kAccentColor0),
+                  child: Icon(Icons.add),
                 ),
                 body: Column(
                   children: [
@@ -100,6 +97,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             });
                           },
                           child: Text("Por Mês"),
+                          style: calendarView == CalendarView.month
+                              ? ElevatedButton.styleFrom(
+                                  primary: Style.kAccentColor1,
+                                  onPrimary: Colors.white,
+                                )
+                              : null,
                         ),
                         OutlinedButton(
                           onPressed: () {
@@ -109,6 +112,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             });
                           },
                           child: Text("Por Semana"),
+                          style: calendarView == CalendarView.week
+                              ? ElevatedButton.styleFrom(
+                                  primary: Style.kAccentColor1,
+                                  onPrimary: Colors.white,
+                                )
+                              : null,
                         ),
                         OutlinedButton(
                           onPressed: () {
@@ -118,10 +127,16 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             });
                           },
                           child: Text("Por Dia"),
+                          style: calendarView == CalendarView.day
+                              ? ElevatedButton.styleFrom(
+                                  primary: Style.kAccentColor1,
+                                  onPrimary: Colors.white,
+                                )
+                              : null,
                         ),
                       ],
                     ),
-                    Expanded( 
+                    Expanded(
                       child: SfCalendar(
                         view: calendarView,
                         showNavigationArrow: true,
@@ -130,12 +145,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         dataSource: ActivityDataSource(provider.activities),
                         selectionDecoration: BoxDecoration(
                           color: Style.kAccentColor2.withOpacity(0.1),
-                          border: Border.all(color: Style.kSecondaryColor, width: 3),
+                          border: Border.all(
+                              color: Style.kSecondaryColor, width: 3),
                           borderRadius:
                               const BorderRadius.all(Radius.circular(7)),
                           shape: BoxShape.rectangle,
                         ),
-                        monthViewSettings:  MonthViewSettings(
+                        monthViewSettings: MonthViewSettings(
                           appointmentDisplayMode:
                               MonthAppointmentDisplayMode.indicator,
                           showAgenda: true,

@@ -151,9 +151,7 @@ class _EventCreatorState extends State<EventCreator> {
       });
     } else {
       return Container(
-        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -170,12 +168,10 @@ class _EventCreatorState extends State<EventCreator> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Style.kAccentColor0,
-                          ),
                           decoration: InputDecoration(
+
                             prefixIcon:
-                                Icon(Icons.title, color: Style.kAccentColor1),
+                                Icon(Icons.title, color: Theme.of(context).iconTheme.color),
                             hintText: 'Título do evento',
                             border: InputBorder.none,
                             focusedBorder: OutlineInputBorder(
@@ -185,6 +181,7 @@ class _EventCreatorState extends State<EventCreator> {
                                     .kAccentColor1, // Set your desired focused color here
                               ),
                             ),
+
                           ),
                           controller: _titleController,
                           validator: (value) {
@@ -203,10 +200,7 @@ class _EventCreatorState extends State<EventCreator> {
                     height: 200,
                     decoration: BoxDecoration(
                       borderRadius: Style.kBorderRadius,
-                      border: Border.all(
-                        color: Style
-                            .kAccentColor1, // Set your desired border color here
-                      ),
+
                       color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
@@ -214,13 +208,12 @@ class _EventCreatorState extends State<EventCreator> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Style.kAccentColor0,
-                          ),
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.description,
-                                color: Style.kAccentColor1),
+
+                                color: Theme.of(context).iconTheme.color),
+
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),
@@ -251,14 +244,11 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _startingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color: Style.kAccentColor1),
+
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de começo',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: Style.kBorderRadius,
-                              borderSide:
-                                  BorderSide(color: Style.kAccentColor1),
-                            ),
+
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -306,14 +296,10 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _endingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color: Style.kAccentColor1),
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de fim',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: Style.kBorderRadius,
-                              borderSide:
-                                  BorderSide(color: Style.kAccentColor1),
-                            ),
+
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -400,8 +386,11 @@ class _EventCreatorState extends State<EventCreator> {
                               imageData: _imageData,
                               fileName: _fileName,
                               description: _descriptionController.text,
+
+ 
                               start: startTimeFinal,
                               end: endTimeFinal,
+
                               lat: _markers.first.position.latitude,
                               lng: _markers.first.position.longitude,
                             );
