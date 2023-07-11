@@ -25,6 +25,7 @@ import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/routes_view.dart';
 import 'package:responsive_login_ui/views/signUp_view.dart';
 import 'package:responsive_login_ui/views/splash_secreen.dart';
+import 'package:responsive_login_ui/views/welcome_screen.dart';
 // import 'package:responsive_login_ui/views/welcome_screen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 import 'package:responsive_login_ui/views/salas_view.dart';
@@ -45,11 +46,10 @@ import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
 import '../views/route_creator.dart';
 import '../views/routes_map.dart';
- '../views/sala_creator.dart';
+import '../views/sala_creator.dart';
 import '../views/sala_page.dart';
 
 import '../views/verify_account_view.dart';
-
 
 class AppRouter {
   DrawerModel drawerModel = DrawerModel();
@@ -151,7 +151,7 @@ class AppRouter {
               );
             },
           ),
-            GoRoute(
+          GoRoute(
             path: '/event/qrcode/:id',
             builder: (BuildContext context, GoRouterState state) {
               return ConfirmationPage(
@@ -184,7 +184,7 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: "/buildings/:building",
+            path: "${Paths.buildings}/:building",
             builder: (BuildContext context, GoRouterState state) {
               return SalaView(
                 building: state.pathParameters["building"]!,
@@ -192,7 +192,7 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: "/buildings/:building/:salaId",
+            path: "${Paths.buildings}/:building/:salaId",
             builder: (BuildContext context, GoRouterState state) {
               return SalaPage(
                 salaId: state.pathParameters["salaId"]!,
@@ -344,9 +344,6 @@ class AppRouter {
           return const SignUpView();
         },
       ),
-
-       GoRoute(
-
       GoRoute(
         path: Paths.forgotPwd,
         builder: (BuildContext context, GoRouterState state) {
@@ -370,13 +367,11 @@ class AppRouter {
         },
       ),
       GoRoute(
-
         path: Paths.welcome,
         builder: (BuildContext context, GoRouterState state) {
           return WelcomeScreen();
         },
       ),
-
       GoRoute(
         path: Paths.splash,
         builder: (BuildContext context, GoRouterState state) {
@@ -434,13 +429,11 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
-
     } else if (location.contains(Paths.buildings)) {
       return 'Edifício';
     } else if (location.contains(Paths.buildings)) {
       return 'Sala';
-    }else if (location.contains(Paths.post)) {
-
+    } else if (location.contains(Paths.post)) {
     } else if (location == Paths.post) {
       return 'Comentários';
     } else if (location == Paths.nucleos) {
@@ -519,19 +512,13 @@ class AppRouter {
             context.go(Paths.createRoute);
           },
           icon: Icon(Icons.add));
-    } else if (location == Paths.buildings) {
-      return IconButton(
-          onPressed: () {
-            context.go(Paths.createSala);
-          },
-          icon: Icon(Icons.add));
-    }else if (location == Paths.createSala) {
+    } else if (location == Paths.createSala) {
       return IconButton(
           onPressed: () {
             context.go(Paths.buildings);
           },
           icon: Icon(Icons.arrow_back));
-    }else if (location == Paths.createRoute) {
+    } else if (location == Paths.createRoute) {
       return IconButton(
           onPressed: () {
             context.go(Paths.routes);
@@ -549,7 +536,7 @@ class AppRouter {
             context.go(Paths.buildings);
           },
           icon: Icon(Icons.arrow_back));
-    }else if (location.contains(Paths.otherProfile) ||
+    } else if (location.contains(Paths.otherProfile) ||
         location.contains(Paths.post)) {
       return IconButton(
           onPressed: () {

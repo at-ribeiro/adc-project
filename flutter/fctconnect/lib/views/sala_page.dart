@@ -66,7 +66,7 @@ class _SalaPageState extends State<SalaPage> {
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return Container(
-        decoration: kGradientDecorationUp,
+
         child: TokenGetterWidget(onTokenLoaded: (Token token) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             setState(() {
@@ -81,7 +81,7 @@ class _SalaPageState extends State<SalaPage> {
       return loadSala();
     } else {
       return Container(
-  decoration: kGradientDecorationUp,
+
   child: Scaffold(
     backgroundColor: Colors.transparent,
     body: SingleChildScrollView(
@@ -98,23 +98,23 @@ class _SalaPageState extends State<SalaPage> {
                   style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
-                      color: kAccentColor0),
+                      ),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Building: ${_sala.building}',
-                  style: TextStyle(fontSize: 16, color: kAccentColor2),
+                  'Edifício: ${_sala.building}',
+                  style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Capacity: ${_sala.capacity}',
-                  style: TextStyle(fontSize: 16, color: kAccentColor2),
+                  'Capacidade: ${_sala.capacity}',
+                  style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 16),
                 // Display selected day
                 Text(
-                  'Selected Day: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
-                  style: TextStyle(fontSize: 16, color: kAccentColor1),
+                  'Selecione um dia: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
+                  style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 16),
                 // Date Picker Button
@@ -133,7 +133,7 @@ class _SalaPageState extends State<SalaPage> {
                       });
                     }
                   },
-                  child: Text('Select day'),
+                  child: Text('Selecione um dia'),
                 ),
                 SizedBox(height: 16),
                 // Time Slots
@@ -141,39 +141,42 @@ class _SalaPageState extends State<SalaPage> {
                   children: generateHours().map((hour) {
                     final count = getReservationCountForHour(hour);
                     
-                    return ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text('Reservations for $hour'),
-                              content: Text('There are $count reservations at this time.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: Text('OK'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    ReservationData reservation = ReservationData(
-                                      user: _token.username, 
-                                      room: _sala.name,  
-                                      hour: getSelectedHourAsInt(hour),
-                                      day: getSelectedDayAsInt(),
-                                      );
-                                    BaseClient().addReservation("/rooms", _token.username, _token.tokenID, _salaId, reservation);
-                                    _refreshReservations();
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('Reserve Slot'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Text('Hour: $hour, Reservations: $count'),
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Reserva para $hour'),
+                                content: Text('Há $count reservas para esta hora.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text('OK'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      ReservationData reservation = ReservationData(
+                                        user: _token.username, 
+                                        room: _sala.name,  
+                                        hour: getSelectedHourAsInt(hour),
+                                        day: getSelectedDayAsInt(),
+                                        );
+                                      BaseClient().addReservation("/rooms", _token.username, _token.tokenID, _salaId, reservation);
+                                      _refreshReservations();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Reservar Slot'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Text('Hora: $hour, Reservas: $count'),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -219,18 +222,18 @@ class _SalaPageState extends State<SalaPage> {
               errorText = 'Algo não correu bem';
 
             return Container(
-              decoration: kGradientDecorationUp,
+            
               child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: kBorderRadius,
+                shape:  RoundedRectangleBorder(
+                  borderRadius: Style.kBorderRadius,
                 ),
-                backgroundColor: kAccentColor0.withOpacity(0.3),
+                backgroundColor: Style.kAccentColor0.withOpacity(0.3),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       errorText,
-                      style: const TextStyle(color: kAccentColor0),
+                   
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(

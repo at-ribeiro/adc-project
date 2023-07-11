@@ -279,7 +279,7 @@ class _MyProfileState extends State<MyProfile> {
             ),
             Text(
               info.about_me,
-               style: textTheme.bodyText1!.copyWith(fontSize: 16),
+              style: textTheme.bodyText1!.copyWith(fontSize: 16),
             ),
             SizedBox(height: 16),
             Text(
@@ -315,18 +315,9 @@ class _MyProfileState extends State<MyProfile> {
             ),
             Text(
               info.city,
-             style: textTheme.bodyText1!.copyWith(fontSize: 16),
+              style: textTheme.bodyText1!.copyWith(fontSize: 16),
             ),
             SizedBox(height: 16),
-            Text(
-              "Grupos: ${info.nGroups}",
-              style: textTheme.headline6,
-            ),
-            SizedBox(height: 16),
-            Text(
-              "Núcleos: ${info.nNucleos}",
-              style: textTheme.headline6,
-            ),
           ],
         ),
       );
@@ -722,8 +713,7 @@ class _MyProfileState extends State<MyProfile> {
                                     style:
                                         TextStyle(color: Style.kAccentColor0),
                                   )),
-                              if (!kIsWeb) 
-                              SizedBox(width: 16),
+                              if (!kIsWeb) SizedBox(width: 16),
                               if (!kIsWeb)
                                 ElevatedButton(
                                     onPressed: () {

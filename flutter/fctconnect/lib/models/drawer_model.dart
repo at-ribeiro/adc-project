@@ -59,234 +59,157 @@ class _DrawerModelState extends State<DrawerModel> {
     String profiPic = _token.profilePic;
 
     return Drawer(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(30),
-                topRight: Radius.circular(30))),
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              IntrinsicWidth(
-                stepWidth: double.infinity,
-                child: DrawerHeader(
-                  decoration: const BoxDecoration(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (_token.role != "SA" &&
-                              _token.role != "SECRETARIA") {
-                            context.go(Paths.myProfile);
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(_token.profilePic),
-                        ),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(30), topRight: Radius.circular(30))),
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          children: [
+            IntrinsicWidth(
+              stepWidth: double.infinity,
+              child: DrawerHeader(
+                decoration: const BoxDecoration(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (_token.role != "SA" &&
+                            _token.role != "SECRETARIA") {
+                          context.go(Paths.myProfile);
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(_token.profilePic),
                       ),
-                      const SizedBox(height: 5),
-                      Text(username, style: const TextStyle(fontSize: 18)),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(username, style: const TextStyle(fontSize: 18)),
+                  ],
                 ),
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.home,
-                  color: Theme.of(context).indicatorColor,
-                ),
-                title: Text(
-                  'Home',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.homePage);
-                  Navigator.pop(context);
-                },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.home,
+                color: Theme.of(context).indicatorColor,
               ),
-
-            ), // Set the width of the DrawerHeader to the maximum available width
-          ),
-          ListTile(
-            leading: Icon(Icons.home, color: kAccentColor1),
-            title: const Text('Home'),
-            onTap: () {
-              context.go(Paths.homePage);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.map, color: kAccentColor1),
-            title: const Text('Mapa'),
-            onTap: () {
-              context.go(Paths.mapas);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.directions_walk, color: kAccentColor1),
-            title: const Text('Percursos'),
-            onTap: () {
-              context.go(Paths.routes);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.event, color: kAccentColor1),
-            title: const Text('Eventos'),
-            onTap: () {
-              context.go(Paths.events);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_month, color: kAccentColor1),
-            title: const Text('Calendário'),
-            onTap: () {
-              context.go(Paths.calendar);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.message, color: kAccentColor1),
-            title: const Text('Mensagens'),
-            onTap: () {
-              Navigator.push(context,
-                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.message, color: kAccentColor1),
-            title: const Text('Salas'),
-            onTap: () {
-              context.go(Paths.buildings);
-              Navigator.pop(context);
-            },
-          ),
-          const Spacer(),
-          ListTile(
-            leading: Icon(Icons.report, color: kAccentColor1),
-            title: const Text('Report'),
-            onTap: () {
-              context.go(Paths.report);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_problem_outlined, color: kAccentColor1),
-            title: const Text('Lista de Anomalias'),
-            onTap: () {
-              context.go(Paths.listReports);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.report_gmailerrorred, color: kAccentColor1),
-            title: const Text('Posts Reportados'),
-            onTap: () {
-              context.go(Paths.reportedPosts);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app, color: kAccentColor1),
-            title: const Text('Sair', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
-
-              ListTile(
-                leading: Icon(
-                  Icons.map,
-                  color: Theme.of(context).indicatorColor,
+              title: Text(
+                'Home',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                title: Text(
-                  'Mapa',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.mapas);
-                  Navigator.pop(context);
-                },
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.directions_walk,
-                  color: Theme.of(context).indicatorColor,
+              onTap: () {
+                context.go(Paths.homePage);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading:
+                  Icon(Icons.message, color: Theme.of(context).indicatorColor),
+              title: Text(
+                'Salas',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                title: Text(
-                  'Percursos',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.routes);
-                  Navigator.pop(context);
-                },
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.event,
-                  color: Theme.of(context).indicatorColor,
-                ),
-                title: Text(
-                  'Eventos',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.events);
-                  Navigator.pop(context);
-                },
+              onTap: () {
+                context.go(Paths.buildings);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.map,
+                color: Theme.of(context).indicatorColor,
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.calendar_month,
-                  color: Theme.of(context).indicatorColor,
+              title: Text(
+                'Mapa',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                title: Text(
-                  'Calendário',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.calendar);
-                  Navigator.pop(context);
-                },
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.group,
-                  color: Theme.of(context).indicatorColor,
-                ),
-                title: Text(
-                  'Núcleos',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.nucleos);
-                  Navigator.pop(context);
-                },
+              onTap: () {
+                context.go(Paths.mapas);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.directions_walk,
+                color: Theme.of(context).indicatorColor,
               ),
-              if(!kIsWeb)...[
+              title: Text(
+                'Percursos',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                context.go(Paths.routes);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.event,
+                color: Theme.of(context).indicatorColor,
+              ),
+              title: Text(
+                'Eventos',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                context.go(Paths.events);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.calendar_month,
+                color: Theme.of(context).indicatorColor,
+              ),
+              title: Text(
+                'Calendário',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                context.go(Paths.calendar);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.group,
+                color: Theme.of(context).indicatorColor,
+              ),
+              title: Text(
+                'Núcleos',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                context.go(Paths.nucleos);
+                Navigator.pop(context);
+              },
+            ),
+            if (!kIsWeb) ...[
               ListTile(
                 leading: Icon(
                   Icons.timer,
@@ -303,118 +226,118 @@ class _DrawerModelState extends State<DrawerModel> {
                   context.go(Paths.pomodoro);
                   Navigator.pop(context);
                 },
-              ),],
+              ),
+            ],
+            ListTile(
+              leading: Icon(
+                Icons.report,
+                color: Theme.of(context).indicatorColor,
+              ),
+              title: Text(
+                'Report',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () {
+                context.go(Paths.report);
+                Navigator.pop(context);
+              },
+            ),
+            if (_token.role == "SA" || _token.role == "SECRETARIA")
+              Column(
+                children: [
+                  ListTile(
+                    leading: Icon(
+                      Icons.report_problem_outlined,
+                      color: Theme.of(context).indicatorColor,
+                    ),
+                    title: Text(
+                      'Lista de Anomalias',
+                      style: textTheme.bodyText1!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onTap: () {
+                      context.go(Paths.listReports);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.report_gmailerrorred,
+                      color: Theme.of(context).indicatorColor,
+                    ),
+                    title: Text(
+                      'Posts Reportados',
+                      style: textTheme.bodyText1!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onTap: () {
+                      context.go(Paths.reportedPosts);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            if (_token.role == "SA" || _token.role == "SECRETARIA") ...[
               ListTile(
                 leading: Icon(
-                  Icons.report,
+                  Icons.settings,
                   color: Theme.of(context).indicatorColor,
                 ),
                 title: Text(
-                  'Report',
+                  'Definições',
                   style: textTheme.bodyText1!.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
                 onTap: () {
-                  context.go(Paths.report);
-                  Navigator.pop(context);
-                },
-              ),
-              if (_token.role == "SA" || _token.role == "SECRETARIA")
-                Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                        Icons.report_problem_outlined,
-                        color: Theme.of(context).indicatorColor,
-                      ),
-                      title: Text(
-                        'Lista de Anomalias',
-                        style: textTheme.bodyText1!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        context.go(Paths.listReports);
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.report_gmailerrorred,
-                        color: Theme.of(context).indicatorColor,
-                      ),
-                      title: Text(
-                        'Posts Reportados',
-                        style: textTheme.bodyText1!.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        context.go(Paths.reportedPosts);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              if (_token.role == "SA" || _token.role == "SECRETARIA") ...[
-                ListTile(
-                  leading: Icon(
-                    Icons.settings,
-                    color: Theme.of(context).indicatorColor,
-                  ),
-                  title: Text(
-                    'Definições',
-                    style: textTheme.bodyText1!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  onTap: () {
-                    context.go(Paths.optionsProfile);
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-              ListTile(
-                leading: Icon(
-                  Icons.exit_to_app,
-                  color: Theme.of(context).indicatorColor,
-                ),
-                title: Text(
-                  'Sair',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () async {
-                  BaseClient()
-                      .doLogout("/logout", _token.username, _token.tokenID);
-
-                  CacheDefault.cacheFactory.logout();
-                  CacheDefault.cacheFactory.delete('isLoggedIn');
-
-
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-
-                  prefs.remove('ProfilePic');
-
-                  if (kIsWeb) {
-                    context.go(Paths.welcome);
-                  } else {
-                    context.go(Paths.login);
-                  }
+                  context.go(Paths.optionsProfile);
                   Navigator.pop(context);
                 },
               ),
             ],
-          ),
-        ));
+            ListTile(
+              leading: Icon(
+                Icons.exit_to_app,
+                color: Theme.of(context).indicatorColor,
+              ),
+              title: Text(
+                'Sair',
+                style: textTheme.bodyText1!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                  fontSize: 16,
+                ),
+              ),
+              onTap: () async {
+                BaseClient()
+                    .doLogout("/logout", _token.username, _token.tokenID);
+
+                CacheDefault.cacheFactory.logout();
+                CacheDefault.cacheFactory.delete('isLoggedIn');
+
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                prefs.remove('ProfilePic');
+
+                if (kIsWeb) {
+                  context.go(Paths.welcome);
+                } else {
+                  context.go(Paths.login);
+                }
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

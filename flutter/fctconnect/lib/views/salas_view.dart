@@ -62,9 +62,22 @@ class _SalaViewState extends State<SalaView> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          floatingActionButton:
+              _token.role == "SA" || _token.role == "SECRETARIA"
+                  ? FloatingActionButton(
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      foregroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .foregroundColor,
+                      onPressed: () {
+                        context.go(Paths.createSala);
+                      },
+                      child: Icon(Icons.add),
+                    )
+                  : null,
           body: Column(
             children: [
               Expanded(
@@ -82,19 +95,21 @@ class _SalaViewState extends State<SalaView> {
                         SalaGetData sala = _salas[index];
                         return GestureDetector(
                           onTap: () {
-                            context.go(Paths.buildings + '/${_building}' + '/${sala.id}');
+                            context.go(Paths.buildings +
+                                '/${_building}' +
+                                '/${sala.id}');
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: ClipRRect(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(
                                     sigmaX: 50.0, sigmaY: 50.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: kAccentColor2.withOpacity(0.1),
-                                    borderRadius: kBorderRadius,
+                                    color: Style.kAccentColor2.withOpacity(0.1),
+                                    borderRadius: Style.kBorderRadius,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -112,15 +127,14 @@ class _SalaViewState extends State<SalaView> {
                                                 sala.name,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
                                               Text(
-                                                "capacity: " + sala.capacity.toString(),
+                                                "capacity: " +
+                                                    sala.capacity.toString(),
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -153,13 +167,13 @@ class _SalaViewState extends State<SalaView> {
       _token.tokenID,
       _token.username,
       _building,
-     // _lastDisplayedSalaTimestamp.toString(),
+      // _lastDisplayedSalaTimestamp.toString(),
     );
     if (mounted) {
       setState(() {
         _salas = salas;
         if (salas.isNotEmpty) {
-         // _lastDisplayedSalaTimestamp = salas.last.start;
+          // _lastDisplayedSalaTimestamp = salas.last.start;
         }
       });
     }
@@ -172,12 +186,12 @@ class _SalaViewState extends State<SalaView> {
       _token.tokenID,
       _token.username,
       _building,
-     // _lastDisplayedSalaTimestamp.toString(),
+      // _lastDisplayedSalaTimestamp.toString(),
     );
     setState(() {
       _salas = latestSalas;
       if (latestSalas.isNotEmpty) {
-     //   _lastDisplayedSalaTimestamp = latestSalas.last.start;
+        //   _lastDisplayedSalaTimestamp = latestSalas.last.start;
       }
     });
   }

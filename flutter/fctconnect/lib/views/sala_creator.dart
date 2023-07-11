@@ -65,9 +65,7 @@ class _SalaCreatorState extends State<SalaCreator> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -76,28 +74,19 @@ class _SalaCreatorState extends State<SalaCreator> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.title,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Nome da sala',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: _titleController,
                           validator: (value) {
@@ -113,27 +102,20 @@ class _SalaCreatorState extends State<SalaCreator> {
                   ),
                   SizedBox(height: 20.0),
                   Container(
-                    height: 200,
+                    
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      border: Border.all(
-                        color:
-                            kAccentColor1, // Set your desired border color here
-                      ),
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.description, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.description,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Edifício',
                             border: InputBorder.none,
                           ),
@@ -152,28 +134,19 @@ class _SalaCreatorState extends State<SalaCreator> {
                   SizedBox(height: 20.0),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: kBorderRadius,
-                      color: kAccentColor0.withOpacity(0.3),
+                      borderRadius: Style.kBorderRadius,
+                      color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: kAccentColor0,
-                          ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title, color: kAccentColor1),
+                            prefixIcon: Icon(Icons.title,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Capacidade da sala',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: _capacityController,
                           validator: (value) {
@@ -205,36 +178,36 @@ class _SalaCreatorState extends State<SalaCreator> {
                   ElevatedButton(
                     onPressed: () {
                       //if (_validateDates()) {
-                        //if (_fileName.isNotEmpty) {
-                          if (_markers.isNotEmpty) {
-                            SalaPostData sala = SalaPostData(
-                              name: _titleController.text,
-                              building: _descriptionController.text,
-                              lat: _markers.first.position.latitude,
-                              lng: _markers.first.position.longitude,
-                              capacity: int.parse(_capacityController.text),
-                            );
-                            var response = BaseClient()
-                                .createSala("/rooms", _token.username, _token.tokenID, sala);
+                      //if (_fileName.isNotEmpty) {
+                      if (_markers.isNotEmpty) {
+                        SalaPostData sala = SalaPostData(
+                          name: _titleController.text,
+                          building: _descriptionController.text,
+                          lat: _markers.first.position.latitude,
+                          lng: _markers.first.position.longitude,
+                          capacity: int.parse(_capacityController.text),
+                        );
+                        var response = BaseClient().createSala(
+                            "/rooms", _token.username, _token.tokenID, sala);
 
-                            if (response == 200 || response == 204) {
-                              //context.go(Paths.salas);
-                            } else {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => ErrorDialog(
-                                      'Erro ao criar sala.', 'Ok', context));
-                            }
-                          } else {
-                            showDialog(
-                                context: context,
-                                builder: (context) => ErrorDialog(
-                                    'Verifique se selecionou uma localização para a sala.',
-                                    'Ok',
-                                    context));
-                          }
-                        //} 
-                      },
+                        if (response == 200 || response == 204) {
+                          context.go(Paths.salas);
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) => ErrorDialog(
+                                  'Erro ao criar sala.', 'Ok', context));
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) => ErrorDialog(
+                                'Verifique se selecionou uma localização para a sala.',
+                                'Ok',
+                                context));
+                      }
+                      //}
+                    },
                     //},
                     child: Text('Criar sala'),
                   ),
