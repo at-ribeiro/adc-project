@@ -300,12 +300,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                       setState(() {
                                         currentNewsIndex++;
                                       });
-                                    }else if (currentNewsIndex == _news.length - 1) {
+                                    } else if (currentNewsIndex ==
+                                        _news.length - 1) {
                                       setState(() {
                                         currentNewsIndex = 0;
                                       });
                                     }
-
                                   },
                                   icon: Icon(Icons.arrow_forward),
                                   color: Theme.of(context).iconTheme.color,
@@ -353,24 +353,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               }),
                         ),
                       ),
-                      SizedBox(height: 30.0),
                       Container(
                         color: const Color.fromARGB(71, 0, 0, 0),
                         child: Column(
                           children: [
                             Row(
                               children: [
-                                SizedBox(width: 1650.0),
                                 Align(
                                   alignment: Alignment.centerRight,
-                                  child: IconButton(
-                                      onPressed: () {
-                                        _launchInstagramURL(
-                                            'https://www.instagram.com/estudasses.fct/');
-                                      },
-                                      icon: Icon(FontAwesomeIcons.instagram,
-                                          color: Style.kAccentColor0,
-                                          size: 50.0)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ElevatedButton(
+                                        onPressed: () {
+                                          _launchInstagramURL(
+                                              'https://www.instagram.com/estudasses.fct/');
+                                        },
+                                        child: Icon(FontAwesomeIcons.instagram,
+                                            color: Style.kAccentColor0,
+                                            size: 50.0)),
+                                  ),
                                 )
                               ],
                             ),
