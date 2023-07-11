@@ -115,6 +115,7 @@ class _ListReportPageState extends State<ListReportsPage> {
                       ],
                     ),
                     child: Container(
+                      height: 150,
                       child: Card(
                         color: Colors
                             .transparent, // To make sure Card takes the glass effect
@@ -142,67 +143,76 @@ class _ListReportPageState extends State<ListReportsPage> {
                                             alertData.timestamp.toString()),
                                       ),
                                     )}'),
-                                  ],
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    Style.kBorderRadius,
-                                              ),
-                                              backgroundColor: Style
-                                                  .kAccentColor0
-                                                  .withOpacity(0.3),
-                                              content: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Text(
-                                                    'Tem a certeza que pretende alertar todos os utilizadores sobre esta anomalia?',
-                                                    style: TextStyle(
-                                                        color: Style
-                                                            .kAccentColor0),
+                                    IconButton(
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        Style.kBorderRadius,
                                                   ),
-                                                  const SizedBox(height: 15),
-                                                  Row(
+                                                  backgroundColor: Style
+                                                      .kAccentColor0
+                                                      .withOpacity(0.3),
+                                                  content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
-                                                      MyNotificationButton(
-                                                          username:
-                                                              _token.username,
-                                                          tokenId:
-                                                              _token.tokenID,
-                                                          title: alertData
-                                                              .description,
-                                                          body: alertData
-                                                              .location),
-                                                      SizedBox(width: 15),
-                                                      ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors.red),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: Text('Não',
-                                                            style: textTheme
-                                                                .button!),
+                                                      Text(
+                                                        'Tem a certeza que pretende alertar todos os utilizadores sobre esta anomalia?',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyText1!
+                                                                  .color,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 15),
+                                                      Row(
+                                                        children: [
+                                                          MyNotificationButton(
+                                                              username: _token
+                                                                  .username,
+                                                              tokenId: _token
+                                                                  .tokenID,
+                                                              title: alertData
+                                                                  .description,
+                                                              body: alertData
+                                                                  .location),
+                                                          SizedBox(width: 15),
+                                                          ElevatedButton(
+                                                            style: ElevatedButton
+                                                                .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            },
+                                                            child: Text('Não',
+                                                                style: textTheme
+                                                                    .button!),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
-                                            );
-                                          });
-                                    },
-                                    icon: Icon(
-                                      Icons.notification_add,
-                                      color: Theme.of(context).iconTheme.color,
-                                    )),
+                                                );
+                                              });
+                                        },
+                                        icon: Icon(
+                                          Icons.notification_add,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
+                                        )),
+                                  ],
+                                ),
                               ],
                             ),
                             trailing: Flexible(

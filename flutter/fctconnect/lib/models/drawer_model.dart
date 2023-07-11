@@ -204,25 +204,25 @@ class _DrawerModelState extends State<DrawerModel> {
                 Navigator.pop(context);
               },
             ),
-            if (!kIsWeb) ...[
-              ListTile(
-                leading: Icon(
-                  Icons.timer,
-                  color: Theme.of(context).indicatorColor,
-                ),
-                title: Text(
-                  'Pomodoro',
-                  style: textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  context.go(Paths.pomodoro);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+            // if (!kIsWeb) ...[
+            //   ListTile(
+            //     leading: Icon(
+            //       Icons.timer,
+            //       color: Theme.of(context).indicatorColor,
+            //     ),
+            //     title: Text(
+            //       'Pomodoro',
+            //       style: textTheme.bodyText1!.copyWith(
+            //         fontWeight: FontWeight.bold,
+            //         fontSize: 16,
+            //       ),
+            //     ),
+            //     onTap: () {
+            //       context.go(Paths.pomodoro);
+            //       Navigator.pop(context);
+            //     },
+            //   ),
+            // ],
             ListTile(
               leading: Icon(
                 Icons.report,
