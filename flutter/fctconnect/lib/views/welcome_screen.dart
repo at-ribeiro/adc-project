@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -10,13 +11,11 @@ import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/NewsData.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 import '../Themes/theme_manager.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/theme_switch.dart';
-
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -45,6 +44,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     ThemeManager themeManager = context.watch<ThemeManager>();
+    var screenSize = MediaQuery.of(context).size;
 
     if (_isLoadingNews) {
       return FutureBuilder(
@@ -170,107 +170,149 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           _launchInstagramURL('https://www.fct.unl.pt/' +
                               _news[currentNewsIndex].newsUrl);
                         },
-                        child: Card(
-                          color: Style.kPrimaryColor.withOpacity(0.8),
-                          child: Container(
-                            height: 500.0,
-                            child: PageView.builder(
-                              itemCount: _news.length,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  currentNewsIndex = index;
-                                });
-                              },
-                              itemBuilder: (context, index) {
-                                final newsItem = _news[index];
-                                return Container(
-                                  color: Style.kPrimaryColor.withOpacity(0.5),
-                                  child: Stack(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          ClipRRect(
-                                            child: AspectRatio(
-                                              aspectRatio: 16 / 9,
-                                              child: FittedBox(
-                                                fit: BoxFit.cover,
-                                                child: Image.network(
-                                                  _news[index].imageUrl,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10.0),
-                                          Column(
-                                            children: [
-                                              SizedBox(height: 10.0),
-                                              Container(
-                                                width: 850,
-                                                child: Flexible(
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Text(
-                                                      "       " +
-                                                          _news[index].text,
-                                                      style: TextStyle(
-                                                        fontSize: 24.0,
-                                                        color:
-                                                            Style.kAccentColor0,
-                                                      ),
-                                                      maxLines:
-                                                          null, // Remove the limitation of 2 lines
-                                                      overflow: TextOverflow
-                                                          .visible, // Set overflow to visible
+                        child: Container(
+                          height: screenSize.height * 0.4,
+                          child: Stack(
+                            children: [
+                              PageView.builder(
+                                itemCount: _news.length,
+                                controller: PageController(
+                                    initialPage: currentNewsIndex),
+                                onPageChanged: (index) {
+                                  setState(() {
+                                    currentNewsIndex = index;
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final newsItem = _news[currentNewsIndex];
+                                  return Container(
+                                    width:
+                                        MediaQuery.of(context).size.width - 20,
+                                    color: Style.kPrimaryColor.withOpacity(0.5),
+                                    child: Stack(
+                                      children: [
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            return Row(
+                                              children: [
+                                                ClipRRect(
+                                                  child: AspectRatio(
+                                                    aspectRatio: 16 / 9,
+                                                    child: Image.network(
+                                                      newsItem.imageUrl,
+                                                      fit: BoxFit.cover,
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 16.0, vertical: 8.0),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.bottomCenter,
-                                              end: Alignment.topCenter,
-                                              colors: [
-                                                Colors.black.withOpacity(0.7),
-                                                Colors.transparent,
+                                                SizedBox(width: 10.0),
+                                                if (constraints.maxWidth >
+                                                    600) // Set the breakpoint
+                                                  Flexible(
+                                                    // Use Flexible instead of Expanded to avoid forcing the widgets to take up all available space
+                                                    child: Column(
+                                                      children: [
+                                                        SizedBox(height: 10.0),
+                                                        Align(
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          child: Text(
+                                                            newsItem.text,
+                                                            style: TextStyle(
+                                                              fontSize: 24.0,
+                                                              color: Style
+                                                                  .kAccentColor0,
+                                                            ),
+                                                            maxLines:
+                                                                null, // Remove the limitation of 2 lines
+                                                            overflow: TextOverflow
+                                                                .visible, // Set overflow to visible
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
                                               ],
-                                            ),
-                                          ),
-                                          child: Text(
-                                            newsItem.title,
-                                            style: TextStyle(
-                                              fontSize: 28.0,
-                                              color: Style.kAccentColor0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 10.0,
-                                        right: 10.0,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            // Show more information or navigate to a detailed view
+                                            );
                                           },
-                                          child: Text('Show More'),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                        Positioned(
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 8.0),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.bottomCenter,
+                                                end: Alignment.topCenter,
+                                                colors: [
+                                                  Theme.of(context)
+                                                      .primaryColor
+                                                      .withOpacity(0.7),
+                                                  Theme.of(context)
+                                                      .primaryColor
+                                                      .withOpacity(0.1),
+                                                ],
+                                              ),
+                                            ),
+                                            child: Text(newsItem.title,
+                                                style: textTheme.headline6!
+                                                    .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              Positioned(
+                                left: 16.0,
+                                top: screenSize.height * 0.4 / 2 -
+                                    20.0, // Adjust the position of the buttons
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (currentNewsIndex > 0) {
+                                      setState(() {
+                                        currentNewsIndex--;
+                                      });
+                                    } else if (currentNewsIndex == 0) {
+                                      setState(() {
+                                        currentNewsIndex = _news.length - 1;
+                                      });
+                                    }
+                                  },
+                                  icon: Icon(Icons.arrow_back),
+                                  color: Theme.of(context).iconTheme.color,
+                                  iconSize: 40.0,
+                                ),
+                              ),
+                              Positioned(
+                                right: 16.0,
+                                top: screenSize.height * 0.4 / 2 -
+                                    20.0, // Adjust the position of the buttons
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (currentNewsIndex < _news.length - 1) {
+                                      setState(() {
+                                        currentNewsIndex++;
+                                      });
+                                    }else if (currentNewsIndex == _news.length - 1) {
+                                      setState(() {
+                                        currentNewsIndex = 0;
+                                      });
+                                    }
+
+                                  },
+                                  icon: Icon(Icons.arrow_forward),
+                                  color: Theme.of(context).iconTheme.color,
+                                  iconSize: 40.0,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -285,7 +327,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       SizedBox(height: 50.0),
                       Container(
-                        height: 500.0, // Set height for the map container
+                        height: screenSize.height *
+                            0.4, // Set height for the map container
                         width: 800.0, // Set width for the map container
                         child: ClipRRect(
                           borderRadius: Style.kBorderRadius,

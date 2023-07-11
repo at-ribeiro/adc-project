@@ -119,13 +119,6 @@ class _SignUpViewState extends State<SignUpView> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ThemeSwitch(themeManager: themeManager),
-            ),
-          ),
           SizedBox(height: size.height * 0.03),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
@@ -274,12 +267,16 @@ class _SignUpViewState extends State<SignUpView> {
                                       horizontal: 9, vertical: 4),
                                   child: DropdownButtonHideUnderline(
                                     child: ExpansionTile(
-                              
                                       initiallyExpanded: isExpandedRole,
                                       title: roleController.text.isEmpty
                                           ? Text(
                                               "Role",
-                                            style: TextStyle(color: Theme.of(context).appBarTheme.iconTheme?.color),)
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .appBarTheme
+                                                      .iconTheme
+                                                      ?.color),
+                                            )
                                           : Text(
                                               roleController.text,
                                             ),

@@ -13,19 +13,18 @@ class PomodoroTimer extends StatefulWidget {
 }
 
 class _PomodoroTimerState extends State<PomodoroTimer> {
-  static const String POMODORO = "pomodoro";
-  static const String SHORT_BREAK = "shortBreak";
-  static const String LONG_BREAK = "longBreak";
+  static const String POMODORO = "Pomodoro";
+  static const String SHORT_BREAK = "ShortBreak";
+  static const String LONG_BREAK = "LongBreak";
 
   bool mainPressed = false;
 
   String mainButtonAction = "start";
-  String focus = "time to focus";
-  String message = "time to focus";
-  String rest = "time to take a break";
+  String focus = "hora de focar";
+  String message = "hora de focar";
+  String rest = "hora do intervalo";
 
-  Color backgroundColor = Style.kPrimaryColor;
-  Color buttonsColor = Style.kPrimaryColor;
+ 
 
   var timerDetails = {
     "pomodoro": 25,
@@ -42,7 +41,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
   String seconds = "00";
 
   List<String> tasks = [];
-  String currentTask = "your task";
+  String currentTask = "tarefa atual";
 
   void switchColor(String mode) {
     setState(() {
@@ -114,7 +113,6 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
       int total = remainingTime["total"];
       if (total <= 0) {
         interval.cancel();
-        // audioPlayer.play();
         HapticFeedback.vibrate();
 
         switch (timerDetails["mode"]) {
@@ -131,7 +129,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
           default:
             switchMode(POMODORO);
         }
-        startTimer();
+        startTimer(); // Restart the timer for the break section
       }
     });
   }
@@ -169,19 +167,20 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Enter task"),
+            backgroundColor: Style.kAccentColor2Light.withOpacity(0.5),
+            title: Text("Registe uma tarefa"),
             content: Padding(
               padding: EdgeInsets.all(0),
               child: Form(
                 child: TextFormField(
                   controller: taskController,
                   decoration: InputDecoration(
-                      labelText: "task's name", icon: Icon(Icons.edit)),
+                      labelText: "nome da tarefa", icon: Icon(Icons.edit)),
                 ),
               ),
             ),
             actions: [
-              TextButton(
+              ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                     // print(taskController.text);
@@ -189,7 +188,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                       tasks.add(taskController.text);
                     });
                   },
-                  child: Text("ok"))
+                  child: Text("Ok"))
             ],
           );
         });
@@ -219,10 +218,15 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
-      decoration: Style.kGradientDecorationUp,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showTaskDialog();
+          },
+          child: Icon(Icons.add),
+        ),
         resizeToAvoidBottomInset: false,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -242,28 +246,27 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                               switchMode(POMODORO);
                             },
                             buttonText: "Pomodoro",
-                            buttonColor: buttonsColor),
+                            buttonColor: Theme.of(context).primaryColor),
                         TomadonoButton(
                             callback: () {
                               switchMode(LONG_BREAK);
                             },
                             buttonText: "long break",
-                            buttonColor: buttonsColor),
+                            buttonColor:Theme.of(context).primaryColor),
                         TomadonoButton(
                             callback: () {
                               switchMode(SHORT_BREAK);
                             },
                             buttonText: "short break",
-                            buttonColor: buttonsColor),
+                            buttonColor:Theme.of(context).primaryColor),
                       ],
                     ),
                     Text(
                       "$message\n[$currentTask]",
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 2),
+                      style: textTheme.headline5?.copyWith(
+                        fontWeight: FontWeight.bold
+                      ),
                     ),
                     Text(
                       "$minutes:$seconds",
@@ -278,14 +281,10 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                             stopTimer();
                           }
                         },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Style.kAccentColor0),
-                        ),
                         child: Text(
                           mainButtonAction,
                           style:
-                              TextStyle(fontSize: 28, color: backgroundColor),
+                              TextStyle(fontSize: 28, color: Theme.of(context).primaryColor),
                         ))
                   ],
                 ),
@@ -301,7 +300,7 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Style.kAccentColor0,
+                    color: Theme.of(context).indicatorColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
@@ -312,14 +311,13 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                         Expanded(
+                        Expanded(
                             flex: 1,
                             child: Text(
-                              "   my tasks",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Style.kPrimaryColor,
-                                  fontWeight: FontWeight.bold),
+                              "  Minhas tarefas.",
+                              style: textTheme.headline6!.copyWith(
+                                color: Theme.of(context).primaryColor,
+                              )
                             )),
                         Expanded(
                           flex: 3,
@@ -339,10 +337,11 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                                         style: ButtonStyle(
                                             backgroundColor:
                                                 MaterialStateProperty.all(
-                                                    backgroundColor),
+                                                    Theme.of(context).primaryColor),
                                             foregroundColor:
                                                 MaterialStateProperty.all(
-                                                    Style.kAccentColor0)),
+                                                  Theme.of(context)
+                                                      .indicatorColor,)),
                                         onPressed: () {
                                           setState(() {
                                             currentTask = tasks[index];
@@ -351,8 +350,9 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                                         child: Center(
                                           child: Text(
                                             tasks[index],
-                                            style:
-                                                TextStyle(color: Style.kAccentColor1),
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .iconTheme.color),
                                           ),
                                         ),
                                       ),
@@ -372,15 +372,6 @@ class _PomodoroTimerState extends State<PomodoroTimer> {
                                 );
                               }),
                         ),
-                        Expanded(
-                            flex: 2,
-                            child: TomadonoTaskButton(
-                              callback: () {
-                                showTaskDialog();
-                              },
-                              buttonText: "+ add task +",
-                              buttonColor: buttonsColor,
-                            )),
                       ],
                     ),
                   ),

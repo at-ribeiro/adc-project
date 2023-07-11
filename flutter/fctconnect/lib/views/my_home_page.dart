@@ -153,7 +153,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _loadProfilePic(post),
+                                    GestureDetector(
+                                        onTap: () {
+                                          context.go(Paths.otherProfile +
+                                              "/${post.user}");
+                                        },
+                                        child: _loadProfilePic(post)),
                                     SizedBox(width: 8.0),
                                     Center(
                                       heightFactor: 2.4,

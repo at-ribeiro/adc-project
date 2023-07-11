@@ -85,7 +85,7 @@ class _LoginViewState extends State<LoginView>
   ) {
     return Center(
       child: Row(
-        
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(width: size.width * 0.06),
           Expanded(
@@ -134,15 +134,6 @@ class _LoginViewState extends State<LoginView>
                     ? MainAxisAlignment.center
                     : MainAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ThemeSwitch(
-                        themeManager: themeManager,
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     height: size.height * 0.03,
                   ),
@@ -234,9 +225,8 @@ class _LoginViewState extends State<LoginView>
                                           simpleUIController.isObscure.value
                                               ? Icons.visibility
                                               : Icons.visibility_off,
-                                          color: Theme.of(context)
-                                              .iconTheme
-                                              .color,
+                                          color:
+                                              Theme.of(context).iconTheme.color,
                                         ),
                                         onPressed: () {
                                           simpleUIController.isObscureActive();

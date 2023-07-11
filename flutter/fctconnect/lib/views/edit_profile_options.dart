@@ -143,18 +143,20 @@ class _EditProfileOptionsState extends State<EditProfileOptions> {
               SizedBox(
                 height: 10,
               ),
-              ListTile(
-                onTap: () {
-                  context.go(Paths.editProfile);
-                },
-                title: Text(
-                  "Editar Perfil",
-                  style: textTheme.headline6,
+              if (_token.role != "SA" && _token.role != "SECRETARIA") ...[
+                ListTile(
+                  onTap: () {
+                    context.go(Paths.editProfile);
+                  },
+                  title: Text(
+                    "Editar Perfil",
+                    style: textTheme.headline6,
+                  ),
+                  leading: Icon(
+                    Icons.edit,
+                  ),
                 ),
-                leading: Icon(
-                  Icons.edit,
-                ),
-              ),
+              ],
               ListTile(
                 onTap: () {
                   context.go(Paths.changePassword);
@@ -413,11 +415,10 @@ class _EditProfileOptionsState extends State<EditProfileOptions> {
                   });
                   if (value) {
                     await _firebaseApi.reenableNotifications();
-                      CacheDefault.cacheFactory.set('NotificationState', 'true');
-
+                    CacheDefault.cacheFactory.set('NotificationState', 'true');
                   } else {
                     await _firebaseApi.disableNotifications();
-                      CacheDefault.cacheFactory.set('NotificationState', 'false');
+                    CacheDefault.cacheFactory.set('NotificationState', 'false');
                   }
                 },
                 secondary: const Icon(Icons.notifications),

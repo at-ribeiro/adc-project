@@ -149,9 +149,7 @@ class _EventCreatorState extends State<EventCreator> {
       });
     } else {
       return Container(
-        decoration: Style.kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -160,28 +158,19 @@ class _EventCreatorState extends State<EventCreator> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius:Style. kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius:Style.kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Style.kAccentColor0,
-                          ),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.title, color: Style.kAccentColor1),
+                            prefixIcon: Icon(Icons.title,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Título do evento',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: Style.kBorderRadius,
-                              borderSide: BorderSide(
-                                color:
-                                    Style.kAccentColor1, // Set your desired focused color here
-                              ),
-                            ),
                           ),
                           controller: _titleController,
                           validator: (value) {
@@ -199,11 +188,7 @@ class _EventCreatorState extends State<EventCreator> {
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
-                      borderRadius:Style. kBorderRadius,
-                      border: Border.all(
-                        color:
-                            Style.kAccentColor1, // Set your desired border color here
-                      ),
+                      borderRadius: Style.kBorderRadius,
                       color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
@@ -211,13 +196,10 @@ class _EventCreatorState extends State<EventCreator> {
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Style.kAccentColor0,
-                          ),
                           maxLines: null, // Allow unlimited lines
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.description, color: Style.kAccentColor1),
+                            prefixIcon: Icon(Icons.description,
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Descrição',
                             border: InputBorder.none,
                           ),
@@ -240,7 +222,7 @@ class _EventCreatorState extends State<EventCreator> {
                       color: Style.kAccentColor2.withOpacity(0.3),
                     ),
                     child: ClipRRect(
-                      borderRadius:Style.kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: TextField(
@@ -248,13 +230,9 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _startingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color:Style.kAccentColor1),
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de começo',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: Style.kBorderRadius,
-                              borderSide: BorderSide(color: Style.kAccentColor1),
-                            ),
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -300,13 +278,9 @@ class _EventCreatorState extends State<EventCreator> {
                           controller: _endingDateController,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.calendar_today,
-                                color: Style.kAccentColor1),
+                                color: Theme.of(context).iconTheme.color),
                             hintText: 'Data de fim',
                             border: InputBorder.none,
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: Style.kBorderRadius,
-                              borderSide: BorderSide(color: Style.kAccentColor1),
-                            ),
                           ),
                           onTap: () async {
                             DateTime? date = await showDatePicker(
@@ -359,10 +333,7 @@ class _EventCreatorState extends State<EventCreator> {
                         onPressed: () {
                           _pickImage();
                         },
-
-                        child: const Text(
-                            'Selecione um icon para Evento'),
-
+                        child: const Text('Selecione um icon para Evento'),
                       ),
                       SizedBox(width: 20),
                       const Padding(
@@ -379,77 +350,80 @@ class _EventCreatorState extends State<EventCreator> {
                   _buildImagePreview(),
                   SizedBox(height: 20),
                   ElevatedButton(
-  onPressed: () async {
-    if (_validateDates()) {
-      if (_fileName.isNotEmpty) {
-        if (_markers.isNotEmpty) {
-          setState(() {
-            _isLoading = true; // Show the loading circle
-          });
+                    onPressed: () async {
+                      if (_validateDates()) {
+                        if (_fileName.isNotEmpty) {
+                          if (_markers.isNotEmpty) {
+                            setState(() {
+                              _isLoading = true; // Show the loading circle
+                            });
 
-          EventPostData event = EventPostData(
-            creator: _token.username,
-            title: _titleController.text,
-            imageData: _imageData,
-            fileName: _fileName,
-            description: _descriptionController.text,
-            start: _startingDate.millisecondsSinceEpoch,
-            end: _endingDate.millisecondsSinceEpoch,
-            lat: _markers.first.position.latitude,
-            lng: _markers.first.position.longitude,
-          );
-          try {
-            var response = await BaseClient()
-                .createEvent("/events", _token.tokenID, event);
+                            EventPostData event = EventPostData(
+                              creator: _token.username,
+                              title: _titleController.text,
+                              imageData: _imageData,
+                              fileName: _fileName,
+                              description: _descriptionController.text,
+                              start: _startingDate.millisecondsSinceEpoch,
+                              end: _endingDate.millisecondsSinceEpoch,
+                              lat: _markers.first.position.latitude,
+                              lng: _markers.first.position.longitude,
+                            );
+                            try {
+                              var response = await BaseClient().createEvent(
+                                  "/events", _token.tokenID, event);
 
-            if (response == 200 || response == 204) {
-              context.go(Paths.events);
-            } else {
-              showDialog(
-                  context: context,
-                  builder: (context) => ErrorDialog(
-                      'Erro ao criar evento.', 'Ok', context));
-            }
-          } catch (e) {
-            showDialog(
-                context: context,
-                builder: (context) => ErrorDialog(
-                    'Erro ao criar evento.', 'Ok', context));
-          } finally {
-            setState(() {
-              _isLoading = false; // Hide the loading circle
-            });
-          }
-        } else {
-          showDialog(
-              context: context,
-              builder: (context) => ErrorDialog(
-                  'Verifique se selecionou uma localização para o evento.',
-                  'Ok',
-                  context));
-        }
-      } else {
-        showDialog(
-            context: context,
-            builder: (context) => ErrorDialog(
-                'Adicione uma imagem ao evento',
-                'Ok',
-                context));
-      }
-    } else {
-      showDialog(
-          context: context,
-          builder: (context) => ErrorDialog(
-              'Verifique se a data de início é antes da data do fim.',
-              'Ok',
-              context));
-    }
-  },
-  child: _isLoading
-      ? CircularProgressIndicator(color: Style.kAccentColor1,) // Show the loading circle
-      : Text('Criar evento'),
-),
-
+                              if (response == 200 || response == 204) {
+                                context.go(Paths.events);
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => ErrorDialog(
+                                        'Erro ao criar evento.',
+                                        'Ok',
+                                        context));
+                              }
+                            } catch (e) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => ErrorDialog(
+                                      'Erro ao criar evento.', 'Ok', context));
+                            } finally {
+                              setState(() {
+                                _isLoading = false; // Hide the loading circle
+                              });
+                            }
+                          } else {
+                            showDialog(
+                                context: context,
+                                builder: (context) => ErrorDialog(
+                                    'Verifique se selecionou uma localização para o evento.',
+                                    'Ok',
+                                    context));
+                          }
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) => ErrorDialog(
+                                  'Adicione uma imagem ao evento',
+                                  'Ok',
+                                  context));
+                        }
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) => ErrorDialog(
+                                'Verifique se a data de início é antes da data do fim.',
+                                'Ok',
+                                context));
+                      }
+                    },
+                    child: _isLoading
+                        ? CircularProgressIndicator(
+                            color: Style.kAccentColor1,
+                          ) // Show the loading circle
+                        : Text('Criar evento'),
+                  ),
                 ],
               ),
             ),

@@ -24,7 +24,7 @@ class MyNotificationButton extends StatelessWidget {
         BaseClient.sendNotificationToAll(tokenId, username, title, body);
       },
       child: Text(
-        'Enviar notificação a todos os utilizadores',
+        'Continuar',
         style: textTheme.bodyText1!.copyWith(
             fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
       ),

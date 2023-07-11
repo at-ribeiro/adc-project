@@ -75,14 +75,6 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
               context.go(Paths.noticias);
             } else if (index == 2) {
               context.go(Paths.createPost);
-              // showModalBottomSheet(
-              //     shape: RoundedRectangleBorder(borderRadius: kBorderRadius),
-              //     backgroundColor: kPrimaryColor,
-              //     context: context,
-              //     builder: (BuildContext context) {
-              //       context.go(Paths.createPost);
-              //       return Container();
-              //     });
             } else if (index == 3) {
               context.go(Paths.myProfile);
             }
@@ -90,7 +82,9 @@ class _NavigationBarModelState extends State<NavigationBarModel> {
               _selectedIndex = index;
             });
           },
-          destinations: (_token.role == "SECRETARIA" || _token.role == "SA") ? _navBarItemsBackOffice : _navBarItems,
+          destinations: (_token.role == "SECRETARIA" || _token.role == "SA")
+              ? _navBarItemsBackOffice
+              : _navBarItems,
         ),
       );
     }
