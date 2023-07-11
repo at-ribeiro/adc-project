@@ -15,7 +15,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  setPathUrlStrategy();
+  //setPathUrlStrategy();
 
   await FcmServices.initializeFirebase();
 

@@ -5,7 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.fctconnect.util.Token.AuthToken;
 import pt.unl.fct.di.apdc.fctconnect.util.Login.LoginData;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

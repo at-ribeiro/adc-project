@@ -187,28 +187,10 @@ public class RegisterResource {
             }
 
             user =  Entity.newBuilder(userKey)
-                    .set("user_username", user.getString("user_username"))
-                    .set("user_fullname", user.getString("user_fullname"))
-                    .set("user_pwd", user.getString("user_pwd"))
-                    .set("user_email", user.getString("user_email"))
-                    .set("user_creation_time", user.getTimestamp("user_creation_time"))
-                    .set("user_role", user.getString("user_role"))
                     .set("user_state", "ACTIVE")
-                    .set("user_privacy", user.getString("user_privacy"))
-                    .set("user_phone", user.getString("user_phone"))
-                    .set("user_city", user.getString("user_city"))
-                    .set("user_about_me", user.getString("user_about_me"))
-                    .set("user_department", user.getString("user_department"))
-                    .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("user_course", user.getString("user_course"))
-                    .set("user_year", user.getString("user_year"))
-                    .set("user_profile_pic", user.getString("user_profile_pic"))
-                    .set("user_cover_pic", user.getString("user_cover_pic"))
-                    .set("user_purpose", user.getString("user_purpose"))
-                    .set("user_events", user.getList("user_events"))
                     .build();
 
-            txn.put(user);
+            txn.update(user);
             txn.commit();
 
             LOG.fine(username + " successfully activated!");
