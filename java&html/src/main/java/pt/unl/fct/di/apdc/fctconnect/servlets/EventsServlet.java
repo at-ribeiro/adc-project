@@ -1,6 +1,7 @@
 package pt.unl.fct.di.apdc.fctconnect.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.cloud.storage.*;
 import com.google.cloud.storage.Blob;
@@ -99,47 +100,51 @@ public class EventsServlet extends HttpServlet {
             List<EventGetData> eventList = new ArrayList<>();
 
             eventResults.forEachRemaining(event -> {
-                String url = "";
-                String qrCodeUrl;
 
-                if (!event.getString("event_image").equals("")) {
+                if(event.getLong("event_end") > System.currentTimeMillis()) {
 
-                    BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
+                    String url = "";
+                    String qrCodeUrl;
+
+                    if (!event.getString("event_image").equals("")) {
+
+                        BlobId blobId = BlobId.of(bucketName, event.getString("event_image"));
+                        Blob blob = storage.get(blobId);
+                        url = blob.getMediaLink();
+
+                    }
+
+                    BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));
                     Blob blob = storage.get(blobId);
-                    url = blob.getMediaLink();
+                    qrCodeUrl = blob.getMediaLink();
 
+                    List<String> participants = new ArrayList<>();
+
+                    for (Value<?> value : event.getList("event_participants")) {
+                        Key userKey = (Key) value.get();
+                        Entity entity = txn.get(userKey);
+                        participants.add(entity.getString("user_username"));
+                    }
+
+                    if (participants.isEmpty()) {
+                        participants.add("");
+                    }
+
+                    EventGetData eventInstance = new EventGetData(
+                            event.getString("event_creator"),
+                            event.getString("event_title"),
+                            event.getString("event_description"),
+                            url,
+                            event.getLong("event_start"),
+                            event.getLong("event_end"),
+                            event.getString("id"),
+                            qrCodeUrl,
+                            participants,
+                            event.getDouble("event_latitude"),
+                            event.getDouble("event_longitude"));
+
+                    eventList.add(eventInstance);
                 }
-
-                BlobId blobId = BlobId.of(bucketName, event.getString("event_qr"));
-                Blob blob = storage.get(blobId);
-                qrCodeUrl = blob.getMediaLink();
-
-                List<String> participants = new ArrayList<>();
-
-                for(Value<?> value : event.getList("event_participants")){
-                    Key userKey = (Key) value.get();
-                    Entity entity = txn.get(userKey);
-                    participants.add(entity.getString("user_username"));
-                }
-
-                if(participants.isEmpty()){
-                    participants.add("");
-                }
-
-                EventGetData eventInstance = new EventGetData(
-                        event.getString("event_creator"),
-                        event.getString("event_title"),
-                        event.getString("event_description"),
-                        url,
-                        event.getLong("event_start"),
-                        event.getLong("event_end"),
-                        event.getString("id"),
-                        qrCodeUrl,
-                        participants,
-                        event.getDouble("event_latitude"),
-                        event.getDouble("event_longitude"));
-
-                eventList.add(eventInstance);
             });
 
             if (eventList.isEmpty()) {
