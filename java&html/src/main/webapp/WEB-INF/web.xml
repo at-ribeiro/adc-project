@@ -59,6 +59,10 @@
 		<servlet-name>CoverPicServlet</servlet-name>
 		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.CoverPicServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>NucleosServlet</servlet-name>
+		<servlet-class>pt.unl.fct.di.apdc.firstwebapp.resources.NucleosServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>PostServlet</servlet-name>
@@ -83,6 +87,10 @@
 	<servlet-mapping>
 		<servlet-name>CoverPicServlet</servlet-name>
 		<url-pattern>/rest/coverPic/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>NucleosServlet</servlet-name>
+		<url-pattern>/rest/nucleos/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>MainServices</servlet-name>

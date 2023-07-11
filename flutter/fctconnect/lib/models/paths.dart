@@ -51,6 +51,15 @@ class Paths {
 
   static String welcome = '/welcome';
 
+
+  static String buildings = "/buildings";
+
+  static String building = "/building";
+
+  static String salas = "/salas";
+
+  static String createSala = '$salas/newSala';
+
   static String createPost = '$post/create';
 
   static String nucleos = '/nucleos';
@@ -60,4 +69,5 @@ class Paths {
   static String pomodoro = '/pomodoro';
 
   static String notification = '/notification';
+
 }
