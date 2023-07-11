@@ -62,6 +62,11 @@ class _SalaPageState extends State<SalaPage> {
     return int.parse(hour.split(':')[0]);
   }
 
+  // This method checks if a reservation exists for a specific hour, day, and user.
+  bool hasReservationForHour(String hour) {
+    return _reservations.any((res) => res.hour == getSelectedHourAsInt(hour) && res.day == getSelectedDayAsInt() && res.user == _token.username);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
@@ -144,13 +149,21 @@ class _SalaPageState extends State<SalaPage> {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            hasReservationForHour(hour) ? Colors.red : null, // If there is a reservation, the button will be red. Otherwise, it uses the default color.
+                          ),
+                        ),
                         onPressed: () {
                           showDialog(
                             context: context,
                             builder: (context) {
+                              final hasReservation = hasReservationForHour(hour);
                               return AlertDialog(
                                 title: Text('Reserva para $hour'),
-                                content: Text('Há $count reservas para esta hora.'),
+                                content: Text(hasReservation
+                                  ? 'Você já tem uma reserva para esta hora.'
+                                  : 'Há $count reservas para esta hora.'),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(context).pop(),
@@ -158,17 +171,24 @@ class _SalaPageState extends State<SalaPage> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      ReservationData reservation = ReservationData(
-                                        user: _token.username, 
-                                        room: _sala.name,  
-                                        hour: getSelectedHourAsInt(hour),
-                                        day: getSelectedDayAsInt(),
+                                      if (hasReservation) {
+                                        // call a function to cancel the reservation
+                                        String reservationID = _token.username+"-"+getSelectedDayAsInt().toString()+"-"+getSelectedHourAsInt(hour).toString();
+                                        BaseClient().cancelReservation("/rooms/reservation", _token.username, _token.tokenID, _salaId, reservationID);
+                                        _refreshReservations();
+                                      } else {
+                                        ReservationData reservation = ReservationData(
+                                          user: _token.username, 
+                                          room: _sala.name,  
+                                          hour: getSelectedHourAsInt(hour),
+                                          day: getSelectedDayAsInt(),
                                         );
-                                      BaseClient().addReservation("/rooms", _token.username, _token.tokenID, _salaId, reservation);
-                                      _refreshReservations();
+                                        BaseClient().addReservation("/rooms", _token.username, _token.tokenID, _salaId, reservation);
+                                        _refreshReservations();
+                                      }
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('Reservar Slot'),
+                                    child: Text(hasReservation ? 'Cancelar Reserva' : 'Reservar Slot'),
                                   ),
                                 ],
                               );

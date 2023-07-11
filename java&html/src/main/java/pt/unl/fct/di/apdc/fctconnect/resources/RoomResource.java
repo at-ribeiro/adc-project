@@ -451,10 +451,10 @@ public class RoomResource {
     }
 
     @DELETE
-    @Path("/reservation/{reservationId}")
+    @Path("/reservation/{roomId}/{reservationId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteReservation(@HeaderParam("Authorization") String tokenId, @HeaderParam("User") String username,
-                                      @PathParam("reservationId") String reservationId) {
+                                      @PathParam("roomId") String roomId, @PathParam("reservationId") String reservationId) {
 
         Transaction txn = datastore.newTransaction();
 
@@ -489,6 +489,7 @@ public class RoomResource {
 
             Key reservationKey = datastore.newKeyFactory()
                     .setKind("Reservation")
+                    .addAncestor(PathElement.of("Room", roomId))
                     .newKey(reservationId);
 
             Entity reservation = txn.get(reservationKey);
