@@ -44,9 +44,11 @@ class Paths {
 
   static String welcome = '/welcome';
 
-  static String salas = "/salas";
+  static String buildings = "/buildings";
 
-  static String sala = "/sala";
+  static String building = "/building";
+
+  static String salas = "/salas";
 
   static String createSala = '$salas/newSala';
 

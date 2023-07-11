@@ -20,6 +20,7 @@ import '../models/NewsData.dart';
 import '../models/Post.dart';
 import '../models/PostReport.dart';
 import '../models/Token.dart';
+import '../models/ReservationData.dart';
 
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
@@ -842,103 +843,141 @@ class BaseClient {
 
   // sala stuff
 
-    Future<int> createSala(String api, String tokenID, SalaPostData sala) async {
+  Future<dynamic> createSala(String api, String username, String tokenID, SalaPostData sala) async {
     var _headers = {
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse(baseUrl + api + '/' + sala.name));
-    request.headers.addAll(_headers);
-    
-    request.fields['sala'] = json.encode(sala.toJson());
+    var url = Uri.parse('$baseUrl$api');
 
-    if (sala.imageData != null) {
-      var multipartFile = http.MultipartFile.fromBytes(
-        'image',
-        sala.imageData!,
-        filename: "${sala.fileName}.jpg",
-        contentType: MediaType('image', 'jpeg'),
-      );
-      request.files.add(multipartFile);
+    //var salaJson = sala.toJson();
+
+    var salaJson = jsonEncode({
+      'name': sala.name,
+      'building': sala.building,
+      'lat': sala.lat,
+      'lng': sala.lng,
+      'capacity': sala.capacity,
+    });
+
+    var response = await http.post(
+      url,
+      headers: _headers,
+      body: salaJson,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      // Throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
     }
-
-    var response = await request.send();
-
-    return response.statusCode;
   }
 
   Future<List<SalaGetData>> getSalas(
-      String api, String tokenID, String username) async {
+      String api, String tokenID, String username, String building) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api/$username');
 
-    var response = await http.get(url, headers: _headers);
-    if (response.statusCode == 200) {
-      final jsonList = json.decode(response.body) as List<dynamic>;
-      final salasList =
-          jsonList.map((json) => SalaGetData.fromJson(json)).toList();
-      return salasList;
-    } else {
-      // throw exception
-      throw Exception(
-          "Error: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-    
-  }
-
-  Future<SalaGetData> getSala(String api, id, tokenID, user) async {
-    Map<String, String>? _headers = {
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": tokenID,
-      "User": user,
-    };
-    var url = Uri.parse('$baseUrl$api/$id');
-
-    var response = await http.get(url, headers: _headers);
-
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final sala = SalaGetData.fromJson(jsonData);
-
-      return sala;
-    } else {
-      // throw exception
-      throw Exception(
-          "Error: ${response.statusCode} - ${response.reasonPhrase}");
-    }
-  }
-
-  Future<bool> isInSala(String api, String username, String tokenID) async {
-    var _headers = {
-      "Content-Type": "application/json; charset=UTF-8",
-      "Authorization": tokenID,
-    };
-    var url = Uri.parse('$baseUrl$api/$username');
+    var url = Uri.parse('$baseUrl$api?building=$building');
+    //var url = Uri.https(baseUrl, api, {"building": building});
 
     var response = await http.get(
       url,
       headers: _headers,
     );
 
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<SalaGetData> rooms =
+          List<SalaGetData>.from(data.map((json) => SalaGetData.fromJson(json)));
+      return rooms;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
   }
 
-  Future<dynamic> joinSala(
-      String api, String username, String tokenID, SalaPostData sala) async {
+  Future<SalaGetData> getSala(
+      String api, String tokenID, String username, String salaId) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api/$username');
 
-    var response = await http.post(
+    var url = Uri.parse('$baseUrl$api/$salaId');
+    //var url = Uri.https(baseUrl, api, {"building": building});
+
+    var response = await http.get(
       url,
       headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final SalaGetData room = SalaGetData.fromJson(data);
+      return room;
+    } else {
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<List<ReservationData>> getReservations(String api, id, tokenID, user) async {
+    Map<String, String>? _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": user,
+    };
+    var url = Uri.parse('$baseUrl$api/$id/reservations');
+
+    var response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+       final jsonString =
+          utf8.decode(response.bodyBytes); // Specify the correct encoding
+      final data = jsonDecode(jsonString);
+      final List<ReservationData> reservations =
+          List<ReservationData>.from(data.map((json) => ReservationData.fromJson(json)));
+      return reservations;
+    } else {
+      // throw exception
+      throw Exception(
+          "Error: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+  Future<dynamic> addReservation(
+      String api, String username, String tokenID, String id, ReservationData reservation) async {
+    var _headers = {
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": tokenID,
+      "User": username,
+    };
+    var url = Uri.parse('$baseUrl$api/$id');
+
+    var reservationJson = jsonEncode({
+      'user': reservation.user,
+      'room': reservation.room,
+      'day': reservation.day,
+      'hour': reservation.hour,
+    });
+
+    var response = await http.put(
+      url,
+      headers: _headers,
+      body: reservationJson,
     );
 
     if (response.statusCode == 200) {

@@ -17,20 +17,16 @@ import '../services/base_client.dart';
 import '../services/load_token.dart';
 import 'sala_page.dart';
 
-class SalaView extends StatefulWidget {
-  //const SalaView({Key? key}) : super(key: key);
-  final String building;
-
-  const SalaView({required this.building});
+class BuildingView extends StatefulWidget {
+  const BuildingView({Key? key}) : super(key: key);
 
   @override
-  State<SalaView> createState() => _SalaViewState();
+  State<BuildingView> createState() => _BuildingViewState();
 }
 
-class _SalaViewState extends State<SalaView> {
-  List<SalaGetData> _salas = [];
+class _BuildingViewState extends State<BuildingView> {
+  List<String> _buildings = ["Edificio I", "test"];
   late Token _token;
-  late String _building;
   bool _isLoadingToken = true;
   bool _loadingMore = false;
   int _lastDisplayedSalaTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -42,7 +38,6 @@ class _SalaViewState extends State<SalaView> {
 
   @override
   void initState() {
-    _building = widget.building;
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
@@ -56,7 +51,7 @@ class _SalaViewState extends State<SalaView> {
           setState(() {
             _token = token;
             _isLoadingToken = false;
-            _loadSalas();
+            //_loadSalas();
           });
         });
       });
@@ -68,21 +63,21 @@ class _SalaViewState extends State<SalaView> {
           body: Column(
             children: [
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refreshSalas,
+                //child: RefreshIndicator(
+                  //onRefresh: _refreshSalas,
                   child: ListView.builder(
                     controller: _scrollController,
-                    itemCount: _salas.length + (_loadingMore ? 1 : 0),
+                    itemCount: _buildings.length + (_loadingMore ? 1 : 0),
                     itemBuilder: (BuildContext context, int index) {
-                      if (index >= _salas.length) {
+                      if (index >= _buildings.length) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       } else {
-                        SalaGetData sala = _salas[index];
+                        String building = _buildings[index];
                         return GestureDetector(
                           onTap: () {
-                            context.go(Paths.buildings + '/${_building}' + '/${sala.id}');
+                            context.go(Paths.buildings + '/${building}');
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -109,20 +104,14 @@ class _SalaViewState extends State<SalaView> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                sala.name,
+                                                building,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: kAccentColor0,
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
-                                              Text(
-                                                "capacity: " + sala.capacity.toString(),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
-                                                ),
-                                              ),
+                                              // capacity here ?
                                               const SizedBox(height: 8.0),
                                             ],
                                           ),
@@ -138,54 +127,20 @@ class _SalaViewState extends State<SalaView> {
                       }
                     },
                   ),
-                ),
+//                ),
               ),
             ],
           ),
         ),
       );
+      
     }
-  }
-
-  void _loadSalas() async {
-    List<SalaGetData> salas = await BaseClient().getSalas(
-      "/rooms",
-      _token.tokenID,
-      _token.username,
-      _building,
-     // _lastDisplayedSalaTimestamp.toString(),
-    );
-    if (mounted) {
-      setState(() {
-        _salas = salas;
-        if (salas.isNotEmpty) {
-         // _lastDisplayedSalaTimestamp = salas.last.start;
-        }
-      });
-    }
-  }
-
-  Future<void> _refreshSalas() async {
-    _lastDisplayedSalaTimestamp = DateTime.now().millisecondsSinceEpoch;
-    List<SalaGetData> latestSalas = await BaseClient().getSalas(
-      "/rooms",
-      _token.tokenID,
-      _token.username,
-      _building,
-     // _lastDisplayedSalaTimestamp.toString(),
-    );
-    setState(() {
-      _salas = latestSalas;
-      if (latestSalas.isNotEmpty) {
-     //   _lastDisplayedSalaTimestamp = latestSalas.last.start;
-      }
-    });
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent) {
-      _loadSalas();
+      //_loadSalas();
     }
   }
 }

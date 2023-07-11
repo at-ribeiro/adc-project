@@ -6,7 +6,6 @@ public class RoomGetData {
 
     private String name;
     private String building;
-    private String url;
     private String id;
     private double lat;
     private double lng;
@@ -29,10 +28,6 @@ public class RoomGetData {
 
     public String getBuilding() {
         return building;
-    }
-
-    public String getUrl() {
-        return url;
     }
 
     public String getId() {

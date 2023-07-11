@@ -135,7 +135,7 @@ class _DrawerModelState extends State<DrawerModel> {
             leading: Icon(Icons.message, color: kAccentColor1),
             title: const Text('Salas'),
             onTap: () {
-              context.go(Paths.salas);
+              context.go(Paths.buildings);
               Navigator.pop(context);
             },
           ),

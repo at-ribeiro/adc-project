@@ -19,6 +19,8 @@ import 'package:responsive_login_ui/views/splash_secreen.dart';
 // import 'package:responsive_login_ui/views/welcome_screen.dart';
 import 'package:responsive_login_ui/widgets/nav_bar.dart';
 import 'package:responsive_login_ui/views/salas_view.dart';
+import 'package:responsive_login_ui/views/buildings_view.dart';
+import 'package:responsive_login_ui/views/sala_page.dart';
 
 import '../constants.dart';
 import '../models/drawer_model.dart';
@@ -148,17 +150,25 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: '/sala/:id',
+            path: Paths.buildings,
             builder: (BuildContext context, GoRouterState state) {
-              return SalaPage(
-                salaId: state.pathParameters['id']!,
+              return BuildingView();
+            },
+          ),
+          GoRoute(
+            path: "/buildings/:building",
+            builder: (BuildContext context, GoRouterState state) {
+              return SalaView(
+                building: state.pathParameters["building"]!,
               );
             },
           ),
           GoRoute(
-            path: Paths.salas,
+            path: "/buildings/:building/:salaId",
             builder: (BuildContext context, GoRouterState state) {
-              return SalaView();
+              return SalaPage(
+                salaId: state.pathParameters["salaId"]!,
+              );
             },
           ),
           GoRoute(
@@ -308,8 +318,8 @@ class AppRouter {
       return 'Criar Evento';
     } else if (location == Paths.createRoute) {
       return 'Criar Percurso';
-    } else if (location == Paths.salas) {
-      return 'Salas';
+    } else if (location == Paths.buildings) {
+      return 'Edifícios';
     } else if (location == Paths.createSala) {
       return 'Criar Sala';
     } else if (location == Paths.report) {
@@ -326,9 +336,11 @@ class AppRouter {
       return 'Perfil';
     } else if (location.contains(Paths.event)) {
       return 'Evento';
-    } else if (location.contains(Paths.sala)) {
+    } else if (location.contains(Paths.buildings)) {
+      return 'Edifício';
+    } else if (location.contains(Paths.buildings)) {
       return 'Sala';
-    } else if (location.contains(Paths.post)) {
+    }else if (location.contains(Paths.post)) {
       return 'Comentários';
     } else if (location.contains(Paths.changePassword)) {
       return 'Mudar Password';
@@ -384,31 +396,34 @@ class AppRouter {
             context.go(Paths.createRoute);
           },
           icon: Icon(Icons.add));
-    } else if (location == Paths.createRoute) {
+    } else if (location == Paths.buildings) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.createSala);
+          },
+          icon: Icon(Icons.add));
+    }else if (location == Paths.createSala) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.buildings);
+          },
+          icon: Icon(Icons.arrow_back));
+    }else if (location == Paths.createRoute) {
       return IconButton(
           onPressed: () {
             context.go(Paths.routes);
           },
           icon: Icon(Icons.arrow_back));
-
     } else if (location == Paths.createEvent) {
       return IconButton(
           onPressed: () {
             context.go(Paths.events);
           },
           icon: Icon(Icons.arrow_back));
-    } else if (location == Paths.salas) {
+    } else if (location.contains(Paths.buildings + "/")) {
       return IconButton(
           onPressed: () {
-            context.go(Paths.createSala);
-          },
-          icon: Icon(Icons.add));
-
-    }else if (location == Paths.createSala) {
-
-      return IconButton(
-          onPressed: () {
-            context.go(Paths.salas);
+            context.go(Paths.buildings);
           },
           icon: Icon(Icons.arrow_back));
     }else if (location.contains(Paths.otherProfile) ||

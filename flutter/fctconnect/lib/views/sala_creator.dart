@@ -23,9 +23,6 @@ class SalaCreator extends StatefulWidget {
 
 class _SalaCreatorState extends State<SalaCreator> {
   late Token _token;
-  Uint8List? _imageData;
-  late String _fileName;
-
   bool _isLoadingToken = true;
 
   final TextEditingController _titleController = TextEditingController();
@@ -52,48 +49,6 @@ class _SalaCreatorState extends State<SalaCreator> {
     _capacityController.dispose();
     //_endingDateController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final fileData = await pickedFile.readAsBytes();
-      setState(() {
-        _imageData = Uint8List.fromList(fileData);
-        _fileName = pickedFile.path.split('/').last;
-      });
-    }
-  }
-
-  bool _isImageLoading = false;
-
-  Widget _buildImagePreview() {
-    if (_imageData != null) {
-      return Container(
-        width: 440, // Adj ust the width as needed
-        height: 300, // Adjust the height as needed
-        child: ClipRRect(
-            borderRadius: kBorderRadius,
-            child: Image.memory(_imageData!, fit: BoxFit.fill)),
-      );
-    } else if (_isImageLoading) {
-      return CircularProgressIndicator();
-    } else {
-      return SizedBox.shrink();
-    }
-  }
-
-  Future<void> _takePicture() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      final fileData = await pickedFile.readAsBytes();
-      setState(() {
-        _imageData = Uint8List.fromList(fileData);
-        _fileName = pickedFile.path.split('/').last;
-      });
-    }
   }
 
   @override
@@ -247,51 +202,23 @@ class _SalaCreatorState extends State<SalaCreator> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  const Padding(padding: EdgeInsets.symmetric(vertical: 20.0)),
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _pickImage();
-                        },
-
-                        child: const Text(
-                            'Selecione um icon para a Sala'),
-
-                      ),
-                      SizedBox(width: 20),
-                      const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20.0)),
-                      if (!kIsWeb)
-                        ElevatedButton(
-                          onPressed: () {
-                            _takePicture();
-                          },
-                          child: const Text('Take Photo'),
-                        ),
-                    ],
-                  ),
-                  _buildImagePreview(),
-                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       //if (_validateDates()) {
-                        if (_fileName.isNotEmpty) {
+                        //if (_fileName.isNotEmpty) {
                           if (_markers.isNotEmpty) {
                             SalaPostData sala = SalaPostData(
                               name: _titleController.text,
-                              imageData: _imageData,
-                              fileName: _fileName,
                               building: _descriptionController.text,
                               lat: _markers.first.position.latitude,
                               lng: _markers.first.position.longitude,
                               capacity: int.parse(_capacityController.text),
                             );
                             var response = BaseClient()
-                                .createSala("/salas", _token.tokenID, sala);
+                                .createSala("/rooms", _token.username, _token.tokenID, sala);
 
                             if (response == 200 || response == 204) {
-                              context.go(Paths.salas);
+                              //context.go(Paths.salas);
                             } else {
                               showDialog(
                                   context: context,
@@ -306,14 +233,7 @@ class _SalaCreatorState extends State<SalaCreator> {
                                     'Ok',
                                     context));
                           }
-                        } else {
-                          showDialog(
-                              context: context,
-                              builder: (context) => ErrorDialog(
-                                  'Adicione uma imagem para a sala',
-                                  'Ok',
-                                  context));
-                        }
+                        //} 
                       },
                     //},
                     child: Text('Criar sala'),
