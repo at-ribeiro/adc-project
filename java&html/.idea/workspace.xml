@@ -5,35 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/dartpad/web_plugin_registrant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/dartpad/web_plugin_registrant.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/package_config_subset" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/package_config_subset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.dart_tool/version" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.flutter-plugins" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.flutter-plugins" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/.flutter-plugins-dependencies" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/android/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/android/local.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/ios/Runner/GeneratedPluginRegistrant.m" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/ios/Runner/GeneratedPluginRegistrant.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../flutter/fctconnect/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../flutter/fctconnect/windows/flutter/generated_plugins.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/CommentResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/CommentResource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/FeedServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/resources/FeedServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/CommentGetData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/firstwebapp/util/CommentGetData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/NOTICES" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/NOTICES" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/fonts/MaterialIcons-Regular.otf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/fonts/MaterialIcons-Regular.otf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/packages/wakelock_web/assets/no_sleep.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/packages/wakelock_web/assets/no_sleep.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/shaders/ink_sparkle.frag" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/shaders/ink_sparkle.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/canvaskit/canvaskit.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/canvaskit/canvaskit.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/canvaskit/chromium/canvaskit.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/canvaskit/chromium/canvaskit.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/canvaskit/skwasm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/canvaskit/skwasm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/canvaskit/skwasm.worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/canvaskit/skwasm.worker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/flutter_service_worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/flutter_service_worker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/main.dart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/main.dart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RegisterResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RegisterResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/util/Register/RegisterData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/util/Register/RegisterData.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
