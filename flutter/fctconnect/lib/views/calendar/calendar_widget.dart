@@ -157,15 +157,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                           showAgenda: true,
                           monthCellStyle: MonthCellStyle(
                             textStyle: TextStyle(
-                              color: Style.kAccentColor0,
+                              color: Colors.black,
                               fontSize: 16,
                             ),
                             trailingDatesTextStyle: TextStyle(
-                              color: Style.kAccentColor0,
+                              color: Colors.grey,
                               fontSize: 16,
                             ),
                             leadingDatesTextStyle: TextStyle(
-                              color: Style.kAccentColor0,
+                              color: Colors.grey,
                               fontSize: 16,
                             ),
                             todayTextStyle: TextStyle(
