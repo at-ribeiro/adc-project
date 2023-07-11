@@ -187,6 +187,7 @@ class _SalaPageState extends State<SalaPage> {
                                         _refreshReservations();
                                       }
                                       Navigator.of(context).pop();
+                                      _refreshReservations();
                                     },
                                     child: Text(hasReservation ? 'Cancelar Reserva' : 'Reservar Slot'),
                                   ),
