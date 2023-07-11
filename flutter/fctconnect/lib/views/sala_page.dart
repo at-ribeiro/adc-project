@@ -54,7 +54,7 @@ class _SalaPageState extends State<SalaPage> {
 
   // Calculates the difference in days between the selected day and today
   int getSelectedDayAsInt() {
-    return _selectedDay.difference(DateTime.now()).inDays;
+    return _selectedDay.weekday;
   }
 
   // Retrieves the selected hour as an integer
