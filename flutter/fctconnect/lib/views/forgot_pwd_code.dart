@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import 'package:responsive_login_ui/widgets/theme_switch.dart';
 
@@ -204,7 +205,7 @@ class _ForgotPwdCodeViewState extends State<ForgotPwdCodeView> {
               builder: (BuildContext context) {
                 return FutureBuilder(
                   future: BaseClient()
-                      .forgotPWDCode("/forgotpwd", widget.query , codeController.text, pwdController.text),
+                      .forgotPWDCode("/forgotpwd", widget.query , codeController.text, hashPWD(pwdController.text)),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return AlertDialog(
@@ -262,5 +263,13 @@ class _ForgotPwdCodeViewState extends State<ForgotPwdCodeView> {
         child: const Text('Confirmar'),
       ),
     );
+  }
+
+  String hashPWD(String text) {
+    var bytes = utf8.encode(text);
+
+    var hash = sha512.convert(bytes);
+
+    return hash.toString();
   }
 }

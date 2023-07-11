@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../Themes/theme_manager.dart';
 
-import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
-
 class ThemeSwitch extends StatefulWidget {
   const ThemeSwitch({
     Key? key,

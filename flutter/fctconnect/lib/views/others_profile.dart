@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';

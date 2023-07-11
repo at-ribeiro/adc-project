@@ -1,12 +1,13 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/models/change_pwd_data.dart';
 
-import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,6 @@ import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
 
 import '../models/paths.dart';
-import '../models/update_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 
@@ -116,9 +116,9 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           ChangePwdData data = ChangePwdData(
-            oldPassword: oldPasswordController.text,
-            newPassword: newPasswordController.text,
-            passwordV: passwordVController.text,
+            oldPassword: hashPWD(oldPasswordController.text),
+            newPassword: hashPWD(newPasswordController.text),
+            passwordV: hashPWD(passwordVController.text),
           );
           showDialog(
             context: context,
@@ -213,6 +213,14 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
         ),
       ),
     );
+  }
+
+  String hashPWD(String text) {
+    var bytes = utf8.encode(text);
+
+    var hash = sha512.convert(bytes);
+
+    return hash.toString();
   }
 }
 

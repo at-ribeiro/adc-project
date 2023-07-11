@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,12 +7,9 @@ import 'package:responsive_login_ui/Themes/theme_constant.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
 import 'package:responsive_login_ui/api/firebase_api.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
-import 'package:responsive_login_ui/services/base_client.dart';
-import 'package:responsive_login_ui/services/fcm_services.dart';
 import 'package:responsive_login_ui/services/get_fcm_token.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'config/app_router.dart';
-import 'package:url_strategy/url_strategy.dart';
 import 'controller/simple_ui_controller.dart';
 
 

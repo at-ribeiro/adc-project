@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 class SalaPostData {
   final String name;

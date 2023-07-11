@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -17,7 +19,6 @@ import '../data/cache_factory_provider.dart';
 import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../widgets/error_dialog.dart';
-import '../widgets/theme_switch.dart';
 
 class LoginView extends StatefulWidget {
   final String? session;
@@ -321,7 +322,7 @@ class _LoginViewState extends State<LoginView>
   Future<dynamic> _performLogin() async {
     var body = {
       "username": nameController.text,
-      "password": passwordController.text,
+      "password": hashPWD(passwordController.text),
     };
 
     var response = await BaseClient().postLogin("/login/", body);
@@ -400,7 +401,6 @@ class _LoginViewState extends State<LoginView>
       height: 45,
       child: ElevatedButton(
         onPressed: () {
-          // Validate returns true if the form is valid, or false otherwise.
           showDialog(
               context: context,
               barrierDismissible: false,
@@ -412,5 +412,13 @@ class _LoginViewState extends State<LoginView>
         child: Text('Login', style: TextStyle(color: Style.kAccentColor0)),
       ),
     );
+  }
+
+  String hashPWD(String text) {
+    var bytes = utf8.encode(text);
+
+    var hash = sha512.convert(bytes);
+
+    return hash.toString();
   }
 }

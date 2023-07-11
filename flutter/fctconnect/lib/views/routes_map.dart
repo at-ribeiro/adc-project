@@ -2,15 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:responsive_login_ui/models/route_get_data.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
-import '../models/directions_model.dart';
 import '../models/location_get_data.dart';
 import '../models/paths.dart';
-import '../models/route_post_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import 'directions_repository.dart';

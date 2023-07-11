@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
 
-import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +14,6 @@ import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
 
 import '../models/paths.dart';
-import '../models/update_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 

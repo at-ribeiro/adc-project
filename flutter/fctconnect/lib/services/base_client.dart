@@ -8,7 +8,6 @@ import 'package:responsive_login_ui/models/location_get_data.dart';
 import 'package:responsive_login_ui/models/route_post_data.dart';
 
 import 'package:html/dom.dart' as dom;
-import 'package:html/dom.dart' as html;
 
 import 'package:responsive_login_ui/models/nucleos_data.dart';
 import 'package:responsive_login_ui/models/nucleos_get.dart';

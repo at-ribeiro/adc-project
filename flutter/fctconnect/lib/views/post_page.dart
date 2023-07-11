@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../constants.dart';
 import '../models/CommentData.dart';

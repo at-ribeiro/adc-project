@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 class NucleosGet {
   final List<String> admins;
@@ -33,8 +32,6 @@ class NucleosGet {
   });
 
   factory NucleosGet.fromJson(Map<String, dynamic> json) {
-
-    // ... repeat the same for other properties
 
     return NucleosGet(
       admins: List<String>.from(json['admins'] ?? []),

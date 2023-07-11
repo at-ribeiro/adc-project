@@ -1,21 +1,15 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/salas_list_data.dart';
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/views/sala_creator.dart';
-import 'package:responsive_login_ui/views/search_salas_view.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
 import '../models/sala_get_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'sala_page.dart';
 
 class SalaView extends StatefulWidget {
   //const SalaView({Key? key}) : super(key: key);

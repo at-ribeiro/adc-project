@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constants.dart';
 import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';

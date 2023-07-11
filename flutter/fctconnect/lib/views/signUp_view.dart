@@ -1,14 +1,14 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
-import 'package:responsive_login_ui/widgets/theme_switch.dart';
 
 import '../Themes/theme_manager.dart';
 import '../models/paths.dart';
@@ -377,8 +377,8 @@ class _SignUpViewState extends State<SignUpView> {
             var _body = {
               "username": nameController.text,
               "fullname": fullNameController.text,
-              "password": passwordController.text,
-              "passwordV": passwordVerController.text,
+              "password": hashPWD(passwordController.text),
+              "passwordV": hashPWD(passwordVerController.text),
               "email": emailController.text,
               "state": "INACTIVE",
               "privacy": "PRIVATE",
@@ -447,5 +447,13 @@ class _SignUpViewState extends State<SignUpView> {
         child: const Text('Sign up'),
       ),
     );
+  }
+
+  String hashPWD(String text) {
+    var bytes = utf8.encode(text);
+
+    var hash = sha512.convert(bytes);
+
+    return hash.toString();
   }
 }

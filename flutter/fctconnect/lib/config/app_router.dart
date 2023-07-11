@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
-import 'package:responsive_login_ui/models/Token.dart';
-import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
@@ -32,7 +30,6 @@ import 'package:responsive_login_ui/views/salas_view.dart';
 import 'package:responsive_login_ui/views/buildings_view.dart';
 import 'package:responsive_login_ui/views/sala_page.dart';
 
-import '../constants.dart';
 import '../models/drawer_model.dart';
 import '../models/paths.dart';
 import '../services/costum_search_delegate.dart';
@@ -47,7 +44,6 @@ import '../views/reported_posts_view.dart';
 import '../views/route_creator.dart';
 import '../views/routes_map.dart';
 import '../views/sala_creator.dart';
-import '../views/sala_page.dart';
 
 import '../views/verify_account_view.dart';
 

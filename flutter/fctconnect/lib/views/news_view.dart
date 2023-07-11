@@ -1,21 +1,17 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../models/NewsData.dart';
 import '../models/Token.dart';
-import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../widgets/circular_indicator.dart';
-import 'news_page.dart';
 
 class NewsView extends StatefulWidget {
   const NewsView({Key? key}) : super(key: key);

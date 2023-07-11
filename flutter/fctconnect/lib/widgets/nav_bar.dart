@@ -1,15 +1,10 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_login_ui/constants.dart';
-import 'package:responsive_login_ui/services/media_up.dart';
 import '../models/Token.dart';
 import '../models/paths.dart';
-import '../services/post_actions.dart';
 import '../services/load_token.dart';
 
 class NavigationBarModel extends StatefulWidget {

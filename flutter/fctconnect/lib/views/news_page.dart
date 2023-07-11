@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import '../models/NewsData.dart';

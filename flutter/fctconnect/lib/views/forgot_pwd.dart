@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_login_ui/services/session_manager.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import 'package:responsive_login_ui/widgets/theme_switch.dart';
 

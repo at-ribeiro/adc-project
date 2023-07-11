@@ -12,7 +12,6 @@ import '../models/Token.dart';
 import '../models/event_get_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'event_page.dart';
 
 class EventView extends StatefulWidget {
   const EventView({Key? key}) : super(key: key);

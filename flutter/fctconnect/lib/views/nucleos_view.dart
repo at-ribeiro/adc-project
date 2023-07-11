@@ -8,7 +8,6 @@ import '../models/paths.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../widgets/circular_indicator.dart';
-import '../widgets/error_dialog.dart';
 
 class NucleosView extends StatefulWidget {
   @override

@@ -1,21 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Themes/theme_manager.dart';
-import '../constants.dart';
 
 import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import '../views/messages/messages_view.dart';
-import '../views/salas_view.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {
@@ -111,7 +106,7 @@ class _DrawerModelState extends State<DrawerModel> {
             ),
             ListTile(
               leading:
-                  Icon(Icons.message, color: Theme.of(context).indicatorColor),
+                  Icon(Icons.business, color: Theme.of(context).indicatorColor),
               title: Text(
                 'Salas',
                 style: textTheme.bodyText1!.copyWith(

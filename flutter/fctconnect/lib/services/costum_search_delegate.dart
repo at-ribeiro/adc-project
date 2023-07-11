@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/paths.dart';
 import 'package:responsive_login_ui/models/user_query_data.dart';
 import 'package:responsive_login_ui/services/base_client.dart';
