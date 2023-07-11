@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
+import 'package:responsive_login_ui/models/Token.dart';
+import 'package:responsive_login_ui/services/base_client.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
@@ -34,6 +36,7 @@ import '../views/calendar_view.dart';
 import '../views/edit_profile_options.dart';
 import '../views/event_creator.dart';
 import '../views/event_page.dart';
+import '../views/evente_registration_page.dart';
 import '../views/map_view.dart';
 import '../views/nucleo_creator.dart';
 import '../views/reported_posts_view.dart';
@@ -137,6 +140,14 @@ class AppRouter {
             path: '/event/:id',
             builder: (BuildContext context, GoRouterState state) {
               return EventPage(
+                eventId: state.pathParameters['id']!,
+              );
+            },
+          ),
+            GoRoute(
+            path: '/event/qrcode/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return ConfirmationPage(
                 eventId: state.pathParameters['id']!,
               );
             },
