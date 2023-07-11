@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		18E3F5A72A4C811D00711BE7 /* RunnerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E3F5A62A4C811D00711BE7 /* RunnerTest.swift */; };
 		18E3F5C02A4C845C00711BE7 /* fctconnectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E3F5BF2A4C845C00711BE7 /* fctconnectTests.swift */; };
 		1E28B6EC2404AEBEDCBA0B78 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CF7885F74F8313CBB827208 /* GoogleService-Info.plist */; };
@@ -51,8 +50,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
-		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		18E3F5A42A4C811D00711BE7 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		18E3F5A62A4C811D00711BE7 /* RunnerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTest.swift; sourceTree = "<group>"; };
 		18E3F5BD2A4C845C00711BE7 /* fctconnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = fctconnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -177,8 +174,6 @@
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,
-				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
-				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -465,7 +460,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
-				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
