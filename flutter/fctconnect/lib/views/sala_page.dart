@@ -118,7 +118,7 @@ class _SalaPageState extends State<SalaPage> {
                 SizedBox(height: 16),
                 // Display selected day
                 Text(
-                  'Selecione um dia: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
+                  'Dia Escolhido: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 16),
