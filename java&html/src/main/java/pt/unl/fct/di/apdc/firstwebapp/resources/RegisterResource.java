@@ -95,16 +95,17 @@ public class RegisterResource {
 
             LOG.info("User registered" + data.getUsername());
 
-            String tokenId = UUID.randomUUID().toString();
-            VerificationToken tokenData = new VerificationToken(tokenId, data.getUsername());
+            Random rand = new Random();
+
+            int code = rand.nextInt(900000) + 100000;
 
             Key verKey = datastore.newKeyFactory()
                     .setKind("Verification")
                     .addAncestor(PathElement.of("User", data.getUsername()))
-                    .newKey(DigestUtils.sha512Hex(tokenId));
+                    .newKey("verification");
 
             Entity token = Entity.newBuilder(verKey)
-                            .set("token_id", DigestUtils.sha512Hex(tokenId))
+                            .set("token_code", DigestUtils.sha512Hex(String.valueOf(code)))
                             .set("token_user", data.getUsername())
                             .build();
 
@@ -112,9 +113,9 @@ public class RegisterResource {
             txn.commit();
 
 
-            sendEmailVerification(tokenId, data.getUsername(), data.getEmail());
+            sendEmailVerification(code, data.getEmail());
 
-            return Response.ok(tokenData).header("Access-Control-Allow_Origin", "*").build();
+            return Response.ok().build();
 
         }finally {
             if(txn.isActive()){
@@ -123,15 +124,17 @@ public class RegisterResource {
         }
     }
 
-    private void sendSendGridEmail(String email, String link){
+    private void sendSendGridEmail(int code, String email){
         Email from = new Email("fctconnect2023@gmail.com");
         String subject = "noreply - Activate your account!";
         Email to = new Email(email);
+
+
         Content content = new Content("text/plain", "Thank you for registering!\n " +
-                                                                "To activate your account please click the following link: " + link );
+                "Para ativar a sua conta, por favor, utilize o seguinte código: " + code );
         Mail mail = new Mail(from, subject, to, content);
 
-        //TODO: Remover key e subs por ?
+        //TODO: Substituir key por variavel de ambiente
         SendGrid sg = new SendGrid("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");
         Request request = new Request();
         try {
@@ -139,20 +142,19 @@ public class RegisterResource {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
             com.sendgrid.Response response = sg.api(request);
-            LOG.info(String.valueOf("Verification email ("+ email +") result: " + response.getStatusCode()));
+            LOG.info("Verification email (" + email + ") result: " + response.getStatusCode());
         } catch (IOException ex) {
             LOG.warning(ex.getMessage());
         }
     }
 
-    public void sendEmailVerification(String tokenId, String username, String email) {
-
-        String link = "https://fct-connect-estudasses.oa.r.appspot.com/rest/register/verification/" + username +"?token=" + tokenId;
+    public void sendEmailVerification(int code, String email) {
 
         try{
-            sendSendGridEmail(email, link);
+            sendSendGridEmail(code, email);
         } catch (Exception e) {
-            LOG.warning("Google API Error: " + e.getMessage());
+            LOG.warning("Sendgrid API Error: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -160,7 +162,7 @@ public class RegisterResource {
 
     @GET
     @Path("/verification/{username}")
-    public Response verify(@PathParam("username") String username, @QueryParam("token") String tokenId){
+    public Response verify(@PathParam("username") String username, @QueryParam("code") int code){
 
         Transaction txn = datastore.newTransaction();
 
@@ -177,13 +179,18 @@ public class RegisterResource {
             Key verKey = datastore.newKeyFactory()
                     .setKind("Verification")
                     .addAncestor(PathElement.of("User", username))
-                    .newKey(DigestUtils.sha512Hex(tokenId));
+                    .newKey("verification");
 
             Entity verToken = txn.get(verKey);
 
             if(verToken == null){
                 LOG.warning("Token doesn't exist");
-                Response.status(Response.Status.FORBIDDEN);
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            if(!verToken.getString("token_code").equals(DigestUtils.sha512Hex(String.valueOf(code)))){
+                LOG.warning("Code doesn't match");
+                 return Response.status(Response.Status.FORBIDDEN).build();
             }
 
             user =  Entity.newBuilder(userKey)

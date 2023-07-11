@@ -15,6 +15,7 @@ import '../data/cache_factory_provider.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 import '../views/messages/messages_view.dart';
+import '../views/salas_view.dart';
 import 'Token.dart';
 
 class DrawerModel extends StatefulWidget {
@@ -109,6 +110,97 @@ class _DrawerModelState extends State<DrawerModel> {
                   Navigator.pop(context);
                 },
               ),
+
+            ), // Set the width of the DrawerHeader to the maximum available width
+          ),
+          ListTile(
+            leading: Icon(Icons.home, color: kAccentColor1),
+            title: const Text('Home'),
+            onTap: () {
+              context.go(Paths.homePage);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.map, color: kAccentColor1),
+            title: const Text('Mapa'),
+            onTap: () {
+              context.go(Paths.mapas);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.directions_walk, color: kAccentColor1),
+            title: const Text('Percursos'),
+            onTap: () {
+              context.go(Paths.routes);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.event, color: kAccentColor1),
+            title: const Text('Eventos'),
+            onTap: () {
+              context.go(Paths.events);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.calendar_month, color: kAccentColor1),
+            title: const Text('Calendário'),
+            onTap: () {
+              context.go(Paths.calendar);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.message, color: kAccentColor1),
+            title: const Text('Mensagens'),
+            onTap: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (ctx) => MessagesView()));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.message, color: kAccentColor1),
+            title: const Text('Salas'),
+            onTap: () {
+              context.go(Paths.buildings);
+              Navigator.pop(context);
+            },
+          ),
+          const Spacer(),
+          ListTile(
+            leading: Icon(Icons.report, color: kAccentColor1),
+            title: const Text('Report'),
+            onTap: () {
+              context.go(Paths.report);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.report_problem_outlined, color: kAccentColor1),
+            title: const Text('Lista de Anomalias'),
+            onTap: () {
+              context.go(Paths.listReports);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.report_gmailerrorred, color: kAccentColor1),
+            title: const Text('Posts Reportados'),
+            onTap: () {
+              context.go(Paths.reportedPosts);
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app, color: kAccentColor1),
+            title: const Text('Sair', style: TextStyle(color: Colors.red)),
+            onTap: () async {
+              BaseClient().doLogout("/logout", _token.username, _token.tokenID);
+
               ListTile(
                 leading: Icon(
                   Icons.map,
@@ -306,6 +398,7 @@ class _DrawerModelState extends State<DrawerModel> {
 
                   CacheDefault.cacheFactory.logout();
                   CacheDefault.cacheFactory.delete('isLoggedIn');
+
 
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();

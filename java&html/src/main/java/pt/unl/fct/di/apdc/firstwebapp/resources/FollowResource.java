@@ -242,6 +242,7 @@ public class FollowResource {
         }catch (Exception e) {
             txn.rollback();
             LOG.severe(e.getMessage());
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             if (txn.isActive()) {

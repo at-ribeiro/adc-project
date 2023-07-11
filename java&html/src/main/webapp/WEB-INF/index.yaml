@@ -16,3 +16,8 @@ indexes:
     properties:
       - name: timestamp
         direction: desc
+
+  - kind: User
+    properties:
+      - name: user_state
+      - name: user_username

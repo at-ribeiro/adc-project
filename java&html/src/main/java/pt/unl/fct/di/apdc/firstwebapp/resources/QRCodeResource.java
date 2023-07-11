@@ -88,9 +88,10 @@ public class QRCodeResource {
             Blob blob = storage.get(blobId);
             qrCodeUrl = blob.getMediaLink();
 
-            List<Value<String>> eventList = user.getList("user_events");
+            List<StringValue> eventList = user.getList("user_events");
 
-            eventList.add(StringValue.of(eventId));
+            eventList.remove(StringValue.of(eventId));
+
 
             Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
