@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 public class RegisterResource {
 
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
-    private static final String API_MAIL = "fctconnect2023@gmail.com";
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
@@ -47,40 +46,45 @@ public class RegisterResource {
             Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").setFilter(
                     StructuredQuery.PropertyFilter.eq("user_email", data.getEmail())
             ).build();
+
             QueryResults<Entity> users = txn.run(query);
 
-            List<Entity> userList = new ArrayList<>();
-
-            users.forEachRemaining(userQ ->{
-                userList.add(userQ);
-            });
-
-            if(!userList.isEmpty()){
-                txn.rollback();
-                return Response.status(Response.Status.CONFLICT).entity("Email already in use.").build();
+            if(users.hasNext()){
+                LOG.warning("Email already exists: " + data.getEmail());
+                return Response.status(Response.Status.CONFLICT).build();
             }
 
             List<Value<String>> events = new ArrayList<>();
+
+            String role;
+
+            if (data.getEmail().endsWith("@fct.unl.pt")) {
+                role = "PROFESSOR";
+            } else if (data.getEmail().endsWith("@campus.fct.unl.pt")) {
+                role = "ALUNO";
+            } else {
+                role = "EXTERNO";
+            }
 
             user = Entity.newBuilder(userKey)
                     .set("user_username", data.getUsername())
                     .set("user_fullname", data.getFullname())
                     .set("user_pwd", DigestUtils.sha512Hex(data.getPassword()))
                     .set("user_email", data.getEmail())
-                    .set("user_creation_time", Timestamp.now())
-                    .set("user_role", data.getRole())
+                    .set("user_creation_time", LongValue.newBuilder(Timestamp.now().getSeconds()).setExcludeFromIndexes(true).build())
+                    .set("user_role", role)
                     .set("user_state", "INACTIVE")
                     .set("user_privacy", "PUBLIC")
                     .set("user_phone", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("user_city", "")
+                    .set("user_city", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_about_me", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("user_department", "")
+                    .set("user_department", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_office", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("user_course", "")
-                    .set("user_year", "")
+                    .set("user_course", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
+                    .set("user_year", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_profile_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_cover_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
-                    .set("user_purpose","")
+                    .set("user_purpose",StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_events", ListValue.of(events))
                     .build();
 
@@ -98,8 +102,8 @@ public class RegisterResource {
                     .newKey("verification");
 
             Entity token = Entity.newBuilder(verKey)
-                            .set("token_code", DigestUtils.sha512Hex(String.valueOf(code)))
-                            .set("token_user", data.getUsername())
+                            .set("token_code", StringValue.newBuilder(DigestUtils.sha512Hex(String.valueOf(code))).setExcludeFromIndexes(true).build())
+                            .set("token_user", StringValue.newBuilder(data.getUsername()).setExcludeFromIndexes(true).build())
                             .build();
 
             txn.add(token);
@@ -187,7 +191,25 @@ public class RegisterResource {
             }
 
             user =  Entity.newBuilder(userKey)
+                    .set("user_username", user.getString("user_username"))
+                    .set("user_fullname", user.getString("user_fullname"))
+                    .set("user_pwd", user.getString("user_pwd"))
+                    .set("user_email", user.getString("user_email"))
+                    .set("user_creation_time", user.getLong("user_creation_time"))
+                    .set("user_role", user.getString("user_role"))
                     .set("user_state", "ACTIVE")
+                    .set("user_privacy", user.getString("user_privacy"))
+                    .set("user_phone", user.getString("user_phone"))
+                    .set("user_city", user.getString("user_city"))
+                    .set("user_about_me", user.getString("user_about_me"))
+                    .set("user_department", user.getString("user_department"))
+                    .set("user_office", user.getString("user_office"))
+                    .set("user_course", user.getString("user_course"))
+                    .set("user_year", user.getString("user_year"))
+                    .set("user_profile_pic", user.getString("user_profile_pic"))
+                    .set("user_cover_pic", user.getString("user_cover_pic"))
+                    .set("user_purpose", user.getString("user_purpose"))
+                    .set("user_events", user.getList("user_events"))
                     .build();
 
             txn.update(user);

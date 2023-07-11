@@ -9,7 +9,6 @@ public class RegisterData {
     private String password;
     private String passwordV;
     private String email;
-    private String role;
     private String state;
     private String privacy;
 
@@ -21,7 +20,6 @@ public class RegisterData {
         this.password = password;
         this.passwordV = passwordV;
         this.email = email;
-        this.role = role;
         this.state = state;
         this.privacy = privacy;
     }
@@ -37,7 +35,6 @@ public class RegisterData {
     }
     public String getPasswordV() {return passwordV;}
     public String getEmail() {return email;}
-    public String getRole() {return role;}
     public String getState() {return state;}
     public String getPrivacy() {return privacy;}
 
