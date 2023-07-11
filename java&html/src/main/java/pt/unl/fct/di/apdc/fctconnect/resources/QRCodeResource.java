@@ -88,10 +88,8 @@ public class QRCodeResource {
             Blob blob = storage.get(blobId);
             qrCodeUrl = blob.getMediaLink();
 
-            List<StringValue> eventList = user.getList("user_events");
-
+            List<StringValue> eventList = new ArrayList<>(user.getList("user_events"));
             eventList.remove(StringValue.of(eventId));
-
 
             Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
@@ -117,19 +115,26 @@ public class QRCodeResource {
 
             txn.update(task);
 
-            List<Value<Key>> eventParticipants = event.getList("event_participants");
+            List<Value<String>> eventParticipants = new ArrayList<>(event.getList("event_participants"));
 
-            eventParticipants.add(KeyValue.of(userKey));
+            if(eventParticipants.contains(StringValue.of(username))){
+                LOG.warning("User already in event: " + eventId);
+                return Response.status(Response.Status.CONFLICT).build();
+            }
+
+            eventParticipants.add(StringValue.of(username));
 
             task = Entity.newBuilder(eventKey)
                     .set("id", event.getString("id"))
-                    .set("event_title", event.getString("id"))
-                    .set("event_creator", event.getString("id"))
-                    .set("event_description", event.getString("id"))
-                    .set("event_start", event.getString("id"))
-                    .set("event_end", event.getString("id"))
-                    .set("event_image", event.getString("id"))
-                    .set("event_qr", event.getString("id"))
+                    .set("event_title", event.getString("event_title"))
+                    .set("event_creator", event.getString("event_creator"))
+                    .set("event_description", event.getString("event_description"))
+                    .set("event_start", event.getLong("event_start"))
+                    .set("event_end", event.getLong("event_end"))
+                    .set("event_latitude", event.getDouble("event_latitude"))
+                    .set("event_longitude", event.getDouble("event_longitude"))
+                    .set("event_image", event.getString("event_image"))
+                    .set("event_qr", event.getString("event_qr"))
                     .set("event_participants", ListValue.of(eventParticipants))
                     .build();
 

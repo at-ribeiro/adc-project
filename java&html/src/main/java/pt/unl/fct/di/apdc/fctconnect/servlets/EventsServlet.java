@@ -289,7 +289,7 @@ public class EventsServlet extends HttpServlet {
 
             }
 
-            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/qrcode/"+uniqueEventId, 500, 500);
+            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/#/qrcode/"+uniqueEventId, 500, 500);
 
             BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
 
