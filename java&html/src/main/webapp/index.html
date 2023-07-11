@@ -12,34 +12,65 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyDqJdRjuqeuTWBoiSPHk3jr9wFCUF9ksOg",
+      authDomain: "fctconnect-flutter.firebaseapp.com",
+      projectId: "fctconnect-flutter",
+      storageBucket: "fctconnect-flutter.appspot.com",
+      messagingSenderId: "223517067321",
+      appId: "1:223517067321:web:87d0b6fa3e43e345eea5e8"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig); 
+  </script>
   <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Conecta-te com os teus colegas!">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="fctconnect">
+  <meta name="apple-mobile-web-app-title" content="FCTConnect">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" type="favicon.ico" href="image/x-icon">
+  <link rel="icon" type="favicon.ico" href="image/x-icon">
 
-  <title>fctconnect</title>
+
+
+
+  <title>FCTConnect</title>
   <link rel="manifest" href="manifest.json">
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = "1146527415";
+    var serviceWorkerVersion = "2071355514";
+
+
+
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer=""></script>
 
-  
-  
+
+
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+
+
+
+
+
+
   
   
   
@@ -54,9 +85,8 @@
     body {
       margin: 0;
       min-height: 100%;
-      background-color: #ffffff;
-      background-image: url("splash/img/light-background.png");
-      background-size: 100% 100%;
+      background-color: #ddf4ff;
+          background-size: 100% 100%;
     }
 
     .center {
@@ -107,9 +137,8 @@
 
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #000000;
-        background-image: url("splash/img/dark-background.png");
-      }
+        background-color: #1b2035;
+          }
     }
   </style>
   <script id="splash-screen-script">
@@ -120,31 +149,42 @@
     }
   </script>
 </head>
+
 <body>
   <picture id="splash-branding">
     <source srcset="splash/img/branding-1x.png 1x, splash/img/branding-2x.png 2x, splash/img/branding-3x.png 3x, splash/img/branding-4x.png 4x" media="(prefers-color-scheme: light)">
     <source srcset="splash/img/branding-dark-1x.png 1x, splash/img/branding-dark-2x.png 2x, splash/img/branding-dark-3x.png 3x, splash/img/branding-dark-4x.png 4x" media="(prefers-color-scheme: dark)">
     <img class="bottom" aria-hidden="true" src="splash/img/branding-1x.png" alt="">
   </picture>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
   
   
   
-  
+
+
+
+
   <script>
-    window.addEventListener('load', function(ev) {
+    window.addEventListener('load', function (ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
+        onEntrypointLoaded: function (engineInitializer) {
+          engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
           });
         }
       });
     });
   </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E&amp;libraries=drawing,visualization,places"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_XbEWiJ69QJBQbZ2d7doDMpgBtmJG04E&amp;libraries=drawing,visualization,places"></script>
+
+
 
 </body></html>

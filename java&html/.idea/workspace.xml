@@ -6,8 +6,46 @@
   <component name="ChangeListManager">
     <list default="true" id="7058574e-a052-4dee-94a2-08ebee5a551c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RegisterResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RegisterResource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/util/Register/RegisterData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/util/Register/RegisterData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/LoginResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/LoginResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RoomResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/unl/fct/di/apdc/fctconnect/resources/RoomResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/.last_build_id" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/.last_build_id" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/AssetManifest.bin" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/AssetManifest.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/AssetManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/AssetManifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/FontManifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/FontManifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/NOTICES" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/NOTICES" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/assets/background.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/assets/background.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/assets/dark-background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/assets/icon-android.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/assets/icon-nbg.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/assets/icon-nbg.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/assets/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/assets/fonts/MaterialIcons-Regular.otf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/assets/fonts/MaterialIcons-Regular.otf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/flutter_service_worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/flutter_service_worker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/icons/Icon-192.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/icons/Icon-192.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/icons/Icon-512.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/icons/Icon-512.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/icons/Icon-maskable-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/icons/Icon-maskable-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/main.dart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/main.dart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-4x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-4x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-4x.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/splash/img/branding-dark-4x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/dark-background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/splash/img/light-background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/app.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/app.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/flutter_service_worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/flutter_service_worker.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/main.dart.js" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/main.dart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/appengine-staging/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/appengine-staging/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +129,7 @@
       <workItem from="1686133291183" duration="16216000" />
       <workItem from="1687711716720" duration="4486000" />
       <workItem from="1687772124875" duration="823000" />
+      <workItem from="1689110946956" duration="1346000" />
     </task>
     <servers />
   </component>

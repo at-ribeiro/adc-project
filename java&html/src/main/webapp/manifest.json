@@ -1,11 +1,11 @@
 {
-    "name": "fctconnect",
-    "short_name": "fctconnect",
+    "name": "FCTConnect",
+    "short_name": "FCTConnect",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Conecta-te com os teus colegas!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
