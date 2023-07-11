@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/widgets/error_dialog.dart';
 
 import '../constants.dart';
 import '../models/CommentData.dart';
@@ -70,9 +69,7 @@ class _PostPageState extends State<PostPage> {
       );
     } else {
       return Container(
-        decoration: kGradientDecoration,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: ContentBody(),
         ),
       );
@@ -97,6 +94,7 @@ class _PostPageState extends State<PostPage> {
   }
 
   Widget ContentBody() {
+    TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
         Expanded(
@@ -110,7 +108,7 @@ class _PostPageState extends State<PostPage> {
                   borderRadius: BorderRadius.circular(10.0),
                   side: BorderSide(
                     width: 1.5,
-                    color: kAccentColor0.withOpacity(0.0),
+                    color: Style.kAccentColor2.withOpacity(0.0),
                   ),
                 ),
                 child: ClipRRect(
@@ -118,7 +116,7 @@ class _PostPageState extends State<PostPage> {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
                     child: Container(
-                      color: kAccentColor0.withOpacity(0.1),
+                      color: Style.kAccentColor2.withOpacity(0.1),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ListTile(
@@ -129,7 +127,7 @@ class _PostPageState extends State<PostPage> {
                               Text(comment.user),
                             ],
                           ),
-                          subtitle: Text(comment.text),
+                          subtitle: Text(comment.text, style: textTheme.headline6),
                           trailing: Text(
                             DateFormat('HH:mm - dd-MM-yyyy').format(
                               DateTime.fromMillisecondsSinceEpoch(
@@ -146,38 +144,29 @@ class _PostPageState extends State<PostPage> {
           ),
         ),
         Container(
-          color: kPrimaryColor,
+          color: Theme.of(context).navigationBarTheme.backgroundColor,
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Row(
             children: [
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: kBorderRadius,
-                    color: kAccentColor0.withOpacity(0.3),
+                    borderRadius: Style.kBorderRadius,
+                    color: Style.kAccentColor2.withOpacity(0.3),
                   ),
                   child: ClipRRect(
-                    borderRadius: kBorderRadius,
+                    borderRadius: Style.kBorderRadius,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: TextFormField(
-                        style: const TextStyle(
-                          color: kAccentColor0,
-                        ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           prefixIcon: Icon(
                             Icons.comment,
-                            color: kAccentColor1,
+                            color:
+                                Theme.of(context).appBarTheme.foregroundColor,
                           ),
                           hintText: 'Comente algo...',
                           border: InputBorder.none,
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: kBorderRadius,
-                            borderSide: BorderSide(
-                              color:
-                                  kAccentColor1, // Set your desired focused color here
-                            ),
-                          ),
                         ),
                         controller: _commentController,
                         validator: (value) {
@@ -216,7 +205,8 @@ class _PostPageState extends State<PostPage> {
                     });
                   }
                 },
-                icon: Icon(Icons.send, color: kAccentColor0),
+                icon: Icon(Icons.send,
+                    color: Theme.of(context).appBarTheme.foregroundColor),
               ),
             ],
           ),

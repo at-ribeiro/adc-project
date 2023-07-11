@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+
+  <sessions-enabled>false</sessions-enabled>
+  <runtime>java11</runtime>
+
+  <system-properties>
+    <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+  </system-properties>
+
+  <!-- Define the number of idle instances -->
+  <automatic-scaling>
+    <min-idle-instances>0</min-idle-instances>
+  </automatic-scaling>
+
+  <static-files>
+    <include path="/**.html" expiration="1m" /> <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.css" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.js"  expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.jpg" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.gif" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.png" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.mp3" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.wav" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.ttf" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.ico" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+    <include path="/**.cur" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
+  </static-files>
+  
+</appengine-web-app>

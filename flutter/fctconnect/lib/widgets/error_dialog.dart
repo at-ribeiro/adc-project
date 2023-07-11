@@ -5,16 +5,16 @@ import '../constants.dart';
 
 AlertDialog ErrorDialog(String errorText, buttonText, BuildContext context) {
     return AlertDialog(
-            shape: const RoundedRectangleBorder(
-              borderRadius: kBorderRadius,
+            shape:  RoundedRectangleBorder(
+              borderRadius: Style.kBorderRadius,
             ),
-            backgroundColor: kAccentColor0.withOpacity(0.3),
+            backgroundColor: Style.kAccentColor2.withOpacity(0.3),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   errorText,
-                  style: const TextStyle(color: kAccentColor0),
+                  style: TextStyle(color: Style.kAccentColor0),
                 ),
                 const SizedBox(height: 15),
                 ElevatedButton(

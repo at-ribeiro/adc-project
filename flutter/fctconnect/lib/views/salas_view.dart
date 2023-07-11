@@ -1,24 +1,21 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/salas_list_data.dart';
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/views/sala_creator.dart';
-import 'package:responsive_login_ui/views/search_salas_view.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
 import '../models/sala_get_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'sala_page.dart';
 
 class SalaView extends StatefulWidget {
-  const SalaView({Key? key}) : super(key: key);
+  //const SalaView({Key? key}) : super(key: key);
+  final String building;
+
+  const SalaView({required this.building});
 
   @override
   State<SalaView> createState() => _SalaViewState();
@@ -27,6 +24,7 @@ class SalaView extends StatefulWidget {
 class _SalaViewState extends State<SalaView> {
   List<SalaGetData> _salas = [];
   late Token _token;
+  late String _building;
   bool _isLoadingToken = true;
   bool _loadingMore = false;
   int _lastDisplayedSalaTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -38,6 +36,7 @@ class _SalaViewState extends State<SalaView> {
 
   @override
   void initState() {
+    _building = widget.building;
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
@@ -57,9 +56,22 @@ class _SalaViewState extends State<SalaView> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+          floatingActionButton:
+              _token.role == "SA" || _token.role == "SECRETARIA"
+                  ? FloatingActionButton(
+                      backgroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                      foregroundColor: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .foregroundColor,
+                      onPressed: () {
+                        context.go(Paths.createSala);
+                      },
+                      child: Icon(Icons.add),
+                    )
+                  : null,
           body: Column(
             children: [
               Expanded(
@@ -77,19 +89,21 @@ class _SalaViewState extends State<SalaView> {
                         SalaGetData sala = _salas[index];
                         return GestureDetector(
                           onTap: () {
-                            context.go(Paths.sala + '/${sala.id}');
+                            context.go(Paths.buildings +
+                                '/${_building}' +
+                                '/${sala.id}');
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: ClipRRect(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(
                                     sigmaX: 50.0, sigmaY: 50.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: kAccentColor2.withOpacity(0.1),
-                                    borderRadius: kBorderRadius,
+                                    color: Style.kAccentColor2.withOpacity(0.1),
+                                    borderRadius: Style.kBorderRadius,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -97,16 +111,6 @@ class _SalaViewState extends State<SalaView> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        if (sala.url != null)
-                                          ClipRRect(
-                                            borderRadius: kBorderRadius,
-                                            child: Image.network(
-                                              sala.url!,
-                                              width: 220,
-                                              height: 150,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
                                         const SizedBox(width: 7.0),
                                         Expanded(
                                           child: Column(
@@ -117,11 +121,16 @@ class _SalaViewState extends State<SalaView> {
                                                 sala.name,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
-                                              // capacity here ?
+                                              Text(
+                                                "capacity: " +
+                                                    sala.capacity.toString(),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
                                               const SizedBox(height: 8.0),
                                             ],
                                           ),
@@ -143,22 +152,22 @@ class _SalaViewState extends State<SalaView> {
           ),
         ),
       );
-      
     }
   }
 
   void _loadSalas() async {
     List<SalaGetData> salas = await BaseClient().getSalas(
-      "/salas",
+      "/rooms",
       _token.tokenID,
       _token.username,
-     // _lastDisplayedSalaTimestamp.toString(),
+      _building,
+      // _lastDisplayedSalaTimestamp.toString(),
     );
     if (mounted) {
       setState(() {
         _salas = salas;
         if (salas.isNotEmpty) {
-         // _lastDisplayedSalaTimestamp = salas.last.start;
+          // _lastDisplayedSalaTimestamp = salas.last.start;
         }
       });
     }
@@ -167,15 +176,16 @@ class _SalaViewState extends State<SalaView> {
   Future<void> _refreshSalas() async {
     _lastDisplayedSalaTimestamp = DateTime.now().millisecondsSinceEpoch;
     List<SalaGetData> latestSalas = await BaseClient().getSalas(
-      "/salas",
+      "/rooms",
       _token.tokenID,
       _token.username,
-     // _lastDisplayedSalaTimestamp.toString(),
+      _building,
+      // _lastDisplayedSalaTimestamp.toString(),
     );
     setState(() {
       _salas = latestSalas;
       if (latestSalas.isNotEmpty) {
-     //   _lastDisplayedSalaTimestamp = latestSalas.last.start;
+        //   _lastDisplayedSalaTimestamp = latestSalas.last.start;
       }
     });
   }

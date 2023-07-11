@@ -9,8 +9,15 @@ class Paths {
 
   static String noticias = '/news';
 
-    static String noticia= '/:id';
+  static String forgotPwd = '/forgotPassword';
+
+  static String forgotPwdCode = '/forgotPasswordCode';
+
+  static String noticia = '/:id';
+
   static String otherProfile = '/otherProfile';
+
+  static String verifyAccount = '/verifyAccount';
 
   static String mapas = '/mapas';
 
@@ -44,10 +51,23 @@ class Paths {
 
   static String welcome = '/welcome';
 
+
+  static String buildings = "/buildings";
+
+  static String building = "/building";
+
   static String salas = "/salas";
 
-  static String sala = "/sala";
-
   static String createSala = '$salas/newSala';
+
+  static String createPost = '$post/create';
+
+  static String nucleos = '/nucleos';
+
+  static String criarNucleo = '$nucleos/create';
+
+  static String pomodoro = '/pomodoro';
+
+  static String notification = '/notification';
 
 }
