@@ -1,5 +1,6 @@
 package pt.unl.fct.di.apdc.fctconnect.resources;
 
+import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import pt.unl.fct.di.apdc.fctconnect.util.Token.AuthToken;
@@ -37,7 +38,7 @@ public class LoginResource {
 
         Key userKey = userKeyFactory.newKey(data.getUsername());
 
-        /*
+
         Key ctrsKey = datastore.newKeyFactory().addAncestors(PathElement.of("User", data.getUsername()))
                                 .setKind("UserStats").newKey("Counters");
 
@@ -45,7 +46,7 @@ public class LoginResource {
                                             .addAncestors(PathElement.of("User", data.getUsername()))
                                             .setKind("UserLog").newKey());
 
-         */
+
 
         Transaction txn = datastore.newTransaction();
         try {
@@ -58,7 +59,7 @@ public class LoginResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
-            /*
+
             Entity stats = txn.get(ctrsKey);
             if(stats == null){
                 stats = Entity.newBuilder(ctrsKey)
@@ -68,7 +69,7 @@ public class LoginResource {
                         .set("user_last_login", Timestamp.now())
                         .build();
             }
-               */
+
 
             String hashedPWD = user.getString("user_pwd");
 
@@ -79,7 +80,7 @@ public class LoginResource {
 
             if (hashedPWD.equals(DigestUtils.sha512Hex(data.getPassword()))) {
 
-                /*
+
                 Entity log = Entity.newBuilder(logKey)
                         .set("user_login_ip", request.getRemoteAddr())
                         .set("user_login_host", request.getRemoteHost())
@@ -98,7 +99,7 @@ public class LoginResource {
                         .build();
 
                 txn.put(log, ustats);
-                */
+
 
                 AuthToken token = new AuthToken(data.getUsername(), user.getString("user_role"));
 
@@ -152,7 +153,7 @@ public class LoginResource {
                 //Incorrect password
                 LOG.warning("Wrong password for username: " + data.getUsername());
 
-                /*
+
                 Entity ustats = Entity.newBuilder(ctrsKey)
                         .set("user_stats_logins", stats.getLong("user_stats_logins"))
                         .set("user_stats_failed", 1L + stats.getLong("user_stats_failed"))
@@ -163,7 +164,7 @@ public class LoginResource {
 
                 txn.put(ustats);
                 txn.commit();
-                */
+
 
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
