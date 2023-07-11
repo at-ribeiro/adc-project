@@ -4,6 +4,7 @@ class LocationGetData {
   final double longitude;
   final String type;
   final String event;
+  String duration; 
 
  
   LocationGetData({
@@ -12,6 +13,7 @@ class LocationGetData {
     required this.longitude,
     required this.type,
     required this.event,
+    this.duration = '0 min',
   });
 
   factory LocationGetData.fromJson(Map<String, dynamic> json) {
@@ -22,5 +24,15 @@ class LocationGetData {
       type: json['type'],
       event: json['event'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'latitude': latitude,
+      'longitude': longitude,
+      'type': type,
+      'event': event,
+    };
   }
 }

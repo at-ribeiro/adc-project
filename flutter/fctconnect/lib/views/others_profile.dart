@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/constants.dart';
 import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/models/FeedData.dart';
 import 'package:responsive_login_ui/models/Token.dart';
@@ -40,6 +39,7 @@ class _OtherProfileState extends State<OtherProfile> {
   late ScrollController _scrollController;
   late ProfileInfo info;
   late bool _followStatus;
+  late bool _disableStatus;
   String followButton = '';
 
   @override
@@ -99,6 +99,12 @@ class _OtherProfileState extends State<OtherProfile> {
     return _followStatuAux;
   }
 
+  Future<bool> _isActivated() async {
+    bool _activatedStatus = await BaseClient().isAccountEnabled(
+        "/update/state", _token.username, _token.tokenID, widget.name);
+    return _activatedStatus;
+  }
+
   Widget _loadProfilePic() {
     if (info == null || info.profilePicUrl.isEmpty) {
       return const CircleAvatar(
@@ -115,6 +121,27 @@ class _OtherProfileState extends State<OtherProfile> {
     }
   }
 
+  Future<bool> _buttonStatusType() {
+    if (_token.role == "SECRETARIA" || _token.role == "SA") {
+      return _isActivated();
+    } else {
+      return _isFollowing();
+    }
+  }
+
+  void _toggleDisableAccount() {
+    if (_disableStatus == true) {
+      BaseClient().disableAccount(
+          "/update/deactivate", _token.username, _token.tokenID, info.username);
+    } else {
+      BaseClient().enableAccount(
+          "/update/activate", _token.username, _token.tokenID, info.username);
+    }
+    setState(() {
+      _disableStatus = !_disableStatus;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
@@ -128,36 +155,35 @@ class _OtherProfileState extends State<OtherProfile> {
       });
     } else if (_infoIsLoading) {
       return FutureBuilder(
-          future: Future.wait([_loadInfo(), _isFollowing()]),
+          future: Future.wait([_loadInfo(), _buttonStatusType()]),
           builder:
               (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 const Text('Algo correu mal.');
-                return Container(
-                  decoration: kGradientDecoration,
-                );
+                return Container();
               } else {
                 WidgetsBinding.instance!.addPostFrameCallback((_) {
                   setState(() {
                     info = snapshot.data![0];
-                    _followStatus = snapshot.data![1];
+
+                    if (_token.role == "SECRETARIA" || _token.role == "SA") {
+                      _disableStatus = snapshot.data![1];
+                    } else {
+                      _followStatus = snapshot.data![1];
+                    }
                     _infoIsLoading = false;
                   });
                 });
-                return Container(
-                  decoration: kGradientDecorationUp,
-                );
+                return Container();
               }
             } else {
               return Container(
-                  decoration: kGradientDecorationUp,
                   child: const Center(child: CircularProgressIndicator()));
             }
           });
     } else {
       return Container(
-        decoration: kGradientDecoration,
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: ListView(
@@ -168,13 +194,12 @@ class _OtherProfileState extends State<OtherProfile> {
               const SizedBox(height: 16),
               buildButtons(context),
               Divider(
-                color: kAccentColor0,
                 thickness: 2.0,
               ),
               const SizedBox(height: 16),
-              if (_token.role == "ALUNO") buildInfoAlunoSection(info),
-              if (_token.role == "PROFESSOR") buildInfoProfessorSection(info),
-              if (_token.role == "EXTERNO") buildInfoExternoSection(info),
+              if (info.role == "ALUNO") buildInfoAlunoSection(info),
+              if (info.role == "PROFESSOR") buildInfoProfessorSection(info),
+              if (info.role == "EXTERNO") buildInfoExternoSection(info),
               SizedBox(height: 30),
             ],
           ),
@@ -373,7 +398,6 @@ class _OtherProfileState extends State<OtherProfile> {
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
           width: 1.5,
-          color: kAccentColor0.withOpacity(0.0),
         ),
       ),
       child: ClipRRect(
@@ -381,10 +405,7 @@ class _OtherProfileState extends State<OtherProfile> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
           child: Container(
-            decoration: BoxDecoration(
-              color: kAccentColor2.withOpacity(0.1),
-              borderRadius: kBorderRadius,
-            ),
+            decoration: BoxDecoration(),
             child: Material(
               color: Colors.transparent,
               child: Padding(
@@ -411,19 +432,20 @@ class _OtherProfileState extends State<OtherProfile> {
                       ],
                     ),
                     const SizedBox(height: 8.0),
-                      if (post.url.contains('.mp4') ||
-                          post.url.contains('.mov') ||
-                          post.url.contains('.avi') ||
-                          post.url.contains('.mkv'))
-                        Center(
-                          child: VideoPlayerWidget(
-                            videoUrl: post.url,
-                          ),
+                    if (post.url.contains('.mp4') ||
+                        post.url.contains('.mov') ||
+                        post.url.contains('.avi') ||
+                        post.url.contains('.mkv'))
+                      Center(
+                        child: VideoPlayerWidget(
+                          videoUrl: post.url,
                         ),
+                      ),
                     if ((!post.url.contains('.mp4') &&
-                        !post.url.contains('.mov') &&
-                        !post.url.contains('.avi') &&
-                        !post.url.contains('.mkv')) && post.url != '')
+                            !post.url.contains('.mov') &&
+                            !post.url.contains('.avi') &&
+                            !post.url.contains('.mkv')) &&
+                        post.url != '')
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -431,11 +453,9 @@ class _OtherProfileState extends State<OtherProfile> {
                               context: context,
                               builder: (BuildContext context) {
                                 return ClipRRect(
-                                  borderRadius: kBorderRadius,
                                   child: Dialog(
                                     child: Container(
                                       child: ClipRRect(
-                                        borderRadius: kBorderRadius,
                                         child: Image.network(
                                           post.url,
                                           fit: BoxFit.cover,
@@ -516,7 +536,6 @@ class _OtherProfileState extends State<OtherProfile> {
   Widget buildCoverImage() {
     if (info.coverPicUrl.isEmpty) {
       return Container(
-        color: kAccentColor0,
         child: Image.network(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
@@ -526,7 +545,6 @@ class _OtherProfileState extends State<OtherProfile> {
       );
     } else {
       return Container(
-        color: kAccentColor0,
         child: Image.network(
           info.coverPicUrl,
           width: double.infinity,
@@ -541,7 +559,6 @@ class _OtherProfileState extends State<OtherProfile> {
     if (info.profilePicUrl.isEmpty) {
       return CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: kAccentColor0,
         backgroundImage: const NetworkImage(
           'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
@@ -549,7 +566,6 @@ class _OtherProfileState extends State<OtherProfile> {
     } else {
       return CircleAvatar(
         radius: profileHeight / 2,
-        backgroundColor: kAccentColor0,
         backgroundImage: NetworkImage(
           info.profilePicUrl,
         ),
@@ -566,9 +582,7 @@ class _OtherProfileState extends State<OtherProfile> {
       return Container(
         width: 400,
         height: 400,
-        child: ClipRRect(
-            borderRadius: kBorderRadius,
-            child: Image.memory(_imageData!, fit: BoxFit.fill)),
+        child: ClipRRect(child: Image.memory(_imageData!, fit: BoxFit.fill)),
       );
     } else {
       return SizedBox.shrink();
@@ -581,35 +595,49 @@ class _OtherProfileState extends State<OtherProfile> {
         const SizedBox(height: 8),
         Text(
           info.username,
-          style: const TextStyle(
-              fontSize: 28, fontWeight: FontWeight.bold, color: kAccentColor0),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
           info.role,
-          style: const TextStyle(fontSize: 20, color: kAccentColor2),
+          style: const TextStyle(fontSize: 20),
         ),
         const SizedBox(height: 16),
-        Center(
-          child: ElevatedButton(
-            onPressed: _toggleFollow,
-            child: Text(
-              _followStatus ? 'Unfollow' : 'Follow',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: kAccentColor0,
+        if (_token.role != "SECRETARIA" && _token.role != "SA")
+          Center(
+            child: ElevatedButton(
+              onPressed: _toggleFollow,
+              child: Text(
+                _followStatus ? 'Unfollow' : 'Follow',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ),
+        if (_token.role == "SECRETARIA" || _token.role == "SA")
+          Center(
+              child: ElevatedButton(
+            onPressed: _toggleDisableAccount,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red, 
+            ),
+            child: Text(
+              _disableStatus ? 'Desativar Conta' : 'Ativar Conta',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, 
+              ),
+            ),
+          )),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
@@ -617,7 +645,6 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0, left: 8.0),
@@ -625,7 +652,6 @@ class _OtherProfileState extends State<OtherProfile> {
             ),
             Divider(
               thickness: 2.0,
-              color: kAccentColor0,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -648,7 +674,6 @@ class _OtherProfileState extends State<OtherProfile> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kAccentColor0,
                 ),
               ),
             ),
@@ -665,7 +690,6 @@ class _OtherProfileState extends State<OtherProfile> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: kAccentColor0,
                 ),
               ),
             ),

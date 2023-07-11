@@ -1,12 +1,13 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/models/change_pwd_data.dart';
 
-import 'package:responsive_login_ui/models/profile_info.dart';
 import 'package:responsive_login_ui/widgets/error_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,6 @@ import '../data/cache_factory_provider.dart';
 import '../models/Token.dart';
 
 import '../models/paths.dart';
-import '../models/update_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 
@@ -66,9 +66,7 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           body: Container(
             // Use Center here to center SingleChildScrollView
             child: SingleChildScrollView(
@@ -118,9 +116,9 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           ChangePwdData data = ChangePwdData(
-            oldPassword: oldPasswordController.text,
-            newPassword: newPasswordController.text,
-            passwordV: passwordVController.text,
+            oldPassword: hashPWD(oldPasswordController.text),
+            newPassword: hashPWD(newPasswordController.text),
+            passwordV: hashPWD(passwordVController.text),
           );
           showDialog(
             context: context,
@@ -136,20 +134,20 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return AlertDialog(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: kBorderRadius,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: Style.kBorderRadius,
                       ),
-                      backgroundColor: kAccentColor0.withOpacity(0.3),
+                      backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'A carregar...',
-                            style: const TextStyle(color: kAccentColor0),
+                            style: TextStyle(color: Style.kAccentColor0),
                           ),
                           const SizedBox(height: 15),
-                          const CircularProgressIndicator(
-                            color: kAccentColor1,
+                          CircularProgressIndicator(
+                            color: Style.kAccentColor1,
                           ),
                         ],
                       ),
@@ -166,16 +164,16 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
                       return ErrorDialog(showErrorMessage, 'Ok', context);
                     } else {
                       return AlertDialog(
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: kBorderRadius,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Style.kBorderRadius,
                         ),
-                        backgroundColor: kAccentColor0.withOpacity(0.3),
+                        backgroundColor: Style.kAccentColor2.withOpacity(0.3),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Password atualizada com sucesso!',
-                              style: const TextStyle(color: kAccentColor0),
+                              style: TextStyle(color: Style.kAccentColor0),
                             ),
                             const SizedBox(height: 15),
                             ElevatedButton(
@@ -216,6 +214,14 @@ class _EditProfilePasswordState extends State<EditProfilePassword> {
       ),
     );
   }
+
+  String hashPWD(String text) {
+    var bytes = utf8.encode(text);
+
+    var hash = sha512.convert(bytes);
+
+    return hash.toString();
+  }
 }
 
 class oldPasswordWidget extends StatelessWidget {
@@ -230,27 +236,19 @@ class oldPasswordWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-            style: TextStyle(
-              color: kAccentColor0,
-            ),
             decoration: InputDecoration(
-              prefixIcon: Icon(Icons.key, color: kAccentColor1),
+              prefixIcon:
+                  Icon(Icons.key, color: Theme.of(context).iconTheme.color),
               hintText: 'Password',
               border: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: kBorderRadius,
-                borderSide: BorderSide(
-                  color: kAccentColor1,
-                ),
-              ),
             ),
             controller: oldPasswordController,
           ),
@@ -273,27 +271,19 @@ class newPasswordWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-              style: TextStyle(
-                color: kAccentColor0,
-              ),
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.key, color: kAccentColor1),
+                prefixIcon:
+                    Icon(Icons.key, color: Theme.of(context).iconTheme.color),
                 hintText: 'Nova Password',
                 border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: kBorderRadius,
-                  borderSide: BorderSide(
-                    color: kAccentColor1,
-                  ),
-                ),
               ),
               controller: newPasswordController,
               validator: (value) {
@@ -329,27 +319,19 @@ class passwordVWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: kBorderRadius,
-        color: kAccentColor0.withOpacity(0.3),
+        borderRadius: Style.kBorderRadius,
+        color: Style.kAccentColor2.withOpacity(0.3),
       ),
       child: ClipRRect(
-        borderRadius: kBorderRadius,
+        borderRadius: Style.kBorderRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: TextFormField(
-              style: TextStyle(
-                color: kAccentColor0,
-              ),
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.key, color: kAccentColor1),
+                prefixIcon:
+                    Icon(Icons.key, color: Theme.of(context).iconTheme.color),
                 hintText: 'Confirmar Nova Password',
                 border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: kBorderRadius,
-                  borderSide: BorderSide(
-                    color: kAccentColor1,
-                  ),
-                ),
               ),
               controller: passwordVController,
               validator: (value) {

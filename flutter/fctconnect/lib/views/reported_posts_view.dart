@@ -70,9 +70,9 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               await BaseClient().deletePostsReport(
@@ -87,7 +87,7 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
               });
               _loadReports();
             },
-            child: Icon(Icons.delete, color: kAccentColor0),
+            child: Icon(Icons.delete, color: Style.kAccentColor0),
           ),
           body: ListView.builder(
             itemCount: postReportsList.length,
@@ -98,12 +98,12 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: ClipRRect(
                   borderRadius:
-                      kBorderRadius, // Setting the border radius
+                      Style.kBorderRadius, // Setting the border radius
                   child: Container(
                     decoration: BoxDecoration(
-                      color: kAccentColor0
+                      color: Style.kAccentColor0
                           .withOpacity(0.3), // Glass effect by using opacity
-                      borderRadius: kBorderRadius,
+                      borderRadius: Style.kBorderRadius,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
@@ -117,7 +117,7 @@ class _ReportedPostsPageState extends State<ReportedPostsPage> {
                           .transparent, // To make sure Card takes the glass effect
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: kBorderRadius,
+                        borderRadius: Style.kBorderRadius,
                       ),
                       child: ListTile(
                         title: Text(postsReport.postCreator),

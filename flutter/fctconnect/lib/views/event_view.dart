@@ -1,21 +1,17 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_login_ui/models/events_list_data.dart';
+
 import 'package:responsive_login_ui/models/paths.dart';
-import 'package:responsive_login_ui/views/event_creator.dart';
-import 'package:responsive_login_ui/views/search_event_view.dart';
 
 import '../constants.dart';
 import '../models/Token.dart';
 import '../models/event_get_data.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
-import 'event_page.dart';
 
 class EventView extends StatefulWidget {
   const EventView({Key? key}) : super(key: key);
@@ -57,9 +53,9 @@ class _EventViewState extends State<EventView> {
       });
     } else {
       return Container(
-        decoration: kGradientDecorationUp,
+   
         child: Scaffold(
-          backgroundColor: Colors.transparent,
+
           body: Column(
             children: [
               Expanded(
@@ -77,19 +73,19 @@ class _EventViewState extends State<EventView> {
                         EventGetData event = _events[index];
                         return GestureDetector(
                           onTap: () {
-                            context.go(Paths.event + '/${event.id}');
+                            context.go('${Paths.event}/${event.id}');
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: ClipRRect(
-                              borderRadius: kBorderRadius,
+                              borderRadius: Style.kBorderRadius,
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(
                                     sigmaX: 50.0, sigmaY: 50.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: kAccentColor2.withOpacity(0.1),
-                                    borderRadius: kBorderRadius,
+                                    color: Style.kAccentColor2.withOpacity(0.1),
+                                    borderRadius: Style.kBorderRadius,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -99,7 +95,7 @@ class _EventViewState extends State<EventView> {
                                       children: [
                                         if (event.url != null)
                                           ClipRRect(
-                                            borderRadius: kBorderRadius,
+                                            borderRadius: Style.kBorderRadius,
                                             child: Image.network(
                                               event.url!,
                                               width: 220,
@@ -115,9 +111,9 @@ class _EventViewState extends State<EventView> {
                                             children: [
                                               Text(
                                                 event.title,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  color: kAccentColor0,
+                                             
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -128,8 +124,8 @@ class _EventViewState extends State<EventView> {
                                                     event.start,
                                                   ),
                                                 )}',
-                                                style: const TextStyle(
-                                                  color: kAccentColor2,
+                                                style: TextStyle(
+                                               
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -140,8 +136,8 @@ class _EventViewState extends State<EventView> {
                                                     event.end,
                                                   ),
                                                 )}',
-                                                style: const TextStyle(
-                                                  color: kAccentColor2,
+                                                style: TextStyle(
+                                                  
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
@@ -165,7 +161,6 @@ class _EventViewState extends State<EventView> {
           ),
         ),
       );
-      
     }
   }
 
@@ -174,7 +169,7 @@ class _EventViewState extends State<EventView> {
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp.toString(),
+      _lastDisplayedEventTimestamp,
     );
     if (mounted) {
       setState(() {
@@ -192,7 +187,7 @@ class _EventViewState extends State<EventView> {
       "/events",
       _token.tokenID,
       _token.username,
-      _lastDisplayedEventTimestamp.toString(),
+      _lastDisplayedEventTimestamp,
     );
     setState(() {
       _events = latestEvents;

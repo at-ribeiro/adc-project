@@ -1,36 +1,45 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_login_ui/Themes/theme_constant.dart';
 import 'package:responsive_login_ui/Themes/theme_manager.dart';
-import 'package:responsive_login_ui/constants.dart';
+import 'package:responsive_login_ui/api/firebase_api.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
-import 'package:responsive_login_ui/services/fcm_services.dart';
-import 'package:responsive_login_ui/services/get_fcm_token.dart';import 'package:responsive_login_ui/services/session_manager.dart';
+import 'package:responsive_login_ui/services/get_fcm_token.dart';
+import 'package:responsive_login_ui/services/session_manager.dart';
 import 'config/app_router.dart';
-import 'package:url_strategy/url_strategy.dart';
 import 'controller/simple_ui_controller.dart';
 
-void main() async {
 
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //setPathUrlStrategy();
 
-  await FcmServices.initializeFirebase();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyDqJdRjuqeuTWBoiSPHk3jr9wFCUF9ksOg",
+          authDomain: "fctconnect-flutter.firebaseapp.com",
+          projectId: "fctconnect-flutter",
+          storageBucket: "fctconnect-flutter.appspot.com",
+          messagingSenderId: "223517067321",
+          appId: "1:223517067321:web:be1a93ee777f2337eea5e8"),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
 
-  FcmServices.firebaseAnalytics();
-
-  FcmServices.firebaseMessaging();
-
-  Get.put(SimpleUIController());
+  
+   await FirebaseApi().initNotification();
 
   // Restore session from shared preferences
 
   String? session = await CacheDefault.cacheFactory.get('Session');
 
-  getKey();
-
+  Get.put(SimpleUIController());
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeManager(),
@@ -39,36 +48,7 @@ void main() async {
   );
 }
 
-// class ThemeNotifier extends ChangeNotifier {
-//   // Define your default thememode here
-//   ThemeMode themeMode = ThemeMode.system;
-//   SharedPreferences? prefs;
-
-//   ThemeNotifier() {
-//     _init();
-//   }
-
-//   _init() async {
-//     // Get the stored theme from shared preferences
-//     prefs = await SharedPreferences.getInstance();
-
-//     int _theme = prefs?.getInt("theme") ?? themeMode.index;
-//     themeMode = ThemeMode.values[_theme];
-//     notifyListeners();
-//   }
-
-//   setTheme(ThemeMode mode) {
-//     themeMode = mode;
-//     notifyListeners();
-//     // Save the selected theme using shared preferences
-//     prefs?.setInt("theme", mode.index);
-//   }
-// }
-
-// final themeNotifierProvider =
-//     ChangeNotifierProvider<ThemeNotifier>(create: (_ ) => ThemeNotifier());
-
-void getKey() async {
+getKey() async {
   String? fcmKey = await FcmToken.getFcmToken();
   print("TOKEN : $fcmKey");
 }
@@ -77,7 +57,7 @@ ThemeManager _themeManager = ThemeManager();
 
 class MyApp extends StatefulWidget {
   final String? session;
-  
+
   MyApp({Key? key, this.session}) : super(key: key);
 
   @override
@@ -100,6 +80,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+
   themeListener() {
     if (mounted) {
       setState(() {});
@@ -109,13 +90,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     _initializeIsLoggedIn();
+    final themeManager = Provider.of<ThemeManager>(context);
     return Consumer<ThemeManager>(builder: (context, themeManager, child) {
       return MaterialApp.router(
+        title: 'FCTConnect',
         routerConfig: AppRouter().router,
         debugShowCheckedModeBanner: false,
-        theme: darkTheme,
+        theme: lightTheme,
         darkTheme: darkTheme,
-        themeMode: _themeManager.themeMode,
+        themeMode: themeManager.themeMode,
       );
     });
   }

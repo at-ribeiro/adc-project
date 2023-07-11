@@ -12,17 +12,20 @@ class ActivityProvider extends ChangeNotifier {
     List<ActivityData> activitiesData = await BaseClient()
         .getActivities("/activity", token.username, token.tokenID);
     activities.clear();
-    for(var activity in activitiesData){
-      activities.add(
-        Activity(
+    for (var activity in activitiesData) {
+      activities.add(Activity(
         activity.activityName,
         DateTime.fromMillisecondsSinceEpoch(activity.from),
         DateTime.fromMillisecondsSinceEpoch(activity.to),
         Color(int.parse("0xFF${activity.background}")),
         activity.creationTime,
-      )
-      );
+      ));
     }
+  }
+
+  void updateActivities(List<Activity> newActivities) {
+    activities = newActivities;
+    notifyListeners();
   }
 
   void addActivity(BuildContext context, Token token) async {
@@ -35,7 +38,7 @@ class ActivityProvider extends ChangeNotifier {
         return _CreateActivityDialog(
           nameController: nameController,
           selectedColor: selectedColor,
-          onAdd: (activity) {
+          onAdd: (activity) async {
             activities.add(activity);
             ActivityData a = ActivityData(
               activityName: activity.activityName,
@@ -48,9 +51,13 @@ class ActivityProvider extends ChangeNotifier {
               creationTime: activity.creationTime,
             );
 
-            BaseClient()
-                .createActivity("/activity", token.username, token.tokenID, a);
-            notifyListeners();
+            await BaseClient().createActivity(
+              "/activity",
+              token.username,
+              token.tokenID,
+              a,
+            );
+            updateActivities(activities); // Update activities list
             Navigator.pop(context);
           },
         );
@@ -378,7 +385,6 @@ class _UpdateActivityDialogState extends State<_UpdateActivityDialog> {
   @override
   void initState() {
     super.initState();
-    // Initialize the date and time values with the original activity's start and end dates
     startDate = widget.originalActivity.from;
     startTime = TimeOfDay.fromDateTime(widget.originalActivity.from);
     endDate = widget.originalActivity.to;
