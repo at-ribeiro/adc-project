@@ -168,7 +168,6 @@ class _NucleosViewState extends State<NucleosView> {
                         ],
                       ),
                       SizedBox(width: 10),
-
                       Wrap(
                         alignment: WrapAlignment.spaceAround,
                         children: [
@@ -288,7 +287,9 @@ class _NucleosViewState extends State<NucleosView> {
                             Center(
                               child: Text(
                                 filteredNucleos[index].name,
-                                style: textTheme.headline6,
+                                style: textTheme.titleLarge,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(height: 4.0),

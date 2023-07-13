@@ -112,61 +112,65 @@ class _NucleoPageState extends State<NucleoPage> {
 
               if (constraints.maxWidth > 600) {
                 // Use Row for larger screen sizes
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_nucleo.url != null && _nucleo.url!.isNotEmpty)
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_nucleo.url != null && _nucleo.url!.isNotEmpty)
+                          Expanded(
+                            child: Image.network(
+                              _nucleo.url!,
+                              height: 250,
+                              width: 250,
+                              fit: BoxFit.fitHeight,
+                            ),
+                          ),
+                        SizedBox(width: 16),
                         Expanded(
-                          child: Image.network(
-                            _nucleo.url!,
-                            height: 250,
-                            width: 250,
-                            fit: BoxFit.fitHeight,
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _nucleo.name,
+                                style: textTheme.headline2?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              ...commonWidgets,
+                            ],
                           ),
                         ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _nucleo.name,
-                              style: textTheme.headline2?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            ...commonWidgets,
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               } else {
                 // Use Column for smaller screen sizes
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_nucleo.url != null && _nucleo.url!.isNotEmpty)
-                        Image.network(
-                          _nucleo.url!,
-                          height: 250,
-                          fit: BoxFit.cover,
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_nucleo.url != null && _nucleo.url!.isNotEmpty)
+                          Image.network(
+                            _nucleo.url!,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
+                        SizedBox(height: 16),
+                        Text(
+                          _nucleo.name,
+                          style: textTheme.headline2?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      SizedBox(height: 16),
-                      Text(
-                        _nucleo.name,
-                        style: textTheme.headline2?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      ...commonWidgets,
-                    ],
+                        ...commonWidgets,
+                      ],
+                    ),
                   ),
                 );
               }
@@ -177,14 +181,12 @@ class _NucleoPageState extends State<NucleoPage> {
     }
   }
 
-
   void _launchURL(String url) async {
     Uri uri = Uri.parse(url);
 
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication))
       throw 'Could not launch $url';
   }
-
 
   Widget loadNucleo() {
     return FutureBuilder(

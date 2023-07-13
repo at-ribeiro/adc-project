@@ -12,11 +12,8 @@ import 'package:responsive_login_ui/services/session_manager.dart';
 import 'config/app_router.dart';
 import 'controller/simple_ui_controller.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
 
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -32,8 +29,7 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  
-   await FirebaseApi().initNotification();
+  await FirebaseApi().initNotification();
 
   // Restore session from shared preferences
 
@@ -79,7 +75,6 @@ class _MyAppState extends State<MyApp> {
         .addListener(themeListener);
     super.initState();
   }
-
 
   themeListener() {
     if (mounted) {

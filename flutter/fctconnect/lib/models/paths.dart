@@ -70,4 +70,6 @@ class Paths {
 
   static String notification = '/notification';
 
+  static String reportDetails = '/reportDetails';
+
 }
