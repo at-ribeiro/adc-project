@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @Path("/")
-@Consumes(MediaType.APPLICATION_JSON)
 public class GetUserResource {
 
     private static final Logger LOG = Logger.getLogger(GetUserResource.class.getName());
@@ -29,11 +28,11 @@ public class GetUserResource {
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
     private final Gson g = new Gson();
 
     @GET
-    @Path("/profile/{username}")
+    @Path("profile/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("username")String username, @QueryParam("searcher") String searcher, @HeaderParam("Authorization") String tokenId) {
         LOG.fine("Attempt to get user " + username);
@@ -100,17 +99,7 @@ public class GetUserResource {
 
             int nFollowers = followerList.size();
 
-            Query<Entity> postsQuery = Query.newEntityQueryBuilder()
-                    .setKind("Post")
-                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
-                    .build();
-
-            QueryResults<Entity> postResults = txn.run(postsQuery);
-
-            List<Entity> postsList = new ArrayList<>();
-            postResults.forEachRemaining(postsList::add);
-
-            int nPosts = postsList.size();
+            int nPosts = Math.toIntExact(user.getLong("user_posts"));
 
             String profilePicUrl = "";
             String coverPicUrl = "";
@@ -172,8 +161,12 @@ public class GetUserResource {
                                       @PathParam("username") String usernamePath, @QueryParam("event") String event) {
 
         Transaction txn = datastore.newTransaction();
+        LOG.severe("DEBUG");
+
 
         try{
+
+            LOG.severe("DEBUG");
 
             Key userKey = userKeyFactory.newKey(usernamePath);
             Entity user = txn.get(userKey);
@@ -220,6 +213,9 @@ public class GetUserResource {
             }
 
             List<StringValue> eventList = searchedUser.getList("user_events");
+
+            if(eventList.isEmpty())
+                return Response.status(Response.Status.NOT_ACCEPTABLE).build();
 
             if(eventList.contains(StringValue.newBuilder(event).build())){
                 return Response.status(Response.Status.ACCEPTED).build();

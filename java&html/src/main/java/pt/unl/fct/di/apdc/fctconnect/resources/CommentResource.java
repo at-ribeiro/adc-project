@@ -26,7 +26,7 @@ public class CommentResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
     private final Gson g = new Gson();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
 
 
@@ -88,6 +88,11 @@ public class CommentResource {
                     .addAncestor(PathElement.of("Post", postId))
                     .newKey(data.getTimestamp());
 
+            if(data.getText().isEmpty() || data.getText().isBlank() || data.getText().length() > 300){
+                LOG.warning("Comment is empty.");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
             Entity comment = Entity.newBuilder(commentKey)
                     .set("user", data.getUser())
                     .set("text", StringValue.newBuilder(data.getText()).setExcludeFromIndexes(true).build())
@@ -114,7 +119,8 @@ public class CommentResource {
     @Path("/{creator}/{post}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response addComment(@HeaderParam("Authorization") String tokenId, @PathParam("creator") String creator,
-                               @QueryParam("searcher") String searcher, @PathParam("post") String postId) {
+                               @HeaderParam("User") String searcher, @PathParam("post") String postId,
+                               @QueryParam("cursor") String cursor) {
 
         LOG.fine("Attempt to comment on post: " + postId);
 
@@ -173,8 +179,14 @@ public class CommentResource {
 
             Query<Entity> commentQuery = Query.newEntityQueryBuilder()
                                         .setKind("Comment")
-                                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(postKey))
+                                        .setFilter(
+                                                StructuredQuery.CompositeFilter.and(
+                                                        StructuredQuery.PropertyFilter.hasAncestor(postKey),
+                                                        StructuredQuery.PropertyFilter.lt("timestamp", cursor)
+                                                )
+                                        )
                                         .addOrderBy(descendingTimestamp)
+                                        .setLimit(10)
                                         .build();
 
 

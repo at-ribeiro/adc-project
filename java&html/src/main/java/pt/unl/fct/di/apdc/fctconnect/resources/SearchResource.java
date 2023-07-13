@@ -21,7 +21,7 @@ public class SearchResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
 
     @GET
     @Path("/user")

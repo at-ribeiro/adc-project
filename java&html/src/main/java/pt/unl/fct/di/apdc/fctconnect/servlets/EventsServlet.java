@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +43,7 @@ public class EventsServlet extends HttpServlet {
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
 
     public byte[] generateQRCode(String data, int width, int height) throws IOException, WriterException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -59,7 +61,6 @@ public class EventsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
         Transaction txn = datastore.newTransaction();
-
         try {
 
             String tokenId = request.getHeader("Authorization");
@@ -101,7 +102,13 @@ public class EventsServlet extends HttpServlet {
 
             eventResults.forEachRemaining(event -> {
 
-                if(event.getLong("event_end") > System.currentTimeMillis()) {
+                long currentTimeMillis = System.currentTimeMillis();
+                Instant instant = Instant.ofEpochMilli(currentTimeMillis);
+                instant = instant.minus(Duration.ofHours(24));
+                long newTimeMillis = instant.toEpochMilli();
+
+
+                if(event.getLong("event_end") > newTimeMillis ) {
 
                     String url = "";
                     String qrCodeUrl;
@@ -121,8 +128,8 @@ public class EventsServlet extends HttpServlet {
                     List<String> participants = new ArrayList<>();
 
                     for (Value<?> value : event.getList("event_participants")) {
-                        Key userKey = (Key) value.get();
-                        Entity entity = txn.get(userKey);
+                        String userKey = (String) value.get();
+                        Entity entity = txn.get(userKeyFactory.newKey(userKey));
                         participants.add(entity.getString("user_username"));
                     }
 
@@ -193,6 +200,13 @@ public class EventsServlet extends HttpServlet {
             String tokenId = request.getHeader("Authorization");
             String title = data.getTitle();
             String description = data.getDescription();
+
+            if(title.isBlank() || description.isBlank() || description.length() > 300){
+                LOG.warning("Invalid input.");
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
             long start = data.getStart();
             long end = data.getEnd();
             String uniqueEventId = (title + System.currentTimeMillis()).replace(' ', '-');
@@ -212,7 +226,7 @@ public class EventsServlet extends HttpServlet {
                 return;
             }
 
-            if(!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("AE"))){
+            if(!(user.getString("user_role").equals("SECRETARIA") || user.getString("user_role").equals("SA"))){
                 LOG.warning("Not enough role.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
@@ -235,6 +249,8 @@ public class EventsServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
+
+
 
             String imageName = "";
 
@@ -294,7 +310,7 @@ public class EventsServlet extends HttpServlet {
 
             }
 
-            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/#/qrcode/"+uniqueEventId, 500, 500);
+            byte[] qrCode = this.generateQRCode("www.fct-connect-estudasses.oa.r.appspot.com/#/event/qrcode/"+uniqueEventId, 500, 500);
 
             BlobId blobId = BlobId.of(bucketName, uniqueEventId + "-qrCode.png");
 

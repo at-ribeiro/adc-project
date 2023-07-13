@@ -71,6 +71,11 @@ public class ActivityResource {
                 return Response.status(Response.Status.CONFLICT).build();
             }
 
+            if(data.getActivityName().length()>300){
+                LOG.warning("Activity name too long.");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
             activity = Entity.newBuilder(activityKey)
                     .set("activity_creation_time", data.getCreationTime())
                     .set("activity_name", data.getActivityName())

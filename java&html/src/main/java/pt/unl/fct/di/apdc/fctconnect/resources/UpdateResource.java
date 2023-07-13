@@ -67,6 +67,13 @@ public class UpdateResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
 
+            if(data.getAbout_me().length() > 300 || data.getCity().length()>300 || data.getDepartment().length()>300 || data.getOffice().length()>300
+                    || data.getPurpose().length()>300 || data.getPhone().length()>300 || data.getFullname().length()>300 || data.getCourse().length()>300
+                    || data.getYear().length()>300){
+                LOG.warning("Invalid input.");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
 
             Entity task = Entity.newBuilder(userKey)
                     .set("user_username", user.getString("user_username"))
@@ -88,6 +95,7 @@ public class UpdateResource {
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", data.getPurpose())
                     .set("user_events", user.getList("user_events"))
+                    .set("user_posts", user.getLong("user_posts"))
                     .build();;
 
             txn.update(task);
@@ -168,7 +176,7 @@ public class UpdateResource {
                     .set("user_email", userToChangeEntity.getString("user_email"))
                     .set("user_creation_time", userToChangeEntity.getTimestamp("user_creation_time"))
                     .set("user_role", userToChangeEntity.getString("user_role"))
-                    .set("user_state", "ACTIVE")
+                    .set("user_state", userToChangeEntity.getString("user_state"))
                     .set("user_privacy", userToChangeEntity.getString("user_privacy"))
                     .set("user_phone", userToChangeEntity.getString("user_phone"))
                     .set("user_city", userToChangeEntity.getString("user_city"))
@@ -181,6 +189,7 @@ public class UpdateResource {
                     .set("user_cover_pic", userToChangeEntity.getString("user_cover_pic"))
                     .set("user_purpose", userToChangeEntity.getString("user_purpose"))
                     .set("user_events", userToChangeEntity.getList("user_events"))
+                    .set("user_posts", userToChangeEntity.getLong("user_posts"))
                     .build();
 
             txn.update(task);
@@ -276,6 +285,7 @@ public class UpdateResource {
                     .set("user_cover_pic", userToChangeEntity.getString("user_cover_pic"))
                     .set("user_purpose", userToChangeEntity.getString("user_purpose"))
                     .set("user_events", userToChangeEntity.getList("user_events"))
+                    .set("user_posts", userToChangeEntity.getLong("user_posts"))
                     .build();
 
             txn.update(task);
