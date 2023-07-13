@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (post == null || post.profilePic.isEmpty) {
       return const CircleAvatar(
         backgroundImage: NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
     } else {

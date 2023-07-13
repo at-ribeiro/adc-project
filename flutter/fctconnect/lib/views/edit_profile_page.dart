@@ -649,12 +649,6 @@ class aboutMeWidget extends StatelessWidget {
               hintText: 'Sobre Mim',
             ),
             controller: aboutMeController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione o seu Sobre Mim';
-              } else
-                return null;
-            },
           ),
         ),
       ),
@@ -691,13 +685,6 @@ class cityWidget extends StatelessWidget {
               hintText: 'Cidade',
             ),
             controller: homeTownController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Selecione a sua cidade';
-              } else {
-                return null;
-              }
-            },
           ),
         ),
       ),

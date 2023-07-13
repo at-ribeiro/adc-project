@@ -100,7 +100,7 @@ class _RouteCreatorState extends State<RouteCreator> {
           locationsListEdificios = locations;
         } else if (type == "TRANSPORTE") {
           locationsListTransporte = locations;
-        } else if (type == "EVENTO") {
+        } else if (type == "EVENT") {
           locationsListEventos = locations;
         }
       });
@@ -480,7 +480,7 @@ class _RouteCreatorState extends State<RouteCreator> {
                   onExpansionChanged: (expanded) {
                     if (expanded && _isFirstLoadEv) {
                       _isFirstLoadEv = false;
-                      _loadLocations("EVENTO");
+                      _loadLocations("EVENT");
                     }
                   },
                   children: [

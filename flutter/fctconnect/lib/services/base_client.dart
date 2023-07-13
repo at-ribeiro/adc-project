@@ -422,12 +422,13 @@ class BaseClient {
   }
 
   Future<List<CommentData>> getComments(String api, String username,
-      String tokenID, String postID, String postUser) async {
+      String tokenID, String postID, String postUser, int cursor) async {
     var _headers = {
       "Content-Type": "application/json; charset=UTF-8",
       "Authorization": tokenID,
+      "User": username,
     };
-    var url = Uri.parse('$baseUrl$api/$postUser/$postID?searcher=$username');
+    var url = Uri.parse('$baseUrl$api/$postUser/$postID?cursor=$cursor');
 
     var response = await http.get(
       url,
