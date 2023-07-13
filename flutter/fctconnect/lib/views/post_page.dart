@@ -26,14 +26,18 @@ class _PostPageState extends State<PostPage> {
   String? _loadingError;
   late String _postUser;
   late String _postID;
-  List<CommentData> _comments = []; // List to store comments
+  List<CommentData> _comments = []; 
+  int _lastDisplayedCommentTimestamp = DateTime.now().millisecondsSinceEpoch;
+    late ScrollController _scrollController;
+
 
   @override
   void initState() {
     super.initState();
     _postUser = widget.postUser;
     _postID = widget.postID;
-    getComments(); // Load token on initialization
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -42,15 +46,29 @@ class _PostPageState extends State<PostPage> {
     super.dispose();
   }
 
-  // Method to fetch comments (replace with your implementation)
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      getComments();
+    }
+  }
+
   Future<void> getComments() async {
-    // Call the BaseClient method to fetch comments
     List<CommentData> comments = await BaseClient().getComments(
-        '/comment', _token.username, _token.tokenID, _postID, _postUser);
+        '/comment', _token.username, _token.tokenID, _postID, _postUser, _lastDisplayedCommentTimestamp);
 
     setState(() {
       _comments = comments;
     });
+
+    if (mounted) {
+      setState(() {
+      _comments = comments;
+        if (_comments.isNotEmpty) {
+          _lastDisplayedCommentTimestamp = comments.last.timestamp;
+        }
+      });
+    }
   }
 
   @override
@@ -70,7 +88,7 @@ class _PostPageState extends State<PostPage> {
     } else {
       return Container(
         child: Scaffold(
-          body: ContentBody(),
+          body: contentBody(),
         ),
       );
     }
@@ -80,7 +98,7 @@ class _PostPageState extends State<PostPage> {
     if (profilePic.isEmpty) {
       return const CircleAvatar(
         backgroundImage: NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
     } else {
@@ -93,11 +111,25 @@ class _PostPageState extends State<PostPage> {
     }
   }
 
-  Widget ContentBody() {
+  Future<void> _refreshComments() async {
+    _lastDisplayedCommentTimestamp = DateTime.now().millisecondsSinceEpoch;
+    List<CommentData> latestComments = await BaseClient().getComments(
+        '/comment', _token.username, _token.tokenID, _postID, _postUser, _lastDisplayedCommentTimestamp);
+    setState(() {
+      _comments = latestComments;
+      if (latestComments.isNotEmpty) {
+        _lastDisplayedCommentTimestamp = latestComments.last.timestamp;
+      }
+    });
+  }
+
+  Widget contentBody() {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
         Expanded(
+          child: RefreshIndicator(
+                  onRefresh: _refreshComments,
           child: ListView.builder(
             itemCount: _comments.length,
             itemBuilder: (context, index) {
@@ -141,6 +173,7 @@ class _PostPageState extends State<PostPage> {
                 ),
               );
             },
+          ),
           ),
         ),
         Container(
@@ -198,11 +231,10 @@ class _PostPageState extends State<PostPage> {
                       _postID,
                       _postUser,
                       comment,
-                    )
-                        .then((_) {
-                      _commentController.clear();
-                      getComments(); // Fetch the updated comments
-                    });
+                    );                      
+                    _commentController.clear();
+                    _refreshComments();
+                   
                   }
                 },
                 icon: Icon(Icons.send,

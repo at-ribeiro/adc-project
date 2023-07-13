@@ -112,7 +112,7 @@ class _OtherProfileState extends State<OtherProfile> {
     if (info == null || info.profilePicUrl.isEmpty) {
       return const CircleAvatar(
         backgroundImage: NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
     } else {
@@ -706,7 +706,7 @@ class _OtherProfileState extends State<OtherProfile> {
     if (info.coverPicUrl.isEmpty) {
       return Container(
         child: Image.network(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/foto-fct.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/foto-fct.jpg',
           width: double.infinity,
           height: coverHeight,
           fit: kIsWeb ? BoxFit.fitWidth : BoxFit.cover,
@@ -729,7 +729,7 @@ class _OtherProfileState extends State<OtherProfile> {
       return CircleAvatar(
         radius: profileHeight / 2,
         backgroundImage: const NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
     } else {

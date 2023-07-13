@@ -64,73 +64,61 @@ class _PostCreatorState extends State<PostCreator> {
     super.dispose();
   }
 
-  Future<void> _pickFile(String mediaType) async {
-    FileType fileType;
-    if (mediaType == 'image') {
-      fileType = FileType.image;
-    } else {
-      fileType = FileType.video;
+  Future<void> _pickFile(MediaType mediaType) async {
+    ImageSource source;
+
+    source = ImageSource.gallery;
+    XFile? pickedFile;
+
+    FileType? fileType;
+
+    switch (mediaType) {
+      case MediaType.image:
+        pickedFile = await ImagePicker().pickImage(source: source);
+        break;
+      case MediaType.video:
+        fileType = FileType.video;
+        break;
     }
+    if (mediaType == MediaType.video) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: fileType!,
+      );
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: fileType,
-    );
+      if (result != null) {
+        PlatformFile file = result.files.first;
+        Uint8List fileData = file.bytes!;
+        String fileName = file.name;
+        String fileExtension = fileName.split('.').last;
 
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      Uint8List imageData = file.bytes!;
-      String fileName = file.name;
-      String fileExtension = fileName.split('.').last;
-
-      setState(() {
-        _imageData = imageData;
-        _fileName = fileName;
-        _mediaType =
-            fileExtension; // Assign the file extension as the media type
-        _type = mediaType;
-      });
-
-      if (mediaType == 'video') {
         setState(() {
-          _videoFile = file!;
+          _imageData = fileData;
+          _fileName = fileName;
+          _mediaType = fileExtension;
+          _type = 'video';
+
+          _videoFile = file;
         });
       }
+    } else if (pickedFile != null) {
+      final fileData = await pickedFile.readAsBytes();
+
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile!.path.split('/').last;
+        _mediaType = pickedFile!.path.split('.').last;
+        _type = mediaType == MediaType.image ? 'image' : 'video';
+      });
+      setState(() {
+        _imageData = Uint8List.fromList(fileData);
+        _fileName = pickedFile!.path.split('/').last;
+        _mediaType = pickedFile!.path.split('.').last;
+        _type = mediaType == MediaType.image ? 'image' : 'video';
+      });
     }
   }
 
   bool _isImageLoading = false;
-
-  Future<int> _post() async {
-    try {
-      print('Starting post...');
-      int result = await PostActions.doPost(
-          _postTextController.text,
-          _imageData,
-          _fileName,
-          _mediaType,
-          _type,
-          _token.username,
-          _token.tokenID);
-
-      print('Post completed with result: $result');
-      return result;
-    } catch (e) {
-      print('Error posting: $e');
-      return 500;
-    }
-  }
-
-  void _onMapTap(LatLng position) {
-    setState(() {
-      _markers = {
-        Marker(
-          markerId: MarkerId('Evento'),
-          position: position,
-          // Set other marker properties as needed
-        ),
-      };
-    });
-  }
 
   Widget _buildMediaPreview() {
     if (_type == 'image' && _imageData != null) {
@@ -180,6 +168,8 @@ class _PostCreatorState extends State<PostCreator> {
       setState(() {
         _imageData = Uint8List.fromList(fileData);
         _fileName = pickedFile.path.split('/').last;
+        _mediaType = pickedFile.path.split('.').last;
+        _type = 'image';
       });
     }
   }
@@ -246,40 +236,38 @@ class _PostCreatorState extends State<PostCreator> {
         children: <Widget>[
           FloatingActionButton(
             onPressed: () async {
-              _pickFile('image');
+              _pickFile(MediaType.image);
             },
             child: Icon(Icons.image),
             tooltip: 'Escolher uma imagem',
             // You can replace this with your own text
           ),
-          SizedBox(width: 30), // Gives some space between the buttons
-          FloatingActionButton(
-            onPressed: () async {
-              _pickFile('video');
-            },
-            child: Icon(Icons.videocam),
-            tooltip: 'Escolher um video',
-            // You can replace this with your own text
-          ),
+          
+          if (kIsWeb) // Gives some space between the buttons
+            Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  _pickFile(MediaType.video);
+                },
+                child: Icon(Icons.videocam),
+                tooltip: 'Escolher um video',
+                // You can replace this with your own text
+              ),
+            ),
           if (!kIsWeb)
             Padding(
               padding: const EdgeInsets.only(left: 30.0),
               child: FloatingActionButton(
                 onPressed: () async {
-                  var imageDataMap = await _mediaUp.takePicture();
-                  if (imageDataMap.isNotEmpty) {
-                    _imageData = imageDataMap['fileData'];
-                    _fileName = imageDataMap['fileName'];
-                    _mediaType = imageDataMap['mediaType'].toString();
-                    _type = imageDataMap['type'];
-                  }
+                  _takePicture();
                 },
                 child: Icon(Icons.camera_alt),
                 tooltip: 'Tirar uma foto',
                 // You can replace this with your own text
               ),
             ),
-          SizedBox(width: 30),
+        SizedBox(width: 30),
           FloatingActionButton(
             onPressed: () async {
               setState(() {
@@ -298,6 +286,10 @@ class _PostCreatorState extends State<PostCreator> {
                   return;
                 }
                 try {
+                  setState(() {
+                    _isLoading = true; // Show the loading circle
+                  });
+
                   int response = await PostActions.doPost(
                       _postTextController.text,
                       _imageData,
@@ -327,6 +319,9 @@ class _PostCreatorState extends State<PostCreator> {
                   });
                 }
               } else {
+                setState(() {
+                  _isLoading = false; // Hide the loading circle
+                });
                 showDialog(
                     context: context,
                     builder: (context) => ErrorDialog(
@@ -334,6 +329,9 @@ class _PostCreatorState extends State<PostCreator> {
                         'Ok',
                         context));
               }
+              setState(() {
+                _isLoading = false; // Hide the loading circle
+              });
             },
             child: _isLoading
                 ? CircularProgressIndicator(

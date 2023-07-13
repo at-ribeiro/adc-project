@@ -50,7 +50,7 @@ class CustomSearchDelegate extends SearchDelegate {
       return const CircleAvatar(
         radius: 30,
         backgroundImage: NetworkImage(
-          'https://storage.googleapis.com/staging.fct-connect-estudasses.appspot.com/default_profile.jpg',
+          'https://storage.googleapis.com/fct-connect-estudasses.appspot.com/default_profile.jpg',
         ),
       );
     } else {
