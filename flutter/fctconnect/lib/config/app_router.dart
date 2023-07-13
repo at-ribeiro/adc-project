@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_login_ui/data/cache_factory_provider.dart';
+import 'package:responsive_login_ui/models/AlertPostData.dart';
 import 'package:responsive_login_ui/views/edit_profile_page.dart';
 import 'package:responsive_login_ui/views/edit_profile_password.dart';
 import 'package:responsive_login_ui/views/event_view.dart';
@@ -18,6 +19,7 @@ import 'package:responsive_login_ui/views/others_profile.dart';
 import 'package:responsive_login_ui/views/pomodoro/pomodoro_page.dart';
 import 'package:responsive_login_ui/views/post_creator.dart';
 import 'package:responsive_login_ui/views/post_page.dart';
+import 'package:responsive_login_ui/views/report_page.dart';
 import 'package:responsive_login_ui/views/report_view.dart';
 import 'package:responsive_login_ui/views/reports_list_view.dart';
 import 'package:responsive_login_ui/views/routes_view.dart';
@@ -296,6 +298,24 @@ class AppRouter {
               return NotificationScreen();
             },
           ),
+          GoRoute(
+            path: Paths.reportDetails +
+                '/:creator' +
+                '/:description' +
+                '/:location' +
+                '/:date',
+            builder: (BuildContext context, GoRouterState state) {
+              dynamic alert = AlertPostData(
+                  creator: state.pathParameters['creator']!,
+                  location: state.pathParameters['location']!,
+                  description: state.pathParameters['description']!,
+                  timestamp: int.parse(state.pathParameters['date']!));
+
+              return ReportDetailsPage(
+                alertData: alert,
+              );
+            },
+          ),
         ],
         builder: (context, state, child) {
           return Scaffold(
@@ -448,6 +468,8 @@ class AppRouter {
       return 'Notificação';
     } else if (location.contains(Paths.post) && location != Paths.post) {
       return 'Criar Post';
+    }else if (location.contains(Paths.reportDetails) ) {
+      return 'Detalhes da Anomalia';
     }
     // add more conditions for other routes
 
@@ -568,7 +590,13 @@ class AppRouter {
           onPressed: () {
             context.go(Paths.events);
           },
-          icon: Icon(Icons.home));
+          icon: Icon(Icons.arrow_back));
+    }else if (location.contains(Paths.reportDetails)) {
+      return IconButton(
+          onPressed: () {
+            context.go(Paths.listReports);
+          },
+          icon: Icon(Icons.arrow_back));
     }
     return Container();
   }

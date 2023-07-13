@@ -159,7 +159,7 @@ class _RouteViewState extends State<RouteView> {
                                           ),
                                         ],
                                       ),
-                                      trailing: Flexible(
+                                      trailing: Container(
                                         child: Column(
                                           children: [
                                             IconButton(
