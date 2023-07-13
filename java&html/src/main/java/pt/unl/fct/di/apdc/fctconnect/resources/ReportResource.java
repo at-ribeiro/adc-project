@@ -106,7 +106,13 @@ public class ReportResource {
                 reasons.add(reason);
             }
 
+            if(data.getComment().length() > 300){
+                LOG.warning("Comment too long.");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
             comments.add(StringValue.newBuilder(data.getComment()).build());
+
 
 
             Entity report = Entity.newBuilder(reportKey)

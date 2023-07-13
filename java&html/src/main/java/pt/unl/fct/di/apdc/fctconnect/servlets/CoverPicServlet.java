@@ -26,7 +26,7 @@ public class CoverPicServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response){
@@ -137,6 +137,7 @@ public class CoverPicServlet extends HttpServlet {
                     .set("user_cover_pic", StringValue.newBuilder(username+"-"+imageNameFull).setExcludeFromIndexes(true).build())
                     .set("user_purpose", user.getString("user_purpose"))
                     .set("user_events", user.getList("user_events"))
+                    .set("user_posts", user.getLong("user_posts"))
                     .build();
 
             txn.update(task);

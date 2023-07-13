@@ -34,7 +34,7 @@ public class PostServlet extends HttpServlet {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
@@ -56,6 +56,13 @@ public class PostServlet extends HttpServlet {
 
             String tokenId = request.getHeader("Authorization");
             String postText = data.getPost();
+
+            if(postText.isBlank() || postText.length() > 300){
+                LOG.warning("Invalid post text.");
+                response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return;
+            }
+
             String username = data.getUsername();
             long timestamp = System.currentTimeMillis();
 
@@ -179,8 +186,7 @@ public class PostServlet extends HttpServlet {
 
             List<Value<Key>> likeList = new ArrayList<>();
 
-
-            Entity entity = Entity.newBuilder(postKey)
+            Entity postEntity = Entity.newBuilder(postKey)
                     .set("id", username + "-" + timestamp)
                     .set("text", StringValue.newBuilder(postText).setExcludeFromIndexes(true).build())
                     .set("user", username)
@@ -189,7 +195,33 @@ public class PostServlet extends HttpServlet {
                     .set("likes", likeList)
                     .build();
 
-            txn.put(entity);
+            txn.put(postEntity);
+
+            user = Entity.newBuilder(userKey)
+                    .set("user_username", user.getString("user_username"))
+                    .set("user_fullname", user.getString("user_fullname"))
+                    .set("user_pwd", user.getString("user_pwd"))
+                    .set("user_email", user.getString("user_email"))
+                    .set("user_creation_time", user.getTimestamp("user_creation_time"))
+                    .set("user_role", user.getString("user_role"))
+                    .set("user_state", user.getString("user_state"))
+                    .set("user_privacy", user.getString("user_privacy"))
+                    .set("user_phone", user.getString("user_phone"))
+                    .set("user_city", user.getString("user_city"))
+                    .set("user_about_me", user.getString("user_about_me"))
+                    .set("user_department", user.getString("user_department"))
+                    .set("user_office", user.getString("user_office"))
+                    .set("user_course", user.getString("user_course"))
+                    .set("user_year", user.getString("user_year"))
+                    .set("user_profile_pic", user.getString("user_profile_pic"))
+                    .set("user_cover_pic", user.getString("user_cover_pic"))
+                    .set("user_purpose", user.getString("user_purpose"))
+                    .set("user_events", user.getList("user_events"))
+                    .set("user_posts", user.getLong("user_posts") + 1)
+                    .build();
+
+            txn.update(user);
+
             txn.commit();
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -396,6 +428,32 @@ public class PostServlet extends HttpServlet {
             }
 
             txn.delete(postKey);
+
+            user = Entity.newBuilder(userKey)
+                    .set("user_username", user.getString("user_username"))
+                    .set("user_fullname", user.getString("user_fullname"))
+                    .set("user_pwd", user.getString("user_pwd"))
+                    .set("user_email", user.getString("user_email"))
+                    .set("user_creation_time", user.getTimestamp("user_creation_time"))
+                    .set("user_role", user.getString("user_role"))
+                    .set("user_state", user.getString("user_state"))
+                    .set("user_privacy", user.getString("user_privacy"))
+                    .set("user_phone", user.getString("user_phone"))
+                    .set("user_city", user.getString("user_city"))
+                    .set("user_about_me", user.getString("user_about_me"))
+                    .set("user_department", user.getString("user_department"))
+                    .set("user_office", user.getString("user_office"))
+                    .set("user_course", user.getString("user_course"))
+                    .set("user_year", user.getString("user_year"))
+                    .set("user_profile_pic", user.getString("user_profile_pic"))
+                    .set("user_cover_pic", user.getString("user_cover_pic"))
+                    .set("user_purpose", user.getString("user_purpose"))
+                    .set("user_events", user.getList("user_events"))
+                    .set("user_posts", user.getLong("user_posts") - 1)
+                    .build();
+
+            txn.update(user);
+
             txn.commit();
             response.setStatus(HttpServletResponse.SC_OK);
 

@@ -22,7 +22,7 @@ public class QRCodeResource {
     private final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private final KeyFactory userKeyFactory = datastore.newKeyFactory().setKind("User");
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = "staging.fct-connect-estudasses.appspot.com";
+    private final String bucketName = "fct-connect-estudasses.appspot.com";
 
 
     @GET
@@ -111,6 +111,7 @@ public class QRCodeResource {
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", user.getString("user_purpose"))
                     .set("user_events", ListValue.of(eventList))
+                    .set("user_posts", user.getLong("user_posts"))
                     .build();;
 
             txn.update(task);
@@ -143,8 +144,8 @@ public class QRCodeResource {
             List<String> participants = new ArrayList<>();
 
             for(Value<?> value : event.getList("event_participants")){
-                Key key = (Key) value.get();
-                Entity entity = txn.get(key);
+                String key = (String) value.get();
+                Entity entity = txn.get(userKeyFactory.newKey(key));
                 participants.add(entity.getString("user_username"));
             }
 
@@ -240,8 +241,8 @@ public class QRCodeResource {
             List<String> participants = new ArrayList<>();
 
             for(Value<?> value : event.getList("event_participants")){
-                Key key = (Key) value.get();
-                Entity entity = txn.get(key);
+                String key = (String) value.get();
+                Entity entity = txn.get(userKeyFactory.newKey(key));
                 participants.add(entity.getString("user_username"));
             }
 

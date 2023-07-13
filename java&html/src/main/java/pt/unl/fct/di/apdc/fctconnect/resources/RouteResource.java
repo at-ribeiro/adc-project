@@ -70,6 +70,11 @@ public class RouteResource {
                 return Response.status(Response.Status.CONFLICT).build();
             }
 
+            if(data.getName().length()>300){
+                LOG.warning("Route name too long.");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
             List<Value<String>> locations = new ArrayList<>();
 
             for(String location : data.getLocations()){
@@ -91,6 +96,7 @@ public class RouteResource {
                 LOG.warning("Route has no participants.");
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
+
 
             List<LongValue> duration = new ArrayList<>();
 

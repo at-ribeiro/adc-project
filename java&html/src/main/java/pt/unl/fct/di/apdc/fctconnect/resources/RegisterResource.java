@@ -86,6 +86,7 @@ public class RegisterResource {
                     .set("user_cover_pic", StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_purpose",StringValue.newBuilder("").setExcludeFromIndexes(true).build())
                     .set("user_events", ListValue.of(events))
+                    .set("user_posts", LongValue.newBuilder(0).setExcludeFromIndexes(true).build())
                     .build();
 
             txn.add(user);
@@ -210,6 +211,7 @@ public class RegisterResource {
                     .set("user_cover_pic", user.getString("user_cover_pic"))
                     .set("user_purpose", user.getString("user_purpose"))
                     .set("user_events", user.getList("user_events"))
+                    .set("user_posts", user.getLong("user_posts"))
                     .build();
 
             txn.update(user);

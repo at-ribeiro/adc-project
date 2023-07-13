@@ -66,6 +66,11 @@ public class AlertResource {
                 return Response.status(Response.Status.CONFLICT).build();
             }
 
+            if(data.getDescription().length()>300 || data.getCreator().length()>300){
+                LOG.warning("Description or creator too long");
+                return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            }
+
             Entity alert = Entity.newBuilder(alertKey)
                     .set("alert_creator", data.getCreator())
                     .set("alert_location", data.getLocation())
