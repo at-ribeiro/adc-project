@@ -245,7 +245,7 @@ class _PostCreatorState extends State<PostCreator> {
           
           if (kIsWeb) // Gives some space between the buttons
             Padding(
-              padding: const EdgeInsets.all(30.0),
+              padding: const EdgeInsets.only(left:30.0),
               child: FloatingActionButton(
                 onPressed: () async {
                   _pickFile(MediaType.video);
