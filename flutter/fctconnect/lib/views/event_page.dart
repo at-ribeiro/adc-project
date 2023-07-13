@@ -106,7 +106,7 @@ class _EventPageState extends State<EventPage> {
                       SizedBox(height: 8),
                       Text(
                         'Data de Inicio: ' +
-                            DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                            DateFormat('dd-MM-yyyy HH:mm').format(
                               DateTime.fromMillisecondsSinceEpoch(
                                 _event.start,
                               ),
@@ -116,7 +116,7 @@ class _EventPageState extends State<EventPage> {
                       SizedBox(height: 8),
                       Text(
                         'Data de Fim: ' +
-                            DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                            DateFormat('dd-MM-yyyy HH:mm').format(
                               DateTime.fromMillisecondsSinceEpoch(
                                 _event.end,
                               ),

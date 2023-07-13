@@ -161,7 +161,7 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                   showDialog(
                       context: context,
                       builder: (context) =>
-                          ErrorDialog('Erro ao criar evento.', 'Ok', context));
+                          ErrorDialog('Erro ao criar núcleo.', 'Ok', context));
                 }
                 setState(() {
                   _isLoading = false; // Hide the loading circle
@@ -529,7 +529,7 @@ class _NuceloCreatorState extends State<NuceloCreator> {
                                 _pickImage();
                               },
                               child:
-                                  const Text('Selecione um icon para Evento'),
+                                  const Text('Selecione um icon para Núcleo'),
                             ),
                           ],
                         ),

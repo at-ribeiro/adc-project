@@ -8,28 +8,6 @@ import '../models/Token.dart';
 import '../services/base_client.dart';
 import '../services/load_token.dart';
 
-class _CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onPressed;
-
-  const _CustomAppBar({required this.onPressed});
-
-  @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Text('Reporte um problema'),
-      actions: [
-        IconButton(
-          onPressed: onPressed,
-          icon: Icon(Icons.send),
-        ),
-      ],
-    );
-  }
-}
-
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
 
@@ -44,6 +22,8 @@ class _ReportPageState extends State<ReportPage> {
   TextEditingController locationController = TextEditingController();
   TextEditingController problemController = TextEditingController();
   bool isExpanded = false;
+  int _characterCount = 0;
+  final int _maxCharacterLimit = 300;
 
   @override
   void initState() {
@@ -79,6 +59,16 @@ class _ReportPageState extends State<ReportPage> {
         },
       );
       return;
+    }else if(_characterCount > _maxCharacterLimit){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          String errorText = 'O texto não pode exceder os 300 caracteres';
+          String buttonText = 'Ok';
+          return ErrorDialog(errorText, buttonText, context);
+        },
+      );
+      return;
     }
     AlertPostData alert = AlertPostData(
       creator: name,
@@ -92,6 +82,9 @@ class _ReportPageState extends State<ReportPage> {
     nameController.clear();
     locationController.clear();
     problemController.clear();
+    setState(() {
+      _characterCount = 0;
+    });
   }
 
   @override
@@ -190,25 +183,45 @@ class _ReportPageState extends State<ReportPage> {
                     borderRadius: Style.kBorderRadius,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: TextFormField(
-                        maxLines: null, // Allow unlimited lines
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.description,
-                              color: Theme.of(context).iconTheme.color),
-                          hintText: 'Qual foi o problema que encontrou?',
-                          border: InputBorder.none,
-                        ),
-                        controller: problemController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Selecione uma descrição para o report';
-                          } else {
-                            return null;
-                          }
-                        },
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              maxLines: null, // Allow unlimited lines
+
+                              onChanged: (text) {
+                                setState(() {
+                                  _characterCount = text.length;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.description,
+                                    color: Theme.of(context).iconTheme.color),
+                                hintText: 'Qual foi o problema que encontrou?',
+                                border: InputBorder.none,
+                              ),
+                              controller: problemController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Selecione uma descrição para o report';
+                                } else if (_characterCount >
+                                    _maxCharacterLimit) {
+                                  return 'A descrição não pode ter mais de $_maxCharacterLimit caracteres';
+                                } else {
+                                  return null;
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
+                SizedBox(height: 8.0),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('$_characterCount/$_maxCharacterLimit'),
                 ),
               ],
             ),

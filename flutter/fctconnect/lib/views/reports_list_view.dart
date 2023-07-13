@@ -122,7 +122,6 @@ class _ListReportPageState extends State<ListReportsPage> {
                         ],
                       ),
                       child: Container(
-                        height: 150,
                         child: Card(
                           color: Colors
                               .transparent, // To make sure Card takes the glass effect
@@ -139,9 +138,6 @@ class _ListReportPageState extends State<ListReportsPage> {
                                   children: [
                                     Text('Criador: ${alertData.creator}'),
                                     Text('Localização: ${alertData.location}'),
-                                    Text('Descrição:'),
-                                    Text(alertData.description,
-                                        style: textTheme.bodyText1),
                                     Text(
                                         'Data/Hora: ${DateFormat('HH:mm - dd-MM-yyyy').format(
                                       DateTime.fromMillisecondsSinceEpoch(

@@ -129,7 +129,7 @@ class _SalaPageState extends State<SalaPage> {
                       context: context,
                       initialDate: _selectedDay,
                       firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(Duration(days: 7)), // Can select up to a year into the future.
+                      lastDate: DateTime.now().add(Duration(days: 6)), // Can select up to a year into the future.
                     );
                     
                     if (date != null) {

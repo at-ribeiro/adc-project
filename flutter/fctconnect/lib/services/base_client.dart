@@ -876,7 +876,7 @@ class BaseClient {
     );
 
     if (response.statusCode == 200) {
-      return response;
+      return response.statusCode;
     } else {
       // Throw exception
       throw Exception(

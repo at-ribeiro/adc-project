@@ -35,11 +35,15 @@ class _PostCreatorState extends State<PostCreator> {
   String? _type;
   PlatformFile? _videoFile;
 
+  bool _isLoading = false;
+
   VideoPlayerController? _videoPlayerController;
 
   bool _isLoadingToken = true;
 
   final TextEditingController _postTextController = TextEditingController();
+  int _characterCount = 0;
+  final int _maxCharacterLimit = 300;
 
   late ScrollController _scrollController;
   GoogleMapController? _mapController;
@@ -81,7 +85,8 @@ class _PostCreatorState extends State<PostCreator> {
       setState(() {
         _imageData = imageData;
         _fileName = fileName;
-        _mediaType = fileExtension;
+        _mediaType =
+            fileExtension; // Assign the file extension as the media type
         _type = mediaType;
       });
 
@@ -94,6 +99,38 @@ class _PostCreatorState extends State<PostCreator> {
   }
 
   bool _isImageLoading = false;
+
+  Future<int> _post() async {
+    try {
+      print('Starting post...');
+      int result = await PostActions.doPost(
+          _postTextController.text,
+          _imageData,
+          _fileName,
+          _mediaType,
+          _type,
+          _token.username,
+          _token.tokenID);
+
+      print('Post completed with result: $result');
+      return result;
+    } catch (e) {
+      print('Error posting: $e');
+      return 500;
+    }
+  }
+
+  void _onMapTap(LatLng position) {
+    setState(() {
+      _markers = {
+        Marker(
+          markerId: MarkerId('Evento'),
+          position: position,
+          // Set other marker properties as needed
+        ),
+      };
+    });
+  }
 
   Widget _buildMediaPreview() {
     if (_type == 'image' && _imageData != null) {
@@ -151,7 +188,7 @@ class _PostCreatorState extends State<PostCreator> {
   Widget build(BuildContext context) {
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
           if (mounted)
             setState(() {
               _token = token;
@@ -171,8 +208,15 @@ class _PostCreatorState extends State<PostCreator> {
                     children: <Widget>[
                       TextField(
                         maxLines: 6,
+                        maxLength: _maxCharacterLimit,
+                        onChanged: (text) {
+                          setState(() {
+                            _characterCount = text.length;
+                          });
+                        },
                         decoration: InputDecoration(
                           hintText: "O que se passa no campus?",
+                          counterText: '$_characterCount/$_maxCharacterLimit',
                         ),
                         controller: _postTextController,
                       ),
@@ -226,7 +270,7 @@ class _PostCreatorState extends State<PostCreator> {
                   if (imageDataMap.isNotEmpty) {
                     _imageData = imageDataMap['fileData'];
                     _fileName = imageDataMap['fileName'];
-                    _mediaType = imageDataMap['mediaType'];
+                    _mediaType = imageDataMap['mediaType'].toString();
                     _type = imageDataMap['type'];
                   }
                 },
@@ -237,77 +281,68 @@ class _PostCreatorState extends State<PostCreator> {
             ),
           SizedBox(width: 30),
           FloatingActionButton(
-            onPressed: _isPosting ? null : doPost,
-            child: Icon(Icons.publish),
-            tooltip: 'Publicar',
+            onPressed: () async {
+              setState(() {
+                _isLoading = true; // Show the loading circle
+              });
+
+              // Perform your post logic here
+              if (_postTextController.text.isNotEmpty) {
+                if (_postTextController.text.length > _maxCharacterLimit) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => ErrorDialog(
+                          'O texto não pode ter mais de $_maxCharacterLimit caracteres.',
+                          'Ok',
+                          context));
+                  return;
+                }
+                try {
+                  int response = await PostActions.doPost(
+                      _postTextController.text,
+                      _imageData,
+                      _fileName,
+                      _mediaType,
+                      _type,
+                      _token.username,
+                      _token.tokenID);
+
+                  if (response == 200 || response == 204) {
+                    context.go(Paths.homePage);
+                  } else {
+                    print('Error creating post.=====' + response.toString());
+                    showDialog(
+                        context: context,
+                        builder: (context) => ErrorDialog(
+                            'Erro ao criar evento.', 'Ok', context));
+                  }
+                } catch (e) {
+                  showDialog(
+                      context: context,
+                      builder: (context) =>
+                          ErrorDialog('Erro ao criar post.', 'Ok', context));
+                } finally {
+                  setState(() {
+                    _isLoading = false; // Hide the loading circle
+                  });
+                }
+              } else {
+                showDialog(
+                    context: context,
+                    builder: (context) => ErrorDialog(
+                        'Verifique se escreveu alguma coisa no Post.',
+                        'Ok',
+                        context));
+              }
+            },
+            child: _isLoading
+                ? CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ) // Show the loading circle
+                : Icon(Icons.upload),
           ),
         ],
       ),
     );
-  }
-
-  // void doPost() async {
-  //   print('doPost called...');
-  //   setState(() {
-  //     _isPosting = true;
-  //   });
-
-  //   try {
-  //     int result = await _post();
-  //     print('doPost result: $result');
-  //     // rest of your code...
-  //   } catch (e) {
-  //     print('doPost error: $e');
-  //     // rest of your code...
-  //   } finally {
-  //     setState(() {
-  //       _isPosting = false;
-  //     });
-  //   }
-  // }
-
-  FutureBuilder doPost() {
-    return FutureBuilder<int>(
-      future: _post(), // this will hold the future returned by doPost
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // return a button that indicates loading while the future is not completed
-          return ElevatedButton(
-            onPressed: null,
-            child: CircularProgressIndicator(),
-          );
-        } else if (snapshot.hasError) {
-          return ErrorDialog('Erro ao publicar evento', 'Ok', context);
-        } else {
-          if (snapshot.data == 200) {
-            context.go(Paths.homePage);
-            return Container();
-          } else {
-            return ErrorDialog('Erro ao publicar evento', 'Ok', context);
-          }
-        }
-      },
-    );
-  }
-
-  Future<int> _post() async {
-    print('Starting post...');
-    int result = await PostActions.doPost(_postTextController.text, _imageData,
-        _fileName, _mediaType, _type, _token.username, _token.tokenID);
-
-    print('Post completed with result: $result');
-    return result;
-  }
-
-  void _onMapTap(LatLng position) {
-    setState(() {
-      _markers = {
-        Marker(
-          markerId: MarkerId('Evento'),
-          position: position,
-          // Set other marker properties as needed
-        ),
-      };
-    });
   }
 }

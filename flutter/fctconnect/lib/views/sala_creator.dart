@@ -34,8 +34,6 @@ class _SalaCreatorState extends State<SalaCreator> {
   @override
   void initState() {
     _scrollController = ScrollController();
-    //_startingDate = DateTime.now();
-    //_endingDate = DateTime.now();
     super.initState();
   }
 
@@ -44,7 +42,6 @@ class _SalaCreatorState extends State<SalaCreator> {
     _titleController.dispose();
     _descriptionController.dispose();
     _capacityController.dispose();
-    //_endingDateController.dispose();
     super.dispose();
   }
 
@@ -53,11 +50,12 @@ class _SalaCreatorState extends State<SalaCreator> {
     if (_isLoadingToken) {
       return TokenGetterWidget(onTokenLoaded: (Token token) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted)
+          if (mounted) {
             setState(() {
               _token = token;
               _isLoadingToken = false;
             });
+          }
         });
       });
     } else {

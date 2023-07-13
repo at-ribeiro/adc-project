@@ -67,23 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
         extendBody: true,
         body: Stack(
           children: [
-            // Here's where you add the gradient
-            // Positioned.fill(
-            //   child: DecoratedBox(decoration: Style.kGradientDecoration),
-            // ),
-            // Positioned.fill(
-            //   child: BackdropFilter(
-            //     filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            //     child: Container(
-            //       color: Colors.transparent,
-            //     ),
-            //   ),
-            // ),
             Center(
-              // Center the ContentBody widget
               child: Container(
-                constraints: BoxConstraints(maxWidth: 800), // Set max width
-                child: ContentBody(),
+                constraints: BoxConstraints(maxWidth: 800),
+                child: _posts.isEmpty ? buildEmptyPostsText() : contentBody(),
               ),
             ),
           ],
@@ -91,6 +78,15 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
   }
+
+  Widget buildEmptyPostsText() {
+  return Center(
+    child: Text(
+      'Parece que não segues ninguém com posts!',
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    ),
+  );
+}
 
   Widget _loadProfilePic(FeedData post) {
     if (post == null || post.profilePic.isEmpty) {
@@ -108,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Widget ContentBody() {
+  Widget contentBody() {
     return RefreshIndicator(
       onRefresh: _refreshPosts,
       child: ListView.builder(

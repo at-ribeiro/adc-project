@@ -118,7 +118,7 @@ class _EventViewState extends State<EventView> {
                                               ),
                                               const SizedBox(height: 8.0),
                                               Text(
-                                                'Start Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                'Data de Inicio: ${DateFormat('dd-MM-yyyy HH:mm').format(
                                                   DateTime
                                                       .fromMillisecondsSinceEpoch(
                                                     event.start,
@@ -130,7 +130,7 @@ class _EventViewState extends State<EventView> {
                                               ),
                                               const SizedBox(height: 8.0),
                                               Text(
-                                                'End Date & Time: ${DateFormat('dd-MM-yyyy HH:mm:ss').format(
+                                                'Data de Fim: ${DateFormat('dd-MM-yyyy HH:mm').format(
                                                   DateTime
                                                       .fromMillisecondsSinceEpoch(
                                                     event.end,
