@@ -15,6 +15,6 @@ De momento disponível para android via apk e no website.
 | --- | --- |
 | <img src="https://github.com/at-ribeiro/adc-project/assets/93600404/02ab87fa-b99c-4d99-885c-a0a9052622a3" width="200" height="400"> | <img src="URL_OF_FOURTH_IMAGE" width="200" height="400"> |
 
-![Screenshot_20230708_222000](https://github.com/at-ribeiro/adc-project/assets/93600404/4afd20e7-e7df-4c45-b30e-08368841130f)
-![Screenshot_20230712_161526](https://github.com/at-ribeiro/adc-project/assets/93600404/fb8d324a-0608-4e09-92c0-b775911458a4)
-![Screenshot_20230712_182044](https://github.com/at-ribeiro/adc-project/assets/93600404/68617378-7244-4035-bda2-e9f34bb4db4c)
+| <img src="https://github.com/at-ribeiro/adc-project/assets/93600404/4afd20e7-e7df-4c45-b30e-08368841130f" width="200" height="400"> | <img src="https://github.com/at-ribeiro/adc-project/assets/93600404/fb8d324a-0608-4e09-92c0-b775911458a4" width="200" height="400"> |
+| --- | --- |
+| <img src="https://github.com/at-ribeiro/adc-project/assets/93600404/68617378-7244-4035-bda2-e9f34bb4db4c" width="200" height="400"> | |
