@@ -13,3 +13,6 @@ De momento disponível para android via apk e no website:
 
 
 ![post1](https://github.com/at-ribeiro/adc-project/assets/93600404/587aafc9-ff37-492a-b0ca-bb05d624611b)
+![WhatsApp Image 2023-06-28 at 13 42 37](https://github.com/at-ribeiro/adc-project/assets/93600404/69b9e968-44f0-486c-8ca4-a6a1bfbcb089)
+![WhatsApp Image 2023-06-28 at 13 42 41](https://github.com/at-ribeiro/adc-project/assets/93600404/58091a30-ebc2-4f4c-82ad-3e2bd8487bc5)
+![WhatsApp Image 2023-06-28 at 13 42 33](https://github.com/at-ribeiro/adc-project/assets/93600404/02ab87fa-b99c-4d99-885c-a0a9052622a3)
