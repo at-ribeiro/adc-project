@@ -10,3 +10,6 @@ Servidor com host na Google Cloud.
 Pequena aplicação voltada para membros e futuros membros de uma faculdade, no caso da FCT NOVA.
 
 De momento disponível para android via apk e no website:
+
+
+![post1](https://github.com/at-ribeiro/adc-project/assets/93600404/587aafc9-ff37-492a-b0ca-bb05d624611b)
